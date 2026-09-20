@@ -1,3 +1,4 @@
 {
-	"name": "music"
+  "name": "music",
+  "type": "module"
 }

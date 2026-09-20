@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
 
 import DbManager from "@shared-classes/DbManager"
@@ -10,10 +10,10 @@ import SharedMiddlewares from "@shared-middlewares"
 import GroupChatChannelController from "@classes/GroupChatChannelController"
 import DMChatChannelController from "@classes/DMChatChannelController"
 
-export default class API extends Server {
+export class API extends Server {
 	static refName = "chats"
 	static listenPort = 3004
-	static routesPath = __dirname + "/routes"
+	static routesPath = import.meta.dirname + "/routes"
 
 	static useMiddlewares = ["logs"]
 	static bypassCors = true
@@ -52,4 +52,4 @@ export default class API extends Server {
 	}
 }
 
-Boot(API)
+export default API

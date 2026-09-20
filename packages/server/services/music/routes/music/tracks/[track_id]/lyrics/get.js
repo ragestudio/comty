@@ -1,4 +1,4 @@
-import { TrackLyric } from "@db_models"
+import TrackLyric from "@db_models/trackLyrics"
 
 function secondsToMs(number) {
 	return number * 1000

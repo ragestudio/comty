@@ -1,4 +1,5 @@
-import { User, UserFollow } from "@db_models"
+import User from "@db_models/user"
+import UserFollow from "@db_models/userFollow"
 
 export default async (payload = {}) => {
 	const { user_id, data = false, limit = 50, page = 0 } = payload

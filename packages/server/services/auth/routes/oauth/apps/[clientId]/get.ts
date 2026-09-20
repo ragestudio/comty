@@ -1,6 +1,6 @@
 import type API from "@services/auth/auth.service"
-//@ts-ignore
-import { OidcApp } from "@db_models"
+
+import OidcApp from "@db_models/oidc_apps"
 
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],

@@ -1,4 +1,5 @@
-import { User, NFCTag } from "@db_models"
+import NFCTag from "@db_models/NFCTags"
+import User from "@db_models/user"
 
 export default async (req, res) => {
 	let tag = await NFCTag.findOne({

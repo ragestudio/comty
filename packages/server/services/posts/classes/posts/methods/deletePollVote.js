@@ -1,4 +1,4 @@
-import { VotePoll } from "@db_models"
+import VotePoll from "@db_models/votePoll"
 
 export default async (payload = {}) => {
 	if (!payload.user_id) {

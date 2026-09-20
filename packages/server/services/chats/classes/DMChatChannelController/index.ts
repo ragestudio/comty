@@ -70,7 +70,7 @@ export default class DMChatChannelController {
 	}
 
 	// TODO: implement pagination
-	rooms = async (userId, { limit = 20, offset = 0 } = {}) => {
+	rooms = async (userId: string, { limit = 20, offset = 0 } = {}) => {
 		let activity = await ActivityModel.find(
 			{
 				user_id: userId,

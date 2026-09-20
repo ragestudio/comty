@@ -13,7 +13,7 @@ export default class GroupChatChannelController {
 	server: Server
 
 	get = async (group_id: string, channel_id: string, user_id: string) => {
-		const group = await Groups.get(group_id, user_id)
+		const group = await Groups.get(group_id)
 
 		if (!group) {
 			throw new OperationError(404, "Group not found")

@@ -1,4 +1,4 @@
-import { Config } from "@db_models"
+import Config from "@db_models/config"
 
 export default (req, res, next) => {
 	const requestedPath = `${req.method.toLowerCase()}${req.path.toLowerCase()}`

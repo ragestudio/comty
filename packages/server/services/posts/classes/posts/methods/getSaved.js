@@ -1,4 +1,4 @@
-import { PostSave } from "@db_models"
+import PostSave from "@db_models/postSave"
 import GetData from "./data"
 
 export default async (payload = {}) => {

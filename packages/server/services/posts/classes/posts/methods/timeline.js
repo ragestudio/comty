@@ -1,4 +1,4 @@
-import { UserFollow } from "@db_models"
+import UserFollow from "@db_models/userFollow"
 
 import GetPostData from "./data"
 

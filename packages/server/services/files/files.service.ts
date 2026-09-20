@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -44,7 +44,7 @@ export class API extends Server {
 		multipartUpload: null as Multipart,
 		s3: new S3Manager(),
 		tasker: new TaskQueueManager({
-			workersPath: `${__dirname}/queues`,
+			workersPath: `${import.meta.dirname}/queues`,
 		}),
 	}
 
@@ -106,4 +106,4 @@ export class API extends Server {
 	}
 }
 
-Boot(API)
+export default API

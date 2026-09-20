@@ -1,5 +1,5 @@
-//@ts-ignore
-import { User } from "@db_models"
+import User from "@db_models/user"
+
 import AuthToken from "@shared-classes/AuthToken"
 import { buildClaims } from "../utils"
 

@@ -1,4 +1,4 @@
-import { FeaturedWallpaper } from "@db_models"
+import FeaturedWallpaper from "@db_models/featuredWallpaper"
 
 export default async (req) => {
 	let {

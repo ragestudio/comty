@@ -1,4 +1,4 @@
-import { Post } from "@db_models"
+import Post from "@db_models/post"
 
 const classifyAPI = "https://vision-service.ragestudio.net"
 

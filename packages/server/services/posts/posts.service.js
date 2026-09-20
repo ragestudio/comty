@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -7,7 +7,7 @@ import TaskQueueManager from "@shared-classes/TaskQueueManager"
 
 import SharedMiddlewares from "@shared-middlewares"
 
-export default class API extends Server {
+export class API extends Server {
 	static refName = "posts"
 	static listenPort = 3001
 
@@ -30,7 +30,7 @@ export default class API extends Server {
 	}
 
 	queuesManager = new TaskQueueManager({
-		workersPath: `${__dirname}/queues`,
+		workersPath: `${import.meta.dirname}/queues`,
 	})
 
 	initialize = [
@@ -48,4 +48,4 @@ export default class API extends Server {
 	}
 }
 
-Boot(API)
+export default API

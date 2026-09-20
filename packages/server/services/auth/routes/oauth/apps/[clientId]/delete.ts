@@ -1,6 +1,6 @@
-import type API from "@services/auth/auth.service"
+import API from "@services/auth/auth.service"
 
-export default defineRoute<API>()({
+export default defineRoute(API)({
 	useMiddlewares: ["withAuthentication"],
 	useContexts: ["oauth"] as const,
 	fn: async (req, res, ctx) => {

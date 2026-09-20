@@ -1,4 +1,4 @@
-import { RecentActivity } from "@db_models"
+import RecentActivity from "@db_models/recentActivity"
 
 import TrackClass from "@classes/track"
 

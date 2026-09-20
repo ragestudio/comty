@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -7,7 +7,7 @@ import RedisClient from "@shared-classes/RedisClient"
 import SharedMiddlewares from "@shared-middlewares"
 import LimitsClass from "@shared-classes/Limits"
 
-export default class API extends Server {
+export class API extends Server {
 	static refName = "music"
 	static listenPort = 3003
 
@@ -46,4 +46,4 @@ export default class API extends Server {
 	}
 }
 
-Boot(API)
+export default API

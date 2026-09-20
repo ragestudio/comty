@@ -1,5 +1,5 @@
 // TODO: Support SMS 2fa
-import { User } from "@db_models"
+import User from "@db_models/user"
 import templates from "../templates"
 
 export default async (ctx, data) => {

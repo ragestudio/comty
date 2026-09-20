@@ -1,4 +1,6 @@
-import { Post, PostLike, PostSave } from "@db_models"
+import Post from "@db_models/post"
+import PostLike from "@db_models/postLike"
+import PostSave from "@db_models/postSave"
 
 export default async (payload = {}) => {
 	let { post_id } = payload

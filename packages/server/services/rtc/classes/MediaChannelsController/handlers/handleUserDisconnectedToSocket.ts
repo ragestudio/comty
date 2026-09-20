@@ -1,4 +1,4 @@
-import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
+import type { RtEngineContext } from "linebridge/classes/RtEngine/types"
 import type MediaChannelsController from "../index"
 
 const GRACE_PERIOD_MS = 15000

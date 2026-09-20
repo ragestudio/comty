@@ -1,14 +1,14 @@
-import { Server } from "linebridge/src"
-import path from "path"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import UserConnections from "@shared-classes/UserConnections"
+import resolveDbModelsPath from "@shared-utils/resolveDbModelsPath"
 
 import SharedMiddlewares from "@shared-middlewares"
 
-export default class API extends Server {
+export class API extends Server {
 	static refName = "main"
 	static listenPort = 3000
 
@@ -27,7 +27,7 @@ export default class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		scylla: (global.scylla = new ScyllaDb({
-			modelsPath: path.resolve(global["paths"].root, "../shared/db"),
+			modelsPath: resolveDbModelsPath(),
 		})),
 		redis: RedisClient(),
 		userConnections: new UserConnections(this),
@@ -43,4 +43,4 @@ export default class API extends Server {
 	]
 }
 
-Boot(API)
+export default API

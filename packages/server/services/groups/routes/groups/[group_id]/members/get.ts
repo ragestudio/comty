@@ -1,11 +1,14 @@
-import { User } from "@db_models"
+import type { PaginatedResponse } from "@comty/shared/types/pagination"
+import type { Member } from "@comty/shared/types/spaces/member"
+
+import User from "@db_models/user"
 import Groups from "@shared-classes/Spaces/Groups"
 import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
-	fn: async (req) => {
+	fn: async (req): Promise<PaginatedResponse<Member>> => {
 		const { limit = 50, offset } = req.query
 
 		const group = await Groups.get(req.params.group_id, req.auth.user_id)
@@ -28,10 +31,13 @@ export default {
 			group._id,
 		)
 
-		let items = await GroupMemberships.getByGroupId(group._id, {
-			limit: limit,
-			offset: offset,
-		})
+		let items = (
+			await GroupMemberships.getAllByGroupId(group._id, {
+				limit: limit,
+				offset: offset,
+				raw: false,
+			})
+		).map((i) => i.toRaw()) as unknown as Member[]
 
 		items = items.map((item) => {
 			if (!Array.isArray(item.roles)) {
@@ -60,14 +66,21 @@ export default {
 			},
 		}).lean()
 
-		users = new Map(users.map((user) => [user._id.toString(), user]))
+		const usersMap = new Map(
+			users.map((user) => [user._id.toString(), user]),
+		)
 
-		items = items.map((item) => {
-			return {
-				...item.toRaw(),
-				user: users.get(item.user_id),
+		for (const item of items) {
+			const userEntry = usersMap.get(item.user_id)
+
+			if (userEntry) {
+				// @ts-ignore
+				item.user = {
+					user_id: String(userEntry._id),
+					...userEntry,
+				}
 			}
-		})
+		}
 
 		return {
 			total_items: totalMembers,

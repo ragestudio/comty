@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -6,7 +6,7 @@ import RedisClient from "@shared-classes/RedisClient"
 
 import SharedMiddlewares from "@shared-middlewares"
 
-class API extends Server {
+export class API extends Server {
 	static refName = "search"
 	static listenPort = 3010
 
@@ -30,4 +30,4 @@ class API extends Server {
 	]
 }
 
-Boot(API)
+export default API

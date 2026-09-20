@@ -1,5 +1,5 @@
 import PostClass from "@classes/posts"
-import { Post } from "@db_models"
+import Post from "@db_models/post"
 
 const AllowedFields = [
 	"message",

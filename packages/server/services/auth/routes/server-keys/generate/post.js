@@ -1,4 +1,4 @@
-import { ServerKeys } from "@db_models"
+import ServerKeys from "@db_models/serverKeys"
 import crypto from "crypto"
 
 export default {

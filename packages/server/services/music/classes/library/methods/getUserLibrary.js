@@ -1,4 +1,4 @@
-import { MusicLibraryItem } from "@db_models"
+import MusicLibraryItem from "@db_models/musicLibraryItem"
 
 import Library from ".."
 

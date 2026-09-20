@@ -1,5 +1,5 @@
 import type MediaChannelsController from "../index"
-import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
+import type { RtEngineContext } from "linebridge/classes/RtEngine/types"
 
 export default async function (
 	this: MediaChannelsController,

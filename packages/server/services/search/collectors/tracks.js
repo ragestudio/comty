@@ -1,4 +1,4 @@
-import { Track } from "@db_models"
+import Track from "@db_models/track"
 
 export default {
 	key: "tracks",

@@ -1,4 +1,6 @@
-import { User, PasswordRecover } from "@db_models"
+import User from "@db_models/user"
+import PasswordRecover from "@db_models/passwordRecover"
+
 import AuthToken from "@shared-classes/AuthToken"
 
 import obscureEmail from "@shared-utils/obscureEmail"

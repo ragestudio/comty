@@ -1,4 +1,4 @@
-import { MusicRelease } from "@db_models"
+import MusicRelease from "@db_models/musicRelease"
 
 export default async (req) => {
 	const { limit = 50, page = 0, user_id } = req.query

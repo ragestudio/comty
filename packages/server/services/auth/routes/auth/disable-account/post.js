@@ -1,5 +1,5 @@
 import AccountClass from "@classes/account"
-import { OperationLog } from "@db_models"
+import OperationLog from "@db_models/operationLog"
 
 export default {
 	useMiddlewares: ["withAuthentication"],

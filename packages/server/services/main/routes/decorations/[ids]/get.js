@@ -1,4 +1,4 @@
-import { Decorations } from "@db_models"
+import Decorations from "@db_models/decorations"
 
 export default async (req) => {
 	let { ids } = req.params

@@ -1,4 +1,5 @@
-import { User, UserFollow } from "@db_models"
+import User from "@db_models/user"
+import UserFollow from "@db_models/userFollow"
 
 export default async (payload = {}) => {
 	let { user_id, from_user_id, to } = payload

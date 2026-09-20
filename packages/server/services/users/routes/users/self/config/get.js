@@ -1,4 +1,4 @@
-import { UserConfig } from "@db_models"
+import UserConfig from "@db_models/userConfig"
 
 export default {
 	useMiddlewares: ["withAuthentication"],

@@ -1,4 +1,4 @@
-import { Post } from "@db_models"
+import Post from "@db_models/post"
 import stage from "./stage"
 
 export default async (payload = {}) => {

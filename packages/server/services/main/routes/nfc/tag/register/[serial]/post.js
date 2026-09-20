@@ -1,4 +1,4 @@
-import { NFCTag } from "@db_models"
+import NFCTag from "@db_models/NFCTags"
 
 const allowedUpdateFields = [
 	"user_id",

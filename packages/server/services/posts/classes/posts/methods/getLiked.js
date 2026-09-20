@@ -1,4 +1,4 @@
-import { PostLike } from "@db_models"
+import PostLike from "@db_models/postLike"
 import GetData from "./data"
 
 export default async (payload = {}) => {

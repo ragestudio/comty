@@ -1,5 +1,4 @@
-//@ts-ignore
-import { OidcApp } from "@db_models"
+import OidcApp from "@db_models/oauth_code"
 
 export default async function (userId: string, clientId: string) {
 	const result = await OidcApp.deleteOne({

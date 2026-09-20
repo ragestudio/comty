@@ -1,3 +1,4 @@
 {
-	"name": "groups"
+  "name": "groups",
+  "type": "module"
 }

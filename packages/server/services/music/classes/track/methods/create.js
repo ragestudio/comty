@@ -1,4 +1,4 @@
-import { Track } from "@db_models"
+import Track from "@db_models/track"
 import requiredFields from "@shared-utils/requiredFields"
 import * as FFMPEGLib from "@shared-classes/FFMPEGLib"
 

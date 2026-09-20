@@ -1,6 +1,6 @@
-import type { RtEngineContext } from "linebridge/src/classes/RtEngine/types"
+import type { RtEngineContext } from "linebridge/classes/RtEngine/types"
 
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 import ScyllaDb from "@ragestudio/scylla-odm"
 
 import DbManager from "@shared-classes/DbManager"
@@ -11,7 +11,7 @@ import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
 
 import MediaChannelsController from "@classes/MediaChannelsController"
 
-export default class API extends Server {
+export class API extends Server {
 	static refName = "rtc"
 	static listenPort = 3011
 
@@ -71,4 +71,4 @@ export default class API extends Server {
 	}
 }
 
-Boot(API)
+export default API

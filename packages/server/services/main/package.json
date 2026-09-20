@@ -1,6 +1,7 @@
 {
-	"name": "main",
-	"dependencies": {
-		"@octokit/rest": "^20.0.2"
-	}
+  "name": "main",
+  "dependencies": {
+    "@octokit/rest": "^20.0.2"
+  },
+  "type": "module"
 }

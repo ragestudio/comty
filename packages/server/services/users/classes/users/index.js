@@ -1,7 +1,13 @@
+import dataMethod from "./method/data.js"
+import toggleFollowMethod from "./method/toggleFollow.js"
+import getFollowersMethod from "./method/getFollowers.js"
+import resolveUserIdMethod from "./method/resolveUserId.js"
+import updateMethod from "./method/update.js"
+
 export default class Users {
-    static data = require("./method/data").default
-    static toggleFollow = require("./method/toggleFollow").default
-    static getFollowers = require("./method/getFollowers").default
-    static resolveUserId = require("./method/resolveUserId").default
-    static update = require("./method/update").default
+    static data = dataMethod
+    static toggleFollow = toggleFollowMethod
+    static getFollowers = getFollowersMethod
+    static resolveUserId = resolveUserIdMethod
+    static update = updateMethod
 }

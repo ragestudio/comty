@@ -1,4 +1,4 @@
-import { Extension } from "@db_models"
+import Extension from "@db_models/extension"
 
 export default async function resolve(payload) {
 	let { user_id, pkg } = payload

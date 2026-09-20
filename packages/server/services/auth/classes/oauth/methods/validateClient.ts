@@ -1,10 +1,10 @@
-//@ts-ignore
-import { OidcApp } from "@db_models"
+import type { OidcApp } from "@db_models/oidc_apps"
+import OidcAppModel from "@db_models/oidc_apps"
 
 export default async function (clientId: string, clientSecret?: string) {
-	const client = (await OidcApp.findOne({ client_id: clientId })
+	const client = (await OidcAppModel.findOne({ client_id: clientId })
 		.select("+client_secret")
-		.lean()) as OidcApp
+		.lean()) as unknown as OidcApp
 
 	if (!client) {
 		return null

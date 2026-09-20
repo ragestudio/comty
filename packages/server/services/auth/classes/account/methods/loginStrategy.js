@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt"
-import { User, PasswordHash } from "@db_models"
+
+import User from "@db_models/user"
+import PasswordHash from "@db_models/passwordHash"
 
 export default async ({ username, password }) => {
 	let isEmail = username.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)

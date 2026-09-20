@@ -1,15 +1,15 @@
 import fs from "fs"
 
-function createRoutesFromDirectory(startFrom, directoryPath, router) {
+async function createRoutesFromDirectory(startFrom, directoryPath, router) {
     const files = fs.readdirSync(directoryPath)
 
-    files.forEach((file) => {
+    for (const file of files) {
         const filePath = `${directoryPath}/${file}`
 
         const stat = fs.statSync(filePath)
 
         if (stat.isDirectory()) {
-            createRoutesFromDirectory(startFrom, filePath, router)
+            await createRoutesFromDirectory(startFrom, filePath, router)
         } else if (file.endsWith(".js") || file.endsWith(".jsx") || file.endsWith(".ts") || file.endsWith(".tsx")) {
             let splitedFilePath = filePath.split("/")
 
@@ -31,13 +31,13 @@ function createRoutesFromDirectory(startFrom, directoryPath, router) {
                 route = `/${route}`
             }
 
-            let handler = require(filePath)
+            let handler = await import(filePath)
 
             handler = handler.default || handler
 
             router[method](route, handler)
         }
-    })
+    }
 
     return router
 }

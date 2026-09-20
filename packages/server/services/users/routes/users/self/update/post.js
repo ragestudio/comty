@@ -1,5 +1,5 @@
 import UserClass from "@classes/users"
-import { User } from "@db_models"
+import User from "@db_models/user"
 
 const AllowedPublicUpdateFields = [
 	"public_name",

@@ -1,4 +1,4 @@
-import { Badge } from "@db_models"
+import Badge from "@db_models/badge"
 
 export default async (req) => {
 	let { ids } = req.params

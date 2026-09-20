@@ -1,7 +1,1 @@
-{
-	"name": "ems",
-	"dependencies": {
-		"handlebars": "^4.7.9",
-		"nodemailer": "^8.0.5"
-	}
-}
+{"name":"ems","type":"module","dependencies":{"handlebars":"^4.7.9","nodemailer":"^10.0.10"}}

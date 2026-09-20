@@ -1,4 +1,6 @@
-import { FavStickersSet, StickersSet, Sticker } from "@db_models"
+import FavStickersSet from "@db_models/favSticker"
+import StickersSet from "@db_models/stickerSet"
+import Sticker from "@db_models/sticker"
 
 export default {
 	useMiddlewares: ["withAuthentication"],

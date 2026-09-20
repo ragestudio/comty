@@ -1,7 +1,8 @@
 {
-	"name": "posts",
-	"dependencies": {
-		"luxon": "^3.7.2",
-		"moment-timezone": "^0.5.48"
-	}
+  "name": "posts",
+  "dependencies": {
+    "luxon": "^3.7.2",
+    "moment-timezone": "^0.5.48"
+  },
+  "type": "module"
 }

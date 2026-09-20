@@ -1,4 +1,6 @@
-import { VotePoll, Post } from "@db_models"
+import Post from "@db_models/post"
+import VotePoll from "@db_models/votePoll"
+
 import stage from "./stage"
 
 // TODO: Implement logic to handle vote poll

@@ -1,4 +1,4 @@
-import { Track } from "@db_models"
+import Track from "@db_models/track"
 
 const allowedFields = ["title", "artist", "album", "cover", "public"]
 

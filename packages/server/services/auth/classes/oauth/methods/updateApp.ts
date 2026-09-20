@@ -1,5 +1,4 @@
-//@ts-ignore
-import { OidcApp } from "@db_models"
+import OidcApp from "@db_models/oidc_apps"
 
 export default async function (
 	userId: string,

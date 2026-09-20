@@ -1,4 +1,4 @@
-import { UserConfig } from "@db_models"
+import UserConfig from "@db_models/userConfig"
 import lodash from "lodash"
 
 const baseConfig = [

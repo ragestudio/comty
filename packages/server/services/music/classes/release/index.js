@@ -1,4 +1,6 @@
-import { MusicRelease, Track } from "@db_models"
+import Track from "@db_models/track"
+import MusicRelease from "@db_models/musicRelease"
+
 import TrackClass from "../track"
 
 const AllowedUpdateFields = [

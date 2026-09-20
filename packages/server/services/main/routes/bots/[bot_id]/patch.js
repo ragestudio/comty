@@ -1,4 +1,5 @@
-import { Bot, User } from "@db_models"
+import User from "@db_models/user"
+import Bot from "@db_models/bot"
 
 export default {
 	useMiddlewares: ["withAuth"],

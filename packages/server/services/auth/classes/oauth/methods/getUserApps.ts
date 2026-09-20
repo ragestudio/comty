@@ -1,6 +1,5 @@
-//@ts-ignore
-import { OidcApp } from "@db_models"
+import OidcAppModel from "@db_models/oidc_apps"
 
 export default async function (userId: string) {
-	return await OidcApp.find({ owner_id: userId }).lean()
+	return await OidcAppModel.find({ owner_id: userId }).lean()
 }

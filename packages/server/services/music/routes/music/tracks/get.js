@@ -1,4 +1,4 @@
-import { Track } from "@db_models"
+import Track from "@db_models/track"
 
 export default async (req) => {
 	const { limit = 50, page = 0, user_id } = req.query

@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
 
@@ -8,7 +8,7 @@ import RedisClient from "@shared-classes/RedisClient"
 import SharedMiddlewares from "@shared-middlewares"
 import UserConnections from "@shared-classes/UserConnections"
 
-export default class API extends Server {
+export class API extends Server {
 	static refName = "groups"
 	static listenPort = 3012
 
@@ -41,4 +41,4 @@ export default class API extends Server {
 	]
 }
 
-Boot(API)
+export default API

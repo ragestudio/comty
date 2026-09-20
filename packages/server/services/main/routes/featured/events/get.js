@@ -1,4 +1,4 @@
-import { Event } from "@db_models"
+import Event from "@db_models/event"
 
 export default async (req) => {
 	const events = await Event.find({

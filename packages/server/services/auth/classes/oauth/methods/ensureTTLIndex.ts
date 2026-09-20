@@ -1,5 +1,4 @@
-//@ts-ignore
-import { OauthCode } from "@db_models"
+import OauthCode from "@db_models/oauth_code"
 
 export default async function () {
 	try {

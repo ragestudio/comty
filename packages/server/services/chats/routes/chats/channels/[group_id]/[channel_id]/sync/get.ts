@@ -15,7 +15,6 @@ export default defineRoute<API>()({
 		await ctx.groupChannels.get(
 			group_id,
 			channel_id,
-			// @ts-ignore
 			req.auth.session.user_id,
 		)
 

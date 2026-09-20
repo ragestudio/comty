@@ -1,4 +1,4 @@
-import { Extension } from "@db_models"
+import Extension from "@db_models/extension"
 
 import fs from "node:fs"
 import path from "node:path"

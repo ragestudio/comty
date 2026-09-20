@@ -1,5 +1,10 @@
 import bcrypt from "bcrypt"
-import { User, OperationLog, PasswordRecover, PasswordHash } from "@db_models"
+
+import User from "@db_models/user"
+import OperationLog from "@db_models/operationLog"
+import PasswordHash from "@db_models/passwordHash"
+import PasswordRecover from "@db_models/passwordRecover"
+
 import Account from "@classes/account"
 import AuthToken from "@shared-classes/AuthToken"
 

@@ -1,6 +1,6 @@
-import type API from "@services/auth/auth.service"
+import API from "@services/auth/auth.service"
 
-export default defineRoute<API>()({
+export default defineRoute(API)({
 	fn: async (req, res) => {
 		const baseUrl =
 			process.env.OIDC_ISSUER_URL || `http://indev-api.comty.app`

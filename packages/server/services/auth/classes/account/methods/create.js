@@ -1,9 +1,12 @@
 import bcrypt from "bcrypt"
-import { User, PasswordHash } from "@db_models"
+
+import User from "@db_models/user"
+import PasswordHash from "@db_models/passwordHash"
+
 import Account from "@classes/account"
 
 import requiredFields from "@shared-utils/requiredFields"
-import verifyTurnstileToken from "@utils/verifyTurnstileToken"
+import verifyTurnstileToken from "../../../utils/verifyTurnstileToken"
 
 export default async (payload) => {
 	requiredFields(["username", "password", "email"], payload)

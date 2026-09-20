@@ -1,4 +1,4 @@
-import { Playlist } from "@db_models"
+import Playlist from "@db_models/playlist"
 
 export default async (id, update) => {
 	let playlist = await Playlist.findById(id).lean()

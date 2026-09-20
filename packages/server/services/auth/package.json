@@ -1,4 +1,5 @@
 {
-	"name": "auth",
-	"dependencies": {}
+  "name": "auth",
+  "dependencies": {},
+  "type": "module"
 }

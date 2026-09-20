@@ -1,4 +1,4 @@
-import { MusicLibraryItem } from "@db_models"
+import MusicLibraryItem from "@db_models/musicLibraryItem"
 
 export default async (user_id, item_id, kind) => {
 	if (!user_id) {

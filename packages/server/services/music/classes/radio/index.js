@@ -1,4 +1,4 @@
-import { RadioProfile } from "@db_models"
+import RadioProfile from "@db_models/radioProfile"
 
 async function scanKeysWithPagination(pattern, count = 10, cursor = "0") {
 	const result = await global.redis.scan(

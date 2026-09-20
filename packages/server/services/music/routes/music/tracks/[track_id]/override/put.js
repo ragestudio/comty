@@ -1,4 +1,4 @@
-import { TrackOverride } from "@db_models"
+import TrackOverride from "@db_models/trackOverride"
 
 export default {
 	useMiddlewares: ["withAuthentication", "onlyAdmin"],

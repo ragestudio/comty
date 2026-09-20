@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -6,9 +6,9 @@ import RedisClient from "@shared-classes/RedisClient"
 
 import SharedMiddlewares from "@shared-middlewares"
 
-export default class API extends Server {
+export class API extends Server {
 	static refName = "users"
-	static routesPath = `${__dirname}/routes`
+	static routesPath = `${import.meta.dirname}/routes`
 	static listenPort = 3008
 
 	static bypassCors = true
@@ -36,4 +36,4 @@ export default class API extends Server {
 	]
 }
 
-Boot(API)
+export default API

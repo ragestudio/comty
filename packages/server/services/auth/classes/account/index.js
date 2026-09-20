@@ -1,10 +1,19 @@
+import createMethod from "./methods/create.js"
+import loginStrategyMethod from "./methods/loginStrategy.js"
+import changePasswordMethod from "./methods/changePassword.js"
+import usernameMeetPolicyMethod from "./methods/usernameMeetPolicy.js"
+import passwordMeetPolicyMethod from "./methods/passwordMeetPolicy.js"
+import sendActivationCodeMethod from "./methods/sendActivationCode.js"
+import activateAccountMethod from "./methods/activateAccount.js"
+import disableAccountMethod from "./methods/disableAccount.js"
+
 export default class Account {
-	static create = require("./methods/create").default
-	static loginStrategy = require("./methods/loginStrategy").default
-	static changePassword = require("./methods/changePassword").default
-	static usernameMeetPolicy = require("./methods/usernameMeetPolicy").default
-	static passwordMeetPolicy = require("./methods/passwordMeetPolicy").default
-	static sendActivationCode = require("./methods/sendActivationCode").default
-	static activateAccount = require("./methods/activateAccount").default
-	static disableAccount = require("./methods/disableAccount").default
+	static create = createMethod
+	static loginStrategy = loginStrategyMethod
+	static changePassword = changePasswordMethod
+	static usernameMeetPolicy = usernameMeetPolicyMethod
+	static passwordMeetPolicy = passwordMeetPolicyMethod
+	static sendActivationCode = sendActivationCodeMethod
+	static activateAccount = activateAccountMethod
+	static disableAccount = disableAccountMethod
 }

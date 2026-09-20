@@ -1,7 +1,7 @@
 import requiredFields from "@shared-utils/requiredFields"
 import { DateTime } from "luxon"
 
-import { Post } from "@db_models"
+import Post from "@db_models/post"
 import stage from "./stage"
 
 const visibilityOptions = ["public", "private", "only_mutuals"]

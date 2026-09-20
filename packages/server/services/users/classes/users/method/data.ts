@@ -1,6 +1,5 @@
-//@ts-ignore
-import { UserFollow } from "@db_models"
 import User from "@db_models/user"
+import UserFollow from "@db_models/userFollow"
 
 export type GetUserData = {
 	user_id: string | string[]

@@ -1,4 +1,4 @@
-import { Sticker } from "@db_models"
+import Sticker from "@db_models/sticker"
 
 export default {
 	fn: async (req) => {

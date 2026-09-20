@@ -1,4 +1,5 @@
-import { User, Badge } from "@db_models"
+import User from "@db_models/user"
+import Badge from "@db_models/badge"
 
 export default {
 	fn: async (req) => {

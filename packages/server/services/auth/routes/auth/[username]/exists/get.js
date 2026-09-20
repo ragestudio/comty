@@ -1,4 +1,4 @@
-import { User } from "@db_models"
+import User from "@db_models/user"
 
 const emailRegex = new RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
 

@@ -1,3 +1,4 @@
 {
-	"name": "chats"
+  "name": "chats",
+  "type": "module"
 }

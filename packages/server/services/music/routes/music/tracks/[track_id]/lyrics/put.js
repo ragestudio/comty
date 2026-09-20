@@ -1,4 +1,5 @@
-import { TrackLyric, Track } from "@db_models"
+import TrackLyric from "@db_models/trackLyrics"
+import Track from "@db_models/track"
 
 export default {
 	useMiddlewares: ["withAuthentication"],

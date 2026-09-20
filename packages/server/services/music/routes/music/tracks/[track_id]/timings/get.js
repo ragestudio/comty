@@ -1,4 +1,4 @@
-import { TrackLyric } from "@db_models"
+import TrackLyric from "@db_models/trackLyrics"
 
 export default async (req) => {
 	const { track_id } = req.params

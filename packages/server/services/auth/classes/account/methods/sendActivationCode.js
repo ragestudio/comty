@@ -1,4 +1,5 @@
-import { User, ActivationCode } from "@db_models"
+import User from "@db_models/user"
+import ActivationCode from "@db_models/activationCode"
 
 // set waiting time to 1 minute
 const waitingTime = 60 * 1000

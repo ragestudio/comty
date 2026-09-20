@@ -1,11 +1,17 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import nodemailer from "nodemailer"
 import DbManager from "@shared-classes/DbManager"
 
 import SharedMiddlewares from "@shared-middlewares"
 
-export default class API extends Server {
+import accountActivation from "./ipcEvents/accountActivation.js"
+import newLogin from "./ipcEvents/newLogin.js"
+import mfaSend from "./ipcEvents/mfaSend.js"
+import aprSend from "./ipcEvents/aprSend.js"
+import passwordChanged from "./ipcEvents/passwordChanged.js"
+
+export class API extends Server {
 	static refName = "ems"
 	static listenPort = 3007
 
@@ -30,12 +36,11 @@ export default class API extends Server {
 	}
 
 	ipcEvents = {
-		"account:activation:send": require("./ipcEvents/accountActivation")
-			.default,
-		"new:login": require("./ipcEvents/newLogin").default,
-		"mfa:send": require("./ipcEvents/mfaSend").default,
-		"apr:send": require("./ipcEvents/aprSend").default,
-		"password:changed": require("./ipcEvents/passwordChanged").default,
+		"account:activation:send": accountActivation,
+		"new:login": newLogin,
+		"mfa:send": mfaSend,
+		"apr:send": aprSend,
+		"password:changed": passwordChanged,
 	}
 
 	async onInitialize() {
@@ -43,4 +48,4 @@ export default class API extends Server {
 	}
 }
 
-Boot(API)
+export default API

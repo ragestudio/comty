@@ -1,6 +1,8 @@
 import crypto from "node:crypto"
-//@ts-ignore
-import { User, OauthCode } from "@db_models"
+
+import User from "@db_models/user"
+import OauthCode from "@db_models/oauth_code"
+
 import AuthToken from "@shared-classes/AuthToken"
 import { parseExpiresIn, buildClaims } from "../utils"
 

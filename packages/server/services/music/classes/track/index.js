@@ -1,5 +1,9 @@
+import createMethod from "./methods/create.js"
+import deleteMethod from "./methods/delete.js"
+import getMethod from "./methods/get.js"
+
 export default class Track {
-	static create = require("./methods/create").default
-	static delete = require("./methods/delete").default
-	static get = require("./methods/get").default
+	static create = createMethod
+	static delete = deleteMethod
+	static get = getMethod
 }

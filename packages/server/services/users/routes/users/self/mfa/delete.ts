@@ -9,7 +9,6 @@ import User from "@db_models/user"
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		//@ts-ignore
 		const user_id = req.auth.session.user_id
 		const { code } = req.body
 

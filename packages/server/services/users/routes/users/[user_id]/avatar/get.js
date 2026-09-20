@@ -1,4 +1,4 @@
-import { User } from "@db_models"
+import User from "@db_models/user"
 
 export default async (req) => {
 	const { user_id } = req.params

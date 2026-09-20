@@ -12,7 +12,6 @@ export default defineRoute<API>()({
 	useContexts: ["mediaChannels"] as const,
 	fn: async (req, res, ctx) => {
 		const { group_id } = req.params
-		// @ts-ignore
 		const user_id = req.auth.session.user_id
 
 		const group = await GroupsModel.findOne(

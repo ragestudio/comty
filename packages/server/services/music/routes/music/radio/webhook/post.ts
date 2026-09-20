@@ -1,5 +1,4 @@
-// @ts-ignore
-import { RadioProfile } from "@db_models"
+import RadioProfile from "@db_models/radioProfile"
 
 import type API from "@services/music/music.service"
 

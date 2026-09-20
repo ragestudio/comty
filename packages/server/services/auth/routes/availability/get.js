@@ -1,4 +1,4 @@
-import { User } from "@db_models"
+import User from "@db_models/user"
 
 export default async (req) => {
 	const { username, email } = req.query

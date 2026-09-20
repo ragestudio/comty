@@ -1,7 +1,7 @@
-import type API from "@services/auth/auth.service"
+import API from "@services/auth/auth.service"
 
-export default defineRoute<API>()({
-	useContexts: ["keys"] as const,
+export default defineRoute(API)({
+	useContexts: ["keys"],
 	fn: async (req, res, ctx) => {
 		return {
 			keys: [

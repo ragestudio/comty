@@ -1,6 +1,7 @@
 {
-	"name": "rtc",
-	"dependencies": {
-		"mediasoup": "^3.16.4"
-	}
+  "name": "rtc",
+  "dependencies": {
+    "mediasoup": "^3.16.4"
+  },
+  "type": "module"
 }

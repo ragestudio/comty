@@ -1,3 +1,5 @@
+import resolveMethod from "./methods/resolve.js"
+
 export default class Extension {
-    static resolve = require("./methods/resolve").default
+    static resolve = resolveMethod
 }

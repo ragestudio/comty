@@ -4,7 +4,8 @@
 import fs from "node:fs"
 import fsPromises from "node:fs/promises"
 import path from "node:path"
-import { XXHash64 } from "xxhash-addon"
+import xxhash from "xxhash-addon"
+const { XXHash64 } = xxhash
 
 export function checkTotalSize(chunkSize, totalChunks, maxFileSize) {
 	return chunkSize * totalChunks < maxFileSize

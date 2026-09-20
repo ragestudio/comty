@@ -1,4 +1,4 @@
-import { User } from "@db_models"
+import User from "@db_models/user"
 
 export default async (user_id, update) => {
 	if (typeof user_id === "undefined") {

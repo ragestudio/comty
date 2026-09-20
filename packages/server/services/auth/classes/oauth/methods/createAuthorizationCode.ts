@@ -1,5 +1,4 @@
-//@ts-ignore
-import { OauthCode } from "@db_models"
+import OauthCode from "@db_models/oauth_code"
 import { generateCode, validateScopes, CODE_EXPIRY_SECONDS } from "../utils"
 
 export default async function (params: {

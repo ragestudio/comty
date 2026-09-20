@@ -4,6 +4,8 @@ export default defineRoute<API>()({
 	useMiddlewares: ["botAuthentication", "withAuthentication"],
 	useContexts: ["dmChannels"] as const,
 	fn: async (req, res, ctx) => {
-		return await ctx.dmChannels.rooms(req.auth.session.user_id)
+		const user_id = req.auth.session.user_id
+
+		return await ctx.dmChannels.rooms(user_id)
 	},
 })

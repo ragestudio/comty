@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -7,7 +7,7 @@ import StorageClient from "@shared-classes/StorageClient"
 
 import SharedMiddlewares from "@shared-middlewares"
 
-class API extends Server {
+export class API extends Server {
 	static refName = "marketplace"
 	static listenPort = 3005
 
@@ -50,4 +50,4 @@ class API extends Server {
 	}
 }
 
-Boot(API)
+export default API

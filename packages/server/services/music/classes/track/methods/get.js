@@ -1,4 +1,5 @@
-import { Track, TrackLyric } from "@db_models"
+import Track from "@db_models/track"
+import TrackLyric from "@db_models/trackLyrics"
 import Library from "@classes/library"
 
 // transform minutes:seconds.milliseconds to milliseconds

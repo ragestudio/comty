@@ -1,5 +1,4 @@
-//@ts-ignore
-import { OidcApp } from "@db_models"
+import OidcAppModel from "@db_models/oidc_apps"
 import { generateClientId, generateClientSecret } from "../utils"
 
 export default async function (
@@ -13,7 +12,7 @@ export default async function (
 	const clientId = generateClientId()
 	const clientSecret = generateClientSecret()
 
-	await new OidcApp({
+	await new OidcAppModel({
 		client_id: clientId,
 		client_secret: clientSecret,
 		client_name: params.client_name,

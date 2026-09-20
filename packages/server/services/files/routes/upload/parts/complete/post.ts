@@ -11,7 +11,6 @@ export default defineRoute<API>()({
 	] as const,
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res, ctx) => {
-		// @ts-ignore
 		const user_id = req.auth.session.user_id
 		const { task_id, file_hash, upload_id, object_path, parts } = req.body
 

@@ -13,7 +13,6 @@ export default defineRoute<API>()({
 	useContexts: ["cache", "limits", "capabilities", "tasker", "s3"] as const,
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res, ctx) => {
-		// @ts-ignore
 		const user_id = req.auth.session.user_id
 
 		if (!checkChunkUploadHeaders(req.headers)) {
