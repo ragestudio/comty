@@ -4,7 +4,7 @@ import { Result, Skeleton, Empty } from "antd"
 
 import ChatsModel from "@models/chats"
 
-import DMRoomListItem from "../DMRoomListItem"
+import { Member } from "@/components/Spaces/Member"
 
 import "./index.less"
 
@@ -15,6 +15,8 @@ const DMRoomsList = ({ onClickItem, selectedRoom, compact }) => {
 	const onActivityUpdate = React.useCallback(
 		(data) => {
 			U_Dms((prev) => {
+				if (!Array.isArray(prev)) return prev
+
 				const items = [...prev]
 
 				const index = items.findIndex(
@@ -94,16 +96,30 @@ const DMRoomsList = ({ onClickItem, selectedRoom, compact }) => {
 			})}
 		>
 			{R_DMs.map((room) => (
-				<DMRoomListItem
+				<Member
+					member={{
+						_id: room._id,
+						user: room.user,
+					}}
+					onClick={() => onClickRoom(room)}
+					className={[
+						"bg-accent",
+						{ selected: selectedRoom === room.to_user_id },
+					]}
+				/>
+			))}
+		</div>
+	)
+}
+
+{
+	/* <DMRoomListItem
 					key={room._id}
 					room={room}
 					selected={selectedRoom === room.to_user_id}
 					onClick={() => onClickRoom(room)}
 					compact={compact}
-				/>
-			))}
-		</div>
-	)
+				/>*/
 }
 
 export default DMRoomsList

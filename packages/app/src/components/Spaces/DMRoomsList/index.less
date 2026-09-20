@@ -2,10 +2,38 @@
 	display: flex;
 	flex-direction: column;
 
-	//align-items: center;
-
-	//overflow: hidden;
-
 	gap: 5px;
 	width: 100%;
+
+	.spaces-member {
+		border: 1px solid var(--border-color);
+		border-radius: 12px;
+
+		&.selected {
+			&::before {
+				opacity: 1;
+				height: 50%;
+			}
+		}
+
+		&::before {
+			content: "";
+
+			position: absolute;
+			display: block;
+
+			top: auto;
+			left: 5px;
+
+			width: 3px;
+			height: 0;
+
+			transition: all 150ms ease-in-out;
+
+			background-color: var(--colorPrimary);
+			border-radius: 12px;
+
+			opacity: 0;
+		}
+	}
 }

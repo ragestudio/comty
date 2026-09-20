@@ -17,6 +17,8 @@
 	cursor: pointer;
 	overflow: hidden;
 
+	//height: 80px;
+
 	&.compact {
 		padding: 5px;
 		width: fit-content;
@@ -92,7 +94,20 @@
 		justify-content: center;
 		align-items: flex-start;
 
+		width: 100%;
+		overflow: hidden;
+
 		&__message {
+			width: 100%;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			svg {
+				min-width: 0.8rem;
+				min-height: 0.8rem;
+			}
+
 			&.sended {
 				color: rgba(var(--bg_color_6), 1);
 			}

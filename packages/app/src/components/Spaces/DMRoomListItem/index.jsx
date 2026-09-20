@@ -42,19 +42,6 @@ const DMRoom = ({ room, onClick, selected, compact }) => {
 								"Deleted user"}
 						</span>
 					</h3>
-
-					<p
-						className={classnames(
-							"dmrooms-list__item__content__message",
-							{
-								["sended"]: room.direction === "outgoing",
-							},
-						)}
-					>
-						{room.direction === "outgoing" && <Icons.ArrowUp />}
-						{room.direction === "incoming" && <Icons.ArrowDown />}
-						{room.short_message}
-					</p>
 				</div>
 			)}
 
