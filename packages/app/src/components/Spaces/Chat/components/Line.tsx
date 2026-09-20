@@ -17,6 +17,9 @@ import db from "@comty/spaces-lib/db/index"
 
 import "./Line.less"
 
+import Markdown from "react-markdown"
+import { ShikiHighlighter, isInlineCode } from "react-shiki"
+
 interface LineProps {
 	data: Message
 	headless: boolean
@@ -26,6 +29,35 @@ interface LineProps {
 	onReadAck?: (messageId: string) => void
 }
 
+const CodeHighlight = ({ className, children, node, ...props }) => {
+	const code = String(children).trim()
+	const match = className?.match(/language-(\w+)/)
+	const language = match ? match[1] : undefined
+	const isInline = node ? isInlineCode(node) : undefined
+
+	console.log({
+		children,
+		node,
+		isInline,
+	})
+
+	return !isInline ? (
+		<ShikiHighlighter
+			language={language}
+			theme="one-dark-pro"
+			{...props}
+		>
+			{code}
+		</ShikiHighlighter>
+	) : (
+		<code
+			className={className}
+			{...props}
+		>
+			{code}
+		</code>
+	)
+}
 const messageRegexs = [
 	{
 		regex:
@@ -59,20 +91,20 @@ const messageRegexs = [
 			return <LinkPreview url={result[1]} />
 		},
 	},
-	{
-		regex: /(@[a-zA-Z0-9_]+)/gi,
-		fn: (result: RegExpExecArray) => {
-			return (
-				<a
-					onClick={() =>
-						(globalThis as any).app.navigation.goToAccount(result[1].substr(1))
-					}
-				>
-					{result[1]}
-				</a>
-			)
-		},
-	},
+	// {
+	// 	regex: /(@[a-zA-Z0-9_]+)/gi,
+	// 	fn: (result: RegExpExecArray) => {
+	// 		return (
+	// 			<a
+	// 				onClick={() =>
+	// 					(globalThis as any).app.navigation.goToAccount(result[1].substr(1))
+	// 				}
+	// 			>
+	// 				{result[1]}
+	// 			</a>
+	// 		)
+	// 	},
+	// },
 ]
 
 const RenderMessage = ({ messageStr }: { messageStr: string }) => {
@@ -104,7 +136,18 @@ const RenderMessage = ({ messageStr }: { messageStr: string }) => {
 		return firstMatch.fn(firstMatch.result)
 	}
 
-	return <p>{messageStr}</p>
+	return (
+		<Markdown
+			components={{
+				pre: (props) => {
+					return props.children
+				},
+				code: CodeHighlight,
+			}}
+		>
+			{messageStr}
+		</Markdown>
+	)
 }
 
 const Line = React.memo(

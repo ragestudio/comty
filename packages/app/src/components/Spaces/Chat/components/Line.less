@@ -205,6 +205,38 @@
 			width: 100%;
 			min-width: 0;
 
+			&__attachments {
+				max-width: 450px;
+				min-width: 250px;
+
+				width: 100%;
+				height: fit-content;
+
+				.lazy-load-image-background {
+					img {
+						background-color: rgba(var(--bg_color_1), 1);
+					}
+				}
+			}
+
+			pre {
+				margin: 0;
+				padding: 10px;
+
+				border-radius: 12px;
+				border: 1px solid var(--border-color);
+
+				code {
+					.line {
+						gap: 0;
+
+						> * {
+							user-select: text !important;
+						}
+					}
+				}
+			}
+
 			p {
 				display: flex;
 				flex-direction: column;
@@ -221,20 +253,6 @@
 				user-select: text;
 
 				text-rendering: optimizeLegibility;
-			}
-
-			&__attachments {
-				max-width: 450px;
-				min-width: 250px;
-
-				width: 100%;
-				height: fit-content;
-
-				.lazy-load-image-background {
-					img {
-						background-color: rgba(var(--bg_color_1), 1);
-					}
-				}
 			}
 
 			a {

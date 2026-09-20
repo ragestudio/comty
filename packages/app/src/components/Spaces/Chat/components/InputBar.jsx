@@ -89,7 +89,13 @@ export const ChatInputBar = ({
 		}
 	}, [])
 
-	const submit = async () => {
+	const submit = async (e) => {
+		if (e?.shiftKey === true) {
+			return
+		}
+
+		e.preventDefault()
+
 		if (!canSubmit()) {
 			console.warn("Can't submit empty message")
 			return false
@@ -253,10 +259,7 @@ export const ChatInputBar = ({
 					autoSize={{ minRows: 1, maxRows: 5 }}
 					value={inputValue}
 					onChange={handleMessageChange}
-					onPressEnter={(e) => {
-						e.preventDefault()
-						submit()
-					}}
+					onPressEnter={submit}
 					maxLength={1200} // TODO: get from server
 				/>
 

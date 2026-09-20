@@ -13,10 +13,7 @@ const LinkPreview = React.memo(({ url }) => {
 		}
 
 		const composedUrl =
-			app.cores.api.client().mainOrigin +
-			"/main/query_url" +
-			"?url=" +
-			url
+			app.cores.api.client().origin + "/main/query_url" + "?url=" + url
 
 		const result = await axios({
 			method: "GET",
