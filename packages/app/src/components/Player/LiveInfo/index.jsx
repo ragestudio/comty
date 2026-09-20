@@ -16,7 +16,7 @@ const LiveInfo = ({ radioId, initialData }) => {
 		}
 
 		eventManager.current = new SSEEvents(
-			`${app.cores.api.client().mainOrigin}/music/radio/sse/radio:${radioId}`,
+			`${app.cores.api.client().origin}/music/radio/sse/radio:${radioId}`,
 			{
 				update: (data) => {
 					if (typeof data.now_playing === "string") {
