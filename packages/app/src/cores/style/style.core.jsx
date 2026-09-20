@@ -17,6 +17,8 @@ const ClientPrefersDark = () =>
 	window.matchMedia("(prefers-color-scheme: dark)")
 
 function variantKeyToColor(key) {
+	if (typeof key === "function") key = key()
+
 	if (key == "auto") {
 		if (ClientPrefersDark().matches) {
 			return "dark"
@@ -30,18 +32,27 @@ function variantKeyToColor(key) {
 
 export class ThemeProvider extends React.Component {
 	state = {
-		useAlgorigthm: variantKeyToColor(app.cores.style.currentVariantKey),
-		useCompactMode: app.cores.style.vars["compact-mode"],
+		useAlgorigthm: undefined,
+		useCompactMode: undefined,
+		vars: undefined,
 	}
 
 	handleUpdate = (update) => {
 		this.setState({
-			useAlgorigthm: variantKeyToColor(app.cores.style.currentVariantKey),
+			useAlgorigthm: variantKeyToColor(
+				() => app.cores.style.currentVariantKey,
+			),
 			useCompactMode: update["compact-mode"],
 		})
 	}
 
 	componentDidMount() {
+		this.setState({
+			useAlgorigthm: variantKeyToColor(app.cores.style.currentVariantKey),
+			useCompactMode: app.cores.style.vars["compact-mode"],
+			vars: app.cores.style.vars,
+		})
+
 		app.eventBus.on("style.update", this.handleUpdate)
 	}
 
@@ -62,7 +73,7 @@ export class ThemeProvider extends React.Component {
 			<ConfigProvider
 				theme={{
 					token: {
-						...app.cores.style.vars,
+						...this.state.vars,
 						borderRadius: 12,
 						borderRadiusSM: 8,
 						colorBgContainer: "var(--background-color-primary)",
@@ -72,7 +83,7 @@ export class ThemeProvider extends React.Component {
 						colorBorder: "var(--border-color)",
 						colorSuccess: "#52c41a",
 						colorWarning: "#faad14",
-						fontFamily: app.cores.style.vars.fontFamily,
+						fontFamily: "var(--fontFamily)",
 					},
 					components: {
 						Button: {
@@ -168,29 +179,25 @@ export default class StyleCore extends Core {
 	}
 
 	static get rootAppVariables() {
-		let rootRules = StyleCore.rootAppVarsElement.childNodes[0].textContent
-
-		rootRules = rootRules.replace(/\n/g, "").replace(/\t/g, "").trim()
-
-		rootRules = rootRules
+		const rootRules = StyleCore.rootAppVarsElement.childNodes[0].textContent
+			.replace(/\n/g, "")
+			.replace(/\t/g, "")
 			.replace(/:root\s?\{/, "")
 			.replace(/\}/, "")
 			.trim()
 
-		rootRules = rootRules.split(";")
-
-		rootRules = rootRules.filter((i) => i.length > 0)
-
-		rootRules = rootRules.map((rule) => {
-			return rule.split(":").map((i) => i.trim())
-		})
-
-		return rootRules.reduce((acc, [key, value]) => {
-			if (key.startsWith("--")) {
-				acc[key.replace("--", "")] = value
-			}
-			return acc
-		}, {})
+		return rootRules
+			.split(";")
+			.filter((i) => i.length > 0)
+			.map((rule) => {
+				return rule.split(":").map((i) => i.trim())
+			})
+			.reduce((acc, [key, value]) => {
+				if (key.startsWith("--")) {
+					acc[key.replace("--", "")] = value
+				}
+				return acc
+			}, {})
 	}
 
 	// variants
@@ -227,7 +234,7 @@ export default class StyleCore extends Core {
 		},
 		getStoragedVariantKey: () => StyleCore.storagedVariantKey,
 
-		applyVars: (...args) => this.applyVars(...args),
+		applyVars: () => this.applyVars(),
 		updateVariant: (...args) => this.updateVariant(...args),
 		updateTemporalVariant: (...args) => this.updateTemporalVariant(...args),
 
