@@ -168,43 +168,43 @@ export default {
 	},
 	capacitor: {
 		isAppCapacitor: () => window.navigator.userAgent === "capacitor",
-		setStatusBarStyleDark: async () => {
-			if (!window.app.capacitor.isAppCapacitor()) {
-				console.warn(
-					"[App] setStatusBarStyleDark is only available on capacitor",
-				)
-				return false
-			}
-			return await StatusBar.setStyle({ style: Style.Dark })
-		},
-		setStatusBarStyleLight: async () => {
-			if (!window.app.capacitor.isAppCapacitor()) {
-				console.warn(
-					"[App] setStatusBarStyleLight is not supported on this platform",
-				)
-				return false
-			}
-			return await StatusBar.setStyle({ style: Style.Light })
-		},
-		hideStatusBar: async () => {
-			if (!window.app.capacitor.isAppCapacitor()) {
-				console.warn(
-					"[App] hideStatusBar is not supported on this platform",
-				)
-				return false
-			}
+		// setStatusBarStyleDark: async () => {
+		// 	if (!window.app.capacitor.isAppCapacitor()) {
+		// 		console.warn(
+		// 			"[App] setStatusBarStyleDark is only available on capacitor",
+		// 		)
+		// 		return false
+		// 	}
+		// 	return await StatusBar.setStyle({ style: Style.Dark })
+		// },
+		// setStatusBarStyleLight: async () => {
+		// 	if (!window.app.capacitor.isAppCapacitor()) {
+		// 		console.warn(
+		// 			"[App] setStatusBarStyleLight is not supported on this platform",
+		// 		)
+		// 		return false
+		// 	}
+		// 	return await StatusBar.setStyle({ style: Style.Light })
+		// },
+		// hideStatusBar: async () => {
+		// 	if (!window.app.capacitor.isAppCapacitor()) {
+		// 		console.warn(
+		// 			"[App] hideStatusBar is not supported on this platform",
+		// 		)
+		// 		return false
+		// 	}
 
-			return await StatusBar.hide()
-		},
-		showStatusBar: async () => {
-			if (!window.app.capacitor.isAppCapacitor()) {
-				console.warn(
-					"[App] showStatusBar is not supported on this platform",
-				)
-				return false
-			}
-			return await StatusBar.show()
-		},
+		// 	return await StatusBar.hide()
+		// },
+		// showStatusBar: async () => {
+		// 	if (!window.app.capacitor.isAppCapacitor()) {
+		// 		console.warn(
+		// 			"[App] showStatusBar is not supported on this platform",
+		// 		)
+		// 		return false
+		// 	}
+		// 	return await StatusBar.show()
+		// },
 	},
 	maintenance: {
 		clearInternalStorage: async () => {
