@@ -15,7 +15,7 @@ export default {
 	},
 	model: {
 		get: (params, options) =>
-			ChatsModel.channels.get(
+			ChatsModel.channels.messages.get(
 				params.group_id,
 				params.channel_id,
 				options,

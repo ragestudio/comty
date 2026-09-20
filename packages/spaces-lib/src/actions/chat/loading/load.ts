@@ -58,6 +58,8 @@ export default async function (
 			}
 		}
 	} catch (err: any) {
+		console.error(err)
+
 		if (generation === this.state.initGeneration)
 			this.setState({ error: err })
 	} finally {

@@ -14,7 +14,8 @@ export default {
 		typing: "dm:typing",
 	},
 	model: {
-		get: (params, options) => ChatsModel.dm.get(params.to_user_id, options),
+		get: (params, options) =>
+			ChatsModel.dm.messages.get(params.to_user_id, options),
 	},
 	params: {
 		send: (params, data) => ({
