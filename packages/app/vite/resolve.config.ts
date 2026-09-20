@@ -21,6 +21,13 @@ export default {
 		"@classes": path.join(src, "classes"),
 		"@ui": path.join(src, "ui"),
 
+		"@comty/spaces-lib": path.join(
+			root,
+			"../../",
+			"packages",
+			"spaces-lib",
+			"src",
+		),
 		"@models": path.join(root, "../../", "modules", "comty.js/src/models"),
 		"comty.js": path.join(root, "../../", "modules", "comty.js", "src"),
 		"@ragestudio/vessel": path.join(
