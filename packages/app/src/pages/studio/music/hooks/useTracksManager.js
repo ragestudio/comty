@@ -1,5 +1,4 @@
 import React from "react"
-import queuedUploadFile from "@utils/queuedUploadFile"
 import FilesModel from "@models/files"
 import TrackManifest from "@cores/player/classes/TrackManifest"
 
