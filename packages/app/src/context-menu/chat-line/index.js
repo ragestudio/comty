@@ -86,7 +86,13 @@ export default {
 			const groupId = channelElement.dataset.groupId
 			const channelType = channelElement.dataset.type
 
-			console.log(channelId, groupId, channelType)
+			console.debug("[context-menu](chat-line)", {
+				channelId,
+				groupId,
+				channelType,
+				messageUserId,
+				messageId,
+			})
 
 			// push copy id
 			items.push({
@@ -118,7 +124,7 @@ export default {
 						control.close()
 
 						switch (channelType) {
-							case "direct": {
+							case "dm": {
 								await ChatsModel.dm.messages.delete(
 									channelId,
 									messageId,
