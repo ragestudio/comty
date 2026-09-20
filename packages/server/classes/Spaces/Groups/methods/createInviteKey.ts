@@ -8,10 +8,16 @@ export default async function (
 	issuer_user_id: string,
 	{ maxUsage = 5, expiresAt = null }: any = {},
 ) {
+	const group = await this.get(group_id)
+
+	if (!group) {
+		throw new OperationError(404, "Group not found")
+	}
+
 	if (
 		!(await GroupPermissions.canPerformAction(
 			issuer_user_id,
-			group_id,
+			group,
 			"MANAGE_INVITES",
 		))
 	) {

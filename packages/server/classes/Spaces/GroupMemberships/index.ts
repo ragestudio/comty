@@ -1,8 +1,13 @@
 import createMethod from "./methods/create"
 import deleteMethod from "./methods/delete"
+
 import getMethod from "./methods/get"
-import getByGroupIdMethod from "./methods/getByGroupId"
-import getByUserIdMethod from "./methods/getByUserId"
+import getOneById from "./methods/getOneById"
+import getOneByUserId from "./methods/getOneByUserId"
+
+import getAllByGroupIdMethod from "./methods/getByGroupId"
+import getAllByUserIdMethod from "./methods/getByUserId"
+
 import getTotalMembersByGroupIdMethod from "./methods/getTotalMembersByGroupId"
 import isUserIdOnMembersMethod from "./methods/isUserIdOnMembers"
 
@@ -22,12 +27,19 @@ export default class GroupMemberships {
 	}
 
 	static get = getMethod.bind(this) as OmitThisParameter<typeof getMethod>
-	static getByGroupId = getByGroupIdMethod.bind(this) as OmitThisParameter<
-		typeof getByGroupIdMethod
+	static getOneById = getOneById.bind(this) as OmitThisParameter<
+		typeof getOneById
 	>
-	static getByUserId = getByUserIdMethod.bind(this) as OmitThisParameter<
-		typeof getByUserIdMethod
+	static getOneByUserId = getOneByUserId.bind(this) as OmitThisParameter<
+		typeof getOneByUserId
 	>
+
+	static getAllByGroupId = getAllByGroupIdMethod.bind(
+		this,
+	) as OmitThisParameter<typeof getAllByGroupIdMethod>
+	static getAllByUserId = getAllByUserIdMethod.bind(
+		this,
+	) as OmitThisParameter<typeof getAllByUserIdMethod>
 	static getTotalMembersByGroupId = getTotalMembersByGroupIdMethod.bind(
 		this,
 	) as OmitThisParameter<typeof getTotalMembersByGroupIdMethod>

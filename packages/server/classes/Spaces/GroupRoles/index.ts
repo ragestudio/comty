@@ -1,5 +1,7 @@
-import GroupRolesModel from "@db/group_roles"
 import type { GroupRole } from "@db/group_roles"
+
+import GroupRolesModel from "@db/group_roles"
+import updateMember from "./updateMember"
 
 export default class GroupRoles {
 	static async getByGroupId(group_id: string): Promise<GroupRole[]> {
@@ -30,4 +32,6 @@ export default class GroupRoles {
 
 		return roles
 	}
+
+	static updateMember = updateMember
 }

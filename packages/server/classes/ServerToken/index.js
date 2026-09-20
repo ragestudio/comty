@@ -1,4 +1,5 @@
-import { User, ServerKeys } from "@db_models"
+import User from "@db_models/user"
+import ServerKeys from "@db_models/serverKeys"
 
 export default class ServerToken {
 	static async validate(access_id, secret_token) {

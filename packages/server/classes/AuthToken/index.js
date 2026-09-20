@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { User } from "@db_models"
+import User from "@db_models/user"
 import AuthSessionModel from "@db/auth_session"
 
 export default class AuthToken {

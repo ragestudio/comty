@@ -15,9 +15,7 @@ export default async function (
 	}
 
 	// lookup for the group
-	const group = await this.get(group_id, {
-		basic: false,
-	})
+	const group = await this.get(group_id)
 
 	if (!group) {
 		throw new OperationError(404, "Group not found")

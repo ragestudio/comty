@@ -9,7 +9,7 @@ export default async function (this: typeof Groups, group: Group) {
 	}
 
 	// delete the memberships
-	const memberships = await GroupMemberships.getByGroupId(group._id)
+	const memberships = await GroupMemberships.getAllByGroupId(group._id)
 
 	for (const membership of memberships) {
 		await GroupMemberships.delete(

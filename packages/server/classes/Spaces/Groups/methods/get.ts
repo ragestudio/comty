@@ -3,7 +3,7 @@ import type Groups from "../index"
 export default async function (
 	this: typeof Groups,
 	group_id: string,
-	{ raw = true }: any = {},
+	{ raw = true }: { raw?: boolean } = {},
 ) {
 	if (typeof group_id !== "string") {
 		throw new OperationError(400, "group_id must be a string")

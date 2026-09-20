@@ -1,13 +1,14 @@
-import GroupRoles from "@shared-classes/Spaces/GroupRoles"
-import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import type { Group } from "@db/groups"
 import type GroupPermissions from "../index"
+
+import GroupRoles from "@shared-classes/Spaces/GroupRoles"
+import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 
 export default async function (
 	this: typeof GroupPermissions,
 	user_id: string,
-	group: Group | string,
-	action: string,
+	group: Group,
+	action: keyof typeof GroupPermissions.enum,
 ) {
 	if (typeof user_id !== "string") {
 		throw new OperationError(400, "user_id must be provided")

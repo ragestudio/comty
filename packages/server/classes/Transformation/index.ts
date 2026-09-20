@@ -1,7 +1,11 @@
+import aDash from "./handlers/a-dash.js"
+import mqHls from "./handlers/mq-hls.js"
+import optimize from "./handlers/optimize.js"
+
 const Handlers = {
-	"a-dash": require("./handlers/a-dash").default,
-	"mq-hls": require("./handlers/mq-hls").default,
-	optimize: require("./handlers/optimize").default,
+	"a-dash": aDash,
+	"mq-hls": mqHls,
+	optimize: optimize,
 }
 
 export type TransformationPayloadType = {

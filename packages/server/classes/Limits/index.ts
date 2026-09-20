@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Config } from "@db_models"
+import Config from "@db_models/config"
 
 export interface LimitsValues extends Record<string, any> {}
 

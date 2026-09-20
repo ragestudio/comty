@@ -3,7 +3,11 @@ import type GroupMemberships from "../index"
 export default async function (
 	this: typeof GroupMemberships,
 	group_id: string,
-	{ limit, offset }: any = {},
+	{
+		limit,
+		offset,
+		raw,
+	}: { limit?: number | string; offset?: string; raw?: boolean } = {},
 ) {
 	if (typeof group_id !== "string") {
 		throw new OperationError(400, "group_id must be a string")
@@ -12,10 +16,12 @@ export default async function (
 	const query: any = {
 		group_id: group_id,
 	}
-	const options: any = {}
+	const options: Record<string, unknown> = {}
 
-	if (limit) {
+	if (typeof limit === "string") {
 		options.limit = parseInt(limit)
+	} else if (typeof limit === "number" && !isNaN(limit)) {
+		options.limit = limit
 	}
 
 	if (offset) {
@@ -24,7 +30,7 @@ export default async function (
 		}
 	}
 
-	const membershipsRef = await this.modelRef.find(query, limit)
+	const membershipsRef = await this.modelRef.find(query, options.limit)
 
 	const users_ids = membershipsRef.map((ref) => ref.user_id)
 
@@ -32,12 +38,15 @@ export default async function (
 		return []
 	}
 
-	const memberships = await this.model.find({
-		user_id: {
-			$in: users_ids,
+	return await this.model.find(
+		{
+			user_id: {
+				$in: users_ids,
+			},
+			group_id: group_id,
 		},
-		group_id: group_id,
-	})
-
-	return memberships
+		{
+			raw: raw,
+		},
+	)
 }
