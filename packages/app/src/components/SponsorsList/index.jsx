@@ -34,6 +34,10 @@ const SponsorsList = () => {
 		return <Skeleton active />
 	}
 
+	if (sponsors.length === 0) {
+		return null
+	}
+
 	return (
 		<div className="group">
 			<h3>Thanks to our sponsors</h3>
