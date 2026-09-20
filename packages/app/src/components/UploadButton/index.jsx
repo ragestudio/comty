@@ -1,7 +1,6 @@
 import React from "react"
 import { Upload, Progress } from "antd"
 import classnames from "classnames"
-import queuedUploadFile from "@utils/queuedUploadFile"
 import PropTypes from "prop-types"
 
 import { Icons } from "@components/Icons"
@@ -77,35 +76,6 @@ const UploadButton = (props) => {
 			},
 			props.headers,
 		)
-
-		// await queuedUploadFile(req.file, {
-		// 	onFinish: (file, response) => {
-		// 		if (typeof props.ctx?.onUpdateItem === "function") {
-		// 			props.ctx.onUpdateItem(response.url)
-		// 		}
-
-		// 		if (typeof props.onUploadDone === "function") {
-		// 			props.onUploadDone(response)
-		// 		}
-
-		// 		setUploading(false)
-		// 		handleOnSuccess(req.file.uid, response)
-
-		// 		setTimeout(() => {
-		// 			setProgress(null)
-		// 		}, 1000)
-		// 	},
-		// 	onError: (file, error) => {
-		// 		setProgress(null)
-		// 		handleOnError(file.uid, error)
-		// 		setUploading(false)
-		// 	},
-		// 	onProgress: (file, progress) => {
-		// 		setProgress(progress)
-		// 		handleOnProgress(file.uid, progress)
-		// 	},
-		// 	headers: props.headers,
-		// })
 	}
 
 	React.useEffect(() => {
