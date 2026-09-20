@@ -2,7 +2,7 @@
  * Copies content to clipboard, supporting both text and file data
  * @param {string|File|Blob} content - The content to copy (text string or file/blob data)
  * @param {Object} options - Optional configuration
- * @param {string} options.successMessage - Custom success message
+ * @param {string} [options.successMessage] - Custom success message
  * @returns {Promise<boolean>} - Promise resolving to success state
  */
 export default async (content, options = {}) => {
