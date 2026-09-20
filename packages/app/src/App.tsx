@@ -4,8 +4,10 @@ import ReactAdapter from "vessel/adapters/react"
 import React from "react"
 import * as Router from "vessel/router"
 import * as Sentry from "@sentry/browser"
-import { ThemeProvider } from "@cores/style/style.core.jsx"
+
+import { ThemeProvider } from "@cores/style/style.core"
 import NotificationsRenderer from "./cores/notifications/render"
+
 import AppCrash from "@components/AppCrash"
 import AuthManager from "@classes/AuthManager"
 import Layout from "./layout"
@@ -30,6 +32,7 @@ class ComtyApp extends React.Component implements VesselApp {
 		firstInitialized: false,
 	}
 
+	// @ts-ignore
 	auth = new AuthManager(this.props.runtime, {
 		behaviors: {
 			onLogin: async () => {
@@ -51,8 +54,9 @@ class ComtyApp extends React.Component implements VesselApp {
 
 	static async initialize() {
 		window.app.version = config.package.version
-		window.app.isCapacitor = window.IS_MOBILE_HOST
+		window.app.isCapacitor = window["IS_MOBILE_HOST"]
 
+		// if in production, initialize Sentry (if VITE_SENTRY_DSN is set)
 		if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.PROD) {
 			console.log(`Initializing Sentry...`)
 
@@ -65,6 +69,7 @@ class ComtyApp extends React.Component implements VesselApp {
 	}
 
 	componentDidMount = async () => {
+		// @ts-ignore
 		const notfCore = this.props.runtime.cores.get("notifications")
 		app.message = notfCore.message
 
