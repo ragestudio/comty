@@ -28,30 +28,35 @@ import useTitle from "@hooks/useTitle"
 
 import SplitterSizes from "./splitter_sizes"
 
-import "@pages/spaces/index.less"
 import "./index.less"
+import {
+	SettingsMenu,
+	SettingsRender,
+	useGroupSettingsPage,
+} from "@/components/Spaces/Group/SettingsPanel"
 
 const GroupPage = (props) => {
-	const spaces = useNavigation()
-
 	const [documentTitle, setDocumentTitle] = useTitle()
 
-	const rtcChannelId = useRtcChannelId()
-
+	const nav = useNavigation()
 	const actions = useGroupActions()
 	const loading = useGroupLoading()
 	const error = useGroupError()
 	const data = useGroupData()
 	const channels = useGroupChannels()
+	const rtcChannelId = useRtcChannelId()
 
 	const savedSizes = React.useMemo(() => SplitterSizes.loadSizes(), [])
 
-	const handleResizeEnd = React.useCallback((sizes) => {
+	const handleResizeEnd = React.useCallback((sizes: number[]) => {
 		SplitterSizes.saveSizes(sizes)
 	}, [])
 
+	const settingsPage = useGroupSettingsPage()
+
 	React.useEffect(() => {
 		actions.init(props.params.group_id)
+
 		const cleanup = subscribeGroupSocket(props.params.group_id)
 
 		return () => {
@@ -66,19 +71,22 @@ const GroupPage = (props) => {
 			return undefined
 		}
 
+		// @ts-ignore
 		setDocumentTitle(data.name)
 
 		// if no channel is selected, load the first text channel (if any)
-		if (!spaces.channel && !spaces.subview) {
+		if (!nav.channel && !nav.subview) {
 			const firstTextChannel = channels?.items?.find(
 				(channel) => channel.kind === "chat",
 			)
 
 			if (firstTextChannel) {
-				spaces.navigate({ channel: firstTextChannel._id })
+				nav.navigate({ channel: firstTextChannel._id })
 			}
 		}
 	}, [data, loading])
+
+	console.log("nav", nav)
 
 	return (
 		<Splitter
@@ -91,7 +99,16 @@ const GroupPage = (props) => {
 				min={270}
 			>
 				<GroupHeader />
-				<ChannelsPanel />
+
+				{nav.subview !== "settings" && <ChannelsPanel />}
+				{nav.subview === "settings" && (
+					<SettingsMenu
+						settings={settingsPage.settings}
+						selectedKey={settingsPage.selectedKey}
+						setSelectedKey={settingsPage.setSelectedKey}
+					/>
+				)}
+
 				{rtcChannelId && <VoiceChannelCard />}
 			</Splitter.Panel>
 
@@ -100,7 +117,7 @@ const GroupPage = (props) => {
 				min={500}
 			>
 				{loading && <Skeleton />}
-				{!loading && !error && (
+				{!loading && !error && nav.subview !== "settings" && (
 					<div className="group-page__content-panel">
 						<ContentPanelHeader />
 						<ContentPanelRender />
@@ -111,6 +128,13 @@ const GroupPage = (props) => {
 						status="error"
 						title="Error"
 						subTitle={error.message}
+					/>
+				)}
+
+				{nav.subview === "settings" && (
+					<SettingsRender
+						settings={settingsPage.settings}
+						selectedKey={settingsPage.selectedKey}
 					/>
 				)}
 			</Splitter.Panel>
@@ -124,7 +148,7 @@ const GroupPage = (props) => {
 				<MembersPanel />
 
 				<div className="group-page__rightbar__attached">
-					<ToolsBar />
+					<ToolsBar filters={["mediartc-channel"]} />
 				</div>
 			</Splitter.Panel>
 		</Splitter>
