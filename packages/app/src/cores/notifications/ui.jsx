@@ -85,7 +85,7 @@ class NotificationUI {
 		if (notification.icon) {
 			notfObj.icon = React.isValidElement(notification.icon)
 				? notification.icon
-				: (createIconRender(notification.icon) ?? <Icons.FiBell />)
+				: (createIconRender(notification.icon) ?? <Icons.Bell />)
 		}
 
 		if (notification.image) {
