@@ -1,5 +1,6 @@
 {
 	"name": "@comty/shared",
+	"type": "module",
 	"version": "0.1.0",
 	"exports": {
 		"./types/*": "./types/*.ts",
@@ -13,7 +14,7 @@
 		}
 	},
 	"peerDependencies": {
-		"@ragestudio/scylla-odm": "^0.22.17",
+		"@ragestudio/scylla-odm": "^0.22.19",
 		"mediasoup": "^3.22.0"
 	}
 }
