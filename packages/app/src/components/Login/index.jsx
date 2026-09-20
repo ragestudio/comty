@@ -119,6 +119,7 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 
 			if (err.response && err.response.data) {
 				const data = err.response.data
+
 				if (data.violation) {
 					setForbidden(data.violation)
 					return
