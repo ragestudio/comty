@@ -5,12 +5,12 @@ import { Icons } from "@components/Icons"
 import { Skeleton } from "antd"
 import mime from "mime"
 import hr from "@tsmx/human-readable"
+import PropTypes from "prop-types"
 
+import { GifItem } from "../Expressions/GifPicker"
 import Image from "@components/Image"
 
 import "./index.less"
-import PropTypes from "prop-types"
-import { GifItem } from "../Expressions/GifPicker"
 
 const GenericFile = ({ attachment }) => {
 	if (!attachment || !attachment.url) {
