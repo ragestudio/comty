@@ -1,6 +1,6 @@
 import Core from "vessel/core"
 
-import createClient from "comty.js"
+import ComtyClient from "comty.js/client"
 
 import request from "comty.js/request"
 import measurePing from "comty.js/utils/measurePing"
@@ -9,18 +9,16 @@ import useRequest from "comty.js/hooks/useRequest"
 import baseWsEvents from "./baseWsEvents"
 
 export default class APICore extends Core {
-	static namespace = "api"
+	static readonly namespace = "api"
 
-	static bgColor = "coral"
-	static textColor = "black"
+	static readonly bgColor = "coral"
+	static readonly textColor = "black"
 
 	client = null
 	mainSocketReconnecting = false
 
 	public = {
-		client: function () {
-			return this.client
-		}.bind(this),
+		client: () => this.client,
 		customRequest: request,
 		joinTopic: this.joinTopic.bind(this),
 		leaveTopic: this.leaveTopic.bind(this),
@@ -30,19 +28,8 @@ export default class APICore extends Core {
 		reset: this.reset.bind(this),
 		measurePing: measurePing,
 		useRequest: useRequest,
-		socket: function () {
-			return this.client.ws.sockets.get("main")
-		},
+		socket: () => this.client.ws.sockets.get("main"),
 	}
-
-	registerSocketListeners = (map) => {
-		Object.entries(map).forEach(([namespace, listeners]) => {
-			Object.entries(listeners).forEach(([event, handler]) => {
-				this.listenEvent(event, handler, namespace)
-			})
-		})
-	}
-
 	onRuntimeEvents = {
 		"wsmanager:main:open": () => {
 			const events = Object.entries(baseWsEvents).reduce(
@@ -108,7 +95,7 @@ export default class APICore extends Core {
 		},
 	}
 
-	getWebsocketClient(namespace) {
+	getWebsocketClient(namespace: string) {
 		if (!this.client.ws?.sockets) {
 			return null
 		}
@@ -125,8 +112,8 @@ export default class APICore extends Core {
 		return instance
 	}
 
-	joinTopic(subscribeEvent, topic, instance = "main") {
-		instance = this.getWebsocketClient(instance)
+	joinTopic(subscribeEvent: string, topic: string, socket = "main") {
+		const instance = this.getWebsocketClient(socket)
 
 		if (!instance) {
 			return false
@@ -135,8 +122,8 @@ export default class APICore extends Core {
 		return instance.topics.subscribe(subscribeEvent, topic)
 	}
 
-	leaveTopic(unsubscribeEvent, topic, instance = "main") {
-		instance = this.getWebsocketClient(instance)
+	leaveTopic(unsubscribeEvent: string, topic: string, socket = "main") {
+		const instance = this.getWebsocketClient(socket)
 
 		if (!instance) {
 			return false
@@ -145,8 +132,8 @@ export default class APICore extends Core {
 		return instance.topics.unsubscribe(unsubscribeEvent, topic)
 	}
 
-	emitEvent(key, data, instance = "main") {
-		instance = this.getWebsocketClient(instance)
+	emitEvent(key: string, data: any, socket = "main") {
+		const instance = this.getWebsocketClient(socket)
 
 		if (!instance) {
 			return false
@@ -155,14 +142,14 @@ export default class APICore extends Core {
 		return instance.emit(key, data)
 	}
 
-	listenEvents(events, instance = "main") {
+	listenEvents(events: Record<string, any>, socket = "main") {
 		for (const [key, handler] of Object.entries(events)) {
-			this.listenEvent(key, handler, instance)
+			this.listenEvent(key, handler, socket)
 		}
 	}
 
-	listenEvent(key, handler, instance = "main") {
-		instance = this.getWebsocketClient(instance)
+	listenEvent(key: string, handler: any, socket = "main") {
+		const instance = this.getWebsocketClient(socket)
 
 		if (!instance) {
 			return false
@@ -171,8 +158,8 @@ export default class APICore extends Core {
 		return instance.on(key, handler)
 	}
 
-	unlistenEvent(key, handler, instance = "main") {
-		instance = this.getWebsocketClient(instance)
+	unlistenEvent(key: string, handler: any, socket = "main") {
+		const instance = this.getWebsocketClient(socket)
 
 		if (!instance) {
 			return false
@@ -186,7 +173,7 @@ export default class APICore extends Core {
 	}
 
 	async onInitialize() {
-		this.client = await createClient({
+		this.client = new ComtyClient({
 			eventBus: app.eventBus,
 			ws: {
 				enable: true,
@@ -195,7 +182,7 @@ export default class APICore extends Core {
 		})
 
 		// make a basic request to check if the API is available
-		await fetch(this.client.mainOrigin, {
+		await fetch(this.client.origin, {
 			method: "HEAD",
 		}).catch((error) => {
 			this.console.error("Ping error", error)
