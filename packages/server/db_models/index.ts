@@ -1,6 +1,4 @@
-import mongoose, { Schema, Model } from "mongoose"
-import fs from "fs"
-import path from "path"
+import mongoose, { Schema } from "mongoose"
 
 export type ModelDefinition = {
 	name: string
@@ -21,25 +19,3 @@ export function defineModel(definition: ModelDefinition) {
 
 	return mongoose.model(name, modelSchema, collection)
 }
-
-function retreiveModels() {
-	let models = {}
-
-	const dirs = fs
-		.readdirSync(__dirname)
-		.filter((file) => file !== "index.js" && file !== "index.ts")
-
-	dirs.forEach((file) => {
-		const mod = require(path.join(__dirname, file)).default
-
-		if (typeof mod === "function" && mod.base) {
-			return (models[mod.modelName] = mod)
-		}
-
-		return (models[mod.name] = defineModel(mod))
-	})
-
-	return models
-}
-
-module.exports = retreiveModels()
