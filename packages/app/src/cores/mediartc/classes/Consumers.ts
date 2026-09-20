@@ -14,6 +14,7 @@ export default class Consumers {
 	}
 
 	get _mirrorMap(): Map<string, Consumer> {
+		// @ts-ignore
 		return this.core.recvTransport?._consumers || new Map()
 	}
 
@@ -86,7 +87,7 @@ export default class Consumers {
 
 			// create a new remote consumer
 			// IMPORTANT: we need to set paused to true.
-			const consumerInfo = await this.core.socket.call(
+			const consumerInfo = (await this.core.socket.call(
 				"channel:consume",
 				{
 					producerId: producerId,
@@ -94,7 +95,7 @@ export default class Consumers {
 					rtpCapabilities: this.core.device.rtpCapabilities,
 					paused: true,
 				},
-			)
+			)) as Consumer
 
 			// create the local consumer
 			const consumer = (await this.core.recvTransport.consume({
@@ -124,6 +125,7 @@ export default class Consumers {
 			})
 
 			const { readable, writable } =
+				// @ts-ignore
 				consumer.rtpReceiver.createEncodedStreams()
 
 			if (consumer.appData.mediaTag === "user-mic") {
