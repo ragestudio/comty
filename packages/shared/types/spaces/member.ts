@@ -1,12 +1,17 @@
 import type { GroupMembership as base } from "@comty/shared/db/group_memberships"
 import type { User } from "../user"
 
-export interface Member extends Omit<base, "created_at"> {
-	created_at?: string
+export interface MemberRole {
+	_id: string
+	label: string
+	color?: string
+}
 
+export interface Member extends Omit<Omit<base, "created_at">, "roles"> {
+	created_at?: Date
+
+	roles: MemberRole[]
 	user?: User
-	roles?: any[]
-
 	cached_at?: number
 }
 
