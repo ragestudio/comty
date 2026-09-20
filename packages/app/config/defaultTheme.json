@@ -74,7 +74,7 @@
 			"background-color-accent": "rgba(42, 42, 42, 0.8)",
 			"background-color-contrast": "#ffffff",
 			"background_disabled": "#080808",
-			"border-color": "rgba(180, 180, 180, 0.15)",
+			"border-color": "rgba(255, 255, 255, 0.2)",
 			"border-color-solid": "#3c3c3c",
 			"header-text-color": "#d8d8d8",
 			"button-background-color": "var(--colorPrimary)",
