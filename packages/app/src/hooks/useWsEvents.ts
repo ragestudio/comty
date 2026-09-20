@@ -1,6 +1,6 @@
 import React from "react"
 
-export default (wsEvents, { socketName } = {}) => {
+export default (wsEvents, { socketName }: { socketName?: string } = {}) => {
 	function registerEvents() {
 		for (const [eventName, eventHandler] of Object.entries(wsEvents)) {
 			app.cores.api.listenEvent(eventName, eventHandler, socketName)
