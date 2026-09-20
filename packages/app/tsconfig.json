@@ -1,18 +1,21 @@
 {
 	"compilerOptions": {
+		"types": ["@types/audioworklet", "vite/client", "node"],
 		"target": "es2024",
-		"lib": ["ES2025", "DOM", "DOM.Iterable"],
+		"lib": ["es2024", "DOM", "DOM.Iterable"],
+		"module": "esnext",
+		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"strict": false,
 		"allowJs": true,
 		"checkJs": true,
+		"noEmit": true,
 		"jsx": "react-jsx",
 		"experimentalDecorators": false,
 		"noFallthroughCasesInSwitch": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
-		"types": ["@types/audioworklet"],
 		"paths": {
 			"@/*": ["./src/*"],
 			"@config/*": ["./config/*"],
@@ -37,5 +40,4 @@
 	},
 	"files": ["./src/global.d.ts", "./src/declarations.d.ts"],
 	"include": ["./src/**/*.ts", "./src/**/*.tsx"],
-	"exclude": ["node_modules", "dist", "build"],
 }
