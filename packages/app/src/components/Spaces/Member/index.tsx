@@ -1,4 +1,4 @@
-import type { Member as T_Member } from "@comty/shared/types/spaces/collections/member"
+import type { Member as T_Member } from "@comty/shared/types/spaces/member"
 
 import React from "react"
 import { Tag } from "antd"
@@ -8,7 +8,7 @@ import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 import copyToClipboard from "@utils/copyToClipboard"
 
-import "./member.less"
+import "./index.less"
 
 export const MemberContextMenu = ({ member, close }) => {
 	const onClickUser = React.useCallback(() => {
@@ -160,12 +160,9 @@ const MemberBackgroundDecoration = ({
 
 	return (
 		<div
-			className={classNames(
-				"group-page__members-panel__member__bg-decoration",
-				{
-					playing: playing,
-				},
-			)}
+			className={classNames("spaces-member__bg-decoration", {
+				playing: playing,
+			})}
 		>
 			{mimetype[0] === "video" && (
 				<video
@@ -186,10 +183,14 @@ export const Member = ({
 	member,
 	connected,
 	decorations,
+	onClick,
+	className,
 }: {
 	member: T_Member
 	connected: boolean
 	decorations?: Record<string, any>
+	onClick?: () => void
+	className?: string
 }) => {
 	if (!member || !member.user) return null
 	const [hovering, setHovering] = React.useState(false)
@@ -225,11 +226,16 @@ export const Member = ({
 			context-menu="ignore"
 			data-membership-id={member._id}
 			data-user-id={member.user._id}
-			className={classNames("group-page__members-panel__member", {
-				["connected"]: !!connected,
-				["hovering"]: hovering,
-			})}
-			onClick={onContextMenuClick}
+			className={classNames(
+				"spaces-member",
+				{
+					["connected"]: !!connected,
+					["hovering"]: hovering,
+				},
+				className,
+			)}
+			onClick={onClick ?? onContextMenuClick}
+			onContextMenu={onClick ? onContextMenuClick : null}
 			onMouseEnter={() => setHovering(true)}
 			onMouseLeave={() => setHovering(false)}
 		>
@@ -239,8 +245,8 @@ export const Member = ({
 					playing={hovering}
 				/>
 			)}
-			<div className="group-page__members-panel__member__connection" />
-			<div className="group-page__members-panel__member__content">
+			<div className="spaces-member__connection" />
+			<div className="spaces-member__content">
 				<UserPreview
 					user={
 						member.user ?? {

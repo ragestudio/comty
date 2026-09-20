@@ -1,0 +1,32 @@
+.settings-members {
+  display: flex;
+  flex-direction: column;
+
+  &__list {
+
+  }
+}
+
+.settings-members__list__item {
+  display: flex;
+  flex-direction: row;
+
+  gap: 10px;
+
+  &__avatar {
+    height: 30px;
+    width: 30px;
+
+    .lazy-load-image-background {
+      height: 100%;
+      width: 100%;
+
+      img {
+        height: 100%;
+        width: 100%;
+
+        object-fit: cover;
+      }
+    }
+  }
+}

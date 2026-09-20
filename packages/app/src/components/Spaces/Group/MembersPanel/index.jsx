@@ -11,7 +11,7 @@ import {
 	useGroupActions,
 } from "@comty/spaces-lib"
 
-import Member from "./member"
+import Member from "../../Member"
 
 import "./index.less"
 

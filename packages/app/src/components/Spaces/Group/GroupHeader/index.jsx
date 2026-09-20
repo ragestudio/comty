@@ -13,24 +13,25 @@ import { useGroupData, useGroupLoading, useNavigation } from "@comty/spaces-lib"
 import "./index.less"
 
 const GroupHeader = () => {
-	const spaces = useNavigation()
-	const data = useGroupData() || {}
+	const nav = useNavigation()
+	const data = useGroupData()
 	const loading = useGroupLoading()
 
 	const [groupCoverImageAverageColor, setGroupCoverImageAverageColor] =
 		React.useState(null)
 
 	const onClickSettingsButton = () => {
-		spaces.navigate({ channel: null, subview: "settings" })
-	}
+		if (nav.subview === "settings") {
+			nav.navigate({ subview: null })
+			return
+		}
 
-	const onClickInviteButton = () => {
-		spaces.navigate({ channel: null, subview: "settings" })
+		nav.navigate({ subview: "settings" })
 	}
 
 	// calculate the average color of the group cover image
 	React.useEffect(() => {
-		if (data.cover) {
+		if (data?.cover) {
 			imageAverageColor(data.cover).then((averageColor) => {
 				setGroupCoverImageAverageColor(averageColor)
 			})
@@ -50,9 +51,9 @@ const GroupHeader = () => {
 	return (
 		<div
 			className={classNames("group-page__header", {
-				["has_banner"]: data.cover,
+				["has_banner"]: data?.cover,
 				["cover_light"]:
-					(data.cover && groupCoverImageAverageColor?.isLight) ??
+					(data?.cover && groupCoverImageAverageColor?.isLight) ??
 					false,
 				["average_color"]: groupCoverImageAverageColor?.hex,
 			})}
@@ -76,7 +77,7 @@ const GroupHeader = () => {
 				</div>
 			</div>
 
-			{data.cover && (
+			{data?.cover && (
 				<div className="group-page__header__cover">
 					<Image src={data.cover} />
 				</div>
