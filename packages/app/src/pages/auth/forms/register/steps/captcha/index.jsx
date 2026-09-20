@@ -7,15 +7,13 @@ const CaptchaStepComponent = (props) => {
 	)
 
 	React.useEffect(() => {
-		fetch(app.cores.api.client().mainOrigin + "/main/turnstile").then(
-			(res) => {
-				if (res.ok) {
-					res.json().then((data) => {
-						setSitekey(data.siteKey)
-					})
-				}
-			},
-		)
+		fetch(app.cores.api.client().origin + "/main/turnstile").then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					setSitekey(data.siteKey)
+				})
+			}
+		})
 	}, [])
 
 	return (
