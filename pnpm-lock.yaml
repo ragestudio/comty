@@ -532,9 +532,6 @@ importers:
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
-      shiki:
-        specifier: ^4.4.3
-        version: 4.4.3
       store:
         specifier: ^2.0.12
         version: 2.0.12
