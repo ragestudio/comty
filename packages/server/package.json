@@ -12,9 +12,9 @@
 		"@db": "../shared/db"
 	},
 	"scripts": {
-		"setup": "cross-env NODE_ENV=development linebridge boot scripts/setup/index.js",
-		"dev": "cross-env NODE_ENV=development DEBUG=true ultragateway",
-		"dev:exp": "cross-env NODE_ENV=development DEBUG=true ../../modules/linebridge/gateway/debug",
+		"setup": "linebridge boot scripts/setup/index.js",
+		"dev": "linebridge gateway",
+		"dev:exp": "DEBUG=true ../../modules/linebridge/gateway/debug",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
