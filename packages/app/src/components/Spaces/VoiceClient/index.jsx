@@ -68,7 +68,26 @@ const VoiceClient = ({ client, speaking, producers }) => {
 
 			soundpadIconClearTimeout.current = setTimeout(() => {
 				setSoundpadIcon(null)
-			}, 5000)
+			}, 10000)
+		},
+		[client],
+	)
+
+	const handleSoundpadEnded = React.useCallback(
+		(payload) => {
+			if (!payload) {
+				return null
+			}
+
+			if (payload?.userId !== client?.userId) {
+				return null
+			}
+
+			if (soundpadIconClearTimeout.current) {
+				clearTimeout(soundpadIconClearTimeout.current)
+			}
+
+			setSoundpadIcon(null)
 		},
 		[client],
 	)
@@ -79,6 +98,10 @@ const VoiceClient = ({ client, speaking, producers }) => {
 				`rtc:vc:soundpad:${client.userId}`,
 				handleSoundpadDispatched,
 			)
+			app.eventBus.on(
+				`rtc:vc:soundpad:${client.userId}:ended`,
+				handleSoundpadEnded,
+			)
 		}
 
 		return () => {
@@ -86,6 +109,10 @@ const VoiceClient = ({ client, speaking, producers }) => {
 				app.eventBus.off(
 					`rtc:vc:soundpad:${client.userId}`,
 					handleSoundpadDispatched,
+				)
+				app.eventBus.off(
+					`rtc:vc:soundpad:${client.userId}:ended`,
+					handleSoundpadEnded,
 				)
 			}
 		}

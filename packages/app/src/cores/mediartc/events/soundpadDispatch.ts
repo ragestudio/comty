@@ -17,17 +17,22 @@ export default async (core: MediaRTC, payload: any) => {
 
 		await audio.play()
 
-		app.eventBus.emit("rtc:vc:soundpad", {
+		const eventBusPayload = {
 			userId: payload.userId,
 			src: payload.data.src,
 			icon: payload.data.icon,
-		})
+		}
 
-		app.eventBus.emit(`rtc:vc:soundpad:${payload.userId}`, {
-			userId: payload.userId,
-			src: payload.data.src,
-			icon: payload.data.icon,
-		})
+		audio.onended = () => {
+			app.eventBus.emit("rtc:vc:soundpad:ended", eventBusPayload)
+			app.eventBus.emit(
+				`rtc:vc:soundpad:${payload.userId}:ended`,
+				eventBusPayload,
+			)
+		}
+
+		app.eventBus.emit("rtc:vc:soundpad", eventBusPayload)
+		app.eventBus.emit(`rtc:vc:soundpad:${payload.userId}`, eventBusPayload)
 
 		setTimeout(() => {
 			if (!audio.ended) {
