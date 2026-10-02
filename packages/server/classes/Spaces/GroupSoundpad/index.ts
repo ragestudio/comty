@@ -1,5 +1,4 @@
-import * as db_models from "@db_models"
-const { GroupSoundpadItem } = db_models as any
+import GroupSoundpadItem from "@db_models/groupSoundpadItem"
 
 import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
