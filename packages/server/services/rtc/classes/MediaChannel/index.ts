@@ -5,7 +5,7 @@ import type Producer from "./producer"
 import type MediaChannelsController from "@classes/MediaChannelsController"
 
 import { SFUNode } from "@classes/MediaChannelsController/sfu/node"
-import EventEmitter from "@foxify/events"
+import { EventEmitter } from "tseep/lib/ee-safe"
 
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
@@ -41,8 +41,6 @@ export type SerializedMediaChannel = {
 import type { Client as SerializedClient } from "@comty/shared/types/rtc/client"
 import type { SerializedProducer } from "@comty/shared/types/rtc/producer"
 import type { StatedChannel as SerializedStateMediaChannel } from "@comty/shared/types/rtc/statedChannel"
-
-
 
 export interface SerializedConsumer extends Partial<Consumer> {
 	user_id: string
