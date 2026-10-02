@@ -41,11 +41,11 @@
 			"disabled-color": "#d2d2d2",
 			"layoutBackgroundColor": "255, 255, 255",
 			"layout-background-contrast": "38, 38, 38",
-			"background-color-primary": "#ffffff",
+			"background-color-primary": "rgba(255, 255, 255, 0.8)",
 			"background-color-primary-2": "#f0f0f0",
 			"shadow-color": "#4b4b4b7c",
 
-			"background-color-accent": "rgba(var(--background-color-accent-values), 0.8)",
+			"background-color-accent": "rgba(240, 242, 245, 0.6)",
 			"background-color-accent-values": "240, 242, 245",
 			"background-color-contrast": "#4b4b4b",
 
