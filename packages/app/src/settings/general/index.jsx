@@ -57,6 +57,39 @@ export default {
 			noUpdate: true,
 		},
 		{
+			id: "app:default_page",
+			group: "general",
+			component: "Select",
+			icon: "Home",
+			title: "Default Page",
+			description:
+				"Set the default page to open when App is launched or the Home button is pressed",
+			defaultValue: () =>
+				app.cores.settings.get("app:default_page") ?? "timeline",
+			props: {
+				defaultValue: "timeline",
+				options: [
+					{
+						value: "timeline",
+						label: "Timeline",
+					},
+					{
+						value: "tv",
+						label: "TV",
+					},
+					{
+						value: "music",
+						label: "Music",
+					},
+					{
+						value: "spaces",
+						label: "Spaces",
+					},
+				],
+			},
+			storaged: true,
+		},
+		{
 			id: "sidebar.collapse_delay_time",
 			group: "sidebar",
 			component: "Slider",

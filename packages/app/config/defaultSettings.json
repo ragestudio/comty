@@ -18,6 +18,8 @@
 	"style:auto_darkmode": true,
 	"player.compressor": false,
 
+	"app:default_page": "timeline",
+
 	"mediartc:soundpad:volume": 0.2,
 	"mediartc:noiseSuppression": "native",
 	"mediartc:inputGain": 1,
