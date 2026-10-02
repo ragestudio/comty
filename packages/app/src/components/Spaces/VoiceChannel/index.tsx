@@ -5,23 +5,37 @@ import { motion } from "motion/react"
 import StreamTile from "@components/Spaces/StreamTile"
 
 import useMediaRTCState from "@hooks/useMediaRTCState"
-
+import useHacks from "@/hooks/useHacks"
 import UsersModel from "@models/user"
 
 import "./index.less"
 
+type VCItem = {
+	type: "screen" | "user"
+	id: string
+	userId?: string
+	isSelf?: boolean
+	stream?: any
+}
+
 const VoiceChannel = () => {
 	const state = useMediaRTCState()
+	const [items, setItems] = React.useState<VCItem[]>([])
 	const [selectedStreamId, setSelectedStreamId] = React.useState(null)
 	const [userData, setUserData] = React.useState({})
 	const fetchedUsersRef = React.useRef(new Set())
 
 	const rtc = app.cores.mediartc.instance()
 
-	const streams = React.useMemo(() => {
-		const result = state.remoteProducers
+	const handleTileClick = React.useCallback((streamId) => {
+		setSelectedStreamId((current) => (current === streamId ? null : streamId))
+	}, [])
+
+	React.useEffect(() => {
+		const streams = state.remoteProducers
 			.filter((p) => p.kind === "video")
 			.map((p) => ({
+				type: "screen",
 				id: p.id,
 				userId: p.userId,
 				isSelf: false,
@@ -29,14 +43,22 @@ const VoiceChannel = () => {
 			}))
 
 		if (state.isProducingScreen && rtc.self.screenStream) {
-			result.push({
+			streams.push({
+				type: "screen",
 				id: `self-${app.userData._id}`,
 				userId: app.userData._id,
 				isSelf: true,
 				stream: rtc.self.screenStream,
 			})
 		}
-		return result
+
+		console.log("computed screens:", {
+			streams,
+		})
+
+		setItems((prev) => {
+			return [...streams]
+		})
 	}, [
 		state.remoteProducersCount,
 		state.isProducingScreen,
@@ -45,14 +67,14 @@ const VoiceChannel = () => {
 	])
 
 	React.useEffect(() => {
-		const missingUserIds = streams
+		const missingUserIds = items
 			.map((s) => s.userId)
 			.filter((id) => !userData[id] && !fetchedUsersRef.current.has(id))
 
 		if (missingUserIds.length > 0) {
 			missingUserIds.forEach((id) => fetchedUsersRef.current.add(id))
 
-			UsersModel.data({ user_id: missingUserIds }).then((data) => {
+			UsersModel.data({ user_id: missingUserIds.join(",") }).then((data) => {
 				const usersArray = Array.isArray(data) ? data : [data]
 
 				setUserData((prev) => {
@@ -68,22 +90,32 @@ const VoiceChannel = () => {
 				})
 			})
 		}
-	}, [streams, userData])
+	}, [items, userData])
+
+	useHacks(
+		{
+			addMockScreen: () => {
+				setItems((prev) => {
+					return [
+						...prev,
+						{
+							type: "screen",
+							id: Date.now().toString(),
+						},
+					]
+				})
+			},
+		},
+		{
+			namespace: "vc_view",
+		},
+	)
 
 	React.useEffect(() => {
-		if (
-			selectedStreamId &&
-			!streams.find((s) => s.id === selectedStreamId)
-		) {
+		if (selectedStreamId && !items.find((s) => s.id === selectedStreamId)) {
 			setSelectedStreamId(null)
 		}
-	}, [streams, selectedStreamId])
-
-	const handleTileClick = React.useCallback((streamId) => {
-		setSelectedStreamId((current) =>
-			current === streamId ? null : streamId,
-		)
-	}, [])
+	}, [items, selectedStreamId])
 
 	React.useEffect(() => {
 		if (!state.channel) {
@@ -100,11 +132,9 @@ const VoiceChannel = () => {
 	}, [state.channel, rtc])
 
 	if (!state.channel) {
-		return (
-			<div className="channel-video-page channel-video-page--empty"></div>
-		)
+		return <div className="channel-video-page channel-video-page--empty"></div>
 	}
-	if (streams.length === 0) {
+	if (items.length === 0) {
 		return (
 			<div className="channel-video-page channel-video-page--empty">
 				<h2>no video streams available</h2>
@@ -122,10 +152,10 @@ const VoiceChannel = () => {
 		return { cols: 4, rows: Math.ceil(count / 4) }
 	}
 
-	const isSingleStream = streams.length === 1
+	const isSingleStream = items.length === 1
 	const hasSidebar = !isSingleStream && selectedStreamId !== null
 
-	const { cols, rows } = getGridLayout(streams.length)
+	const { cols, rows } = getGridLayout(items.length)
 
 	return (
 		<motion.div className="channel-video-page">
@@ -135,27 +165,28 @@ const VoiceChannel = () => {
 						"video-grid--with-sidebar": hasSidebar,
 						"video-grid--single": isSingleStream,
 					})}
-					style={{ "--grid-cols": cols, "--grid-rows": rows }}
+					style={{
+						// @ts-ignore
+						"--grid-cols": cols,
+						"--grid-rows": rows,
+					}}
 				>
-					{streams.map((stream) => {
+					{items.map((item) => {
 						let tileMode = "grid"
 
 						if (isSingleStream) {
 							tileMode = "single"
 						} else if (hasSidebar) {
-							tileMode =
-								stream.id === selectedStreamId
-									? "hero"
-									: "preview"
+							tileMode = item.id === selectedStreamId ? "hero" : "preview"
 						}
 
 						return (
 							<StreamTile
-								key={stream.id}
-								stream={stream}
+								key={item.id}
+								stream={item}
 								mode={tileMode}
 								onTileClick={handleTileClick}
-								userData={userData[stream.userId]}
+								userData={userData[item.userId]}
 							/>
 						)
 					})}

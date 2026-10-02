@@ -1,6 +1,8 @@
-@group_icon_size: 40px;
+@group_icon_size: 50px;
 
 .group-list__item {
+	position: relative;
+
 	display: flex;
 	flex-direction: row;
 
@@ -33,9 +35,9 @@
 		display: block;
 
 		top: auto;
-		right: 1px;
+		right: 5px;
 
-		width: 2px;
+		width: 3px;
 		height: 0;
 
 		transition: all 150ms ease-in-out;
@@ -95,5 +97,26 @@
 		flex-direction: row;
 		align-items: center;
 		gap: 10px;
+	}
+}
+
+.group-list__item__group {
+	&.selected {
+		outline: 2px solid var(--border-color);
+
+		.group-list__item__icon {
+			mask-image: linear-gradient(270deg, #0000 0px, #000 50px, #000 100%);
+		}
+	}
+
+	.group-list__item__icon {
+		z-index: -1;
+		position: absolute;
+
+		left: 0;
+		top: 0;
+
+		width: 100%;
+		height: 100%;
 	}
 }

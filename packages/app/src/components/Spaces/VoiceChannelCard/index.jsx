@@ -51,51 +51,6 @@ const ConnectionStateIndicator = ({ state }) => {
 	)
 }
 
-const Self = ({ client, speaking }) => {
-	const onContextMenu = React.useCallback(
-		(event) => {
-			event.preventDefault()
-			event.stopPropagation()
-
-			const { x, y } = app.cores.ctx_menu.calculateFitCordinates(
-				event,
-				parseInt(
-					app.cores.style.vars["context-menu-width"].replace(
-						"px",
-						"",
-					),
-				),
-				300, // FIXME: calculate height properly
-			)
-
-			const contextMenuProps = {
-				target: event.target,
-				client: { ...client, self: true },
-				close: app.cores.ctx_menu.close,
-			}
-
-			app.cores.ctx_menu.renderMenu(
-				React.createElement(ClientContextMenu, contextMenuProps),
-				x,
-				y,
-			)
-		},
-		[client],
-	)
-
-	return (
-		<div
-			key={app.userData._id}
-			className={classNames("rtc-vc-card__self", {
-				["speaking"]: speaking ?? false,
-			})}
-			onContextMenu={onContextMenu}
-		>
-			<img src={app.userData.avatar} />
-		</div>
-	)
-}
-
 const VoiceChannelCard = () => {
 	const state = useMediaRTCState()
 
@@ -136,13 +91,6 @@ const VoiceChannelCard = () => {
 	return (
 		<div className="rtc-vc-card">
 			<div className="rtc-vc-card__header">
-				<Self
-					speaking={state.isSpeaking}
-					client={{
-						userId: app.userData._id,
-					}}
-				/>
-
 				<div className="rtc-vc-card__header__titles">
 					<div className="rtc-vc-card__header__titles__indicators">
 						<ConnectionStateIndicator
@@ -183,7 +131,9 @@ const VoiceChannelCard = () => {
 					icon={state.isMuted ? <Icons.MicOff /> : <Icons.Mic />}
 					onClick={handleToggleMute}
 					type={state.isMuted ? "primary" : "default"}
-					className={state.isSpeaking ? "speaking" : ""}
+					className={classNames("mic-button", {
+						speaking: state.isSpeaking,
+					})}
 				/>
 
 				<Button

@@ -13,9 +13,14 @@ const GroupListItem = ({ ref, group, onClick, selected }) => {
 	return (
 		<div
 			ref={ref}
-			className={classnames("group-list__item", "bg-accent", {
-				["selected"]: selected,
-			})}
+			className={classnames(
+				"group-list__item",
+				"group-list__item__group",
+				"bg-accent",
+				{
+					["selected"]: selected,
+				},
+			)}
 			onClick={handleClick}
 			data-group-id={group.id}
 		>

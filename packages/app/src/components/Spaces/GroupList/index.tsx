@@ -29,7 +29,13 @@ const SortableItem = ({ group, index, onClick, selected }: any) => {
 	)
 }
 
-const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }: any) => {
+const GroupsList = ({
+	onClickItem,
+	onClickCreateNew,
+	selected,
+	sortable,
+	compact,
+}: any) => {
 	const { groups, loading, error, actions } = useGroupsList()
 
 	React.useEffect(() => {
@@ -45,8 +51,8 @@ const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }: any) 
 			const currentIds = groups.map((item) => item._id)
 			const newItemsIds = move(currentIds, event)
 
-			const newItems = newItemsIds.map(
-				(id) => groups.find((item) => item._id === id)!
+			const newItems = newItemsIds.map((id) =>
+				groups.find((item) => item._id === id)!,
 			)
 
 			actions.setGroups(newItems)
@@ -71,7 +77,11 @@ const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }: any) 
 	}
 
 	return (
-		<div className={classnames("groups-list")}>
+		<div
+			className={classnames("groups-list", {
+				compact: compact,
+			})}
+		>
 			{groups.length === 0 && (
 				<Result
 					status="info"

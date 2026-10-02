@@ -86,29 +86,12 @@
 		align-items: center;
 
 		gap: 10px;
-	}
 
-	&__self {
-		position: relative;
-
-		width: 35px;
-		height: 35px;
-		min-width: 35px;
-		min-height: 35px;
-
-		border-radius: 12px;
-
-		overflow: hidden;
-
-		&.speaking {
-			box-shadow: 0 0 0 2px var(--colorPrimary);
-			animation: speaking-pulse 1.5s ease-in-out infinite;
-		}
-
-		img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
+		.mic-button {
+			&.speaking {
+				box-shadow: 0 0 0 2px var(--colorPrimary);
+				animation: speaking-pulse 1.5s ease-in-out infinite;
+			}
 		}
 	}
 }

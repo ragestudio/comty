@@ -65,7 +65,7 @@ export const ContentPanelHeader = () => {
 	const Icon = definition?.icon
 
 	return (
-		<div className="group-page__content-panel__header">
+		<div className="group-page__content-panel__header bg-accent">
 			<p>
 				{Icon && <Icon />}
 				{title}

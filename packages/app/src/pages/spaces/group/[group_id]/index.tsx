@@ -94,7 +94,7 @@ const GroupPage = (props) => {
 			onResizeEnd={handleResizeEnd}
 		>
 			<Splitter.Panel
-				className="group-page__panel"
+				className="group-page__panel group-page__leftbar bg-accent"
 				defaultSize={savedSizes?.[0] ?? 330}
 				min={270}
 			>
@@ -109,11 +109,13 @@ const GroupPage = (props) => {
 					/>
 				)}
 
-				{rtcChannelId && <VoiceChannelCard />}
+				<div className="group-page__leftbar__bottom">
+					{rtcChannelId && <VoiceChannelCard />}
+				</div>
 			</Splitter.Panel>
 
 			<Splitter.Panel
-				className="group-page__panel"
+				className="group-page__panel group-page__main"
 				min={500}
 			>
 				{loading && <Skeleton />}
@@ -140,7 +142,7 @@ const GroupPage = (props) => {
 			</Splitter.Panel>
 
 			<Splitter.Panel
-				className="group-page__rightbar"
+				className="group-page__panel group-page__rightbar bg-accent"
 				defaultSize={savedSizes?.[2] ?? 300}
 				min={300}
 				collapsible
