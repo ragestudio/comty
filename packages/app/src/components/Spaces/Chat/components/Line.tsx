@@ -9,6 +9,8 @@ import TimeAgo from "@components/TimeAgo"
 import Image from "@components/Image"
 import StickerRender from "@components/StickerRender"
 import { Icons } from "@components/Icons"
+import Markdown from "react-markdown"
+import { ShikiHighlighter, isInlineCode } from "react-shiki"
 
 import LinkPreview from "./LinkPreview"
 import { useLiveQuery } from "dexie-react-hooks"
@@ -16,9 +18,6 @@ import { useLiveQuery } from "dexie-react-hooks"
 import db from "@comty/spaces-lib/db/index"
 
 import "./Line.less"
-
-import Markdown from "react-markdown"
-import { ShikiHighlighter, isInlineCode } from "react-shiki"
 
 interface LineProps {
 	data: Message
@@ -150,166 +149,169 @@ const RenderMessage = ({ messageStr }: { messageStr: string }) => {
 	)
 }
 
-const Line = React.memo(
-	({
-		data,
-		headless,
-		type,
-		onReplyPreviewClick,
-		// isLast,
-		// onReadAck,
-	}: LineProps) => {
-		const dbUserData = useLiveQuery(
-			() => (data.user_id ? db.users.get(data.user_id) : undefined),
-			[data.user_id],
-		)
-		const appUserData =
-			(globalThis as any).app?.userData || (window as any).app?.userData
+const Line = ({
+	data,
+	headless,
+	type,
+	onReplyPreviewClick,
+	// isLast,
+	// onReadAck,
+}: LineProps) => {
+	const dbUserData = useLiveQuery(
+		() => (data.user_id ? db.users.get(data.user_id) : undefined),
+		[data.user_id],
+	)
+	const appUserData =
+		(globalThis as any).app?.userData || (window as any).app?.userData
 
-		// const intersectionRef = useMessageIntersection({
-		// 	messageId: data._id,
-		// 	onAck: isLast ? onReadAck : undefined,
-		// 	delayMs: 5000,
-		// })
+	// const intersectionRef = useMessageIntersection({
+	// 	messageId: data._id,
+	// 	onAck: isLast ? onReadAck : undefined,
+	// 	delayMs: 5000,
+	// })
 
-		const replyData = useLiveQuery(async () => {
-			if (!data.reply_to_id || !type) return null
+	const replyData = useLiveQuery(async () => {
+		if (!data.reply_to_id || !type) return null
 
-			const table = type === "group" ? db.channel_messages : db.direct_messages
+		const table = type === "group" ? db.channel_messages : db.direct_messages
 
-			const repliedMsg = await table.get(data.reply_to_id)
-			if (!repliedMsg) return null
+		const repliedMsg = await table.get(data.reply_to_id)
+		if (!repliedMsg) return null
 
-			const repliedUsr = await db.users.get(repliedMsg.user_id)
+		const repliedUsr = await db.users.get(repliedMsg.user_id)
 
-			return { message: repliedMsg, user: repliedUsr ?? null }
-		}, [data.reply_to_id, type])
+		return { message: repliedMsg, user: repliedUsr ?? null }
+	}, [data.reply_to_id, type])
 
-		const userData = React.useMemo(() => {
-			if (dbUserData) return dbUserData
-			if (appUserData && appUserData._id === data.user_id) return appUserData
+	const userData = React.useMemo(() => {
+		if (dbUserData) return dbUserData
+		if (appUserData && appUserData._id === data.user_id) return appUserData
 
-			return null
-		}, [dbUserData, appUserData, data.user_id])
+		return null
+	}, [dbUserData, appUserData, data.user_id])
 
-		const handleReplyPreviewClick = React.useCallback(() => {
-			if (!data.reply_to_id || typeof onReplyPreviewClick !== "function") return
-			onReplyPreviewClick(data.reply_to_id)
-		}, [data.reply_to_id, onReplyPreviewClick])
+	const handleReplyPreviewClick = React.useCallback(() => {
+		if (!data.reply_to_id || typeof onReplyPreviewClick !== "function") return
+		onReplyPreviewClick(data.reply_to_id)
+	}, [data.reply_to_id, onReplyPreviewClick])
 
-		const isSystemMessage = data.flags?.includes("system")
+	const isSystemMessage = data.flags?.includes("system")
 
-		if (isSystemMessage) {
-			return (
-				<div
-					//ref={intersectionRef}
-					data-message-id={data._id}
-					className={classnames(
-						"channel-chat__timeline__line",
-						"channel-chat__timeline__line--system",
-					)}
-				>
-					<div className="channel-chat__timeline__line__content">
-						<div className="channel-chat__timeline__line__content__body">
-							<p className="channel-chat__timeline__line--system__text">
-								{data.message}
-							</p>
-						</div>
-					</div>
-				</div>
-			)
-		}
-
+	if (isSystemMessage) {
 		return (
 			<div
 				//ref={intersectionRef}
 				data-message-id={data._id}
-				data-message-user-id={data.user_id ?? "unknown"}
-				context-menu="chat-line"
-				className={classnames("channel-chat__timeline__line", {
-					["headless"]: headless,
-					["sending"]: data.status === "sending",
-					["error"]: data.status === "error",
-				})}
+				className={classnames(
+					"channel-chat__timeline__line",
+					"channel-chat__timeline__line--system",
+				)}
 			>
+				<div className="channel-chat__timeline__line__content">
+					<div className="channel-chat__timeline__line__content__body">
+						<p className="channel-chat__timeline__line--system__text">
+							{data.message}
+						</p>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	return (
+		<div
+			//ref={intersectionRef}
+			data-message-id={data._id}
+			data-message-user-id={data.user_id ?? "unknown"}
+			context-menu="chat-line"
+			className={classnames("channel-chat__timeline__line", {
+				["headless"]: headless,
+				["sending"]: data.status === "sending",
+				["error"]: data.status === "error",
+			})}
+		>
+			{!headless && (
+				<div className="channel-chat__timeline__line__avatar">
+					<Image
+						src={userData?.avatar}
+						alt={userData?.username}
+					/>
+				</div>
+			)}
+
+			<div className="channel-chat__timeline__line__content">
 				{!headless && (
-					<div className="channel-chat__timeline__line__avatar">
-						<Image
-							src={userData?.avatar}
-							alt={userData?.username}
-						/>
+					<div className="channel-chat__timeline__line__content__header">
+						<div className="channel-chat__timeline__line__content__header__username">
+							<span>
+								{userData?.public_name ??
+									(userData?.username ? `@${userData?.username}` : "...")}
+							</span>
+
+							{userData?.bot && (
+								<div className="channel-chat__timeline__line__content__header__username__bot-indicator">
+									<span>Bot</span>
+								</div>
+							)}
+						</div>
+
+						<div className="channel-chat__timeline__line__content__header__time">
+							{data.status === "sending" ? (
+								<Icons.Loader2 className="animate-spin" />
+							) : data.status === "error" ? (
+								<Icons.AlertCircle className="text-danger" />
+							) : (
+								<TimeAgo time={data.created_at} />
+							)}
+						</div>
 					</div>
 				)}
 
-				<div className="channel-chat__timeline__line__content">
-					{!headless && (
-						<div className="channel-chat__timeline__line__content__header">
-							<div className="channel-chat__timeline__line__content__header__username">
-								<span>
-									{userData?.public_name ??
-										(userData?.username ? `@${userData?.username}` : "...")}
+				<div
+					className="channel-chat__timeline__line__content__body"
+					id="message-content"
+				>
+					{replyData && (
+						<div
+							className="channel-chat__timeline__line__content__reply-preview"
+							onClick={handleReplyPreviewClick}
+						>
+							<Icons.Reply className="channel-chat__timeline__line__content__reply-preview__icon" />
+							<div className="channel-chat__timeline__line__content__reply-preview__content">
+								<span className="channel-chat__timeline__line__content__reply-preview__username">
+									{replyData.user?.public_name ??
+										(replyData.user?.username
+											? `@${replyData.user.username}`
+											: "...")}
 								</span>
-
-								{userData?.bot && (
-									<div className="channel-chat__timeline__line__content__header__username__bot-indicator">
-										<span>Bot</span>
-									</div>
-								)}
-							</div>
-
-							<div className="channel-chat__timeline__line__content__header__time">
-								{data.status === "sending" ? (
-									<Icons.Loader2 className="animate-spin" />
-								) : data.status === "error" ? (
-									<Icons.AlertCircle className="text-danger" />
-								) : (
-									<TimeAgo time={data.created_at} />
-								)}
+								<span className="channel-chat__timeline__line__content__reply-preview__text">
+									{replyData.message.message}
+								</span>
 							</div>
 						</div>
 					)}
 
-					<div
-						className="channel-chat__timeline__line__content__body"
-						id="message-content"
-					>
-						{replyData && (
-							<div
-								className="channel-chat__timeline__line__content__reply-preview"
-								onClick={handleReplyPreviewClick}
-							>
-								<Icons.Reply className="channel-chat__timeline__line__content__reply-preview__icon" />
-								<div className="channel-chat__timeline__line__content__reply-preview__content">
-									<span className="channel-chat__timeline__line__content__reply-preview__username">
-										{replyData.user?.public_name ??
-											(replyData.user?.username
-												? `@${replyData.user.username}`
-												: "...")}
-									</span>
-									<span className="channel-chat__timeline__line__content__reply-preview__text">
-										{replyData.message.message}
-									</span>
-								</div>
-							</div>
-						)}
+					{data.message && <RenderMessage messageStr={data.message} />}
 
-						{data.message && <RenderMessage messageStr={data.message} />}
-
-						{data.attachments && data.attachments.length > 0 && (
-							<Attachments
-								attachments={data.attachments as any}
-								className="channel-chat__timeline__line__content__body__attachments"
-							/>
-						)}
-					</div>
-
-					{data.sticker && <StickerRender id={data.sticker} />}
+					{data.attachments && data.attachments.length > 0 && (
+						<Attachments
+							attachments={data.attachments as any}
+							className="channel-chat__timeline__line__content__body__attachments"
+						/>
+					)}
 				</div>
+
+				{data.sticker && <StickerRender id={data.sticker} />}
 			</div>
-		)
-	},
-)
+		</div>
+	)
+}
 
-Line.displayName = "Line"
+export const LineMemo = React.memo(Line, (prev, next) => {
+	if (prev.headless !== next.headless) return true
+	return false
+})
 
-export default Line
+LineMemo.displayName = "Line"
+
+export default LineMemo
