@@ -1,0 +1,14 @@
+{
+	"extends": "./node_modules/expo/tsconfig.base.json",
+	"compilerOptions": {
+		"strict": true,
+		"experimentalDecorators": false,
+		"esModuleInterop": true,
+		"paths": {
+			"@/*": ["./src/*"],
+			"@/assets/*": ["./assets/*"],
+			"@models/*": ["./src/lib/comty/models/*"],
+		},
+	},
+	"include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+}
