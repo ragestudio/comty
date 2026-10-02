@@ -1,4 +1,5 @@
 import React from "react"
+import { Menu } from "antd"
 import { motion } from "motion/react"
 import classNames from "classnames"
 import { Icons } from "@components/Icons"
@@ -7,6 +8,9 @@ import QuickSettings from "./quickSettings"
 import { authorizedItems } from "@layouts/components/sidebar/inner"
 import SidebarItemsClickHandlers from "@layouts/components/sidebar/itemClickHandlers"
 import GroupsList from "@components/Spaces/GroupList"
+import GenerateMenuItems from "@utils/generateMenuItems"
+
+import TopMenuItems from "@config/sidebar/TopItems"
 
 import { useNavigation } from "@comty/spaces-lib"
 import config from "@config"
@@ -14,9 +18,16 @@ import config from "@config"
 import "./sidebar.less"
 
 const SpacesSidebar = () => {
+	const [defaultItemsVisible, setDefaultItemsVisible] = React.useState(false)
+	const [compact, setCompact] = React.useState(false)
+	const autoHideDefaultItemsTimeout = React.useRef()
+
 	const { type, room } = useNavigation()
 
-	const [compact, setCompact] = React.useState(false)
+	const defaultSidebarTopItems = React.useMemo(
+		() => GenerateMenuItems(TopMenuItems),
+		[],
+	)
 
 	React.useEffect(() => {
 		if (type !== null) {
@@ -34,6 +45,31 @@ const SpacesSidebar = () => {
 		app.location.push(`/spaces/new`)
 	}
 
+	const onClickHomeButton = () => {
+		if (autoHideDefaultItemsTimeout.current) {
+			clearTimeout(autoHideDefaultItemsTimeout.current)
+		}
+
+		autoHideDefaultItemsTimeout.current = setTimeout(() => {
+			setDefaultItemsVisible(false)
+		}, 4000)
+
+		if (defaultItemsVisible) {
+			app.navigation.goMain()
+			clearTimeout(autoHideDefaultItemsTimeout.current)
+		} else {
+			setDefaultItemsVisible(true)
+		}
+	}
+
+	const onDefaultMenuClick = (e) => {
+		setDefaultItemsVisible(false)
+
+		if (e.itemData.path) {
+			app.location.push(`/${e.itemData.path ?? e.key}`, 150)
+		}
+	}
+
 	return (
 		<div className="spaces-page__sidebar-wrapper">
 			<motion.div
@@ -44,18 +80,29 @@ const SpacesSidebar = () => {
 				<div className="spaces-page__sidebar__header">
 					<img
 						src={config.logo?.alt}
-						onClick={() => app.navigation.goMain()}
+						onClick={onClickHomeButton}
 						className="spaces-page__sidebar__header__logo"
 					/>
 				</div>
 
 				<div className="spaces-page__sidebar__section">
-					<GroupsList
-						selected={type === "group" ? room : null}
-						onClickItem={onClickGroupListItem}
-						onClickCreateNew={onClickCreateNewGroup}
-						sortable
-					/>
+					{defaultItemsVisible && (
+						<Menu
+							mode="inline"
+							onClick={onDefaultMenuClick}
+							//selectedKeys={[selectedKeyId]}
+							items={defaultSidebarTopItems}
+						/>
+					)}
+					{!defaultItemsVisible && (
+						<GroupsList
+							compact={compact}
+							selected={type === "group" ? room : null}
+							onClickItem={onClickGroupListItem}
+							onClickCreateNew={onClickCreateNewGroup}
+							sortable
+						/>
+					)}
 				</div>
 
 				<SpacesSidebarBottomItems />
