@@ -21,6 +21,9 @@ allowBuilds:
   esbuild: true
   mediasoup: true
   msgpackr-extract: true
+  better-sqlite3: true
+  canvas: true
+  is-hidden-file: true
 
 blockExoticSubdeps: false
 
