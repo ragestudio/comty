@@ -41,7 +41,7 @@ const useUserData = (username) => {
 		}
 
 		// get decorations
-		const decorations = await UserModel.V2.decorations
+		const decorations = await UserModel.decorations
 			.get(data._id)
 			.catch((error) => {
 				console.error(error)
