@@ -1,65 +1,132 @@
 <p align="center">
-<img
-    alt="Comty logo"
-    src="https://storage.ragestudio.net/rstudio/branding/comty/iso/basic_alt.svg"
-    height="150px"
-/>
+  <a href="https://comty.app">
+    <img
+      alt="Comty logo"
+      src="https://storage.ragestudio.net/rstudio/branding/comty/iso/basic_alt.svg"
+      height="160px"
+    />
+  </a>
 </p>
 
-# Comty™
-[![CodeFactor](https://www.codefactor.io/repository/github/ragestudio/comty/badge)](https://www.codefactor.io/repository/github/ragestudio/comty)
-[![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
-[![Discord](https://img.shields.io/discord/769176303978938389?label=Discord)](https://discord.gg/yxQR6EXf2F)
-[![Kofi](https://img.shields.io/badge/Kofi-F16061.svg?logo=ko-fi&logoColor=white)
-](https://ko-fi.com/comty)
+<h1 align="center">Comty™</h1>
 
-The platform to hold all your creative.
+<p align="center">
+  <strong>The all-in-one open platform for creators, communities, and real-time collaboration.</strong>
+</p>
 
-> 👋 Check our official beta instance, access it from [https://comty.app](https://comty.app)
+<p align="center">
+  <a href="https://comty.app"><strong>🌐 Try the Web App</strong></a> •
+  <a href="https://ko-fi.com/comty"><strong>☕ Support on Ko-Fi</strong></a>
+</p>
 
-> We recently launched a Ko-Fi page for Comty, you can support us by donating to our page [https://ko-fi.com/comty](https://ko-fi.com/comty)
+<p align="center">
+  <a href="https://www.codefactor.io/repository/github/ragestudio/comty"><img src="https://www.codefactor.io/repository/github/ragestudio/comty/badge" alt="CodeFactor" /></a>
+  <a href="https://codeclimate.com/github/srgooglo/comty/maintainability"><img src="https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability" alt="Maintainability" /></a>
+  <a href="https://ko-fi.com/comty"><img src="https://img.shields.io/badge/Ko--Fi-F16061.svg?logo=ko-fi&logoColor=white" alt="Kofi" /></a>
+</p>
 
-## 🌟 Some of the features
-📝 A microblogging system similar to Twitter allows users to post short messages with attachments and more.
+---
 
-🎥 Comty TV is a live video streaming feature that allows users to stream their videos, events, or anything else in real-time to other users. It provides "playback anywhere™" URL's, including HLS, RTMP, RTSP without vendor lock-in.
+> 👋 **Experience the Beta:** Check out our official live instance at [https://comty.app](https://comty.app).
 
-> Now supports restreams! Easily push your streams to whatever you want.
+> 💖 **Support Development:** We're building Comty for everyone! Help us sustain and expand the project by donating on [Ko-Fi](https://ko-fi.com/comty).
 
-🎶 Comty Music lets users publish their music masterpieces, share their playlists with other users, and synchronize their music with other platforms. A powerful music player is also included in the application.
+---
 
-🧩 Modular and Extensible architecture allows developers to create and publish extensions for the platform using the powerful API provided by Comty.
+## 💡 What is Comty?
 
-## 🌐 Available platforms
-We have official public services that you can find on these platforms!
+**Comty™** is an open, modular ecosystem designed to bring together social networking, live media streaming, music sharing, and real-time communication. Whether you are a creator, developer, or gaming community, Comty provides the tools to connect, share, and collaborate freely.
 
-🌐 Web | [https://comty.app](https://comty.app)
+---
 
-📱 (Outdated) Android APK (unsigned) (bundle auto update) | [https://github.com/ragestudio/comty/releases/download/0.50.4/app-release.apk](https://github.com/ragestudio/comty/releases/download/0.50.4/app-release.apk)
+## 🌟 Key Features
 
-## 🚀 Development
-Check the [getting-started.md](./docs/development/getting-started.md) document to get started with the development.
+### 🪐 Spaces _(New & In Active Development)_
 
-## 🤝 Contributions
-Contributions to Comty are welcome. If you want to contribute, please follow the instructions mentioned in the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+> **Your brand-new real-time communication hub — built for seamless messaging, voice, and high-definition video calls.**
 
-## 💅 Code Style
-Please read the related document [CODE_STYLE.md](./CODE_STYLE.md) for more details.
+We are actively developing **Spaces**, a powerful messaging service designed to connect communities effortlessly.
 
-## 🧑‍💻 Code of Conduct
-We provide a [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) file to help you understand what behavior is expected and unacceptable in the project.
+- 💬 **Direct Messages & Group Spaces:** Chat 1-on-1 or build custom group communities.
+- 📝 **Group Text Channels:** Organize discussions with topic-focused text channels within your groups.
+- 🎙️️ **Voice & Video Channels:** Jump into high-quality, low-latency voice and video calls with your friends or team.
+- 🖥️ **Advanced Screen Sharing:** Share your screen in crisp resolution with **full desktop audio subsystem support** for seamless game streams, presentations, and live collaboration.
+- 🚧 _Spaces is continuously evolving with new features being added regularly!_
+
+---
+
+### 📝 Microblogging
+
+Express yourself with short-form posts, rich media attachments, hashtags, and social interactions similar to modern microblogging platforms.
+
+### 🎥 Comty TV
+
+A versatile live video streaming service that lets creators broadcast events, gameplay, or shows in real-time.
+
+- 🌐 **Playback Anywhere™:** Native support for HLS, RTMP, and RTSP streams without vendor lock-in.
+- 🔒 **Private Streaming & Key Access:** Secure private streams with dynamically generated access keys and authenticated playback URLs for controlled access.
+- 📡 **Custom RTMP Restreaming:** Multistream your live broadcasts to any external platform that supports RTMP using custom stream URLs.
+
+### 🎶 Comty Music
+
+Publish audio tracks, share custom playlists, discover new music, and sync playback across platforms. Includes a built-in player with high-fidelity audio controls.
+
+### 🧩 Modular & Extensible Architecture
+
+Designed with developers in mind. Comty offers a robust API and extension system, enabling you to build custom modules, bots, and integrations.
+
+---
+
+## 🌐 Available Platforms
+
+Experience Comty across your devices:
+
+| Platform                    | Link / Details                         |
+| :-------------------------- | :------------------------------------- |
+| 🌐 **Web App**              | [https://comty.app](https://comty.app) |
+| 🖥️ **Desktop App**          | Check releases page                    |
+| 📱 **Android App (Native)** | Not ready yet                          |
+
+---
+
+## 🚀 Development & Setup
+
+Ready to build with us? Check our developer documentation to get your local environment running:
+
+👉 Read the [Getting Started Guide](./docs/development/getting-started.md)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions of all kinds — code, UI design, bug reports, feature ideas, or documentation!
+
+- 📖 Check our [CONTRIBUTING.md](./CONTRIBUTING.md) guide.
+- 💅 Read our [CODE_STYLE.md](./CODE_STYLE.md) rules.
+- 🧑‍💻 Adhere to our [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+
+---
+
+## 🧑‍🔬 Project Status
+
+Comty is currently in **Alpha / Active Development**. We prioritize code quality, architecture stability, and user privacy to build a long-lasting, solid foundation.
+
+> 👥 **We are hiring open-source contributors!** We're actively looking for passionate developers, designers, and testers. Join our [Discord Server](https://discord.gg/yxQR6EXf2F) to chat with the core team!
+
+---
 
 ## 📜 License
-Comty is licensed under the Comty license. See the [LICENSE](./LICENSE) file for more details.
 
-## 🧑‍🔬 Status
-The project is in alpha design phase, and the development is slow but continuous, prioritizing quality to ensure the project base is preserved for a long time.
+Comty is licensed under the **Comty License**. See the [LICENSE](./LICENSE) file for complete details.
 
-> 👥 The Comty team is looking for new members, and any contribution to the project is very welcome.
+---
 
-> If you are interested in more depth in the project, you can join our [Discord server](https://discord.gg/yxQR6EXf2F) and talk to us.
+## ❤️ Thanks to Our Supporters
 
-## :heart: Thanks to our supporters
-<kbd><img src="https://avatars.githubusercontent.com/u/94137617?v=4" href="https://github.com/SoyRage" height="64" width="64" border="1px" align="center"></kbd>
-<kbd><img src="https://avatars.githubusercontent.com/u/84641340?v=4" href="https://github.com/FoxasFoxVulpes" height="64" width="64" border="1px" align="center"></kbd>
-<kbd><img src="https://avatars.githubusercontent.com/u/179495972?v=4" href="https://github.com/asiersinmasdev" height="64" width="64" border="1px" align="center"></kbd>
+Special thanks to the amazing people supporting the growth of Comty:
+
+<p align="center">
+  <a href="https://github.com/SoyRage"><img src="https://avatars.githubusercontent.com/u/94137617?v=4" width="64" height="64" alt="SoyRage" style="border-radius: 50%; margin: 4px;" /></a>
+  <a href="https://github.com/FoxasFoxVulpes"><img src="https://avatars.githubusercontent.com/u/84641340?v=4" width="64" height="64" alt="FoxasFoxVulpes" style="border-radius: 50%; margin: 4px;" /></a>
+  <a href="https://github.com/asiersinmasdev"><img src="https://avatars.githubusercontent.com/u/179495972?v=4" width="64" height="64" alt="asiersinmasdev" style="border-radius: 50%; margin: 4px;" /></a>
+</p>
