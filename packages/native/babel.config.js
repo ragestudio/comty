@@ -5,7 +5,12 @@ module.exports = function (api) {
 		plugins: [
 			[
 				"@babel/plugin-transform-typescript",
-				{ isTSX: true, allExtensions: true },
+				{
+					isTSX: true,
+					allExtensions: true,
+					allowDeclareFields: true,
+					allowNamespaces: true,
+				},
 			],
 			["@babel/plugin-proposal-decorators", { version: "2023-11" }],
 		],
