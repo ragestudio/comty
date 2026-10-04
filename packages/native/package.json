@@ -5,6 +5,7 @@
 	"private": true,
 	"dependencies": {
 		"@babel/plugin-proposal-decorators": "^8.0.2",
+		"@linebridge/client": "workspace:*",
 		"@comty/shared": "workspace:*",
 		"@expo/ui": "~57.0.21",
 		"@ragestudio/vessel": "workspace:*",
@@ -43,6 +44,7 @@
 		"react-native": "0.86.3",
 		"react-native-audio-api": "^0.13.6",
 		"react-native-gesture-handler": "~2.32.0",
+		"react-native-incall-manager": "^4.3.0",
 		"react-native-keyboard-controller": "^1.22.6",
 		"react-native-reanimated": "4.5.1",
 		"react-native-safe-area-context": "~5.7.0",
