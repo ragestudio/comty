@@ -1,6 +1,5 @@
-import type { JSX } from "react"
 import type { StoreApi } from "zustand"
-import type { ReactNode, ReactElement } from "react"
+import type { ReactNode } from "react"
 
 import * as z from "zustand"
 
