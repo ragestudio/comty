@@ -18,6 +18,10 @@ import TopBar from "@layouts/components/@mobile/topBar"
 import BackgroundDecorator from "@components/BackgroundDecorator"
 
 const DesktopLayout = (props) => {
+	React.useEffect(() => {
+		app.eventBus.emit("layout:ready")
+	}, [])
+
 	return (
 		<>
 			<BackgroundDecorator />
@@ -54,6 +58,10 @@ const DesktopLayout = (props) => {
 }
 
 const MobileLayout = (props) => {
+	React.useEffect(() => {
+		app.eventBus.emit("layout:ready")
+	}, [])
+
 	return (
 		<Layout
 			id="app_layout"
