@@ -6,7 +6,7 @@ import AppTabBar from "@/components/TabBar"
 
 import useApp from "@/engine/app"
 
-export default function TabsLayout() {
+function TabsLayout() {
 	const app = useApp()
 	const theme = useTheme()
 
@@ -71,3 +71,5 @@ export default function TabsLayout() {
 		</Tabs>
 	)
 }
+
+export default TabsLayout
