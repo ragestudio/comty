@@ -1,17 +1,23 @@
+import { registerGlobals } from "react-native-webrtc"
+registerGlobals()
+
 import "../global.css"
 
 import React from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { LucideProvider } from "lucide-react-native"
 import { DarkTheme, ThemeProvider, Slot, useRouter } from "expo-router"
+import { BottomSheet } from "@expo/ui"
 import { TamaguiProvider } from "tamagui"
 import { PanelUIProvider, useTheme } from "panelui-native"
-import { BottomSheet } from "@expo/ui"
-
+import TextureBg from "@/ui/TextureBg"
 import UI from "./tamagui.config"
+
 import useApp from "@/engine/app"
 import useMainSheetStore from "@/stores/MainSheet"
-import TextureBg from "@/ui/TextureBg"
+import useRtc, { rtcService } from "@/lib/spaces/stores/rtc"
+
+import { AudioContext } from "react-native-audio-api"
 
 const RouterTheme = {
 	...DarkTheme,
@@ -25,17 +31,22 @@ export const MainLayout = () => {
 	const router = useRouter()
 	const app = useApp()
 	const sheet = useMainSheetStore()
-	const { theme, setTheme } = useTheme()
+	const rtc = useRtc()
+	const pui = useTheme()
+
+	const initialize = async () => {
+		pui.setTheme("dark")
+
+		await app.initialize({
+			router: router,
+		})
+
+		await rtcService.initialize()
+	}
 
 	// Initialize APP
 	React.useEffect(() => {
-		if (app && app?.ready === false) {
-			app.initialize({
-				router: router,
-			})
-
-			setTheme("dark")
-		}
+		if (app && app?.ready === false) initialize()
 	}, [app])
 
 	if (!app.ready) return null
