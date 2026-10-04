@@ -2,7 +2,7 @@ import type { Channel } from "@comty/shared/types/spaces/channel"
 
 import * as mediasoupClient from "mediasoup-client"
 import { WebsocketClient } from "@linebridge/client"
-import { AppStore } from "@/engine/app"
+import { app } from "@/engine/app"
 import BaseStore from "../base"
 
 import Self from "./self"
@@ -43,7 +43,7 @@ export class RTC extends BaseStore<RTCReactiveState> {
 	}
 
 	get socket() {
-		return AppStore.getState().socket
+		return app.socket
 	}
 
 	handlers = {
