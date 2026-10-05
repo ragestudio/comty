@@ -1,4 +1,4 @@
-import Core from "vessel/core"
+import Core from "@ragestudio/vessel/core"
 import TapShareDialog from "@components/TapShare/Dialog"
 
 const RecordTypes = {

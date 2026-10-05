@@ -1,4 +1,4 @@
-import Core from "vessel/core"
+import Core from "@ragestudio/vessel/core"
 import * as idb from "idb"
 
 import NotificationUI from "./ui"

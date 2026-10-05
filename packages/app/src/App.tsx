@@ -1,8 +1,8 @@
-import { Runtime, VesselApp } from "vessel/runtime"
-import ReactAdapter from "vessel/adapters/react"
+import { Runtime, VesselApp } from "@ragestudio/vessel/runtime"
+import ReactAdapter from "@ragestudio/vessel/adapters/react"
 
 import React from "react"
-import * as Router from "vessel/router"
+import * as Router from "@ragestudio/vessel/router"
 import * as Sentry from "@sentry/browser"
 
 import { ThemeProvider } from "@cores/style/style.core"

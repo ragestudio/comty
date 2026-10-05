@@ -5,6 +5,8 @@ import path from "path"
 const root = path.resolve(__dirname, "..")
 const src = path.join(root, "src")
 
+const modulesPath = path.join(root, "../../", "modules")
+
 export default {
 	alias: {
 		"@": src,
@@ -28,24 +30,15 @@ export default {
 			"spaces-lib",
 			"src",
 		),
-		"@models": path.join(root, "../../", "modules", "comty.js/src/models"),
-		"comty.js": path.join(root, "../../", "modules", "comty.js", "src"),
-		"@ragestudio/vessel": path.join(
-			root,
-			"../../",
-			"modules",
-			"vessel",
-			"src",
-		),
+		"@models": path.join(modulesPath, "comty.js/src/models"),
+		"comty.js": path.join(modulesPath, "comty.js", "src"),
+		"@ragestudio/vessel": path.join(modulesPath, "vessel", "src"),
 		"linebridge-client": path.join(
-			root,
-			"../../",
-			"modules",
+			modulesPath,
 			"linebridge",
 			"client",
 			"src",
 		),
-		vessel: path.join(root, "../../", "modules", "vessel", "src"),
 	},
 	mainFields: ["browser", "module", "main"],
 } satisfies UserConfig["resolve"]

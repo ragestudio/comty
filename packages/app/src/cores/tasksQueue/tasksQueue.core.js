@@ -1,4 +1,4 @@
-import Core from "vessel/core"
+import Core from "@ragestudio/vessel/core"
 import { Observable } from "@gullerya/object-observer"
 
 export default class TasksQueue extends Core {

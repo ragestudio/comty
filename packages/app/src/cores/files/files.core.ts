@@ -1,4 +1,4 @@
-import { Core } from "vessel/core"
+import { Core } from "@ragestudio/vessel/core"
 import xxhash, { XXHashAPI } from "xxhash-wasm"
 import UploadTasksManager from "./task/manager"
 
