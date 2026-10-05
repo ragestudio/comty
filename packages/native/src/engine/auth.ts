@@ -47,7 +47,7 @@ export class AuthManager {
 			throw new Error("Cannot load a session without a valid token")
 		}
 
-		console.log("Loading session with token:", token)
+		console.log("Loading session with token...")
 
 		session.token = token
 		session.refreshToken = refreshToken ?? ""

@@ -1,10 +1,7 @@
-import type { StoreApi } from "zustand"
 import type { ImperativeRouter } from "expo-router"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
-import * as z from "zustand"
 import * as SplashScreen from "expo-splash-screen"
-
 import { WebsocketClient } from "@linebridge/client/src/websocket/index"
 
 import fonts from "./load/fonts"
@@ -26,7 +23,12 @@ export enum InternalEvents {
 	SPLASH_DONE = "init:splash_done",
 }
 
-interface AppState {}
+interface AppState {
+	ready: boolean
+	earlyDone: boolean
+	router: ImperativeRouter | null
+	userData: typeof session.user | null
+}
 
 export class App extends BaseStore<AppState> {
 	router: ImperativeRouter | null = null
@@ -40,7 +42,12 @@ export class App extends BaseStore<AppState> {
 	userData!: typeof session.user | null
 
 	constructor() {
-		super({})
+		super({
+			ready: false,
+			earlyDone: false,
+			router: null,
+			userData: null,
+		})
 	}
 
 	async initialize(params: AppInitializeParam) {
@@ -72,16 +79,14 @@ export class App extends BaseStore<AppState> {
 			worker: false,
 		})
 
-		this.setState({ socket: this.socket })
-
 		this.socket.on("connected", () => {
 			console.log("[ws] connected")
 		})
 		this.socket.on("reconnected", () => {
 			console.log("[ws] reconnected")
 		})
-		this.socket.on("message", (data, msg) => {
-			console.log("[ws] message:", data, msg)
+		this.socket.on("message", (_, msg) => {
+			console.log("[ws] message:", msg)
 		})
 
 		await this.socket.connect()
