@@ -34,7 +34,7 @@ const SponsorsList = () => {
 		return <Skeleton active />
 	}
 
-	if (sponsors.length === 0) {
+	if (sponsors?.length === 0) {
 		return null
 	}
 
