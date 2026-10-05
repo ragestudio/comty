@@ -4,7 +4,8 @@
 	"version": "0.1.0",
 	"exports": {
 		"./types/*": "./types/*.ts",
-		"./db/*": "./db/*.ts"
+		"./db/*": "./db/*.ts",
+		"./utils/*": "./utils/*.ts"
 	},
 	"devEngines": {
 		"packageManager": {
@@ -15,6 +16,6 @@
 	},
 	"peerDependencies": {
 		"@ragestudio/scylla-odm": "^0.22.19",
-		"mediasoup": "^3.22.0"
+		"mediasoup-client": "^3.24.4"
 	}
 }
