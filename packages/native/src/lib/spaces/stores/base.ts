@@ -9,7 +9,7 @@ export class BaseStore<State extends object> {
 		Object.assign(this, initialState)
 	}
 
-	protected setState(partial: Partial<State>) {
+	setState(partial: Partial<State>) {
 		Object.assign(this, partial)
 		this.store.setState(partial)
 	}
