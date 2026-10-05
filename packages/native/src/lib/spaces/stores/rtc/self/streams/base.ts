@@ -1,4 +1,8 @@
 import type { MediaStream } from "react-native-webrtc"
+import type { Self } from ".."
+
+import MicStream from "./mic"
+import ScreenStream from "./screen"
 
 export interface BaseHandlerParams {
 	start: { force?: boolean }
@@ -15,10 +19,19 @@ export interface StreamHandlers<
 	onClose?: (this: BaseStream<T>, params?: T["close"]) => Promise<void>
 }
 
+export const StreamsKinds = {
+	mic: MicStream,
+	screen: ScreenStream,
+}
+
 export class BaseStream<
 	HandlersParams extends BaseHandlerParams = BaseHandlerParams,
 > {
-	constructor(private handlers?: StreamHandlers<HandlersParams>) {}
+	constructor(
+		public readonly self: Self,
+		public readonly kind: keyof typeof StreamsKinds,
+		private handlers?: StreamHandlers<HandlersParams>,
+	) {}
 
 	stream: MediaStream | null = null
 

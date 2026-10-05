@@ -1,3 +1,4 @@
+import type { Self } from ".."
 import BaseStream, { type BaseHandlerParams } from "./base"
 import { mediaDevices } from "react-native-webrtc"
 import InCallManager from "react-native-incall-manager"
@@ -7,13 +8,20 @@ interface MicStreamParams extends BaseHandlerParams {
 	close: { force?: boolean; reason?: string }
 }
 
-export const MicStream = () =>
-	new BaseStream<MicStreamParams>({
+export const MicStream = (self: Self) =>
+	new BaseStream<MicStreamParams>(self, "mic", {
 		async onStart(params) {
 			this.stream = await mediaDevices.getUserMedia({
 				video: false,
 				audio: true,
 			})
+
+			// if is muted, disable audio tracks
+			if (this.self.isMuted) {
+				for (const track of this.stream.getAudioTracks()) {
+					track.enabled = false
+				}
+			}
 
 			console.log(`[micStream] created stream:`, this.stream)
 
@@ -23,7 +31,9 @@ export const MicStream = () =>
 			return this.stream
 		},
 		async onClose() {
-			//InCallManager.stop()
+			if (this.stream) {
+				this.stream.release(true)
+			}
 		},
 	})
 

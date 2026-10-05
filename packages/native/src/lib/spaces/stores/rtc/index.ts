@@ -1,75 +1,102 @@
 import type { Channel } from "@comty/shared/types/spaces/channel"
 
 import * as mediasoupClient from "mediasoup-client"
-import { WebsocketClient } from "@linebridge/client"
-import { app } from "@/engine/app"
+import { WebsocketClient } from "@linebridge/client/src"
 import BaseStore from "../base"
 
 import Self from "./self"
 import Producers from "./producers"
 import Consumers from "./consumers"
 import Clients from "./clients"
+import Transports from "./transports"
 
 import joinChannel from "./handlers/joinChannel"
+import leaveChannel from "./handlers/leaveChannel"
+import attachChannel from "./handlers/attachChannel"
+import syncVoiceState from "./handlers/syncVoiceState"
+import reset from "./handlers/reset"
 
 interface RTCReactiveState {
 	initialized: boolean
-	connected: boolean
+	state: "disconnected" | "loading" | "connecting" | "connected" | "failed"
+	connectedAt: Date | null
 	channel: Channel | null
-	channelId: string | null
+	isMuted: boolean
+	isDeafened: boolean
 }
 
 export class RTC extends BaseStore<RTCReactiveState> {
-	_socket: WebsocketClient | null = null
+	_socket_getter: () => WebsocketClient | null = () => null
+	_userId_getter: () => string | null | undefined = () => null
+
 	device: mediasoupClient.Device | null = null
 
 	self: Self = new Self(this)
 	clients: Clients = new Clients(this)
 	producers: Producers = new Producers(this)
 	consumers: Consumers = new Consumers(this)
+	transports: Transports = new Transports(this)
 
 	initialized!: RTCReactiveState["initialized"]
-	connected!: RTCReactiveState["connected"]
+	state!: RTCReactiveState["state"]
 	channel!: RTCReactiveState["channel"]
-	channelId!: RTCReactiveState["channelId"]
+	isMuted!: RTCReactiveState["isMuted"]
+	isDeafened!: RTCReactiveState["isDeafened"]
+	connectedAt!: RTCReactiveState["connectedAt"]
 
 	constructor() {
 		super({
 			initialized: false,
-			connected: false,
+			state: "disconnected",
 			channel: null,
-			channelId: null,
+			connectedAt: null,
+			isMuted: false,
+			isDeafened: false,
 		})
 	}
 
 	get socket() {
-		return app.socket
+		return this._socket_getter()
+	}
+
+	get userId() {
+		return this._userId_getter()
 	}
 
 	handlers = {
-		joinChannel: joinChannel.bind(this) as OmitThisParameter<
-			typeof joinChannel
-		>,
+		joinChannel: Bind(this, joinChannel),
+		leaveChannel: Bind(this, leaveChannel),
+		attachChannel: Bind(this, attachChannel),
+		syncVoiceState: Bind(this, syncVoiceState),
+		reset: Bind(this, reset),
+	}
+
+	get isConnected(): boolean {
+		const hasChannelData = !!this.channel
+		const hasTransports = !!(this.transports.recv ?? this.transports.send)
+
+		return hasChannelData && hasTransports
+	}
+
+	bind = (
+		socket: typeof this._socket_getter,
+		userId: typeof this._userId_getter,
+	) => {
+		this._socket_getter = socket
+		this._userId_getter = userId
 	}
 
 	async initialize() {
-		// create the device factory
-		this.device = await mediasoupClient.Device.factory()
-
-		// TODO: fetch the capabilities and load into the device
-		await this.device.load({
-			routerRtpCapabilities: {
-				codecs: [],
-				headerExtensions: [],
-			},
-		})
-
 		// set as initialized
 		this.setState({
 			initialized: true,
 		})
 
 		console.log("rtc loaded!")
+	}
+
+	async _handleTransportFailure() {
+		console.error("Transport failure, triggering recovery")
 	}
 }
 
