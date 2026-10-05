@@ -48,7 +48,7 @@ export default defineConfig({
 
 	optimizeDeps: {
 		include: ["src/cores/**/*.core.js", "src/cores/**/*.core.ts"],
-		exclude: ["vessel", "comty.js", "linebridge-client"],
+		exclude: ["vessel", "comty.js", "@linebridge/client"],
 	},
 
 	build: {
