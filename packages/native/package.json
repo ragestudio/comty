@@ -5,9 +5,9 @@
 	"private": true,
 	"dependencies": {
 		"@babel/plugin-proposal-decorators": "^8.0.2",
-		"@linebridge/client": "workspace:*",
 		"@comty/shared": "workspace:*",
 		"@expo/ui": "~57.0.21",
+		"@linebridge/client": "workspace:*",
 		"@ragestudio/vessel": "workspace:*",
 		"@react-native-masked-view/masked-view": "^0.3.2",
 		"@react-navigation/bottom-tabs": "^7.20.0",
@@ -36,7 +36,7 @@
 		"expo-web-browser": "~57.0.3",
 		"indexeddbshim": "^19.0.7",
 		"lucide-react-native": "^1.48.0",
-		"mediasoup-client": "^3.24.1",
+		"mediasoup-client": "^3.24.4",
 		"panelui-native": "^0.103.2",
 		"react": "19.3.0",
 		"react-dom": "19.3.0",
@@ -57,7 +57,7 @@
 		"tamagui": "^2.7.7",
 		"tinybase": "^10.0.1",
 		"tseep": "^1.3.1",
-		"uniwind": "^1.12.0",
+		"uniwind": "^1.12.1",
 		"valibot": "^1.5.0",
 		"zustand": "^5.0.15"
 	},
