@@ -6,6 +6,7 @@ const root = path.resolve(__dirname, "..")
 const src = path.join(root, "src")
 
 const modulesPath = path.join(root, "../../", "modules")
+const packagesPath = path.join(root, "../../", "packages")
 
 export default {
 	alias: {
@@ -23,22 +24,10 @@ export default {
 		"@classes": path.join(src, "classes"),
 		"@ui": path.join(src, "ui"),
 
-		"@comty/spaces-lib": path.join(
-			root,
-			"../../",
-			"packages",
-			"spaces-lib",
-			"src",
-		),
+		"@comty/spaces-lib": path.join(packagesPath, "spaces-lib/src"),
+		"@ragestudio/vessel": path.join(modulesPath, "vessel/src"),
 		"@models": path.join(modulesPath, "comty.js/src/models"),
-		"comty.js": path.join(modulesPath, "comty.js", "src"),
-		"@ragestudio/vessel": path.join(modulesPath, "vessel", "src"),
-		"linebridge-client": path.join(
-			modulesPath,
-			"linebridge",
-			"client",
-			"src",
-		),
+		"comty.js": path.join(modulesPath, "comty.js/src"),
 	},
 	mainFields: ["browser", "module", "main"],
 } satisfies UserConfig["resolve"]
