@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import { RTEngineClient } from "linebridge-client"
+import { WebsocketClient } from "@linebridge/client"
 import StreamingModel from "@models/spectrum"
 import SessionModel from "@models/session"
 
@@ -35,9 +35,10 @@ const useStreamWebsocket = ({ stream_id, statsInterval = 1000 } = {}) => {
 
 	const client = React.useMemo(
 		() =>
-			new RTEngineClient({
+			new WebsocketClient({
 				url: `${StreamingModel.baseUrl}/stream/${stream_id}/ws`,
 				token: SessionModel.token,
+				worker: false,
 			}),
 		[],
 	)

@@ -31,8 +31,7 @@ export const useMembersDecorations = () => {
 
 			try {
 				const users_ids = missingIds.join(",")
-				const fetchedData =
-					await UsersModel.V2.decorations.get(users_ids)
+				const fetchedData = await UsersModel.decorations.get(users_ids)
 
 				if (Array.isArray(fetchedData)) {
 					setMembersDecorations((prev) => {

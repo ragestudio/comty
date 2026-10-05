@@ -22,7 +22,7 @@ export default {
 		"vessel",
 		"src",
 	),
-	"linebridge-client": path.join(
+	"@linebridge/client": path.join(
 		__dirname,
 		"../../",
 		"modules",

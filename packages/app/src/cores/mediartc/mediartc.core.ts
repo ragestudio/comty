@@ -2,7 +2,7 @@ import type { MediaRTCHandlers, MediaRTCPublic, WebsocketEvent } from "./types"
 import type { Device, Transport } from "mediasoup-client/types"
 
 import Core from "vessel/core"
-import { RTEngineClient } from "linebridge-client"
+import { WebsocketClient } from "@linebridge/client"
 import AudioProcessor from "./classes/AudioProcessor"
 
 import MediaRTCState, { MediaRTCStateType } from "./classes/State"
@@ -86,7 +86,7 @@ export default class MediaRTC extends Core {
 	static defaultScreenVideoEncodingParams = defaults.screenVideoEncodingParams
 	static defaultScreenAudioEncodingParams = defaults.screenAudioEncodingParams
 
-	socket: RTEngineClient | null = null
+	socket: WebsocketClient | null = null
 	device: Device = null
 	sendTransport: Transport = null
 	recvTransport: Transport = null

@@ -1,6 +1,6 @@
 import Core from "vessel/core"
 
-import createClient from "comty.js"
+import ComtyClient from "comty.js/client"
 
 import request from "comty.js/request"
 import measurePing from "comty.js/utils/measurePing"
@@ -186,7 +186,7 @@ export default class APICore extends Core {
 	}
 
 	async onInitialize() {
-		this.client = await createClient({
+		this.client = new ComtyClient({
 			eventBus: app.eventBus,
 			ws: {
 				enable: true,
