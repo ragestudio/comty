@@ -8,7 +8,7 @@ import Input from "@/ui/Input"
 import { useForm, Controller } from "react-hook-form"
 
 import { CircleSlash } from "lucide-react-native"
-import useApp from "@/engine/app"
+import { app } from "@/engine/app"
 import useMainSheetStore from "@/stores/MainSheet"
 import LoginCode from "@/components/LoginCode"
 
@@ -18,7 +18,6 @@ type AuthValues = {
 }
 
 const AuthView = () => {
-	const app = useApp()
 	const sheet = useMainSheetStore()
 
 	const formRef = React.useRef(null)
