@@ -1,4 +1,4 @@
-import type { RtpCapabilities } from "mediasoup/types"
+import type { RtpCapabilities, WebRtcTransportDump } from "mediasoup/types"
 import type { SFUNode } from "./node"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
@@ -9,9 +9,9 @@ export class RemoteRouterTransport extends EventEmitter {
 	node: SFUNode
 	id: string
 	closed: boolean
-	iceParameters: any
-	iceCandidates: any
-	dtlsParameters: any
+	iceParameters: WebRtcTransportDump["iceParameters"]
+	iceCandidates: WebRtcTransportDump["iceCandidates"]
+	dtlsParameters: WebRtcTransportDump["dtlsParameters"]
 	appData: any
 
 	constructor(node: SFUNode, data: any) {
