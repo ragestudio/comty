@@ -1,23 +1,24 @@
-import { registerGlobals } from "react-native-webrtc"
-registerGlobals()
+import "@comty/shared/utils/index"
+
+import { registerGlobals as registerRtcGlobals } from "react-native-webrtc"
+registerRtcGlobals()
 
 import "../global.css"
 
 import React from "react"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { LucideProvider } from "lucide-react-native"
 import { DarkTheme, ThemeProvider, Slot, useRouter } from "expo-router"
 import { BottomSheet } from "@expo/ui"
-import { TamaguiProvider } from "tamagui"
+import { TamaguiProvider, YStack, ZStack } from "tamagui"
 import { PanelUIProvider, useTheme } from "panelui-native"
 import TextureBg from "@/ui/TextureBg"
 import UI from "./tamagui.config"
 
-import useApp from "@/engine/app"
+import { app, useStore as useApp } from "@/engine/app"
 import useMainSheetStore from "@/stores/MainSheet"
-import useRtc, { rtcService } from "@/lib/spaces/stores/rtc"
-
-import { AudioContext } from "react-native-audio-api"
+import { rtcService, useRTCStore } from "@/lib/spaces/stores/rtc"
+import RTCControls from "@/components/RTCControls"
 
 const RouterTheme = {
 	...DarkTheme,
@@ -28,11 +29,13 @@ const RouterTheme = {
 }
 
 export const MainLayout = () => {
+	const appState = useApp()
 	const router = useRouter()
-	const app = useApp()
 	const sheet = useMainSheetStore()
-	const rtc = useRtc()
+	const rtc = useRTCStore()
 	const pui = useTheme()
+
+	const insets = useSafeAreaInsets()
 
 	const initialize = async () => {
 		pui.setTheme("dark")
@@ -46,8 +49,15 @@ export const MainLayout = () => {
 
 	// Initialize APP
 	React.useEffect(() => {
-		if (app && app?.ready === false) initialize()
+		if (appState?.ready === false) initialize()
 	}, [app])
+
+	React.useEffect(() => {
+		rtcService.bind(
+			() => app.socket,
+			() => app.userData?._id,
+		)
+	}, [rtc])
 
 	if (!app.ready) return null
 
@@ -62,21 +72,37 @@ export const MainLayout = () => {
 					size={16}
 				>
 					<>
-						<PanelUIProvider>
-							<SafeAreaView
-								edges={["top", "left", "right"]}
-								style={{
-									flex: 1,
-									backgroundColor: app.theme.currentTheme.background?.val,
-								}}
-							>
-								<TextureBg
-									overlayColor="$bgColor"
-									noiseOpacity={0.2}
-									blurIntensity={0}
-								/>
-								<Slot />
-							</SafeAreaView>
+						<PanelUIProvider background={false}>
+							<ZStack style={{ flex: 1 }}>
+								{rtc.state !== "disconnected" && (
+									<YStack
+										position="absolute"
+										style={{
+											bottom: insets.bottom + 65,
+											zIndex: 1,
+											width: "100%",
+											padding: 10,
+										}}
+									>
+										<RTCControls />
+									</YStack>
+								)}
+
+								<SafeAreaView
+									edges={["top", "left", "right"]}
+									style={{
+										flex: 1,
+										backgroundColor: app.theme.currentTheme.background?.val,
+									}}
+								>
+									<TextureBg
+										overlayColor="$bgColor"
+										noiseOpacity={0.2}
+										blurIntensity={0}
+									/>
+									<Slot />
+								</SafeAreaView>
+							</ZStack>
 						</PanelUIProvider>
 
 						<BottomSheet
