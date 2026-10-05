@@ -1,10 +1,16 @@
-import type API from "@services/rtc/rtc.service"
+import type { API } from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
 import type { RTC_JoinPayload as JoinPayload } from "@comty/shared/types/rtc/events/index"
+import type { HandlerKind } from "linebridge"
+import type { JoinChannelResult } from "@comty/shared/types/rtc/handlers/joinChannel"
 
-export default defineRoute<API, "ws">()({
-	useContexts: ["mediaChannels"] as const,
-	fn: async (client: RTCClient, payload: JoinPayload, ctx) => {
+export default defineRoute<API, HandlerKind.ws>()({
+	useContexts: ["mediaChannels"],
+	fn: async (
+		client: RTCClient,
+		payload: JoinPayload,
+		ctx,
+	): Promise<JoinChannelResult> => {
 		if (typeof payload !== "object") {
 			throw new OperationError(400, "Invalid payload")
 		}
