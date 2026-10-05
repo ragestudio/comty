@@ -17,16 +17,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	icon: "./assets/icon.png",
 	scheme: "app",
 	userInterfaceStyle: "dark",
-	ios: {
-		icon: "./assets/expo.icon",
-		bundleIdentifier: "net.ragestudio.spaces",
-	},
 	android: {
 		adaptiveIcon: {
-			backgroundColor: "#E6F4FE",
-			foregroundImage: "./assets/icon.png",
-			backgroundImage: "./assets/icon.png",
-			monochromeImage: "./assets/icon.png",
+			backgroundColor: "#1c1c1c",
+			foregroundImage:
+				"./assets/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+			backgroundImage:
+				"./assets/android/res/mipmap-xxxhdpi/ic_launcher_background.png",
+			monochromeImage:
+				"./assets/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png",
 		},
 		predictiveBackGestureEnabled: false,
 		package: "net.ragestudio.spaces",
@@ -44,6 +43,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			"android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
 		],
 	},
+	ios: {
+		icon: "./assets/icon.png",
+		bundleIdentifier: "net.ragestudio.spaces",
+	},
 	web: {
 		output: "single",
 		favicon: "./assets/icon.png",
@@ -54,8 +57,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			"expo-splash-screen",
 			{
 				backgroundColor: "#1c1c1c",
-				image: "./assets/icon.png",
-				imageWidth: 125,
+				image: "./assets/android/play_store_512.png",
+				imageWidth: 225,
 			},
 		],
 		[
