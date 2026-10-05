@@ -26,7 +26,7 @@ import {
 
 import { rtcService } from "@/lib/spaces/stores/rtc"
 
-const GroupHeader = ({ data }: { data: Group | null }) => {
+export const GroupHeader = ({ data }: { data: Group | null }) => {
 	if (!data) {
 		return (
 			<View className="flex-row items-center gap-3">
@@ -69,7 +69,7 @@ const GroupHeader = ({ data }: { data: Group | null }) => {
 	)
 }
 
-const GroupChannels = ({
+export const GroupChannels = ({
 	channels,
 	onPressChannel,
 }: {
@@ -112,7 +112,7 @@ const GroupChannels = ({
 	)
 }
 
-const GroupChannelsClients = ({
+export const GroupChannelsClients = ({
 	clients,
 }: {
 	clients: StatedChannel["clients"]
@@ -125,6 +125,7 @@ const GroupChannelsClients = ({
 						justifyContent="center"
 						gap={5}
 						padding={10}
+						key={client.userId}
 					>
 						<TextureBg
 							borderRadius={8}
@@ -151,7 +152,7 @@ const GroupChannelsClients = ({
 	)
 }
 
-const GroupChannel = ({
+export const GroupChannel = ({
 	channel,
 	state,
 	onPress,
@@ -214,7 +215,7 @@ const GroupChannel = ({
 	)
 }
 
-const GroupView = () => {
+export const GroupView = () => {
 	const app = useApp()
 	const params = useLocalSearchParams<{ group_id: string }>()
 

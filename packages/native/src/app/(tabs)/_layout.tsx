@@ -5,10 +5,12 @@ import { Home, User } from "lucide-react-native"
 import AppTabBar from "@/components/TabBar"
 
 import useApp from "@/engine/app"
+import useRTCStore from "@/lib/spaces/stores/rtc"
 
 function TabsLayout() {
 	const app = useApp()
 	const theme = useTheme()
+	const rtc = useRTCStore()
 
 	return (
 		<Tabs
@@ -38,9 +40,25 @@ function TabsLayout() {
 				}}
 			/>
 			<Tabs.Screen
+				name="group/[group_id]/[channel]"
+				options={{
+					title: "Channel View",
+					href:
+						rtc.state !== "disconnected"
+							? `/group/${rtc.channel?.group_id}/${rtc.channel?._id}`
+							: null,
+					tabBarIcon: ({ color }) => (
+						<User
+							color={color}
+							size={24}
+						/>
+					),
+				}}
+			/>
+			<Tabs.Screen
 				name="profile"
 				options={{
-					href: app.auth ? "/profile" : null,
+					href: app.userData ? "/profile" : null,
 					tabBarIcon: ({ color }) => {
 						return (
 							<XStack
