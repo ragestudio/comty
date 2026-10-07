@@ -1,0 +1,30 @@
+{
+	"name": "@comty/api-lib",
+	"version": "0.1.0",
+	"author": "ragestudio",
+	"license": "MIT",
+	"type": "module",
+	"main": "./src/index.ts",
+	"scripts": {
+		"build": "tsc",
+		"typecheck": "tsc --noEmit"
+	},
+	"peerDependencies": {
+		"@comty/shared": "workspace:*",
+		"@linebridge/client": "workspace:*"
+	},
+	"dependencies": {
+		"axios": "^1.20.0",
+		"valibot": "^1.5.0",
+		"zustand": "^5.0.15"
+	},
+	"devDependencies": {
+		"@types/node": "^26.6.4",
+		"typescript": "^7.0.2"
+	},
+	"exports": {
+		".": "./src/index.ts",
+		"./session": "./src/session.ts",
+		"./models/*": "./src/models/*/index.ts"
+	}
+}
