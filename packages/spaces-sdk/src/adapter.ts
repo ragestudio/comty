@@ -1,4 +1,5 @@
 import type { AudioDevice } from "./rtc/audio/types"
+import type { AudioProcessingAdapter } from "./rtc/audio/processing/types"
 
 export interface WebRtcObjects {
 	RTCIceCandidate: RTCIceCandidate
@@ -44,6 +45,8 @@ export interface AudioRouting {
 	setAudioOutputDevice(deviceId: string): Promise<boolean>
 }
 
+export type AudioProcessing = AudioProcessingAdapter
+
 export class Adapter {
 	constructor() {}
 
@@ -55,6 +58,7 @@ export class Adapter {
 	sessionGetter?: () => Promise<SessionData>
 	frameTransformEvents?: FrameTransformEvents
 	audioRouting?: AudioRouting
+	audioProcessing?: AudioProcessing
 
 	get webSocketEndpoint(): string {
 		return new URL(this.websocketPath, this.baseApiUrl).toString()
@@ -74,6 +78,10 @@ export class Adapter {
 
 	registerAudioRouting(routing: AudioRouting) {
 		this.audioRouting = routing
+	}
+
+	registerAudioProcessing(processing: AudioProcessing) {
+		this.audioProcessing = processing
 	}
 }
 
