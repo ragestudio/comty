@@ -5,6 +5,8 @@ import type { Producer } from "./producer"
 
 import { attachSpeakingDetection } from "../speaking"
 
+export type ProduceParams = ProducerOptions<ProducerAppData>
+
 export class Producers extends Map<string, Producer> {
 	constructor(core: RTC, data?: Iterable<readonly [string, Producer]>) {
 		super(data)
@@ -15,9 +17,7 @@ export class Producers extends Map<string, Producer> {
 
 	speakingDetectors: Map<string, () => void> = new Map()
 
-	async produce(
-		payload: ProducerOptions<ProducerAppData>,
-	): Promise<Producer> {
+	async produce(payload: ProduceParams): Promise<Producer> {
 		if (!this.core.device) {
 			throw new Error("Device not available")
 		}
@@ -42,22 +42,9 @@ export class Producers extends Map<string, Producer> {
 		producer.observer.on("close", () => this.onSelfProducerClosed(producer))
 		producer.on("trackended", () => producer.close())
 
+		// auto start
 		if (producer.paused) {
 			producer.resume()
-		}
-
-		if (
-			producer.kind === "audio" &&
-			producer.appData?.mediaTag === "user-mic"
-		) {
-			console.debug("[webrtc] Mic producer opened")
-			this.core.self.micProducerId = producer.id
-
-			this.setupSpeakingDetection(producer, (isSpeaking) => {
-				this.core.setState({
-					isSpeaking: isSpeaking,
-				})
-			})
 		}
 
 		this.set(producer.id, producer)
@@ -101,15 +88,6 @@ export class Producers extends Map<string, Producer> {
 		this.core.socket.emit("channel:producer_stop", {
 			producerId: producer.id,
 		})
-
-		if (
-			producer.kind === "audio" &&
-			producer.appData?.mediaTag === "user-mic"
-		) {
-			console.debug("[webrtc] Mic producer closed")
-			this.core.self.micProducerId = null
-			this.core.setState({ isSpeaking: false })
-		}
 	}
 
 	setRemote(producer: Producer): Producer | null {
