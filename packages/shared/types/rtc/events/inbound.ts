@@ -1,3 +1,6 @@
+import type { User } from "../../user"
+import type { VoiceState } from "../voiceState"
+
 export interface RTC_JoinPayload {
 	is_dm?: boolean
 	channel_id?: string
@@ -51,4 +54,12 @@ export interface RTC_LeavePayload {
 export interface RTC_SoundpadPayload {
 	isDm?: boolean
 	[key: string]: any
+}
+
+export type RTC_ClientEvents = "updateVoiceState" | "ping"
+
+export interface RTC_ClientEvent {
+	userId: User["_id"]
+	event: RTC_ClientEvents
+	data: VoiceState
 }
