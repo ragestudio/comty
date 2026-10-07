@@ -22,7 +22,7 @@ const GroupsListItem = ({
 			paddingHorizontal={10}
 			paddingVertical={5}
 			minHeight={50}
-			onPressOut={onPress}
+			onPress={onPress}
 		>
 			<TexturedBackground
 				borderRadius={12}
