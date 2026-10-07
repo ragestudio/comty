@@ -8,6 +8,7 @@ const staticFontLoads = {
 	NotoSans_700Bold: require("../../../assets/fonts/NotoSans_700Bold.ttf"),
 	DMMono_400Regular: require("../../../assets/fonts/DMMono_400Regular.ttf"),
 	DMMono_500Medium: require("../../../assets/fonts/DMMono_500Medium.ttf"),
+	SpaceGrotesk_300Light: require("../../../assets/fonts/SpaceGrotesk_300Light.ttf"),
 	SpaceGrotesk_400Regular: require("../../../assets/fonts/SpaceGrotesk_400Regular.ttf"),
 	SpaceGrotesk_700Bold: require("../../../assets/fonts/SpaceGrotesk_700Bold.ttf"),
 }
