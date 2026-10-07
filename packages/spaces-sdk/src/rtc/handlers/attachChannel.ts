@@ -21,6 +21,9 @@ export async function attachChannel(this: RTC, join: JoinChannelResult) {
 			throw new Error("Server did not provide any codecs")
 		}
 
+		// store rtp capabilities for use in future producers
+		this.rtpCapabilities = join.rtpCapabilities
+
 		if (this.isConnected) {
 			// if already joined, do local cleanup only
 			const errors = await this.handlers.reset()
@@ -34,38 +37,9 @@ export async function attachChannel(this: RTC, join: JoinChannelResult) {
 		// restoring a remote mic needs the device and the recv transport
 		await this.transports.createAll()
 
-		// start audio producer
-		const micStream = await this.self.createStream<"mic">("mic")
-
-		if (!micStream.stream) {
-			throw new Error("mic stream not available")
-		}
-
-		const audioCodec = join.rtpCapabilities.codecs.find(
-			(codec) => codec.kind === "audio",
-		)
-
-		console.log("using audio codec", audioCodec)
-
-		const audioTrack =
-			micStream.stream.getAudioTracks()[0] as unknown as MediaStreamTrack
-
-		console.log("using audio track", audioTrack)
-
-		await this.producers.produce({
-			appData: { mediaTag: "user-mic" },
-			track: audioTrack,
-			codec: audioCodec,
-			codecOptions: {
-				opusStereo: false,
-				opusDtx: true,
-			},
-			encodings: [
-				{
-					...defaults.audioEncodingParams,
-					dtx: true,
-				},
-			],
+		// dispatch user microphone
+		await this.handlers.dispatchMedia({
+			type: "mic",
 		})
 
 		// set state to connected & set date
