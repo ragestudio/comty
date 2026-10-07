@@ -2,14 +2,17 @@ import type { ImperativeRouter } from "expo-router"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
 import * as SplashScreen from "expo-splash-screen"
-import { WebsocketClient } from "@linebridge/client/src/websocket/index"
 
 import fonts from "./load/fonts"
 
 import ThemeController from "./theme"
 import AuthManager from "./auth"
-import session from "./session"
-import { BaseStore } from "@/lib/spaces/stores/base"
+import session from "@comty/api-lib/session"
+
+import { BaseStore } from "@comty/spaces-sdk/classes"
+import { adapter } from "@comty/spaces-sdk"
+import { wsManager } from "@comty/spaces-sdk/ws"
+import { rtcService } from "@comty/spaces-sdk/rtc"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -36,7 +39,6 @@ export class App extends BaseStore<AppState> {
 	earlyDone: Boolean = false
 	eventBus: EventEmitter = new EventEmitter()
 
-	socket: WebsocketClient | null = null
 	auth: AuthManager = new AuthManager(this)
 	theme: ThemeController = new ThemeController(this)
 	userData!: typeof session.user | null
@@ -73,23 +75,11 @@ export class App extends BaseStore<AppState> {
 		// run auth manager
 		await this.auth.initialize()
 
-		this.socket = new WebsocketClient({
-			url: "https://api.comty.app/ws",
-			token: session.token,
-			worker: false,
-		})
+		// run websocket manager
+		await wsManager.initialize()
 
-		this.socket.on("connected", () => {
-			console.log("[ws] connected")
-		})
-		this.socket.on("reconnected", () => {
-			console.log("[ws] reconnected")
-		})
-		this.socket.on("message", (_, msg) => {
-			console.log("[ws] message:", msg)
-		})
-
-		await this.socket.connect()
+		// run rtc service
+		await rtcService.initialize()
 	}
 }
 
