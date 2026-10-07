@@ -9,6 +9,9 @@ export async function reset(this: RTC) {
 		async () => await this.consumers.stopAll(),
 		async () => await this.clients.destroyAll(),
 		async () => this.producers.clear(),
+		async () => {
+			this.rtpCapabilities = {}
+		},
 		async () =>
 			this.setState({
 				state: "disconnected",
