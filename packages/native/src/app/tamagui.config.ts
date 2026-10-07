@@ -19,6 +19,8 @@ export const DarkColors = {
 	borderColor: "#ffffff33",
 	borderColorSolid: "#ffffff",
 
+	disabledContrastColor: "#ff0054",
+
 	colorError: "#E45525",
 }
 
@@ -35,41 +37,36 @@ export const config = createTamagui({
 	fonts: {
 		body: createFont({
 			...defaultConfig.fonts.body,
-			family: "NotoSans",
+			family: "NotoSans_400Regular",
 			face: {
-				normal: {
-					normal: "NotoSans_400Regular",
-				},
-				bold: {
-					normal: "NotoSans_700Bold",
-				},
+				400: { normal: "NotoSans_400Regular" },
+				500: { normal: "NotoSans_500Medium" },
+				700: { normal: "NotoSans_700Bold" },
+				normal: { normal: "NotoSans_400Regular" },
+				medium: { normal: "NotoSans_500Medium" },
+				bold: { normal: "NotoSans_700Bold" },
 			},
 		}),
 		mono: createFont({
 			...defaultConfig.fonts.body,
-			family: "DMMono",
+			family: "DMMono_400Regular",
 			face: {
-				normal: {
-					normal: "DMMono_400Regular",
-				},
-				medium: {
-					normal: "DMMono_500Medium",
-				},
+				400: { normal: "DMMono_400Regular" },
+				500: { normal: "DMMono_500Medium" },
+				normal: { normal: "DMMono_400Regular" },
+				medium: { normal: "DMMono_500Medium" },
 			},
 		}),
 		silk: createFont({
 			...defaultConfig.fonts.body,
-			family: "SpaceGrotesk",
+			family: "SpaceGrotesk_400Regular",
 			face: {
-				light: {
-					normal: "SpaceGrotesk_300Light",
-				},
-				normal: {
-					normal: "SpaceGrotesk_400Regular",
-				},
-				bold: {
-					normal: "SpaceGrotesk_700Bold",
-				},
+				300: { normal: "SpaceGrotesk_300Light" },
+				400: { normal: "SpaceGrotesk_400Regular" },
+				700: { normal: "SpaceGrotesk_700Bold" },
+				light: { normal: "SpaceGrotesk_300Light" },
+				normal: { normal: "SpaceGrotesk_400Regular" },
+				bold: { normal: "SpaceGrotesk_700Bold" },
 			},
 		}),
 	},
