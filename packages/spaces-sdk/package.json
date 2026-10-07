@@ -22,6 +22,7 @@
 		"@linebridge/client": "workspace:*"
 	},
 	"devDependencies": {
+		"@types/node": "^26.6.4",
 		"typescript": "^7.0.2"
 	},
 	"exports": {
@@ -31,6 +32,7 @@
 		"./classes/*": "./src/classes/*",
 		"./rtc": "./src/rtc/index.ts",
 		"./rtc/audio": "./src/rtc/audio/index.ts",
+		"./rtc/audio/processing": "./src/rtc/audio/processing/index.ts",
 		"./rtc/*": "./src/rtc/*",
 		"./group": "./src/group/index.ts",
 		"./group/*": "./src/group/*",
