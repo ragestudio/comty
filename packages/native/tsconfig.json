@@ -1,13 +1,19 @@
 {
 	"extends": "./node_modules/expo/tsconfig.base.json",
 	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
 		"strict": true,
+		"skipLibCheck": true,
 		"experimentalDecorators": false,
 		"esModuleInterop": true,
+
+		"types": ["node"],
 		"paths": {
-			"@/*": ["./src/*"],
+			// fallback to the spaces sdk source so its internal "@/" imports resolve during typecheck
+			// metro already resolves aliases per file in metro.config.js
+			"@/*": ["./src/*", "../spaces-sdk/src/*"],
 			"@/assets/*": ["./assets/*"],
-			"@models/*": ["./src/lib/comty/models/*"],
 		},
 	},
 	"include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
