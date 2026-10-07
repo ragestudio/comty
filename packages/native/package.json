@@ -1,11 +1,15 @@
 {
 	"name": "@comty/native-app",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"main": "expo-router/entry",
 	"private": true,
 	"dependencies": {
-		"@babel/plugin-proposal-decorators": "^8.0.2",
+		"@babel/plugin-proposal-decorators": "^7.29.7",
+		"@babel/plugin-transform-typescript": "^7.29.9",
+		"@comty/api-lib": "workspace:*",
 		"@comty/shared": "workspace:*",
+		"@comty/spaces-sdk": "workspace:*",
+		"@config-plugins/react-native-webrtc": "^15.0.2",
 		"@expo/ui": "~57.0.21",
 		"@linebridge/client": "workspace:*",
 		"@ragestudio/vessel": "workspace:*",
@@ -14,6 +18,7 @@
 		"@shopify/react-native-skia": "^2.13.1",
 		"@tamagui/config": "^2.7.7",
 		"axios": "^1.20.0",
+		"babel-preset-expo": "^57.0.13",
 		"dexie": "^4.4.6",
 		"expo": "~57.0.26",
 		"expo-blur": "^57.0.3",
@@ -23,6 +28,7 @@
 		"expo-device": "~57.0.2",
 		"expo-font": "~57.0.4",
 		"expo-glass-effect": "~57.0.4",
+		"expo-haptics": "~57.0.3",
 		"expo-image": "~57.0.5",
 		"expo-linear-gradient": "^57.0.2",
 		"expo-linking": "~57.0.11",
@@ -36,6 +42,7 @@
 		"expo-web-browser": "~57.0.3",
 		"indexeddbshim": "^19.0.7",
 		"lucide-react-native": "^1.48.0",
+		"luxon": "^3.7.2",
 		"mediasoup-client": "^3.24.4",
 		"panelui-native": "^0.103.2",
 		"react": "19.3.0",
@@ -46,12 +53,13 @@
 		"react-native-gesture-handler": "~2.32.0",
 		"react-native-incall-manager": "^4.3.0",
 		"react-native-keyboard-controller": "^1.22.6",
+		"react-native-notify-kit": "^10.8.0",
 		"react-native-reanimated": "4.5.1",
 		"react-native-safe-area-context": "~5.7.0",
 		"react-native-screens": "~4.28.0",
 		"react-native-svg": "^15.15.4",
 		"react-native-web": "~0.21.3",
-		"react-native-webrtc": "^124.0.8",
+		"react-native-webrtc": "link:/mnt/sda1/repos/webrtc-rn",
 		"react-native-worklets": "0.10.1",
 		"tailwindcss": "^4.3.3",
 		"tamagui": "^2.7.7",
@@ -62,6 +70,7 @@
 		"zustand": "^5.0.15"
 	},
 	"devDependencies": {
+		"@types/node": "^26.6.4",
 		"@types/react": "~19.3.0",
 		"typescript": "^7.0.2"
 	},
@@ -71,6 +80,7 @@
 		"ios": "expo run:ios",
 		"web": "expo start --web",
 		"lint": "expo lint",
-		"prebuild": "expo prebuild"
+		"prebuild": "expo prebuild",
+		"typecheck": "tsc --noEmit"
 	}
 }
