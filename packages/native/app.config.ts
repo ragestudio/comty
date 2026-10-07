@@ -12,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: "Spaces",
 	slug: "spaces",
-	version: "1.0.0",
+	version: "0.1.0",
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	scheme: "app",
@@ -40,9 +40,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 			"android.permission.BLUETOOTH_ADMIN",
 			"android.permission.BLUETOOTH_CONNECT",
 			"android.permission.FOREGROUND_SERVICE",
+			"android.permission.FOREGROUND_SERVICE_MICROPHONE",
+			"android.permission.FOREGROUND_SERVICE_CAMERA",
 			"android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
+			"android.permission.POST_NOTIFICATIONS",
 		],
 	},
+
 	ios: {
 		icon: "./assets/icon.png",
 		bundleIdentifier: "net.ragestudio.spaces",
@@ -86,6 +90,26 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				},
 			},
 		],
+		[
+			"@config-plugins/react-native-webrtc",
+			{
+				cameraPermission: "Allow access to your camera",
+				microphonePermission: "Allow access to your microphone",
+			},
+		],
+		[
+			"react-native-notify-kit",
+			{
+				android: {
+					foregroundService: {
+						types: ["microphone", "camera"],
+					},
+				},
+			},
+		],
+		// enables the websocket webrtc fork media projection foreground service,
+		// required on android 14+ so screen sharing does not capture black frames
+		"./plugins/withScreenShare",
 	],
 	experiments: {
 		typedRoutes: true,
