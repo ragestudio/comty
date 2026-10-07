@@ -9,12 +9,14 @@ import {
 	useImage,
 } from "@shopify/react-native-skia"
 import { YStack, useTheme, type YStackProps } from "tamagui"
+import { useBlurTarget } from "@/ui/BlurTarget"
 
 export interface TextureBgProps extends Omit<
 	YStackProps,
 	"borderRadius" | "borderWidth" | "borderColor"
 > {
 	blurIntensity?: number
+	blurBackground?: boolean
 	noiseOpacity?: number
 	overlayColor?: string
 	borderRadius?: number
@@ -24,7 +26,8 @@ export interface TextureBgProps extends Omit<
 
 const TextureBg = ({
 	children,
-	blurIntensity = 4,
+	blurIntensity = 1,
+	blurBackground = true,
 	noiseOpacity = 1,
 	overlayColor = "$bgAccent",
 	borderColor = "$borderColor",
@@ -34,6 +37,9 @@ const TextureBg = ({
 }: TextureBgProps) => {
 	const noiseImage = useImage(require("@/assets/grain-bg.png"))
 	const theme = useTheme()
+
+	const blurTarget = useBlurTarget()
+	const enableBlur = blurBackground && blurIntensity > 0 && !!blurTarget
 
 	const resolvedColor = React.useMemo(() => {
 		if (overlayColor.startsWith("$")) {
@@ -65,6 +71,9 @@ const TextureBg = ({
 					intensity={blurIntensity}
 					style={StyleSheet.absoluteFill}
 					tint="default"
+					blurMethod={enableBlur ? "dimezisBlurView" : "none"}
+					blurTarget={enableBlur ? blurTarget : undefined}
+					blurReductionFactor={enableBlur ? 1 : undefined}
 				/>
 			)}
 
