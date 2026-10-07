@@ -1,7 +1,5 @@
 import type { Self } from ".."
 import BaseStream, { type BaseHandlerParams } from "./base"
-//import { mediaDevices } from "react-native-webrtc"
-//import InCallManager from "react-native-incall-manager"
 
 export interface MicStreamParams extends BaseHandlerParams {
 	start: { force?: boolean; deviceId?: string }
