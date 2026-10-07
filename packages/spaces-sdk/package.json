@@ -1,0 +1,45 @@
+{
+	"name": "@comty/spaces-sdk",
+	"version": "0.1.0",
+	"description": "Agnostic SDK for Comty Spaces",
+	"author": "ragestudio",
+	"license": "MIT",
+	"type": "module",
+	"main": "./src/index.ts",
+	"scripts": {
+		"build": "tsc",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"axios": "^1.20.0",
+		"mediasoup-client": "^3.24.4",
+		"tinybase": "^10.0.1",
+		"tseep": "^1.3.1",
+		"valibot": "^1.5.0",
+		"zustand": "^5.0.15",
+		"@comty/shared": "workspace:*",
+		"@comty/api-lib": "workspace:*",
+		"@linebridge/client": "workspace:*"
+	},
+	"devDependencies": {
+		"typescript": "^7.0.2"
+	},
+	"exports": {
+		".": "./src/index.ts",
+		"./ws": "./src/ws/index.ts",
+		"./classes": "./src/classes/index.ts",
+		"./classes/*": "./src/classes/*",
+		"./rtc": "./src/rtc/index.ts",
+		"./rtc/audio": "./src/rtc/audio/index.ts",
+		"./rtc/*": "./src/rtc/*",
+		"./group": "./src/group/index.ts",
+		"./group/*": "./src/group/*",
+		"./chat": "./src/chat/index.ts",
+		"./chat/*": "./src/chat/*",
+		"./groupsList": "./src/groupsList/index.ts",
+		"./groupsList/*": "./src/groupsList/*",
+		"./events": "./src/events/index.ts",
+		"./events/*": "./src/events/*",
+		"./db": "./src/db/index.ts"
+	}
+}

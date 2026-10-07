@@ -1,0 +1,28 @@
+import type { AudioStrategy } from "../types"
+
+import adapter from "@/adapter"
+
+const nativeStrategy: AudioStrategy = {
+	name: "native-audio-routing",
+	speakerAvailable: true,
+	supports() {
+		return !!adapter.audioRouting
+	},
+	async getDevices() {
+		return (await adapter.audioRouting?.getAudioDevices()) ?? []
+	},
+	async setSpeakerEnabled(enabled) {
+		adapter.audioRouting?.setSpeakerphoneOn(enabled)
+	},
+	async isSpeakerEnabled() {
+		return (await adapter.audioRouting?.isSpeakerphoneOn()) ?? false
+	},
+	async setOutputDevice(deviceId) {
+		return (
+			(await adapter.audioRouting?.setAudioOutputDevice(deviceId)) ??
+			false
+		)
+	},
+}
+
+export default nativeStrategy
