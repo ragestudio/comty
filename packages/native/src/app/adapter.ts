@@ -6,6 +6,7 @@ import {
 	setSpeakerphoneOn,
 	isSpeakerphoneOn,
 	setAudioOutputDevice,
+	setAudioInputDevice,
 } from "react-native-webrtc"
 registerRtcGlobals()
 
@@ -26,6 +27,7 @@ adapter.registerAudioRouting({
 	setSpeakerphoneOn,
 	isSpeakerphoneOn,
 	setAudioOutputDevice,
+	setAudioInputDevice,
 })
 
 adapter.registerAudioProcessing(nativeAudioProcessing)
