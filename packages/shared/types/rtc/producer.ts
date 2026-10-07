@@ -7,3 +7,9 @@ export type SerializedProducer = {
 	kind: string | null
 	appData: any
 }
+
+export type ProducerAppData = {
+	mediaTag?: MediaTag
+}
+
+export type MediaTag = "user-mic" | "user-cam" | "screen-video" | "screen-audio"
