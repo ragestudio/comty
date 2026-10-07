@@ -2,6 +2,10 @@ import "@comty/shared/utils/index"
 
 import type { Channel } from "@comty/shared/types/spaces/channel"
 import type { Client } from "./clients/client"
+import type {
+	RtpCapabilities,
+	RtpCodecCapability,
+} from "mediasoup-client/types"
 
 import * as mediasoupClient from "mediasoup-client"
 import { EventEmitter } from "tseep"
@@ -20,6 +24,7 @@ import joinChannel from "./handlers/joinChannel"
 import leaveChannel from "./handlers/leaveChannel"
 import attachChannel from "./handlers/attachChannel"
 import syncVoiceState from "./handlers/syncVoiceState"
+import dispatchMedia from "./handlers/dispatchMedia"
 import reset from "./handlers/reset"
 
 interface RTCReactiveState {
@@ -40,6 +45,8 @@ interface RTCReactiveState {
 
 type InternalEvents = {
 	"channel:attached": (data: Channel) => void
+	"rtc:vc:soundpad:ended": (payload: any) => any
+	[key: string]: (...args: any[]) => void
 }
 
 export class RTC extends BaseStore<RTCReactiveState> {
@@ -53,6 +60,8 @@ export class RTC extends BaseStore<RTCReactiveState> {
 	eventBus = new EventEmitter<InternalEvents>()
 
 	channel!: RTCReactiveState["channel"]
+
+	rtpCapabilities: RtpCapabilities = {}
 
 	constructor() {
 		super({
@@ -88,9 +97,24 @@ export class RTC extends BaseStore<RTCReactiveState> {
 
 	handlers = {
 		joinChannel: Bind(this, joinChannel),
-		leaveChannel: Bind(this, leaveChannel),
 		attachChannel: Bind(this, attachChannel),
+
+		leaveChannel: Bind(this, leaveChannel),
+
+		/**
+		 * Syncronizes the local voice state with the server
+		 */
 		syncVoiceState: Bind(this, syncVoiceState),
+
+		/**
+		 * Handler to start streaming & producing a media type
+		 * to the current connected channel
+		 */
+		dispatchMedia: Bind(this, dispatchMedia),
+
+		/**
+		 * Stop and resets the RTC to initial state
+		 */
 		reset: Bind(this, reset),
 	}
 
