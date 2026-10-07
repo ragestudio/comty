@@ -2,9 +2,9 @@ import type { App } from "./app"
 
 import * as SecureStore from "expo-secure-store"
 
-import AuthModel from "@models/auth"
-import UserModel from "@/lib/comty/models/user"
-import session from "./session"
+import AuthModel from "@comty/api-lib/models/auth"
+import UserModel from "@comty/api-lib/models/user"
+import session from "@comty/api-lib/session"
 
 export enum AuthStoreKeys {
 	Token = "session-token",
