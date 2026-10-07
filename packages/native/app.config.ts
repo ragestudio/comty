@@ -107,9 +107,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				},
 			},
 		],
-		// enables the websocket webrtc fork media projection foreground service,
-		// required on android 14+ so screen sharing does not capture black frames
-		"./plugins/withScreenShare",
 	],
 	experiments: {
 		typedRoutes: true,
