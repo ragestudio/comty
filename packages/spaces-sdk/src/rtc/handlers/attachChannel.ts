@@ -1,9 +1,6 @@
 import type { RTC } from ".."
 import type { JoinChannelResult } from "@comty/shared/types/rtc/handlers/joinChannel"
 
-import Client from "../clients/client"
-import defaults from "../defaults"
-
 export async function attachChannel(this: RTC, join: JoinChannelResult) {
 	try {
 		if (!this.channel) {
@@ -38,9 +35,7 @@ export async function attachChannel(this: RTC, join: JoinChannelResult) {
 		await this.transports.createAll()
 
 		// dispatch user microphone
-		await this.handlers.dispatchMedia({
-			type: "mic",
-		})
+		await this.self.createMedia("mic")
 
 		// set state to connected & set date
 		this.setState({

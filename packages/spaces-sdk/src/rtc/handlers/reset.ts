@@ -6,6 +6,7 @@ export async function reset(this: RTC) {
 	const steps = [
 		async () => await this.self.deleteAll(),
 		async () => this.transports.closeAll(),
+		async () => await this.screens.stopAll(),
 		async () => await this.consumers.stopAll(),
 		async () => await this.clients.destroyAll(),
 		async () => this.producers.clear(),
@@ -20,6 +21,12 @@ export async function reset(this: RTC) {
 				isSpeaking: false,
 				statedClients: [],
 				speakingClients: [],
+				statedScreens: [],
+				localScreenStreamURL: null,
+				micProducerId: null,
+				cameraProducerId: null,
+				screenVideoProducerId: null,
+				screenAudioProducerId: null,
 			}),
 	]
 
