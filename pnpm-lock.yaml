@@ -706,6 +706,9 @@ importers:
       '@tamagui/config':
         specifier: ^2.7.7
         version: 2.7.7(react-dom@19.3.0(react@19.3.0))(react-native-reanimated@4.5.1(react-native-worklets@0.10.1(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(react@19.3.0)(supports-color@11.0.0))(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(react@19.3.0))(react@19.3.0)
+      '@types/luxon':
+        specifier: ^3.7.6
+        version: 3.7.6
       axios:
         specifier: ^1.20.0
         version: 1.20.0(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0)
@@ -1164,6 +1167,9 @@ importers:
       '@types/node':
         specifier: ^26.6.4
         version: 26.6.4
+      react:
+        specifier: ^19.1.0
+        version: 19.3.0
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
