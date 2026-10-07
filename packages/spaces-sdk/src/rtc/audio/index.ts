@@ -122,4 +122,6 @@ export function useAudioStore<U>(selector?: (state: AudioReactiveState) => U) {
 
 export type { AudioDevice, AudioDeviceKind, AudioStrategy } from "./types"
 
+export * from "./processing"
+
 export default useAudioStore
