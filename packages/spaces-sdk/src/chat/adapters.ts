@@ -1,6 +1,5 @@
 import type { ExtendedMessage as Message, ChatSyncState } from "./types"
 
-import { Dexie } from "dexie"
 import db from "../db"
 
 export interface ChatAdapter {
@@ -20,6 +19,9 @@ export interface ChatAdapter {
 	) => Promise<void>
 }
 
+const MaxKey = [[]]
+const MinKey = -Infinity
+
 export const groupAdapter: ChatAdapter = {
 	storeMessage: async (message: Message) => {
 		await db.channel_messages.put(message)
@@ -38,7 +40,7 @@ export const groupAdapter: ChatAdapter = {
 		if (beforeId) {
 			return collection
 				.between(
-					[channelId, Dexie.minKey],
+					[channelId, MinKey],
 					[channelId, beforeId],
 					false,
 					false,
@@ -52,7 +54,7 @@ export const groupAdapter: ChatAdapter = {
 			return collection
 				.between(
 					[channelId, afterId],
-					[channelId, Dexie.maxKey],
+					[channelId, MaxKey],
 					false,
 					false,
 				)
@@ -62,7 +64,7 @@ export const groupAdapter: ChatAdapter = {
 		}
 
 		return collection
-			.between([channelId, Dexie.minKey], [channelId, Dexie.maxKey])
+			.between([channelId, MinKey], [channelId, MaxKey])
 			.reverse()
 			.limit(limit)
 			.toArray()
@@ -111,12 +113,7 @@ export const dmAdapter: ChatAdapter = {
 
 		if (beforeId) {
 			return collection
-				.between(
-					[toUserId, Dexie.minKey],
-					[toUserId, beforeId],
-					false,
-					false,
-				)
+				.between([toUserId, MinKey], [toUserId, beforeId], false, false)
 				.reverse()
 				.limit(limit)
 				.toArray()
@@ -124,19 +121,14 @@ export const dmAdapter: ChatAdapter = {
 
 		if (afterId) {
 			return collection
-				.between(
-					[toUserId, afterId],
-					[toUserId, Dexie.maxKey],
-					false,
-					false,
-				)
+				.between([toUserId, afterId], [toUserId, MaxKey], false, false)
 				.limit(limit)
 				.toArray()
 				.then((msgs) => msgs.reverse())
 		}
 
 		return collection
-			.between([toUserId, Dexie.minKey], [toUserId, Dexie.maxKey])
+			.between([toUserId, MinKey], [toUserId, MaxKey])
 			.reverse()
 			.limit(limit)
 			.toArray()
