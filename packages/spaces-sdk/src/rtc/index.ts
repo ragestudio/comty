@@ -2,6 +2,7 @@ import "@comty/shared/utils/index"
 
 import type { Channel } from "@comty/shared/types/spaces/channel"
 import type { Client } from "./clients/client"
+import type { SerializedScreen } from "./screens/screen"
 import type {
 	RtpCapabilities,
 	RtpCodecCapability,
@@ -18,13 +19,13 @@ import Producers from "./producers"
 import Consumers from "./consumers"
 import Clients from "./clients"
 import Transports from "./transports"
+import Screens from "./screens"
 import Events from "./events"
 
 import joinChannel from "./handlers/joinChannel"
 import leaveChannel from "./handlers/leaveChannel"
 import attachChannel from "./handlers/attachChannel"
 import syncVoiceState from "./handlers/syncVoiceState"
-import dispatchMedia from "./handlers/dispatchMedia"
 import reset from "./handlers/reset"
 
 interface RTCReactiveState {
@@ -41,6 +42,13 @@ interface RTCReactiveState {
 	statedClients: Partial<ReturnType<Client["serialize"]>>[]
 	remoteProducersIds: string[]
 	speakingClients: string[]
+	statedScreens: SerializedScreen[]
+	localScreenStreamURL: string | null
+
+	micProducerId: string | null
+	cameraProducerId: string | null
+	screenVideoProducerId: string | null
+	screenAudioProducerId: string | null
 }
 
 type InternalEvents = {
@@ -57,6 +65,7 @@ export class RTC extends BaseStore<RTCReactiveState> {
 	producers = new Producers(this)
 	consumers = new Consumers(this)
 	clients = new Clients(this)
+	screens = new Screens(this)
 	eventBus = new EventEmitter<InternalEvents>()
 
 	channel!: RTCReactiveState["channel"]
@@ -77,6 +86,13 @@ export class RTC extends BaseStore<RTCReactiveState> {
 			statedClients: [],
 			remoteProducersIds: [],
 			speakingClients: [],
+			statedScreens: [],
+			localScreenStreamURL: null,
+
+			micProducerId: null,
+			cameraProducerId: null,
+			screenVideoProducerId: null,
+			screenAudioProducerId: null,
 		})
 	}
 
@@ -105,12 +121,6 @@ export class RTC extends BaseStore<RTCReactiveState> {
 		 * Syncronizes the local voice state with the server
 		 */
 		syncVoiceState: Bind(this, syncVoiceState),
-
-		/**
-		 * Handler to start streaming & producing a media type
-		 * to the current connected channel
-		 */
-		dispatchMedia: Bind(this, dispatchMedia),
 
 		/**
 		 * Stop and resets the RTC to initial state
