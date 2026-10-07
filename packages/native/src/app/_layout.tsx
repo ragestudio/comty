@@ -1,24 +1,27 @@
 import "@comty/shared/utils/index"
-
-import { registerGlobals as registerRtcGlobals } from "react-native-webrtc"
-registerRtcGlobals()
-
+import "@/app/adapter"
 import "../global.css"
 
+import { audioManager } from "@comty/spaces-sdk/rtc/audio"
+
 import React from "react"
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
+import { SafeAreaView } from "react-native-safe-area-context"
 import { LucideProvider } from "lucide-react-native"
 import { DarkTheme, ThemeProvider, Slot, useRouter } from "expo-router"
 import { BottomSheet } from "@expo/ui"
-import { TamaguiProvider, YStack, ZStack } from "tamagui"
+import { TamaguiProvider, ZStack } from "tamagui"
 import { PanelUIProvider, useTheme } from "panelui-native"
 import TextureBg from "@/ui/TextureBg"
+import { BlurTargetArea, BlurTargetProvider } from "@/ui/BlurTarget"
 import UI from "./tamagui.config"
 
 import { app, useStore as useApp } from "@/engine/app"
+import * as notifications from "@/engine/notifications"
 import useMainSheetStore from "@/stores/MainSheet"
-import { rtcService, useRTCStore } from "@/lib/spaces/stores/rtc"
-import RTCControls from "@/components/RTCControls"
+import { useRTCStore } from "@comty/spaces-sdk/rtc"
+import { useAppPermissions } from "@/hooks/useAppPermissions"
+
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const RouterTheme = {
 	...DarkTheme,
@@ -29,13 +32,15 @@ const RouterTheme = {
 }
 
 export const MainLayout = () => {
+	const { hasAllPermissions, isChecking, requestPermissions } =
+		useAppPermissions()
+	// TODO: check if needs to open a main sheet to request permissions
+
 	const appState = useApp()
 	const router = useRouter()
 	const sheet = useMainSheetStore()
 	const rtc = useRTCStore()
 	const pui = useTheme()
-
-	const insets = useSafeAreaInsets()
 
 	const initialize = async () => {
 		pui.setTheme("dark")
@@ -43,8 +48,6 @@ export const MainLayout = () => {
 		await app.initialize({
 			router: router,
 		})
-
-		await rtcService.initialize()
 	}
 
 	// Initialize APP
@@ -53,11 +56,29 @@ export const MainLayout = () => {
 	}, [app])
 
 	React.useEffect(() => {
-		rtcService.bind(
-			() => app.socket,
-			() => app.userData?._id,
-		)
-	}, [rtc])
+		if (rtc.state !== "disconnected") {
+			notifications.startCallNotification().catch(console.error)
+		} else {
+			notifications.stopCallNotification().catch(console.error)
+		}
+
+		// voice channels default to the loud speaker once audio is live
+		if (rtc.state === "connected") {
+			audioManager.refresh().catch(console.error)
+			audioManager.setSpeakerEnabled(true).catch(console.error)
+		}
+	}, [rtc.state])
+
+	// if (!isChecking && !hasAllPermissions) {
+	// 	return (
+	// 		<View>
+	// 			<Button
+	// 				title="Request needed permission"
+	// 				onPress={requestPermissions}
+	// 			/>
+	// 		</View>
+	// 	)
+	// }
 
 	if (!app.ready) return null
 
@@ -73,36 +94,26 @@ export const MainLayout = () => {
 				>
 					<>
 						<PanelUIProvider background={false}>
-							<ZStack style={{ flex: 1 }}>
-								{rtc.state !== "disconnected" && (
-									<YStack
-										position="absolute"
+							<BlurTargetProvider>
+								<ZStack style={{ flex: 1 }}>
+									<SafeAreaView
+										edges={["top", "left", "right"]}
 										style={{
-											bottom: insets.bottom + 65,
-											zIndex: 1,
-											width: "100%",
-											padding: 10,
+											flex: 1,
+											backgroundColor: app.theme.currentTheme.background?.val,
 										}}
 									>
-										<RTCControls />
-									</YStack>
-								)}
-
-								<SafeAreaView
-									edges={["top", "left", "right"]}
-									style={{
-										flex: 1,
-										backgroundColor: app.theme.currentTheme.background?.val,
-									}}
-								>
-									<TextureBg
-										overlayColor="$bgColor"
-										noiseOpacity={0.2}
-										blurIntensity={0}
-									/>
-									<Slot />
-								</SafeAreaView>
-							</ZStack>
+										<BlurTargetArea>
+											<TextureBg
+												overlayColor="$bgColor"
+												noiseOpacity={0.2}
+												blurIntensity={0}
+											/>
+											<Slot />
+										</BlurTargetArea>
+									</SafeAreaView>
+								</ZStack>
+							</BlurTargetProvider>
 						</PanelUIProvider>
 
 						<BottomSheet
@@ -120,4 +131,10 @@ export const MainLayout = () => {
 	)
 }
 
-export default MainLayout
+const Root = () => (
+	<GestureHandlerRootView style={{ flex: 1 }}>
+		<MainLayout />
+	</GestureHandlerRootView>
+)
+
+export default Root
