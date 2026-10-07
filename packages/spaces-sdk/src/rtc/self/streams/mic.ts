@@ -8,7 +8,7 @@ export interface MicStreamParams extends BaseHandlerParams {
 
 export const MicStream = (self: Self) =>
 	new BaseStream<MicStreamParams>(self, "mic", {
-		async onStart(params) {
+		async onStart() {
 			this.stream = await navigator.mediaDevices.getUserMedia({
 				video: false,
 				audio: {
@@ -26,9 +26,6 @@ export const MicStream = (self: Self) =>
 			}
 
 			console.log(`[micStream] created stream:`, this.stream)
-
-			// InCallManager.start({ media: "audio" })
-			// InCallManager.setForceSpeakerphoneOn(true)
 
 			return this.stream
 		},

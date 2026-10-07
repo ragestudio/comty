@@ -1,4 +1,4 @@
-import type { Self } from ".."
+import type { Self, StreamsKinds } from ".."
 
 import MicStream from "./mic"
 import ScreenStream from "./screen"
@@ -20,11 +20,6 @@ export interface StreamHandlers<
 		params?: T["start"],
 	) => Promise<InternalMediaStream | null>
 	onClose?: (this: BaseStream<T>, params?: T["close"]) => Promise<void>
-}
-
-export const StreamsKinds = {
-	mic: MicStream,
-	screen: ScreenStream,
 }
 
 export class BaseStream<

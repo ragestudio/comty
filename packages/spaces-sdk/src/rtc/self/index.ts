@@ -1,9 +1,37 @@
 import type { RTC } from ".."
-import { type BaseStream, StreamsKinds } from "./streams/base"
+import { type BaseStream } from "./streams/base"
+
 import IndexedArray from "@/classes/IndexedArray"
+
+import MicStream from "./streams/mic"
+import ScreenStream from "./streams/screen"
+import Microphone from "./media/mic"
+import Screen from "./media/screen"
+import { SelfMedia } from "./media"
+
+export const StreamsKinds = {
+	mic: MicStream,
+	screen: ScreenStream,
+}
+
+export const MediaKinds = {
+	mic: Microphone,
+	screen: Screen,
+}
 
 type StreamStartParams<Kind extends keyof typeof StreamsKinds> = Parameters<
 	ReturnType<(typeof StreamsKinds)[Kind]>["start"]
+>[0]
+
+type StreamStopParams<Kind extends keyof typeof StreamsKinds> = Parameters<
+	ReturnType<(typeof StreamsKinds)[Kind]>["close"]
+>[0]
+
+type MediaCreateParams<Kind extends keyof typeof MediaKinds> = Parameters<
+	ReturnType<(typeof MediaKinds)[Kind]>["create"]
+>[0]
+type MediaDestroyParams<Kind extends keyof typeof MediaKinds> = Parameters<
+	ReturnType<(typeof MediaKinds)[Kind]>["destroy"]
 >[0]
 
 export class Self {
@@ -15,8 +43,7 @@ export class Self {
 	streams: IndexedArray<BaseStream> = new IndexedArray()
 	streams_ref: Map<string, number> = new Map()
 
-	micProducerId: string | null = null
-	screenProducerId: string | null = null
+	media: Map<keyof typeof MediaKinds, SelfMedia<any>> = new Map()
 
 	localState = {
 		isMuted: false,
@@ -34,6 +61,15 @@ export class Self {
 	// get the state from local state
 	get isDeafened() {
 		return this.localState.isDeafened
+	}
+
+	// the local screen share stream, null while not sharing
+	get screenStream(): MediaStream | null {
+		const index = this.streams_ref.get("screen")
+
+		if (index === undefined) return null
+
+		return this.streams[index]?.stream ?? null
 	}
 
 	toggleMute(to?: boolean) {
@@ -99,7 +135,7 @@ export class Self {
 	async deleteStream<T extends BaseStream<any>>(
 		kind: keyof typeof StreamsKinds,
 		stream: T,
-		params?: Parameters<T["close"]>[0],
+		params?: StreamStopParams<keyof typeof StreamsKinds>,
 	) {
 		await stream.close(params)
 
@@ -109,7 +145,55 @@ export class Self {
 		return stream
 	}
 
+	async deleteStreamByKind(kind: keyof typeof StreamsKinds) {
+		const index = this.streams_ref.get(kind)
+
+		if (index === undefined) return
+
+		const stream = this.streams[index]
+
+		if (!stream) return
+
+		await this.deleteStream(kind, stream)
+	}
+
+	async createMedia<Kind extends keyof typeof StreamsKinds>(
+		kind: Kind,
+		params?: MediaCreateParams<Kind>,
+	) {
+		if (!MediaKinds[kind]) {
+			throw new Error(`Media of kind [${kind}] is not available`)
+		}
+
+		if (this.media.has(kind)) {
+			await this.destroyMedia(kind)
+		}
+
+		const media = MediaKinds[kind](this)
+		await media.create(params)
+
+		this.media.set(kind, media)
+
+		return media
+	}
+
+	async destroyMedia<Kind extends keyof typeof MediaKinds>(
+		type: keyof typeof MediaKinds,
+		handler?: MediaDestroyParams<Kind>,
+	) {
+		const media = this.media.get(type)
+
+		if (!media) return
+
+		await media.destroy(handler)
+		this.media.delete(type)
+	}
+
 	async deleteAll() {
+		for (const [key, media] of this.media) {
+			await this.destroyMedia(key)
+		}
+
 		for (const stream of this.streams) {
 			this.streams.delete(stream)
 		}
