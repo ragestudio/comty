@@ -37,9 +37,13 @@ export default async function (this: RTC, data: Producer) {
 				//app.cores.sfx.play("media_video_join")
 			}
 
-			// if user screen, just play sfx
+			// if a screen share starts, register it as available
 			if (data.appData.mediaTag === "screen-video") {
-				//app.cores.sfx.play("media_video_join")
+				this.screens.add(data)
+			}
+
+			if (data.appData.mediaTag === "screen-audio") {
+				this.screens.attachAudio(data)
 			}
 		}
 	} catch (error) {

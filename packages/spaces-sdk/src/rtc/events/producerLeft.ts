@@ -30,8 +30,14 @@ export default async function (this: RTC, data: any) {
 				client.dettachMic()
 			}
 
+			// if a screen share ends, stop consuming its tracks
 			if (data.appData.mediaTag === "screen-video") {
 				//app.cores.sfx.play("media_video_leave")
+				await this.screens.stop(data.userId)
+			}
+
+			if (data.appData.mediaTag === "screen-audio") {
+				await this.screens.detachAudio(data.userId)
 			}
 		}
 	} catch (error) {
