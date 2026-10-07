@@ -64,6 +64,10 @@ export default class NotificationCore extends Core {
 				body: notification.description,
 			})
 		}
+
+		if (window.ipcRenderer) {
+			window.ipcRenderer.invoke("notifications:handle", notification)
+		}
 	}
 
 	async ack(notf_id) {
