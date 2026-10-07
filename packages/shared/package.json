@@ -16,6 +16,7 @@
 	},
 	"peerDependencies": {
 		"@ragestudio/scylla-odm": "^0.22.19",
+		"mediasoup": "^3.28.0",
 		"mediasoup-client": "^3.24.4"
 	}
 }
