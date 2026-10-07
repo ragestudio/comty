@@ -1,5 +1,6 @@
-import type { ProducerOptions } from "mediasoup-client/types"
 import type { RTC } from ".."
+import type { ProducerOptions } from "mediasoup-client/types"
+import type { ProducerAppData } from "@comty/shared/types/rtc/producer"
 import type { Producer } from "./producer"
 
 import { attachSpeakingDetection } from "../speaking"
@@ -14,7 +15,9 @@ export class Producers extends Map<string, Producer> {
 
 	speakingDetectors: Map<string, () => void> = new Map()
 
-	async produce(payload: ProducerOptions): Promise<Producer> {
+	async produce(
+		payload: ProducerOptions<ProducerAppData>,
+	): Promise<Producer> {
 		if (!this.core.device) {
 			throw new Error("Device not available")
 		}
@@ -27,9 +30,10 @@ export class Producers extends Map<string, Producer> {
 			throw new Error("User ID not available")
 		}
 
-		const producer = (await this.core.transports.send.produce(
-			payload,
-		)) as Producer
+		const producer =
+			(await this.core.transports.send.produce<ProducerAppData>(
+				payload,
+			)) as Producer
 
 		producer.userId = this.core.userId
 		producer.self = true
