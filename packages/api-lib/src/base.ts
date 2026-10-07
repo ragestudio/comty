@@ -5,6 +5,7 @@ import session from "./session"
 
 export class Base {
 	static defaultApi = "https://api.comty.app"
+	//static defaultApi = "https://indev-api.comty.app"
 
 	instance: AxiosInstance
 
