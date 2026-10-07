@@ -21,7 +21,7 @@ const TimeAgo = (props: {
 	}
 
 	async function calculateRelative() {
-		const dateTime = DateTime.fromISO(props.time, {
+		const dateTime = DateTime.fromISO(String(props.time), {
 			locale: "en_US",
 		})
 
