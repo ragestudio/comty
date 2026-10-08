@@ -1,6 +1,6 @@
 {
 	"name": "@comty/native-app",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"main": "expo-router/entry",
 	"private": true,
 	"dependencies": {
@@ -17,6 +17,7 @@
 		"@react-navigation/bottom-tabs": "^7.20.0",
 		"@shopify/react-native-skia": "^2.13.1",
 		"@tamagui/config": "^2.7.7",
+		"@types/luxon": "^3.7.6",
 		"axios": "^1.20.0",
 		"babel-preset-expo": "^57.0.13",
 		"dexie": "^4.4.6",
@@ -33,6 +34,7 @@
 		"expo-linear-gradient": "^57.0.2",
 		"expo-linking": "~57.0.11",
 		"expo-router": "~57.0.24",
+		"expo-screen-orientation": "~57.0.2",
 		"expo-secure-store": "^57.0.4",
 		"expo-splash-screen": "~57.0.9",
 		"expo-sqlite": "^57.0.3",
@@ -41,6 +43,7 @@
 		"expo-system-ui": "~57.0.4",
 		"expo-web-browser": "~57.0.3",
 		"indexeddbshim": "^19.0.7",
+		"json5": "^2.2.3",
 		"lucide-react-native": "^1.48.0",
 		"luxon": "^3.7.2",
 		"mediasoup-client": "^3.24.4",
