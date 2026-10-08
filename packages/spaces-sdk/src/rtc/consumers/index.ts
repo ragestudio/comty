@@ -91,8 +91,11 @@ export class Consumers extends Map<string, Consumer> {
 				paused: false,
 			})
 
-			// if we are deafened, keep the new audio consumer muted too
-			if (this.core.self.isDeafened && consumer.kind === "audio") {
+			if (
+				this.core.self.isDeafened &&
+				consumer.kind === "audio" &&
+				consumer.appData.mediaTag === "user-mic"
+			) {
 				consumer.pause()
 			}
 
