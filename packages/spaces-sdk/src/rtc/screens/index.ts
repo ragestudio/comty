@@ -35,9 +35,14 @@ export class Screens extends Map<string, RemoteScreen> {
 
 		if (!userId) return
 
-		const screen = this.get(userId)
+		// the audio producer can arrive before the video one (the client
+		// produces audio first), so create the screen if it does not exist yet
+		let screen = this.get(userId)
 
-		if (!screen) return
+		if (!screen) {
+			screen = new RemoteScreen(this.core, userId)
+			this.set(userId, screen)
+		}
 
 		screen.setAudioProducer(audioProducer)
 

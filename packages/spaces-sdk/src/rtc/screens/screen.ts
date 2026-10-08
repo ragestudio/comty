@@ -3,6 +3,9 @@ import type { Producer } from "@/rtc/producers/producer"
 import type { Consumer } from "@/rtc/consumers/consumer"
 
 import adapter from "@/adapter"
+import volumeToGain from "@/utils/volumeToGain"
+
+import { MIN_VOLUME_DB } from "./constants"
 
 export interface SerializedScreen {
 	userId: string
@@ -78,6 +81,8 @@ export class RemoteScreen {
 
 		this.enabled = true
 
+		this.core.screens.syncState()
+
 		await this.consumeVideo()
 		await this.consumeAudio()
 
@@ -88,6 +93,8 @@ export class RemoteScreen {
 		if (!this.enabled) return
 
 		this.enabled = false
+
+		this.core.screens.syncState()
 
 		await this.stopConsumers()
 
@@ -215,7 +222,10 @@ export class RemoteScreen {
 
 		if (!track) return
 
-		adapter.trackVolume?.setVolume(track, this.volume / 100)
+		adapter.trackVolume?.setVolume(
+			track,
+			volumeToGain(this.volume, MIN_VOLUME_DB),
+		)
 	}
 
 	requestVideoKeyframe(consumer: Consumer) {
