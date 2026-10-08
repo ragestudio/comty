@@ -12,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: "Spaces",
 	slug: "spaces",
-	version: "0.1.0",
+	version: "0.1.1",
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	scheme: "app",
