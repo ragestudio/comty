@@ -1,6 +1,6 @@
 import React from "react"
 import { Pressable, StatusBar, StyleSheet, View } from "react-native"
-import { RTCView } from "react-native-webrtc"
+import { RTCView } from "@ragestudio/react-native-webrtc"
 import * as ScreenOrientation from "expo-screen-orientation"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useTheme, XStack, YStack } from "tamagui"

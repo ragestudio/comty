@@ -4,7 +4,7 @@ import {
 	setAudioProcessingConfig,
 	setHardwareNoiseSuppressor,
 	setSystemAudioProcessingConfig,
-} from "react-native-webrtc"
+} from "@ragestudio/react-native-webrtc"
 
 const nativeAudioProcessing: AudioProcessing = {
 	capabilities: {

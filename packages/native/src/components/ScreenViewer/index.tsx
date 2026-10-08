@@ -1,5 +1,5 @@
 import { useWindowDimensions, View } from "react-native"
-import { RTCView } from "react-native-webrtc"
+import { RTCView } from "@ragestudio/react-native-webrtc"
 import { XStack, YStack } from "tamagui"
 import { MonitorOffIcon, TvMinimalPlayIcon } from "lucide-react-native"
 import { Slider } from "panelui-native"

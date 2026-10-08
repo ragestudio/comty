@@ -1,7 +1,7 @@
 import type { PressHandler } from "@/types"
 
 import { useTheme, View, XStack, YStack } from "tamagui"
-import { RTCView } from "react-native-webrtc"
+import { RTCView } from "@ragestudio/react-native-webrtc"
 import { Maximize2Icon, TvMinimalPlayIcon, XIcon } from "lucide-react-native"
 import { Slider } from "panelui-native"
 

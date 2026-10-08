@@ -10,7 +10,7 @@ import {
 	setAudioRouteMode,
 	isBluetoothAvailable,
 	resetAudioRoute,
-} from "react-native-webrtc"
+} from "@ragestudio/react-native-webrtc"
 registerRtcGlobals()
 
 import session from "@comty/api-lib/session"
