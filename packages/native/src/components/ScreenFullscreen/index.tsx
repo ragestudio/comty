@@ -18,7 +18,7 @@ import { useScreenFullscreen } from "./store"
 import { CONTROLS_HIDE_DELAY } from "./constants"
 
 export const ScreenFullscreen = () => {
-	const payload = useScreenFullscreen().payload
+	const fullscreen = useScreenFullscreen()
 	const theme = useTheme()
 	const insets = useSafeAreaInsets()
 
@@ -26,7 +26,7 @@ export const ScreenFullscreen = () => {
 	const opacity = useSharedValue(1)
 	const hideTimeout = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
-	const active = payload !== null
+	const active = fullscreen.payload !== null
 
 	const scheduleHide = React.useCallback(() => {
 		if (hideTimeout.current) clearTimeout(hideTimeout.current)
@@ -41,6 +41,10 @@ export const ScreenFullscreen = () => {
 		setControlsVisible(true)
 		scheduleHide()
 	}, [scheduleHide])
+
+	const handleCloseFullscreen = () => {
+		fullscreen.close()
+	}
 
 	// rotation is enabled and the status bar hidden only while fullscreen is up
 	React.useEffect(() => {
@@ -80,13 +84,13 @@ export const ScreenFullscreen = () => {
 
 	const controlsStyle = useAnimatedStyle(() => ({ opacity: opacity.value }))
 
-	if (!payload) return null
+	if (!fullscreen.payload || !fullscreen.id) return null
 
 	return (
 		<View style={[StyleSheet.absoluteFill, styles.container]}>
-			{payload.streamURL && (
+			{fullscreen.payload.streamURL && (
 				<RTCView
-					streamURL={payload.streamURL}
+					streamURL={fullscreen.payload.streamURL}
 					objectFit="contain"
 					style={{ flex: 1 }}
 				/>
@@ -129,7 +133,7 @@ export const ScreenFullscreen = () => {
 							fontSize={13}
 							numberOfLines={1}
 						>
-							{payload.label}
+							{fullscreen.payload.label}
 						</AppText>
 					</XStack>
 
@@ -140,7 +144,7 @@ export const ScreenFullscreen = () => {
 						justifyContent="center"
 						borderRadius={16}
 						backgroundColor="rgba(0,0,0,0.5)"
-						onPress={payload.onClose}
+						onPress={() => handleCloseFullscreen()}
 					>
 						<Minimize2Icon
 							size={16}
@@ -149,7 +153,7 @@ export const ScreenFullscreen = () => {
 					</YStack>
 				</View>
 
-				{payload.hasAudio && payload.onVolume && (
+				{fullscreen.payload.hasAudio && fullscreen.payload.onVolume && (
 					<View
 						style={{
 							position: "absolute",
@@ -170,9 +174,9 @@ export const ScreenFullscreen = () => {
 							min={0}
 							max={100}
 							step={1}
-							defaultValue={payload.volume}
+							defaultValue={fullscreen.payload.volume}
+							onValueCommit={fullscreen.payload.onVolume}
 							onValueChange={reveal}
-							onValueCommit={payload.onVolume}
 							haptics
 						/>
 					</View>

@@ -6,11 +6,17 @@ export type ScreenFullscreenPayload = {
 	hasAudio: boolean
 	volume: number
 	onVolume?: (value: number) => void
-	onClose: () => void
+	onClose?: (params?: {
+		payload: ScreenFullscreenManager["payload"]
+		id: ScreenFullscreenManager["id"]
+	}) => void
 }
 
 interface ScreenFullscreenManager {
+	id: string | null
 	payload: ScreenFullscreenPayload | null
+	open: (id: string, payload: ScreenFullscreenPayload) => void
+	close: () => void
 }
 
 export const ScreenFullscreenStore = z.create<ScreenFullscreenManager>()((
@@ -18,13 +24,21 @@ export const ScreenFullscreenStore = z.create<ScreenFullscreenManager>()((
 	get,
 ) => {
 	return {
+		id: null,
 		payload: null,
-		open(payload: ScreenFullscreenPayload) {
-			set({ payload })
+		open(id, payload) {
+			set({ id, payload })
 		},
 		close() {
-			if (get().payload === null) return
-			set({ payload: null })
+			const state = get()
+
+			if (!state.payload) return
+
+			if (typeof state.payload.onClose === "function") {
+				state.payload.onClose({ payload: state.payload, id: state.id })
+			}
+
+			set({ id: null, payload: null })
 		},
 	}
 })
