@@ -6,25 +6,24 @@ import React from "react"
 import { useLocalSearchParams } from "expo-router"
 import { MessageSquareIcon, Volume2Icon } from "lucide-react-native"
 import { View, StyleSheet, Image, GestureResponderEvent } from "react-native"
-import { XStack, YStack } from "tamagui"
+import { useTheme, XStack, YStack } from "tamagui"
 import { Skeleton, Chip } from "panelui-native"
 import TextureBg from "@/ui/TextureBg"
 import AppText from "@/ui/Text"
 import TimeAgo from "@/components/TimeAgo"
+import ScreenViewer from "@/components/ScreenViewer"
 
-import useApp from "@/engine/app"
 import {
-	subscribeGroupSocket,
 	useGroupActions,
 	useGroupChannels,
 	useGroupData,
 	useGroupError,
 	useGroupLoading,
 	useGroupRTC,
-	useGroupStore,
-} from "@/lib/spaces"
-
-import { rtcService } from "@/lib/spaces/stores/rtc"
+} from "@comty/spaces-sdk/group"
+import { subscribeGroupSocket } from "@comty/spaces-sdk/events"
+import { rtcService, useRTCStore } from "@comty/spaces-sdk/rtc"
+import { Client } from "@comty/shared/types/rtc/client"
 
 export const GroupHeader = ({ data }: { data: Group | null }) => {
 	if (!data) {
@@ -81,8 +80,6 @@ export const GroupChannels = ({
 }) => {
 	const statedChannels = useGroupRTC()
 
-	console.log({ statedChannels })
-
 	if (!channels) {
 		return (
 			<View className="flex-row items-center gap-3">
@@ -112,40 +109,68 @@ export const GroupChannels = ({
 	)
 }
 
+export const GroupChannelClient = ({
+	client,
+	isSpeaking,
+}: {
+	client: Client
+	isSpeaking: boolean
+}) => {
+	const theme = useTheme()
+
+	return (
+		<YStack
+			justifyContent="center"
+			gap={5}
+			padding={10}
+		>
+			<TextureBg
+				borderRadius={8}
+				borderWidth={1}
+			/>
+			<XStack
+				alignItems="center"
+				gap={5}
+			>
+				<Image
+					width={25}
+					height={25}
+					source={{
+						uri: client.user?.avatar,
+					}}
+					style={{
+						borderWidth: isSpeaking ? 3 : 0,
+						borderColor: isSpeaking
+							? theme.productColor.val.toString()
+							: undefined,
+					}}
+				/>
+				<AppText>{client.user?.username}</AppText>
+			</XStack>
+
+			<AppText>{client.userId}</AppText>
+		</YStack>
+	)
+}
+
 export const GroupChannelsClients = ({
 	clients,
+	speakingClients,
 }: {
-	clients: StatedChannel["clients"]
+	clients: Client[]
+	speakingClients: string[]
 }) => {
 	return (
 		<YStack>
 			{clients.map((client) => {
+				const isSpeaking = speakingClients.includes(client.userId)
+
 				return (
-					<YStack
-						justifyContent="center"
-						gap={5}
-						padding={10}
+					<GroupChannelClient
 						key={client.userId}
-					>
-						<TextureBg
-							borderRadius={8}
-							borderWidth={1}
-						/>
-						<XStack
-							alignItems="center"
-							gap={5}
-						>
-							<Image
-								width={25}
-								height={25}
-								source={{
-									uri: client.user?.avatar,
-								}}
-							/>
-							<AppText>{client.user?.username}</AppText>
-						</XStack>
-						<AppText>{client.userId}</AppText>
-					</YStack>
+						client={client}
+						isSpeaking={isSpeaking}
+					/>
 				)
 			})}
 		</YStack>
@@ -164,6 +189,9 @@ export const GroupChannel = ({
 		channel: Channels["items"][0],
 	) => void
 }) => {
+	const rtcState = useRTCStore()
+	const isJoined = rtcState.channel?._id === channel._id
+
 	const handlePressed = (e: GestureResponderEvent) => {
 		if (typeof onPress === "function") {
 			onPress(e, channel)
@@ -209,14 +237,16 @@ export const GroupChannel = ({
 			</XStack>
 
 			{state && state.clients.length > 0 && (
-				<GroupChannelsClients clients={state.clients} />
+				<GroupChannelsClients
+					speakingClients={isJoined ? rtcState.speakingClients : []}
+					clients={state.clients}
+				/>
 			)}
 		</YStack>
 	)
 }
 
 export const GroupView = () => {
-	const app = useApp()
 	const params = useLocalSearchParams<{ group_id: string }>()
 
 	const actions = useGroupActions()
@@ -232,7 +262,10 @@ export const GroupView = () => {
 		console.debug("GroupView::handleOnPressChannel", { e, channel })
 
 		if (channel.kind === "voice") {
-			rtcService.handlers.joinChannel(channel.group_id, channel._id)
+			rtcService.handlers.joinChannel({
+				groupId: channel.group_id,
+				channelId: channel._id,
+			})
 			return
 		}
 
@@ -282,6 +315,7 @@ export const GroupView = () => {
 			gap={15}
 		>
 			<GroupHeader data={data} />
+			<ScreenViewer />
 			<GroupChannels
 				channels={channels}
 				onPressChannel={handleOnPressChannel}
