@@ -1,7 +1,12 @@
 import { YStack } from "tamagui"
 
 import { OptionRow } from "../OptionRow"
-import { EarIcon, MicAudioLinesIcon, Volume2Icon } from "lucide-react-native"
+import {
+	BluetoothIcon,
+	EarIcon,
+	MicAudioLinesIcon,
+	Volume2Icon,
+} from "lucide-react-native"
 import { Select, Slider, SparklesIcon, Switch } from "panelui-native"
 
 import {
@@ -9,13 +14,20 @@ import {
 	useAudioStore,
 	audioProcessing,
 	useAudioProcessing,
+	isBluetoothDevice,
 	type NoiseSuppressionMode,
+	type AudioRouteMode,
 } from "@comty/spaces-sdk/rtc/audio"
 
 const NSModes: { value: NoiseSuppressionMode; label: string }[] = [
 	{ value: "off", label: "Off" },
 	{ value: "system", label: "System" },
 	{ value: "rnnoise", label: "RNNoise" },
+]
+
+const routeModes: { value: AudioRouteMode; label: string }[] = [
+	{ value: "call", label: "Call" },
+	{ value: "high-fidelity", label: "High fidelity (A2DP)" },
 ]
 
 const selectTriggerClass = "py-2 px-3 rounded-md"
@@ -31,6 +43,18 @@ const InputAudioControls = () => {
 	const inputDevices = audioState.devices.filter(
 		(device) => device.kind === "input",
 	)
+
+	const selectedOutput =
+		outputDevices.find((device) => device.id === audioState.outputDeviceId) ??
+		null
+	const selectedOutputIsBluetooth = isBluetoothDevice(selectedOutput)
+
+	const highFidelity =
+		audioState.routeMode === "high-fidelity" && selectedOutputIsBluetooth
+
+	const visibleInputs = highFidelity
+		? inputDevices.filter((device) => !isBluetoothDevice(device))
+		: inputDevices
 
 	const handleToggleSpeaker = (to: boolean) => {
 		audioManager.toggleSpeaker()
@@ -76,7 +100,33 @@ const InputAudioControls = () => {
 				</OptionRow>
 			)}
 
-			{inputDevices.length > 0 && (
+			{selectedOutputIsBluetooth && audioState.routeModeSupported && (
+				<OptionRow
+					label="Bluetooth mode"
+					icon={<BluetoothIcon />}
+					vertical
+				>
+					<Select
+						value={audioState.routeMode}
+						onValueChange={(value) =>
+							audioManager.setRouteMode(value as AudioRouteMode)
+						}
+						triggerClassName={selectTriggerClass}
+						valueClassName={selectTextClass}
+						placeholderClassName={selectTextClass}
+					>
+						{routeModes.map((mode) => (
+							<Select.Item
+								key={mode.value}
+								value={mode.value}
+								label={mode.label}
+							/>
+						))}
+					</Select>
+				</OptionRow>
+			)}
+
+			{visibleInputs.length > 0 && (
 				<OptionRow
 					label="Input device"
 					icon={<MicAudioLinesIcon />}
@@ -91,7 +141,7 @@ const InputAudioControls = () => {
 						valueClassName={selectTextClass}
 						placeholderClassName={selectTextClass}
 					>
-						{inputDevices.map((device) => (
+						{visibleInputs.map((device) => (
 							<Select.Item
 								key={device.id}
 								value={device.id}
