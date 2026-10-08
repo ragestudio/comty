@@ -18,4 +18,5 @@ export interface AudioStrategy {
 	setSpeakerEnabled?(enabled: boolean): Promise<void>
 	isSpeakerEnabled?(): Promise<boolean>
 	setOutputDevice?(deviceId: string): Promise<boolean>
+	setInputDevice?(deviceId: string): Promise<boolean>
 }

@@ -23,6 +23,12 @@ const nativeStrategy: AudioStrategy = {
 			false
 		)
 	},
+	async setInputDevice(deviceId) {
+		return (
+			(await adapter.audioRouting?.setAudioInputDevice?.(deviceId)) ??
+			false
+		)
+	},
 }
 
 export default nativeStrategy

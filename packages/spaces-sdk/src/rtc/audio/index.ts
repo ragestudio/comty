@@ -57,11 +57,22 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 			const currentOutput = devices.find(
 				(device) => device.kind === "output" && device.isCurrent,
 			)
+			const currentInput = devices.find(
+				(device) => device.kind === "input" && device.isCurrent,
+			)
+
+			let speakerEnabled = this.speakerEnabled
+
+			if (strategy.isSpeakerEnabled) {
+				speakerEnabled = await strategy.isSpeakerEnabled()
+			}
 
 			this.setState({
 				devices,
 				speakerAvailable: strategy.speakerAvailable,
+				speakerEnabled,
 				outputDeviceId: currentOutput?.id ?? this.outputDeviceId,
+				inputDeviceId: currentInput?.id ?? this.inputDeviceId,
 			})
 
 			return devices
@@ -107,6 +118,27 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 			return applied
 		} catch (error) {
 			console.error("[audio] failed to set output device", error)
+			return false
+		}
+	}
+
+	async setInputDevice(deviceId: string): Promise<boolean> {
+		const strategy = this.strategy
+
+		if (!strategy?.setInputDevice) {
+			return false
+		}
+
+		try {
+			const applied = await strategy.setInputDevice(deviceId)
+
+			if (applied) {
+				this.setState({ inputDeviceId: deviceId })
+			}
+
+			return applied
+		} catch (error) {
+			console.error("[audio] failed to set input device", error)
 			return false
 		}
 	}
