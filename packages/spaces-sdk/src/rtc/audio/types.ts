@@ -1,5 +1,10 @@
 export type AudioDeviceKind = "input" | "output"
 
+// call uses the system voice path (bluetooth headset mic and output), while
+// high-fidelity keeps bluetooth output on a2dp stereo and captures only from
+// the device builtin mic
+export type AudioRouteMode = "call" | "high-fidelity"
+
 export interface AudioDevice {
 	id: string
 	kind: AudioDeviceKind
@@ -19,4 +24,6 @@ export interface AudioStrategy {
 	isSpeakerEnabled?(): Promise<boolean>
 	setOutputDevice?(deviceId: string): Promise<boolean>
 	setInputDevice?(deviceId: string): Promise<boolean>
+	setRouteMode?(mode: AudioRouteMode): Promise<boolean>
+	isBluetoothAvailable?(): Promise<boolean>
 }

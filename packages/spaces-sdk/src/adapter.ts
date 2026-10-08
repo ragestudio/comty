@@ -1,4 +1,4 @@
-import type { AudioDevice } from "./rtc/audio/types"
+import type { AudioDevice, AudioRouteMode } from "./rtc/audio/types"
 import type { AudioProcessingAdapter } from "./rtc/audio/processing/types"
 
 export interface WebRtcObjects {
@@ -44,6 +44,13 @@ export interface AudioRouting {
 	isSpeakerphoneOn(): Promise<boolean>
 	setAudioOutputDevice(deviceId: string): Promise<boolean>
 	setAudioInputDevice?(deviceId: string): Promise<boolean>
+	setAudioRouteMode?(mode: AudioRouteMode): Promise<boolean>
+	isBluetoothAvailable?(): Promise<boolean>
+}
+
+// notifies when the set of available audio devices changes (hotplug)
+export interface AudioDevicesEvents {
+	subscribe(handler: () => void): () => void
 }
 
 export interface TrackVolume {
@@ -64,6 +71,7 @@ export class Adapter {
 	sessionGetter?: () => Promise<SessionData>
 	frameTransformEvents?: FrameTransformEvents
 	audioRouting?: AudioRouting
+	audioDevicesEvents?: AudioDevicesEvents
 	audioProcessing?: AudioProcessing
 	trackVolume?: TrackVolume
 
@@ -85,6 +93,10 @@ export class Adapter {
 
 	registerAudioRouting(routing: AudioRouting) {
 		this.audioRouting = routing
+	}
+
+	registerAudioDevicesEvents(events: AudioDevicesEvents) {
+		this.audioDevicesEvents = events
 	}
 
 	registerAudioProcessing(processing: AudioProcessing) {
