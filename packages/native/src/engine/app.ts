@@ -5,10 +5,11 @@ import * as SplashScreen from "expo-splash-screen"
 
 import fonts from "./load/fonts"
 
+import { reconnectionToastStore } from "./reconnectionToast"
 import ThemeController from "./theme"
 import AuthManager from "./auth"
-import session from "@comty/api-lib/session"
 
+import session from "@comty/api-lib/session"
 import { BaseStore } from "@comty/spaces-sdk/classes"
 import { wsManager } from "@comty/spaces-sdk/ws"
 import { rtcService } from "@comty/spaces-sdk/rtc"
@@ -30,6 +31,7 @@ interface AppState {
 	earlyDone: boolean
 	router: ImperativeRouter | null
 	userData: typeof session.user | null
+	connected: boolean
 }
 
 export class App extends BaseStore<AppState> {
@@ -48,6 +50,7 @@ export class App extends BaseStore<AppState> {
 			earlyDone: false,
 			router: null,
 			userData: null,
+			connected: false,
 		})
 	}
 
@@ -76,6 +79,27 @@ export class App extends BaseStore<AppState> {
 
 		// run websocket manager
 		await wsManager.initialize()
+
+		if (wsManager.socket) {
+			wsManager.socket.on("close", () => {
+				this.setState({ connected: false })
+			})
+			wsManager.socket.on("error", () => {
+				this.setState({ connected: false })
+			})
+			wsManager.socket.on("reconnecting", () => {
+				this.setState({ connected: false })
+				reconnectionToastStore.getState().open()
+			})
+			wsManager.socket.on("connected", () => {
+				this.setState({ connected: true })
+				reconnectionToastStore.getState().close()
+			})
+			wsManager.socket.on("reconnected", () => {
+				this.setState({ connected: true })
+				reconnectionToastStore.getState().close()
+			})
+		}
 
 		// run rtc service
 		await rtcService.initialize()
