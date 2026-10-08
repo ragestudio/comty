@@ -43,6 +43,11 @@ export interface AudioRouting {
 	setSpeakerphoneOn(enabled: boolean): void
 	isSpeakerphoneOn(): Promise<boolean>
 	setAudioOutputDevice(deviceId: string): Promise<boolean>
+	setAudioInputDevice?(deviceId: string): Promise<boolean>
+}
+
+export interface TrackVolume {
+	setVolume(track: MediaStreamTrack, gain: number): void
 }
 
 export type AudioProcessing = AudioProcessingAdapter
@@ -51,6 +56,7 @@ export class Adapter {
 	constructor() {}
 
 	baseApiUrl: string = "https://api.comty.app"
+	//baseApiUrl: string = "https://indev-api.comty.app"
 	websocketPath: string = "/ws"
 
 	webRtcObjects?: WebRtcObjects
@@ -59,6 +65,7 @@ export class Adapter {
 	frameTransformEvents?: FrameTransformEvents
 	audioRouting?: AudioRouting
 	audioProcessing?: AudioProcessing
+	trackVolume?: TrackVolume
 
 	get webSocketEndpoint(): string {
 		return new URL(this.websocketPath, this.baseApiUrl).toString()
@@ -82,6 +89,10 @@ export class Adapter {
 
 	registerAudioProcessing(processing: AudioProcessing) {
 		this.audioProcessing = processing
+	}
+
+	registerTrackVolume(trackVolume: TrackVolume) {
+		this.trackVolume = trackVolume
 	}
 }
 
