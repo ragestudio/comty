@@ -18,9 +18,19 @@ const NSModes: { value: NoiseSuppressionMode; label: string }[] = [
 	{ value: "rnnoise", label: "RNNoise" },
 ]
 
+const selectTriggerClass = "py-2 px-3 rounded-md"
+const selectTextClass = "text-sm"
+
 const InputAudioControls = () => {
 	const audioState = useAudioStore()
 	const audioProcessingState = useAudioProcessing()
+
+	const outputDevices = audioState.devices.filter(
+		(device) => device.kind === "output",
+	)
+	const inputDevices = audioState.devices.filter(
+		(device) => device.kind === "input",
+	)
 
 	const handleToggleSpeaker = (to: boolean) => {
 		audioManager.toggleSpeaker()
@@ -40,6 +50,58 @@ const InputAudioControls = () => {
 				</OptionRow>
 			)}
 
+			{outputDevices.length > 0 && (
+				<OptionRow
+					label="Output device"
+					icon={<Volume2Icon />}
+					vertical
+				>
+					<Select
+						value={audioState.outputDeviceId ?? ""}
+						onValueChange={(value) =>
+							audioManager.setOutputDevice(value as string)
+						}
+						triggerClassName={selectTriggerClass}
+						valueClassName={selectTextClass}
+						placeholderClassName={selectTextClass}
+					>
+						{outputDevices.map((device) => (
+							<Select.Item
+								key={device.id}
+								value={device.id}
+								label={device.label}
+							/>
+						))}
+					</Select>
+				</OptionRow>
+			)}
+
+			{inputDevices.length > 0 && (
+				<OptionRow
+					label="Input device"
+					icon={<MicAudioLinesIcon />}
+					vertical
+				>
+					<Select
+						value={audioState.inputDeviceId ?? ""}
+						onValueChange={(value) =>
+							audioManager.setInputDevice(value as string)
+						}
+						triggerClassName={selectTriggerClass}
+						valueClassName={selectTextClass}
+						placeholderClassName={selectTextClass}
+					>
+						{inputDevices.map((device) => (
+							<Select.Item
+								key={device.id}
+								value={device.id}
+								label={device.label}
+							/>
+						))}
+					</Select>
+				</OptionRow>
+			)}
+
 			<OptionRow
 				label="Noise supression"
 				icon={<SparklesIcon />}
@@ -50,6 +112,9 @@ const InputAudioControls = () => {
 					onValueChange={(value) =>
 						audioProcessing.setNoiseSuppression(value as NoiseSuppressionMode)
 					}
+					triggerClassName={selectTriggerClass}
+					valueClassName={selectTextClass}
+					placeholderClassName={selectTextClass}
 				>
 					{NSModes.map((mode) => (
 						<Select.Item
@@ -109,8 +174,8 @@ const InputAudioControls = () => {
 					min={-10}
 					max={20}
 					step={1}
-					defaultValue={audioProcessingState.input.gainDb}
-					onValueCommit={(value) => audioProcessing.setInputGainDb(value)}
+					defaultValue={audioProcessingState.output.gainDb}
+					onValueCommit={(value) => audioProcessing.setOutputGainDb(value)}
 					haptics
 				/>
 			</OptionRow>
