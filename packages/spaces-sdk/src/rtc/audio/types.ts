@@ -26,4 +26,5 @@ export interface AudioStrategy {
 	setInputDevice?(deviceId: string): Promise<boolean>
 	setRouteMode?(mode: AudioRouteMode): Promise<boolean>
 	isBluetoothAvailable?(): Promise<boolean>
+	resetRouting?(): Promise<boolean>
 }

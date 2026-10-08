@@ -35,6 +35,9 @@ const nativeStrategy: AudioStrategy = {
 	async isBluetoothAvailable() {
 		return (await adapter.audioRouting?.isBluetoothAvailable?.()) ?? false
 	},
+	async resetRouting() {
+		return (await adapter.audioRouting?.resetAudioRouting?.()) ?? false
+	},
 }
 
 export default nativeStrategy

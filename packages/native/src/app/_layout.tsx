@@ -63,6 +63,10 @@ export const MainLayout = () => {
 			notifications.stopCallNotification().catch(console.error)
 		}
 
+		// hold the audio routing only while a call is running, releasing it lets the
+		// headset go back to its normal profile when the call ends
+		audioManager.setActive(rtc.state !== "disconnected").catch(console.error)
+
 		if (rtc.state === "connected") {
 			audioManager
 				.refresh()

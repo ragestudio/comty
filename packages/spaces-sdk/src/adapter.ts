@@ -46,6 +46,7 @@ export interface AudioRouting {
 	setAudioInputDevice?(deviceId: string): Promise<boolean>
 	setAudioRouteMode?(mode: AudioRouteMode): Promise<boolean>
 	isBluetoothAvailable?(): Promise<boolean>
+	resetAudioRouting?(): Promise<boolean>
 }
 
 // notifies when the set of available audio devices changes (hotplug)

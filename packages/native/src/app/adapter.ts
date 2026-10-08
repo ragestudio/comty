@@ -9,6 +9,7 @@ import {
 	setAudioInputDevice,
 	setAudioRouteMode,
 	isBluetoothAvailable,
+	resetAudioRoute,
 } from "react-native-webrtc"
 registerRtcGlobals()
 
@@ -32,6 +33,7 @@ adapter.registerAudioRouting({
 	setAudioInputDevice,
 	setAudioRouteMode,
 	isBluetoothAvailable,
+	resetAudioRouting: resetAudioRoute,
 })
 
 adapter.registerAudioDevicesEvents({

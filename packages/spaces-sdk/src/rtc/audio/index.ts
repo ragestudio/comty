@@ -47,6 +47,8 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 	private handlingDevices = false
 	private busyUntil = 0
 	private lastBluetoothAvailable?: boolean
+	// routing is only held while a call is running
+	private active = false
 
 	constructor() {
 		super({
@@ -126,6 +128,57 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 		}
 
 		return this.unsubscribeDevices
+	}
+
+	// called when a call starts or ends. while idle no route is held, when a call
+	// ends the native side releases the headset from the voice profile
+	async setActive(active: boolean): Promise<void> {
+		if (this.active === active) {
+			return
+		}
+
+		this.active = active
+
+		const strategy = this.strategy
+
+		if (!strategy) {
+			return
+		}
+
+		if (!active) {
+			await strategy.resetRouting?.()
+			return
+		}
+
+		await this.refresh()
+		await this.applyActiveRouting()
+	}
+
+	// brings the native routing in line with the current selection when a call
+	// starts, preferring bluetooth when a headset is connected
+	private async applyActiveRouting(): Promise<void> {
+		const strategy = this.strategy
+
+		if (!strategy) {
+			return
+		}
+
+		const selected = this.selectedOutput
+		const bluetooth = this.bluetoothOutput
+
+		if (bluetooth && !isBluetoothDevice(selected)) {
+			await this.setOutputDevice(bluetooth.id)
+			return
+		}
+
+		if (isBluetoothDevice(selected)) {
+			this.busyUntil = Date.now() + ROUTING_SETTLE_MS
+			await strategy.setRouteMode?.(this.routeMode)
+			await this.syncInput(true, this.routeMode)
+			return
+		}
+
+		await strategy.setRouteMode?.("call")
 	}
 
 	async refresh(): Promise<AudioDevice[]> {
@@ -244,6 +297,11 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 
 			const previous = this.lastBluetoothAvailable
 			this.lastBluetoothAvailable = available
+
+			// never change routing outside a call
+			if (!this.active) {
+				return
+			}
 
 			// ignore the changes we caused ourselves while routing settles
 			if (previous === undefined || Date.now() < this.busyUntil) {
