@@ -10,7 +10,6 @@ import AuthManager from "./auth"
 import session from "@comty/api-lib/session"
 
 import { BaseStore } from "@comty/spaces-sdk/classes"
-import { adapter } from "@comty/spaces-sdk"
 import { wsManager } from "@comty/spaces-sdk/ws"
 import { rtcService } from "@comty/spaces-sdk/rtc"
 
