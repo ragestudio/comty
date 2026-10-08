@@ -7,8 +7,8 @@ import { XStack, YStack } from "tamagui"
 
 import { useGroupRTC } from "@comty/spaces-sdk/group"
 import { rtcService, useRTCStore } from "@comty/spaces-sdk/rtc"
+import { useScreenFullscreen } from "@/components/ScreenFullscreen/store"
 
-import { ScreenFullscreenStore } from "@/stores/ScreenFullscreen"
 import clientName from "@/utils/clientName"
 
 import ClientTile from "./ClientTile"
@@ -28,10 +28,10 @@ import {
 const ChannelGrid = () => {
 	const rtc = useRTCStore()
 	const channelState = useGroupRTC()
+	const fullscreen = useScreenFullscreen()
 
 	const [area, setArea] = React.useState({ width: 0, height: 0 })
 	const [focusedId, setFocusedId] = React.useState<string | null>(null)
-	const [fullscreenId, setFullscreenId] = React.useState<string | null>(null)
 
 	const channelId = rtc.channel?._id
 	const clients =
@@ -85,6 +85,34 @@ const ChannelGrid = () => {
 		if (focusedId !== null) setFocusedId(null)
 	}
 
+	const handleOnFullscreenItem = (item: GridItem) => {
+		if (item.kind !== "screen" && item.kind !== "local") {
+			return
+		}
+
+		const id = idOf(item)
+
+		if (item.kind === "local" && localStreamURL) {
+			fullscreen.open(id, {
+				streamURL: localStreamURL,
+				label: "Your screen",
+				hasAudio: false,
+				volume: 0,
+			})
+		}
+
+		if (item.kind === "screen") {
+			fullscreen.open(id, {
+				streamURL: item.screen.streamURL,
+				label: nameOf(item.screen.userId),
+				hasAudio: item.screen.hasAudio,
+				volume: item.screen.volume,
+				onVolume: (value) =>
+					rtcService.screens.setVolume(item.screen.userId, value),
+			})
+		}
+	}
+
 	const onLayout = (event: LayoutChangeEvent) => {
 		const { width, height } = event.nativeEvent.layout
 
@@ -105,8 +133,8 @@ const ChannelGrid = () => {
 					streamURL={localStreamURL}
 					label="Your screen"
 					onStop={() => rtcService.self.destroyMedia("screen")}
-					onExpand={() => setFullscreenId(id)}
-					hidden={fullscreenId === id}
+					onExpand={() => handleOnFullscreenItem(item)}
+					hidden={fullscreen.id === id}
 					onPress={handleCardPress(id)}
 				/>
 			)
@@ -130,8 +158,8 @@ const ChannelGrid = () => {
 							rtcService.screens.disable(item.screen.userId)
 							setFocusedId((prev) => (prev === id ? null : prev))
 						}}
-						onExpand={() => setFullscreenId(id)}
-						hidden={fullscreenId === id}
+						onExpand={() => handleOnFullscreenItem(item)}
+						hidden={fullscreen.id === id}
 						onPress={handleCardPress(id)}
 					/>
 				)
@@ -174,49 +202,17 @@ const ChannelGrid = () => {
 			</XStack>
 		))
 
-	const fullscreenItem = fullscreenId
-		? items.find((item) => idOf(item) === fullscreenId)
-		: null
-
-	const isFullscreen =
-		(fullscreenItem?.kind === "local" && !!localStreamURL) ||
-		(fullscreenItem?.kind === "screen" && fullscreenItem.screen.enabled)
-
+	// Safe guardrail if there are a fullscreen payload but no id applied
 	React.useEffect(() => {
-		const store = ScreenFullscreenStore.getState()
-
-		if (!isFullscreen) {
-			store.close()
+		if (!fullscreen.id && fullscreen.payload) {
+			fullscreen.close()
 			return
 		}
+	}, [fullscreen])
 
-		if (fullscreenItem?.kind === "local" && localStreamURL) {
-			store.open({
-				streamURL: localStreamURL,
-				label: "Your screen",
-				hasAudio: false,
-				volume: 0,
-				onClose: () => setFullscreenId(null),
-			})
-			return
-		}
-
-		if (fullscreenItem?.kind === "screen") {
-			const userId = fullscreenItem.screen.userId
-
-			store.open({
-				streamURL: fullscreenItem.screen.streamURL,
-				label: nameOf(userId),
-				hasAudio: fullscreenItem.screen.hasAudio,
-				volume: fullscreenItem.screen.volume,
-				onVolume: (value) => rtcService.screens.setVolume(userId, value),
-				onClose: () => setFullscreenId(null),
-			})
-		}
-	}, [isFullscreen])
-
+	// force close fullscreen if grid is unmounted
 	React.useEffect(() => {
-		return () => ScreenFullscreenStore.getState().close()
+		return () => fullscreen.close()
 	}, [])
 
 	if (items.length === 0) {
