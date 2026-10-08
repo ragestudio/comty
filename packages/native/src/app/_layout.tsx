@@ -13,6 +13,7 @@ import { TamaguiProvider, ZStack } from "tamagui"
 import { PanelUIProvider, useTheme } from "panelui-native"
 import TextureBg from "@/ui/TextureBg"
 import { BlurTargetArea, BlurTargetProvider } from "@/ui/BlurTarget"
+import ScreenFullscreen from "@/components/ScreenFullscreen"
 import UI from "./tamagui.config"
 
 import { app, useStore as useApp } from "@/engine/app"
@@ -62,10 +63,17 @@ export const MainLayout = () => {
 			notifications.stopCallNotification().catch(console.error)
 		}
 
-		// voice channels default to the loud speaker once audio is live
 		if (rtc.state === "connected") {
-			audioManager.refresh().catch(console.error)
-			audioManager.setSpeakerEnabled(true).catch(console.error)
+			audioManager
+				.refresh()
+				.then(() => {
+					const hasExternal = audioManager.outputs.some(
+						(device) => device.type !== "speaker" && device.type !== "earpiece",
+					)
+
+					return audioManager.setSpeakerEnabled(!hasExternal)
+				})
+				.catch(console.error)
 		}
 	}, [rtc.state])
 
@@ -112,6 +120,8 @@ export const MainLayout = () => {
 											<Slot />
 										</BlurTargetArea>
 									</SafeAreaView>
+
+									<ScreenFullscreen />
 								</ZStack>
 							</BlurTargetProvider>
 						</PanelUIProvider>
