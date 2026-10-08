@@ -5,6 +5,7 @@ import * as SecureStore from "expo-secure-store"
 import AuthModel from "@comty/api-lib/models/auth"
 import UserModel from "@comty/api-lib/models/user"
 import session from "@comty/api-lib/session"
+import wsManager from "@/ws"
 
 export enum AuthStoreKeys {
 	Token = "session-token",
@@ -47,17 +48,24 @@ export class AuthManager {
 			throw new Error("Cannot load a session without a valid token")
 		}
 
-		console.log("Loading session with token...")
+		try {
+			console.log("Loading session with token...")
 
-		session.token = token
-		session.refreshToken = refreshToken ?? ""
-		session.user = await UserModel.self()
+			session.token = token
+			session.refreshToken = refreshToken ?? ""
+			session.user = await UserModel.self()
 
-		this.app.setState({
-			userData: session.user,
-		})
+			this.app.setState({
+				userData: session.user,
+			})
 
-		console.log("Session loaded :", session)
+			wsManager.socket?.authenticate(token)
+
+			console.log("Session loaded :", session)
+		} catch (err) {
+			console.error("Failed to load session", err)
+			this.app.router?.navigate("/auth")
+		}
 	}
 
 	async login(usernameOrEmail: string, password: string, code?: string) {
@@ -66,8 +74,6 @@ export class AuthManager {
 			password,
 			code,
 		)
-
-		console.log(response)
 
 		if (response.activation_required) {
 			throw {
@@ -88,6 +94,7 @@ export class AuthManager {
 		)
 
 		await this.loadSession()
+
 		this.app.router?.navigate("/")
 
 		return response
