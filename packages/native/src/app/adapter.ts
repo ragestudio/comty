@@ -7,6 +7,8 @@ import {
 	isSpeakerphoneOn,
 	setAudioOutputDevice,
 	setAudioInputDevice,
+	setAudioRouteMode,
+	isBluetoothAvailable,
 } from "react-native-webrtc"
 registerRtcGlobals()
 
@@ -14,7 +16,7 @@ import session from "@comty/api-lib/session"
 
 import { app } from "@/engine/app"
 import { adapter } from "@comty/spaces-sdk"
-import { audioProcessing } from "@comty/spaces-sdk/rtc/audio"
+import { audioManager, audioProcessing } from "@comty/spaces-sdk/rtc/audio"
 import nativeAudioProcessing from "@/engine/audioProcessing"
 
 adapter.registerFrameTransformEvents({
@@ -28,7 +30,21 @@ adapter.registerAudioRouting({
 	isSpeakerphoneOn,
 	setAudioOutputDevice,
 	setAudioInputDevice,
+	setAudioRouteMode,
+	isBluetoothAvailable,
 })
+
+adapter.registerAudioDevicesEvents({
+	subscribe(handler) {
+		const listener = {}
+		addRtcListener(listener, "onAudioDevicesChanged", handler)
+
+		return () => removeRtcListener(listener)
+	},
+})
+
+// keep the audio device list and routing in sync with hardware hotplug
+audioManager.observe()
 
 adapter.registerAudioProcessing(nativeAudioProcessing)
 
