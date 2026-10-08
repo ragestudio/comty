@@ -19,10 +19,14 @@ export async function reset(this: RTC) {
 				connectedAt: null,
 				channel: null,
 				isSpeaking: false,
+
 				statedClients: [],
 				speakingClients: [],
 				statedScreens: [],
+
 				localScreenStreamURL: null,
+				localCameraStreamURL: null,
+
 				micProducerId: null,
 				cameraProducerId: null,
 				screenVideoProducerId: null,

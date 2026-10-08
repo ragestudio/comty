@@ -43,7 +43,9 @@ interface RTCReactiveState {
 	remoteProducersIds: string[]
 	speakingClients: string[]
 	statedScreens: SerializedScreen[]
+
 	localScreenStreamURL: string | null
+	localCameraStreamURL: string | null
 
 	micProducerId: string | null
 	cameraProducerId: string | null
@@ -87,7 +89,9 @@ export class RTC extends BaseStore<RTCReactiveState> {
 			remoteProducersIds: [],
 			speakingClients: [],
 			statedScreens: [],
+
 			localScreenStreamURL: null,
+			localCameraStreamURL: null,
 
 			micProducerId: null,
 			cameraProducerId: null,

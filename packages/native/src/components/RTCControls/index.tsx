@@ -24,6 +24,8 @@ import {
 	VolumeOffIcon,
 	TvMinimalPlayIcon,
 	MonitorOffIcon,
+	VideoIcon,
+	VideoOffIcon,
 } from "lucide-react-native"
 
 import { useRTCStore, rtcService } from "@comty/spaces-sdk/rtc"
@@ -104,6 +106,8 @@ export const RTCControls = () => {
 			rtcService.self.createMedia<"screen">("screen")
 		}
 	}
+
+	const handleToggleCamera = () => {}
 
 	return (
 		<Animated.View style={containerStyle}>
@@ -188,6 +192,17 @@ export const RTCControls = () => {
 								)
 							}
 							onPress={handleToggleScreenshare}
+						/>
+						<AppButton
+							width="fit-content"
+							children={
+								rtc.cameraProducerId ? (
+									<VideoOffIcon color={theme.productColor.val} />
+								) : (
+									<VideoIcon />
+								)
+							}
+							onPress={handleToggleCamera}
 						/>
 						<AppButton
 							width="fit-content"

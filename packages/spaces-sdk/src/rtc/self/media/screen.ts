@@ -1,51 +1,11 @@
 import type { Self } from ".."
 import type { ProduceParams } from "@/rtc/producers"
-import type {
-	RtpCapabilities,
-	RtpCodecCapability,
-} from "mediasoup-client/types"
+import type { RtpCodecCapability } from "mediasoup-client/types"
 
 import defaults from "@/rtc/defaults"
 import Producer from "@/rtc/producers/producer"
 import { SelfMedia } from "."
-
-const SCREEN_VIDEO_CODECS = [
-	"video/h264",
-	"video/vp9",
-	"video/vp8",
-	"video/av1",
-]
-
-function pickVideoCodec(
-	capabilities: RtpCapabilities,
-	preferred?: RtpCodecCapability,
-): RtpCodecCapability | undefined {
-	const videoCodecs = (capabilities.codecs ?? []).filter(
-		(codec) =>
-			codec.kind === "video" &&
-			!codec.mimeType?.toLowerCase().includes("rtx"),
-	)
-
-	if (preferred?.mimeType) {
-		const match = videoCodecs.find(
-			(codec) =>
-				codec.mimeType?.toLowerCase() ===
-				preferred.mimeType.toLowerCase(),
-		)
-
-		if (match) return match
-	}
-
-	for (const mimeType of SCREEN_VIDEO_CODECS) {
-		const match = videoCodecs.find(
-			(codec) => codec.mimeType?.toLowerCase() === mimeType,
-		)
-
-		if (match) return match
-	}
-
-	return videoCodecs[0]
-}
+import { pickVideoCodec } from "../utils"
 
 export interface ScreenParams {
 	create?: {

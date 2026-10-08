@@ -1,8 +1,5 @@
 import type { Self, StreamsKinds } from ".."
 
-import MicStream from "./mic"
-import ScreenStream from "./screen"
-
 export interface InternalMediaStream extends MediaStream {
 	release?: (releaseTracks?: boolean) => void
 }

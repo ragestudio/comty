@@ -1,22 +1,27 @@
 import type { RTC } from ".."
-import { type BaseStream } from "./streams/base"
+import type { BaseStream } from "./streams/base"
+import type { SelfMedia } from "./media"
 
 import IndexedArray from "@/classes/IndexedArray"
 
 import MicStream from "./streams/mic"
 import ScreenStream from "./streams/screen"
+import CameraStream from "./streams/camera"
+
 import Microphone from "./media/mic"
 import Screen from "./media/screen"
-import { SelfMedia } from "./media"
+import Camera from "./media/camera"
 
 export const StreamsKinds = {
 	mic: MicStream,
 	screen: ScreenStream,
+	cam: CameraStream,
 }
 
 export const MediaKinds = {
 	mic: Microphone,
 	screen: Screen,
+	cam: Camera,
 }
 
 type StreamStartParams<Kind extends keyof typeof StreamsKinds> = Parameters<
