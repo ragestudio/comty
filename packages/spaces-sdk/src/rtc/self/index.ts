@@ -96,6 +96,7 @@ export class Self {
 	toggleDeafened(to?: boolean) {
 		if (to === undefined) to = !this.isDeafened
 
+		// deafen only silences microphones, screen shares keep playing
 		for (const [_id, consumer] of this.core.consumers) {
 			if (
 				consumer.kind !== "audio" ||
