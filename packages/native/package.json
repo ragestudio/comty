@@ -9,7 +9,7 @@
 		"@comty/spaces-sdk": "workspace:*",
 		"@config-plugins/react-native-webrtc": "^15.0.2",
 		"@expo/ui": "~57.0.21",
-		"@ragestudio/react-native-webrtc": "124.0.8-3",
+		"@ragestudio/react-native-webrtc": "https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-4/react-native-webrtc-124.0.8-4.tgz",
 		"@react-native-masked-view/masked-view": "^0.3.2",
 		"@react-navigation/bottom-tabs": "^7.20.0",
 		"@shopify/react-native-skia": "^2.13.1",
