@@ -1,0 +1,38 @@
+---
+id: follows
+title: FollowsModel
+sidebar_label: FollowsModel
+---
+
+## FollowsModel
+
+La clase `FollowsModel` proporciona métodos estáticos para interactuar con las relaciones de seguimiento entre usuarios.
+
+**Resumen de la clase:**
+
+La clase `FollowsModel` ofrece métodos para comprobar si un usuario sigue a otro, recuperar los seguidores y alternar el estado de seguimiento.
+
+### Métodos estáticos
+
+*   `imFollowing(user_id)`
+
+Comprueba si el usuario actual sigue al usuario indicado.
+
+    *   `user_id`: *string* El ID del usuario del que comprobar si el usuario actual lo sigue.
+    *   Devuelve: Una Promise que resuelve con los datos de la respuesta indicando si el usuario actual sigue al usuario indicado.
+    *   Lanza: Error si no se proporciona el parámetro user_id.
+
+*   `getFollowers(user_id, fetchData)`
+
+Recupera la lista de seguidores de un usuario dado.
+
+    *   `user_id`: *string, opcional* El ID del usuario. Si no se proporciona, se usará el ID del usuario actual.
+    *   `fetchData`: *boolean* Si obtener datos adicionales para cada seguidor. Por defecto false.
+    *   Devuelve: Una promise que resuelve con la lista de seguidores y sus datos.
+
+*   `toggleFollow({ user_id })`
+
+Alterna el estado de seguimiento de un usuario.
+
+    *   `user_id`: *string* El ID del usuario al que alternar el estado de seguimiento.
+    *   Devuelve: Una promise que resuelve con los datos de la respuesta tras alternar el estado de seguimiento.

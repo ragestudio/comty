@@ -1,0 +1,54 @@
+---
+id: nfc
+title: NFCModel
+sidebar_label: NFCModel
+---
+
+## NFCModel
+
+La clase `NFCModel` proporciona métodos estáticos para interactuar con etiquetas NFC.
+
+**Resumen de la clase:**
+
+La clase `NFCModel` ofrece métodos para recuperar, registrar y eliminar etiquetas NFC.
+
+### Métodos estáticos
+
+*   `getOwnTags()`
+
+Recupera la lista de etiquetas que posee el usuario actual.
+
+    *   Devuelve: Una Promise que resuelve con los datos de las etiquetas.
+
+*   `getTagById(id)`
+
+Recupera una etiqueta por su ID.
+
+    *   `id`: *string* El ID de la etiqueta a recuperar.
+    *   Devuelve: Los datos de la etiqueta recuperada.
+    *   Lanza: Error si no se proporciona el ID.
+
+*   `getTagBySerial(serial)`
+
+Recupera una etiqueta por su número de serie.
+
+    *   `serial`: *string* El número de serie de la etiqueta a recuperar.
+    *   Devuelve: Una Promise que resuelve con los datos de la etiqueta.
+    *   Lanza: Error si no se proporciona el número de serie.
+
+*   `registerTag(serial, payload)`
+
+Registra una etiqueta con el número de serie y el payload dados.
+
+    *   `serial`: *string* El número de serie de la etiqueta.
+    *   `payload`: *object* Los datos del payload para la etiqueta.
+    *   Devuelve: Los datos de la etiqueta registrada.
+    *   Lanza: Error si no se proporcionan el número de serie o el payload.
+
+*   `deleteTag(id)`
+
+Elimina una etiqueta.
+
+    *   `id`: *string* El ID de la etiqueta a eliminar.
+    *   Devuelve: Una Promise que resuelve con los datos de la etiqueta eliminada.
+    *   Lanza: Error si no se proporciona el ID.

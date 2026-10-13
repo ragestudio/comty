@@ -1,0 +1,63 @@
+---
+id: spotify
+title: SpotifySyncModel
+sidebar_label: SpotifySyncModel
+---
+
+## SpotifySyncModel
+
+La clase `SpotifySyncModel` proporciona métodos estáticos para enlazar e interactuar con el servicio de Spotify.
+
+**Resumen de la clase:**
+
+La clase `SpotifySyncModel` ofrece métodos para autorizar, enlazar, desenlazar y recuperar datos del servicio de Spotify.
+
+### Propiedades estáticas
+
+*   `spotify_redirect_uri`: *string* La URI de redirección para la autorización de Spotify.
+*   `spotify_authorize_endpoint`: *string* El endpoint de autorización de Spotify.
+
+### Métodos estáticos
+
+*   `authorizeAccount()`
+
+Abre una nueva pestaña para autorizar la cuenta de Spotify del usuario.
+
+    *   Devuelve: void
+
+*   `get_client_id()`
+
+Recupera el client ID de Spotify.
+
+    *   Devuelve: Una Promise que resuelve con los datos del client ID.
+
+*   `syncAuthCode(code)`
+
+Sincroniza el código de autorización de Spotify.
+
+    *   `code`: *string* El código de autorización de Spotify.
+    *   Devuelve: Una Promise que resuelve con los datos de sincronización.
+
+*   `unlinkAccount()`
+
+Desenlaza la cuenta de Spotify del usuario.
+
+    *   Devuelve: Una Promise que resuelve con los datos del desenlace.
+
+*   `isAuthorized()`
+
+Comprueba si el usuario está autorizado con Spotify.
+
+    *   Devuelve: Una Promise que resuelve con un booleano indicando si el usuario está autorizado.
+
+*   `getData()`
+
+Recupera los datos de Spotify.
+
+    *   Devuelve: Una Promise que resuelve con los datos de Spotify.
+
+*   `getCurrentPlaying()`
+
+Recupera la pista que se está reproduciendo actualmente en Spotify.
+
+    *   Devuelve: Una Promise que resuelve con los datos de la pista que se está reproduciendo actualmente.

@@ -1,0 +1,30 @@
+---
+id: radio
+title: Radio
+sidebar_label: Radio
+---
+
+## Radio
+
+La clase `Radio` proporciona métodos estáticos para recuperar datos de radio.
+
+**Resumen de la clase:**
+
+La clase `Radio` ofrece métodos para recuperar listas de radio y emisoras en tendencia.
+
+### Métodos estáticos
+
+*   `getRadioList({ limit = 50, offset = 0 } = {})`
+
+Recupera una lista de emisoras de radio.
+
+    *   `{ limit, offset }`: *object, opcional* Un objeto que contiene limit y offset para la paginación.
+        *   `limit`: *number, opcional* El número máximo de emisoras de radio a recuperar (por defecto: 50).
+        *   `offset`: *number, opcional* El offset desde el que empezar a recuperar (por defecto: 0).
+    *   Devuelve: Una promise que resuelve con los datos de la lista de radio.
+
+*   `getTrendings()`
+
+Recupera las emisoras de radio en tendencia.
+
+    *   Devuelve: Una promise que resuelve con los datos de las emisoras de radio en tendencia.

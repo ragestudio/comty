@@ -1,0 +1,80 @@
+---
+id: user
+title: UserModel
+sidebar_label: UserModel
+---
+
+## UserModel
+
+La clase `UserModel` proporciona métodos estáticos para interactuar con los datos de usuario en la plataforma Comty.
+
+**Resumen de la clase:**
+
+La clase `UserModel` ofrece un conjunto de métodos para recuperar y actualizar datos de usuario, incluida la información de perfil, roles, insignias y ajustes de configuración.
+
+### Métodos estáticos
+
+*   `data(payload)`
+
+Recupera los datos de un usuario.
+
+    *   `payload`: *object, opcional* Un objeto que contiene el username y el user_id.
+        *   `username`: *string, opcional* El nombre de usuario.
+        *   `user_id`: *string, opcional* El ID del usuario.
+        *   `basic`: *boolean, opcional* Si obtener solo la información básica del usuario, por defecto: false.
+    *   Devuelve: Una promise que resuelve con los datos del usuario.
+
+*   `updateData(payload)`
+
+Actualiza los datos del usuario con el payload dado.
+
+    *   `payload`: *object* Los datos con los que actualizar el usuario.
+    *   Devuelve: Una promise que resuelve con los datos del usuario actualizados.
+
+*   `unsetPublicName()`
+
+Establece el nombre público a null en los datos del usuario.
+
+    *   Devuelve: Una Promise que resuelve con los datos de la respuesta tras actualizar el nombre público.
+
+*   `getRoles(user_id)`
+
+Recupera los roles de un usuario.
+
+    *   `user_id`: *string, opcional* El ID del usuario. Si no se proporciona, se usará el ID del usuario actual.
+    *   Devuelve: Una promise que resuelve con un array de roles del usuario.
+
+*   `getBadges(user_id)`
+
+Recupera las insignias de un usuario dado.
+
+    *   `user_id`: *string, opcional* El ID del usuario. Si no se proporciona, se usará el ID del usuario de la sesión actual.
+    *   Devuelve: Una promise que resuelve con un array de insignias del usuario.
+
+*   `getConfig(key)`
+
+Recupera la configuración del usuario desde el servidor.
+
+    *   `key`: *string* Una clave de la configuración.
+    *   Devuelve: Una Promise que resuelve con un objeto de configuración.
+
+*   `updateConfig(update)`
+
+Actualiza la configuración con la actualización dada.
+
+    *   `update`: *Object* El objeto con los datos de configuración actualizados.
+    *   Devuelve: Una Promise que resuelve con los datos de la respuesta tras actualizar la configuración.
+
+*   `getPublicKey(user_id)`
+
+Recupera la clave pública de un usuario dado.
+
+    *   `user_id`: *string, opcional* El ID del usuario. Si no se proporciona, se usará el ID del usuario de la sesión actual.
+    *   Devuelve: Una promise que resuelve con la clave pública del usuario.
+
+*   `updatePublicKey(public_key)`
+
+Actualiza la clave pública del usuario actual.
+
+    *   `public_key`: *string* La nueva clave pública a establecer.
+    *   Devuelve: Una promise que resuelve con los datos de la respuesta tras actualizar la clave pública.

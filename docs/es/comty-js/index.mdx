@@ -1,0 +1,44 @@
+---
+id: index
+title: Librería Comty.js
+sidebar_label: Introducción
+---
+
+Bienvenido a la documentación de la librería `comty.js`. Esta librería proporciona un conjunto de módulos y clases para interactuar con la plataforma Comty.
+
+## Modelos principales
+
+Los siguientes son los modelos principales disponibles en la librería `comty.js`:
+
+*   [AddonsManager](models/addons): Gestiona los addons dentro de la librería.
+*   [AuthModel](models/auth): Gestiona la autenticación de usuarios y las sesiones.
+*   [MusicModel](models/music): Gestiona los datos de música.
+*   [Post](models/post): Gestiona los datos de posts.
+*   [Search](models/search): Gestiona las peticiones de búsqueda.
+*   [SessionModel](models/session): Gestiona las sesiones de usuario y los tokens.
+*   [UserModel](models/user): Gestiona los datos de usuario.
+
+## Helpers
+
+*   [Remotes](remotes): Describe todos los remotes.
+*   [Settings](settings): Describe todos los ajustes.
+*   [Storage](storage): Describe todo el almacenamiento.
+*   [WebsocketManager](ws): Gestiona las conexiones websocket.
+
+## Primeros pasos
+
+Para empezar con la librería `comty.js`, puedes instalarla usando pnpm:
+
+```bash
+pnpm add comty.js
+```
+
+Luego puedes importar los módulos que necesites en tu proyecto:
+
+```javascript
+import { AuthModel, SessionModel } from 'comty.js';
+
+// Usa los módulos
+AuthModel.login({ username: 'myuser', password: 'mypassword' })
+  .then(data => console.log(data));
+```

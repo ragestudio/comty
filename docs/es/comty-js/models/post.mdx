@@ -1,0 +1,113 @@
+---
+id: post
+title: Post
+sidebar_label: Post
+---
+
+## Post
+
+La clase `Post` proporciona métodos estáticos para interactuar con posts y datos relacionados en la plataforma Comty.
+
+### Referencia de la API
+
+**Resumen de la clase:**
+
+La clase `Post` ofrece un conjunto completo de métodos para recuperar, crear, actualizar, eliminar, dar me gusta, guardar y votar posts. También proporciona funcionalidades para recuperar hashtags y posts en tendencia.
+
+### Propiedades estáticas
+
+*   `maxPostTextLength`: *number* La longitud máxima permitida para el texto de un post (3200).
+*   `maxCommentLength`: *number* La longitud máxima permitida para un comentario (1200).
+
+### Métodos estáticos
+
+*   `getPostingPolicy()`
+    *   Recupera la política de publicación del servidor.
+    *   Devuelve: *Promise[object]* Los datos de la política de publicación.
+
+*   `post(options)`
+    *   Recupera los datos de un post por su ID.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene el post_id.
+            *   `post_id`: *string* El ID del post a recuperar.
+    *   Devuelve: *Promise[object]* Los datos del post.
+    *   Lanza: Error si no se proporciona el post_id.
+
+*   `replies(options)`
+    *   Recupera las respuestas de un post por su ID.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene el post_id, page y limit.
+            *   `post_id`: *string* El ID del post del que recuperar las respuestas.
+            *   `page`: *number, opcional* El número de caracteres para paginar el contenido de las respuestas (por defecto: 0).
+            *   `limit`: *number, opcional* El número máximo de respuestas a obtener (por defecto: Settings.get("feed_max_fetch")).
+    *   Devuelve: *Promise[object]* Los datos de las respuestas.
+    *   Lanza: Error si no se proporciona el post_id.
+
+*   `getSavedPosts(options)`
+    *   Recupera los posts guardados con recorte y límite opcionales.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene page y limit.
+                *   `page`: *number, opcional* El número de posts desde el que paginar el resultado (por defecto: 0).
+                *   `limit`: *number, opcional* El número máximo de posts a obtener (por defecto: Settings.get("feed_max_fetch")).
+            *   Devuelve: *Promise[object]* Los datos de los posts con me gusta.
+
+        *   `getUserPosts(options)`
+    *   Recupera los posts con me gusta con recorte y límite opcionales.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene page y limit.
+            *   `page`: *number, opcional* El número de posts desde el que paginar el resultado (por defecto: 0).
+            *   `limit`: *number, opcional* El número máximo de posts a obtener (por defecto: Settings.get("feed_max_fetch")).
+    *   Devuelve: *Promise[object]* Los datos de los posts con me gusta.
+
+*   `getUserPosts(options)`
+    *   Recupera los posts de un usuario con recorte y límite opcionales.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene user_id, page y limit.
+            *   `user_id`: *string, opcional* El ID del usuario cuyos posts recuperar. Si no se proporciona, se usará el ID del usuario actual.
+            *   `page`: *number, opcional* El número de caracteres para paginar el contenido de los posts (por defecto: 0).
+            *   `limit`: *number, opcional* El número máximo de posts a obtener (por defecto: Settings.get("feed_max_fetch")).
+    *   Devuelve: *Promise[object]* Los datos de los posts del usuario.
+
+*   `toggleLike(options)`
+    *   Alterna el estado de me gusta de un post.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene el post_id.
+            *   `post_id`: *string* El ID del post al que alternar el estado de me gusta.
+    *   Devuelve: *Promise[object]* Los datos de la respuesta tras alternar el estado de me gusta.
+    *   Lanza: Error si no se proporciona el post_id.
+
+*   `toggleSave(options)`
+    *   Alterna el estado de guardado de un post.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene el post_id.
+            *   `post_id`: *string* El ID del post al que alternar el estado de guardado.
+    *   Devuelve: *Promise[object]* Los datos de la respuesta tras alternar el estado de guardado.
+    *   Lanza: Error si no se proporciona el post_id.
+
+*   `create(payload)`
+    *   Crea un nuevo post con el payload dado.
+    *   Parámetros:
+        *   `payload`: *object* Los datos con los que crear el post.
+    *   Devuelve: *Promise[object]* Los datos de la respuesta tras crear el post.
+
+*   `update(post_id, update)`
+    *   Actualiza un post con el ID de post y el payload de actualización dados.
+    *   Parámetros:
+        *   `post_id`: *string* El ID del post a actualizar.
+        *   `update`: *object* Los datos con los que actualizar el post.
+    *   Devuelve: *Promise[object]* Los datos de la respuesta tras actualizar el post.
+    *   Lanza: Error si no se proporciona el post_id.
+
+*   `delete(options)`
+    *   Elimina un post con el ID de post dado.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene el post_id.
+            *   `post_id`: *string* El ID del post a eliminar.
+    *   Devuelve: *Promise[object]* Los datos de la respuesta tras eliminar el post.
+    *   Lanza: Error si no se proporciona el post_id.
+
+*   `votePoll(options)`
+    *   Vota por una encuesta con el ID de post y el ID de opción dados.
+    *   Parámetros:
+        *   `options`: *object* Un objeto que contiene el post_id y el option_id.
+            *   `post_id`: *string* El ID del post a votar.

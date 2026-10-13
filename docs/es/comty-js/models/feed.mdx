@@ -1,0 +1,51 @@
+---
+id: feed
+title: FeedModel
+sidebar_label: FeedModel
+---
+
+## FeedModel
+
+La clase `FeedModel` proporciona métodos estáticos para recuperar datos de feeds.
+
+**Resumen de la clase:**
+
+La clase `FeedModel` ofrece métodos para recuperar feeds de música, música global, timeline y timeline global.
+
+### Métodos estáticos
+
+*   `getMusicFeed({ page, limit } = {})`
+
+Recupera el feed de música.
+
+    *   `{ page, limit }`: *object, opcional* Un objeto que contiene page y limit.
+        *   `page`: *number, opcional* El número de elementos desde el que paginar el feed.
+        *   `limit`: *number, opcional* El número máximo de elementos a obtener del feed.
+    *   Devuelve: Una Promise que resuelve con los datos del feed de música.
+
+*   `getGlobalMusicFeed({ page, limit } = {})`
+
+Recupera el feed de música global.
+
+    *   `{ page, limit }`: *object, opcional* Un objeto que contiene page y limit.
+        *   `page`: *number, opcional* El número de elementos desde el que paginar el feed.
+        *   `limit`: *number, opcional* El número máximo de elementos a obtener del feed.
+    *   Devuelve: Una Promise que resuelve con los datos del feed de música global.
+
+*   `getTimelineFeed({ page, limit } = {})`
+
+Recupera el feed del timeline.
+
+    *   `{ page, limit }`: *object, opcional* Un objeto que contiene page y limit.
+        *   `page`: *number, opcional* El número de elementos del feed desde el que paginar.
+        *   `limit`: *number, opcional* El número máximo de elementos del feed a recuperar.
+    *   Devuelve: Una Promise que resuelve con los datos del feed del timeline.
+
+*   `getGlobalTimelineFeed({ page, limit } = {})`
+
+Recupera el feed del timeline global.
+
+    *   `{ page, limit }`: *object, opcional* Un objeto que contiene page y limit.
+        *   `page`: *number, opcional* El número de elementos desde el que paginar el feed.
+        *   `limit`: *number, opcional* El número máximo de posts a obtener del feed.
+    *   Devuelve: Una Promise que resuelve con los datos del feed de posts.
