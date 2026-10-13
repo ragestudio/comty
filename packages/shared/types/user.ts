@@ -18,6 +18,8 @@ export interface User {
 
 	roles?: string[]
 	verified?: boolean
+
+	flags?: string[]
 }
 
 export type UserPresenceConnection = {
