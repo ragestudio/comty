@@ -92,6 +92,19 @@ export class API extends Server {
 			})
 		}
 
+		if (process.env.S3_ENDPOINT) {
+			await this.contexts.s3.addService("standard", {
+				endPoint: process.env.S3_ENDPOINT,
+				port: Number(process.env.S3_PORT),
+				useSSL: ToBoolean(process.env.S3_USE_SSL),
+				accessKey: process.env.S3_ACCESS_KEY,
+				secretKey: process.env.S3_SECRET_KEY,
+				defaultBucket: process.env.S3_BUCKET,
+				defaultRegion: process.env.S3_REGION,
+				pathStyle: true,
+			})
+		}
+
 		this.contexts.multipartUpload = new Multipart(
 			this.contexts.s3.getDefaultService(),
 			this.contexts.limits,
