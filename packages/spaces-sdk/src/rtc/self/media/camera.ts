@@ -8,6 +8,9 @@ import { pickVideoCodec } from "../utils"
 export interface CameraParams {
 	create?: {
 		codec?: RtpCodecCapability
+		deviceId?: string
+		facingMode?: "user" | "environment"
+		resolution?: { width?: number; height?: number }
 	}
 }
 
@@ -18,10 +21,14 @@ export const Camera = (self: Self) =>
 				throw new Error("Device not available")
 			}
 
-			const cam = await this.self.createStream<"cam">("cam")
+			const cam = await this.self.createStream<"cam">("cam", {
+				deviceId: params?.deviceId,
+				facingMode: params?.facingMode,
+				resolution: params?.resolution,
+			})
 
 			if (!cam.stream) {
-				throw new Error("mic stream not available")
+				throw new Error("camera stream not available")
 			}
 
 			const localStream = cam.stream as MediaStream & {
@@ -54,6 +61,7 @@ export const Camera = (self: Self) =>
 			const cameraProducer = await this.self.core.producers.produce({
 				track: videoTrack,
 				codec: videoCodec,
+				encodings: [{ ...defaults.cameraVideoEncodingParams }],
 				appData: {
 					mediaTag: "user-cam",
 				},

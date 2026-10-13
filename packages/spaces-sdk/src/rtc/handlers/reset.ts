@@ -7,6 +7,7 @@ export async function reset(this: RTC) {
 		async () => await this.self.deleteAll(),
 		async () => this.transports.closeAll(),
 		async () => await this.screens.stopAll(),
+		async () => await this.cameras.stopAll(),
 		async () => await this.consumers.stopAll(),
 		async () => await this.clients.destroyAll(),
 		async () => this.producers.clear(),
@@ -23,6 +24,7 @@ export async function reset(this: RTC) {
 				statedClients: [],
 				speakingClients: [],
 				statedScreens: [],
+				statedCameras: [],
 
 				localScreenStreamURL: null,
 				localCameraStreamURL: null,

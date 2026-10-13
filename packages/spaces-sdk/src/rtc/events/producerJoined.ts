@@ -32,9 +32,9 @@ export default async function (this: RTC, data: Producer) {
 				client.attachMic(data)
 			}
 
-			// if user camera, just play sfx
+			// if user camera, register it as available
 			if (data.appData.mediaTag === "user-cam") {
-				//app.cores.sfx.play("media_video_join")
+				this.cameras.add(data)
 			}
 
 			// if a screen share starts, register it as available
@@ -43,7 +43,7 @@ export default async function (this: RTC, data: Producer) {
 			}
 
 			if (data.appData.mediaTag === "screen-audio") {
-				this.screens.attachAudio(data)
+				this.screens.add(data)
 			}
 		}
 	} catch (error) {

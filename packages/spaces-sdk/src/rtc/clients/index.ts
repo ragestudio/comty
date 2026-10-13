@@ -84,6 +84,14 @@ export class Clients extends Map<string, Client> {
 			for (const producer of state.producers) {
 				if (producer.userId === this.core.userId) continue
 
+				if (producer.appData?.mediaTag === "user-cam") {
+					this.core.cameras.add(producer)
+				}
+			}
+
+			for (const producer of state.producers) {
+				if (producer.userId === this.core.userId) continue
+
 				if (producer.appData?.mediaTag === "screen-video") {
 					this.core.screens.add(producer)
 				}
@@ -93,7 +101,7 @@ export class Clients extends Map<string, Client> {
 				if (producer.userId === this.core.userId) continue
 
 				if (producer.appData?.mediaTag === "screen-audio") {
-					this.core.screens.attachAudio(producer)
+					this.core.screens.add(producer)
 				}
 			}
 		}

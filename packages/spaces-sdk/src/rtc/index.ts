@@ -2,11 +2,8 @@ import "@comty/shared/utils/index"
 
 import type { Channel } from "@comty/shared/types/spaces/channel"
 import type { Client } from "./clients/client"
-import type { SerializedScreen } from "./screens/screen"
-import type {
-	RtpCapabilities,
-	RtpCodecCapability,
-} from "mediasoup-client/types"
+import type { SerializedRemoteMedia } from "./remote/media"
+import type { RtpCapabilities } from "mediasoup-client/types"
 
 import * as mediasoupClient from "mediasoup-client"
 import { EventEmitter } from "tseep"
@@ -20,6 +17,7 @@ import Consumers from "./consumers"
 import Clients from "./clients"
 import Transports from "./transports"
 import Screens from "./screens"
+import Cameras from "./cameras"
 import Events from "./events"
 
 import joinChannel from "./handlers/joinChannel"
@@ -27,6 +25,8 @@ import leaveChannel from "./handlers/leaveChannel"
 import attachChannel from "./handlers/attachChannel"
 import syncVoiceState from "./handlers/syncVoiceState"
 import reset from "./handlers/reset"
+
+export type { SerializedRemoteMedia } from "./remote/media"
 
 interface RTCReactiveState {
 	initialized: boolean
@@ -42,7 +42,8 @@ interface RTCReactiveState {
 	statedClients: Partial<ReturnType<Client["serialize"]>>[]
 	remoteProducersIds: string[]
 	speakingClients: string[]
-	statedScreens: SerializedScreen[]
+	statedScreens: SerializedRemoteMedia[]
+	statedCameras: SerializedRemoteMedia[]
 
 	localScreenStreamURL: string | null
 	localCameraStreamURL: string | null
@@ -68,6 +69,7 @@ export class RTC extends BaseStore<RTCReactiveState> {
 	consumers = new Consumers(this)
 	clients = new Clients(this)
 	screens = new Screens(this)
+	cameras = new Cameras(this)
 	eventBus = new EventEmitter<InternalEvents>()
 
 	channel!: RTCReactiveState["channel"]
@@ -89,6 +91,7 @@ export class RTC extends BaseStore<RTCReactiveState> {
 			remoteProducersIds: [],
 			speakingClients: [],
 			statedScreens: [],
+			statedCameras: [],
 
 			localScreenStreamURL: null,
 			localCameraStreamURL: null,

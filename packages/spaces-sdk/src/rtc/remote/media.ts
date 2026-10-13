@@ -7,7 +7,9 @@ import volumeToGain from "@/utils/volumeToGain"
 
 import { MIN_VOLUME_DB } from "./constants"
 
-export interface SerializedScreen {
+export type MediaRole = "audio" | "video"
+
+export interface SerializedRemoteMedia {
 	userId: string
 	streamURL: string | null
 	hasAudio: boolean
@@ -15,29 +17,47 @@ export interface SerializedScreen {
 	volume: number
 }
 
-export class RemoteScreen {
-	constructor(core: RTC, userId: string) {
+export interface RemoteMediaCollection {
+	syncState(): void
+	delete(userId: string): unknown
+}
+
+/**
+ * A single remote media entity for one user. It wraps the local MediaStream
+ * together with the producers and consumers that feed it, so screens, cameras
+ * and any future media (mic included) can share the same lifecycle.
+ *
+ * Audio tracks are not added to the stream; they are routed through the audio
+ * adapter (volume) while video tracks feed RTCView through the stream.
+ */
+export class RemoteMedia {
+	constructor(core: RTC, userId: string, collection: RemoteMediaCollection) {
 		this.core = core
 		this.userId = userId
+		this.collection = collection
 	}
 
-	core: RTC
-	userId: string
+	readonly core: RTC
+	readonly userId: string
+	readonly collection: RemoteMediaCollection
 
 	enabled = false
 
 	media: MediaStream = new MediaStream()
 
-	videoProducer: Producer | null = null
-	audioProducer: Producer | null = null
-
-	videoConsumer: Consumer | null = null
-	audioConsumer: Consumer | null = null
+	producers: Map<MediaRole, Producer> = new Map()
+	consumers: Map<MediaRole, Consumer> = new Map()
 
 	volume = 100
 
+	private destroyed = false
+
 	get hasAudio(): boolean {
-		return this.audioProducer !== null
+		return this.producers.has("audio")
+	}
+
+	get hasVideo(): boolean {
+		return this.producers.has("video")
 	}
 
 	get streamURL(): string | null {
@@ -50,7 +70,7 @@ export class RemoteScreen {
 		return typeof media.toURL === "function" ? media.toURL() : null
 	}
 
-	serialize(): SerializedScreen {
+	serialize(): SerializedRemoteMedia {
 		return {
 			userId: this.userId,
 			streamURL: this.streamURL,
@@ -60,20 +80,27 @@ export class RemoteScreen {
 		}
 	}
 
-	setVideoProducer(producer: Producer) {
-		this.videoProducer = producer
+	setProducer(producer: Producer) {
+		const role = producer.kind as MediaRole
+
+		this.producers.set(role, producer)
 
 		if (this.enabled) {
-			this.consumeVideo().then(() => this.core.screens.syncState())
+			this.consume(role).then(() => this.collection.syncState())
 		}
 	}
 
-	setAudioProducer(producer: Producer) {
-		this.audioProducer = producer
+	async removeProducer(role: MediaRole) {
+		this.producers.delete(role)
 
-		if (this.enabled) {
-			this.consumeAudio().then(() => this.core.screens.syncState())
+		const consumer = this.consumers.get(role)
+		this.consumers.delete(role)
+
+		if (consumer) {
+			await this.core.consumers.stop(consumer.id)
 		}
+
+		this.collection.syncState()
 	}
 
 	async enable() {
@@ -81,12 +108,13 @@ export class RemoteScreen {
 
 		this.enabled = true
 
-		this.core.screens.syncState()
+		this.collection.syncState()
 
-		await this.consumeVideo()
-		await this.consumeAudio()
+		for (const role of this.producers.keys()) {
+			await this.consume(role)
+		}
 
-		this.core.screens.syncState()
+		this.collection.syncState()
 	}
 
 	async disable() {
@@ -94,11 +122,11 @@ export class RemoteScreen {
 
 		this.enabled = false
 
-		this.core.screens.syncState()
+		this.collection.syncState()
 
 		await this.stopConsumers()
 
-		this.core.screens.syncState()
+		this.collection.syncState()
 	}
 
 	async destroy() {
@@ -109,49 +137,33 @@ export class RemoteScreen {
 
 		await this.stopConsumers()
 
-		this.core.screens.delete(this.userId)
-		this.core.screens.syncState()
+		this.collection.delete(this.userId)
+		this.collection.syncState()
 	}
 
-	async detachAudio() {
-		this.audioProducer = null
+	async consume(role: MediaRole) {
+		if (this.consumers.has(role)) return
 
-		const consumer = this.audioConsumer
-		this.audioConsumer = null
+		const producer = this.producers.get(role)
 
-		if (consumer) {
-			await this.core.consumers.stop(consumer.id)
+		if (!producer) return
+
+		const consumer = await this.startConsumer(producer)
+
+		if (!consumer) return
+
+		this.consumers.set(role, consumer)
+
+		// only video tracks feed the stream, the rest is handled by the adapter
+		if (role === "video") {
+			this.media.addTrack(consumer.track)
+			this.requestVideoKeyframe(consumer)
+		} else {
+			this.applyVolume()
 		}
-
-		this.core.screens.syncState()
 	}
 
-	async consumeVideo() {
-		if (this.videoConsumer || !this.videoProducer) return
-
-		const consumer = await this.consume(this.videoProducer)
-
-		if (!consumer) return
-
-		this.videoConsumer = consumer
-		this.media.addTrack(consumer.track)
-
-		this.requestVideoKeyframe(consumer)
-	}
-
-	async consumeAudio() {
-		if (this.audioConsumer || !this.audioProducer) return
-
-		const consumer = await this.consume(this.audioProducer)
-
-		if (!consumer) return
-
-		this.audioConsumer = consumer
-
-		this.applyVolume()
-	}
-
-	async consume(producer: Producer): Promise<Consumer | null> {
+	async startConsumer(producer: Producer): Promise<Consumer | null> {
 		let consumer: Consumer | null = null
 
 		const existing = this.core.consumers.findByProducerId(
@@ -195,18 +207,11 @@ export class RemoteScreen {
 			releasable.release?.(false)
 		}
 
-		const videoConsumer = this.videoConsumer
-		const audioConsumer = this.audioConsumer
+		const consumers = Array.from(this.consumers.values())
+		this.consumers.clear()
 
-		this.videoConsumer = null
-		this.audioConsumer = null
-
-		if (videoConsumer) {
-			await this.core.consumers.stop(videoConsumer.id)
-		}
-
-		if (audioConsumer) {
-			await this.core.consumers.stop(audioConsumer.id)
+		for (const consumer of consumers) {
+			await this.core.consumers.stop(consumer.id)
 		}
 	}
 
@@ -214,11 +219,11 @@ export class RemoteScreen {
 		this.volume = Math.max(0, Math.min(100, volume))
 
 		this.applyVolume()
-		this.core.screens.syncState()
+		this.collection.syncState()
 	}
 
 	applyVolume() {
-		const track = this.audioConsumer?.track
+		const track = this.consumers.get("audio")?.track
 
 		if (!track) return
 
@@ -240,7 +245,7 @@ export class RemoteScreen {
 				}
 			} catch (err: any) {
 				console.error(
-					`[screens] failed to request keyframe: ${err.message}`,
+					`[remote-media] failed to request keyframe: ${err.message}`,
 				)
 			}
 		}
@@ -278,8 +283,6 @@ export class RemoteScreen {
 			}
 		}, 1000)
 	}
-
-	private destroyed = false
 }
 
-export default RemoteScreen
+export default RemoteMedia
