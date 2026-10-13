@@ -1,0 +1,128 @@
+# Development stack for Comty.
+#
+# Brings up everything the backend needs to run locally:
+#   docker compose -f docker-dev/compose.yml up -d
+#
+# Optional SFU node (voice/video):
+#   docker compose -f docker-dev/compose.yml --profile sfu up -d
+#
+# All ports are published on 127.0.0.1 so they are only reachable from your machine.
+
+services:
+  redis:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    container_name: comty-dev-redis
+    restart: unless-stopped
+    ulimits:
+      memlock: -1
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: "dragonfly --logtostderr --cache_mode=true --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
+    networks:
+      - comty-dev
+
+  mongodb:
+    image: mongo:8.0.17
+    container_name: comty-dev-mongodb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongodb:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - comty-dev
+
+  scylla:
+    image: scylladb/scylla:latest
+    container_name: comty-dev-scylla
+    restart: unless-stopped
+    # Reduced resources for local development. Tweak if you have more to spare.
+    command: "--smp 1 --memory 1G --overprovisioned 1 --developer-mode 1"
+    ports:
+      - "127.0.0.1:9042:9042"
+    volumes:
+      - scylla:/var/lib/scylla
+    networks:
+      - comty-dev
+
+  nats:
+    image: nats:latest
+    container_name: comty-dev-nats
+    restart: unless-stopped
+    command: "--jetstream --store_dir /data --http_port 8222"
+    ports:
+      - "127.0.0.1:4222:4222"
+      - "127.0.0.1:8222:8222"
+    volumes:
+      - nats:/data
+    networks:
+      - comty-dev
+
+  # S3-compatible object storage for development.
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    container_name: comty-dev-seaweedfs
+    restart: unless-stopped
+    command: "server -dir=/data -s3 -s3.port=8333"
+    ports:
+      - "127.0.0.1:8333:8333"
+      - "127.0.0.1:9333:9333"
+    volumes:
+      - seaweedfs:/data
+    networks:
+      - comty-dev
+
+  # Waits for SeaweedFS and creates the default bucket (idempotent).
+  seaweedfs-init:
+    image: amazon/aws-cli:latest
+    container_name: comty-dev-seaweedfs-init
+    depends_on:
+      - seaweedfs
+    environment:
+      AWS_ACCESS_KEY_ID: any
+      AWS_SECRET_ACCESS_KEY: any
+      AWS_DEFAULT_REGION: us-east-1
+      S3_BUCKET: comty
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until aws --endpoint-url http://seaweedfs:8333 s3api list-buckets >/dev/null 2>&1; do
+          echo "waiting for seaweedfs..."; sleep 2
+        done
+        aws --endpoint-url http://seaweedfs:8333 s3api create-bucket --bucket "$$S3_BUCKET" || true
+    restart: "no"
+    networks:
+      - comty-dev
+
+  # Optional. Only needed for Spaces voice/video.
+  sfu:
+    profiles: ["sfu"]
+    container_name: comty-dev-sfu
+    image: ragestudio/comty-sfu-node:dev
+    build:
+      context: ..
+      dockerfile: ./packages/sfu-node/Dockerfile
+    restart: unless-stopped
+    environment:
+      - NATS_ADDRESS=nats:4222
+    ports:
+      - "40001:40001/tcp"
+      - "40001:40001/udp"
+    depends_on:
+      - nats
+    networks:
+      - comty-dev
+
+networks:
+  comty-dev:
+
+volumes:
+  mongodb:
+  scylla:
+  nats:
+  seaweedfs:
