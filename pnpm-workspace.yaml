@@ -31,4 +31,4 @@ blockExoticSubdeps: false
 minimumReleaseAgeExclude:
   - "@ragestudio/scylla-odm@0.22.19"
   - linebridge@2.0.0 || 2.0.1 || 2.0.2 || 2.0.3 || 2.0.4 || 2.0.5 || 2.0.6
-  - '@ragestudio/react-native-webrtc@124.0.8-2 || 124.0.8-3'
+  - '@ragestudio/react-native-webrtc@124.0.8-2 || 124.0.8-3 || 124.0.8-4'
