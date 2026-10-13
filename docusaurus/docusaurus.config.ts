@@ -31,12 +31,7 @@ const config: Config = {
 	// may want to replace "en" with "zh-Hans".
 	i18n: {
 		defaultLocale: "en",
-		locales: ["en", "es"],
-		path: "../docs/i18n",
-		localeConfigs: {
-			en: { label: "English" },
-			es: { label: "Español" },
-		},
+		locales: ["en"],
 	},
 
 	presets: [
@@ -44,15 +39,9 @@ const config: Config = {
 			"classic",
 			{
 				docs: {
-					path: "../docs",
+					path: "../docs/en",
+					routeBasePath: "docs",
 					sidebarPath: "./sidebars.js",
-					exclude: [
-						"i18n/**",
-						"**/_*.{js,jsx,ts,tsx,md,mdx}",
-						"**/_*/**",
-						"**/*.test.{js,jsx,ts,tsx}",
-						"**/__tests__/**",
-					],
 				},
 				theme: {
 					customCss: "./src/css/custom.css",
@@ -62,6 +51,15 @@ const config: Config = {
 	],
 
 	plugins: [
+		[
+			"@docusaurus/plugin-content-docs",
+			{
+				id: "es",
+				path: "../docs/es",
+				routeBasePath: "es/docs",
+				sidebarPath: "./sidebars.js",
+			},
+		],
 		[
 			"docusaurus-plugin-openapi-docs",
 			{
@@ -108,8 +106,19 @@ const config: Config = {
 					position: "right",
 				},
 				{
-					type: "localeDropdown",
+					type: "dropdown",
+					label: "Language",
 					position: "right",
+					items: [
+						{
+							label: "English",
+							to: "/docs/development/getting-started",
+						},
+						{
+							label: "Español",
+							to: "/es/docs/development/getting-started",
+						},
+					],
 				},
 			],
 		} as ThemeConfig,
