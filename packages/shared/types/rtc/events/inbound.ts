@@ -56,10 +56,10 @@ export interface RTC_SoundpadPayload {
 	[key: string]: any
 }
 
-export type RTC_ClientEvents = "updateVoiceState" | "ping"
+export type RTC_ClientEvents = "updateVoiceState" | "soundpad" | "ping" | string
 
-export interface RTC_ClientEvent {
+export interface RTC_ClientEvent<DataType = any> {
 	userId: User["_id"]
 	event: RTC_ClientEvents
-	data: VoiceState
+	data: DataType
 }
