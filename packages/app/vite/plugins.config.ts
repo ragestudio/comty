@@ -1,6 +1,7 @@
 import type { UserConfig } from "vite"
 
 import react from "@vitejs/plugin-react-swc"
+import tsconfigPaths from "./tsconfigPaths.config"
 
 export const mutateSwcOptions = (options: any) => {
 	options.jsc = options.jsc || {}
@@ -31,6 +32,7 @@ export const parserConfig = (id: string) => {
 }
 
 export default [
+	tsconfigPaths,
 	react({
 		devTarget: "es2024",
 		disableOxcRecommendation: false,
