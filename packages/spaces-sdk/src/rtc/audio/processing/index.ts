@@ -7,6 +7,7 @@ import type {
 	NoiseSuppressionMode,
 } from "./types"
 
+import { logger } from "@/rtc/audio"
 import adapter from "@/adapter"
 import BaseStore from "@/classes/BaseStore"
 
@@ -79,7 +80,7 @@ export class AudioProcessingManager extends BaseStore<AudioProcessingState> {
 		try {
 			await adapter.audioProcessing?.apply(this.config)
 		} catch (error) {
-			console.error("[audio] failed to apply processing config", error)
+			logger.error("failed to apply processing config", error)
 		}
 	}
 

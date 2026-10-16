@@ -2,6 +2,12 @@ import type { RTC } from ".."
 import type { VoiceState } from "@comty/shared/types/rtc/voiceState"
 import type { Producer } from "../producers/producer"
 import type { Consumer } from "../consumers/consumer"
+import type { SoundpadDispatch } from "@comty/shared/types/rtc/clientEvent"
+
+import loggerBase from "@/utils/logger"
+import { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
+
+export const logger = loggerBase.child("clients")
 
 export interface SerializedClient {
 	userId: Client["userId"]
@@ -12,6 +18,7 @@ export interface SerializedClient {
 
 export class Client {
 	core: RTC
+	logger: typeof logger
 
 	constructor(
 		core: RTC,
@@ -30,6 +37,8 @@ export class Client {
 		if (data.voiceState) {
 			this.voiceState = data.voiceState
 		}
+
+		this.logger = logger.child(`(${data.userId})`)
 
 		this.pushToState()
 	}
@@ -60,7 +69,7 @@ export class Client {
 		})
 
 		if (!consumer) {
-			console.error("Cannot attach mic without consumer")
+			logger.error("Cannot attach mic without consumer")
 			return
 		}
 
@@ -68,19 +77,19 @@ export class Client {
 
 		this.setState({ micConsumerId: this.micConsumer.id })
 
-		console.debug(`Attached client mic[${this.userId}]`)
+		logger.debug(`Attached client mic[${this.userId}]`)
 	}
 
 	async dettachMic() {
 		if (!this.micConsumer) {
-			console.error("Cannot dettach mic without consumer")
+			logger.error("Cannot dettach mic without consumer")
 			return
 		}
 
 		await this.core.consumers.stop(this.micConsumer.id)
 		delete this.micConsumer
 
-		console.debug(`Detached client mic[${this.userId}]`)
+		logger.debug(`Detached client mic[${this.userId}]`)
 	}
 
 	async onLeave() {
@@ -109,6 +118,45 @@ export class Client {
 		}
 
 		return producers
+	}
+
+	async dispatchSoundpad(payload: RTC_ClientEvent<SoundpadDispatch>) {
+		this.logger.debug("dispatched soundpad audio", payload)
+
+		const audio = new Audio()
+
+		audio.onended = () => {
+			this.core.eventBus.emit("rtc:vc:soundpad:ended", eventBusPayload)
+			this.core.eventBus.emit(
+				`rtc:vc:soundpad:${payload.userId}:ended`,
+				eventBusPayload,
+			)
+		}
+
+		audio.src = payload.data.src
+		audio.loop = false
+		audio.volume = 0.5 // TODO: get value from a persistent store
+
+		const eventBusPayload = {
+			userId: payload.userId,
+			src: payload.data.src,
+			icon: payload.data.icon,
+		}
+
+		this.core.eventBus.emit("rtc:vc:soundpad", eventBusPayload)
+		this.core.eventBus.emit(
+			`rtc:vc:soundpad:${payload.userId}`,
+			eventBusPayload,
+		)
+
+		await audio.play()
+
+		setTimeout(() => {
+			if (!audio.ended) {
+				audio.pause()
+				audio.currentTime = 0
+			}
+		}, 10000)
 	}
 
 	serialize(): SerializedClient {

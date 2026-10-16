@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { DexieCompat } from "./compat"
+import logger from "@/utils/logger"
 
 export function useLiveQuery<T>(
 	querier: () => Promise<T>,
@@ -16,7 +17,7 @@ export function useLiveQuery<T>(
 				const result = await querier()
 				if (isMounted) setData(result)
 			} catch (err) {
-				console.error("Error en useLiveQuery:", err)
+				logger.error("Error en useLiveQuery:", err)
 			}
 		}
 

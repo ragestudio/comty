@@ -2,6 +2,7 @@ import type EventsActions from "../index"
 import type { GroupUpdatePayload } from "@/group/types"
 
 import db from "@/db"
+import logger from "@/utils/logger"
 
 export default function (
 	this: EventsActions,
@@ -15,7 +16,7 @@ export default function (
 		const updatedGroup = { ...state.data, ...payload }
 
 		db.groups.put(updatedGroup).catch((err) => {
-			console.error("Failed to update group in cache", err)
+			logger.error("Failed to update group in cache", err)
 		})
 
 		return { data: updatedGroup }

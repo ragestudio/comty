@@ -1,8 +1,9 @@
 import type FetchingActions from "./index"
 import type { Group } from "@comty/shared/types/spaces/group"
 
-import GroupsModel from "@comty/api-lib/models/groups"
+import GroupsModel from "comty.js/endpoints/groups"
 import { cacheGroup } from "@/helpers/cache"
+import logger from "@/utils/logger"
 
 export default async function (this: FetchingActions): Promise<Group | null> {
 	if (!this.state.groupId) return null
@@ -20,7 +21,7 @@ export default async function (this: FetchingActions): Promise<Group | null> {
 
 		return response
 	} catch (err: any) {
-		console.error("fetchGroup failed", err)
+		logger.error("fetchGroup failed", err)
 		return null
 	}
 }

@@ -2,6 +2,7 @@ import type EventsActions from "../index"
 import type { MembershipDeletedPayload } from "@/group/types"
 
 import db from "@/db"
+import logger from "@/utils/logger"
 
 export default function (
 	this: EventsActions,
@@ -18,6 +19,6 @@ export default function (
 	}))
 
 	db.members.delete(payload.membership_id).catch((err) => {
-		console.error("Failed to delete member from cache", err)
+		logger.error("Failed to delete member from cache", err)
 	})
 }

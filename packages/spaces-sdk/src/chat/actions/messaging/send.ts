@@ -4,6 +4,7 @@ import { CHAT_CONFIGS } from "@/chat/constants"
 import { ExtendedMessage } from "@/chat/types"
 
 import { adapter } from "@/adapter"
+import logger from "@/utils/logger"
 
 export default async function (
 	this: MessagingActions,
@@ -55,7 +56,7 @@ export default async function (
 			await this.socket.call(config.methods.send, data)
 		}
 	} catch (err) {
-		console.error("failed to send message", err)
+		logger.error("failed to send message", err)
 
 		this.setState((state) => ({
 			timeline: state.timeline.map((msg) =>

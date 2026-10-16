@@ -1,6 +1,7 @@
 import type TypingActions from "./index"
 
 import { CHAT_CONFIGS } from "@/chat/constants"
+import logger from "@/utils/logger"
 
 export default function (this: TypingActions, isTypingNow = true): void {
 	const { type, params, typingTimeout, isTypingNetworkState } =
@@ -22,7 +23,7 @@ export default function (this: TypingActions, isTypingNow = true): void {
 					config.params.typing(params, isTypingNow),
 				)
 				.catch((err: any) =>
-					console.error("error setting typing state:", err),
+					logger.error("error setting typing state:", err),
 				)
 		}
 	}

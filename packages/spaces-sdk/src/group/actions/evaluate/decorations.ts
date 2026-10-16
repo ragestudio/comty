@@ -1,7 +1,8 @@
 import type EvaluateActions from "./index"
 import type { Member } from "@comty/shared/types/spaces/member"
 
-import UsersModel from "@comty/api-lib/models/user"
+import UsersModel from "comty.js/endpoints/user"
+import logger from "@/utils/logger"
 
 export default async function (
 	this: EvaluateActions,
@@ -73,7 +74,7 @@ export default async function (
 			}))
 		}
 	} catch (err) {
-		console.error("[decorations] Failed to fetch decorations", err)
+		logger.error("Failed to fetch decorations", err)
 		missingIds.forEach((id) => cache.delete(id)) // rollback
 	}
 }

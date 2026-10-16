@@ -2,8 +2,12 @@ import type { RTC } from "@/rtc"
 
 export default async function (this: RTC, data: any) {
 	try {
-		await this.clients.join(data)
+		const client = await this.clients.join(data)
+
+		if (client) {
+			this.eventBus.emit("rtc:client:joined", client)
+		}
 	} catch (error) {
-		console.error("Error handling client joined:", error)
+		this.logger.error("Error handling client joined:", error)
 	}
 }

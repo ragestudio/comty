@@ -4,6 +4,7 @@ import type { Group } from "@comty/shared/types/spaces/group"
 import type { Member, Members } from "@comty/shared/types/spaces/member"
 
 import db from "../db"
+import logger from "@/utils/logger"
 
 const CACHED_MEMBERS_PER_GROUP_LIMIT = 2000
 
@@ -17,7 +18,7 @@ export const cacheGroup = async (group: Group): Promise<void> => {
 			cached_at: Date.now(),
 		})
 	} catch (err) {
-		console.error("Error caching group:", err)
+		logger.error("Error caching group:", err)
 	}
 }
 
@@ -65,7 +66,7 @@ export const cacheMembers = async (
 			await db.members.bulkDelete(toDelete.map((m) => m._id))
 		}
 	} catch (err) {
-		console.error("Error caching members:", err)
+		logger.error("Error caching members:", err)
 	}
 }
 
@@ -76,7 +77,7 @@ export const cacheTotalMembers = async (group_id: string, counter: number) => {
 			counter: counter,
 		})
 	} catch (err) {
-		console.error("Error caching total members:", err)
+		logger.error("Error caching total members:", err)
 	}
 }
 
@@ -91,7 +92,7 @@ export const cacheChannels = async (
 
 		await db.channels.put(channels)
 	} catch (err) {
-		console.error("Error caching channels:", err)
+		logger.error("Error caching channels:", err)
 	}
 }
 
@@ -110,7 +111,7 @@ export const cacheUsers = async (users: User[]) => {
 
 		await db.users.bulkPut(users)
 	} catch (error) {
-		console.error("Error caching users", error)
+		logger.error("Error caching users", error)
 	}
 }
 

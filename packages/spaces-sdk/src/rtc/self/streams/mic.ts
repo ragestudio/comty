@@ -1,5 +1,8 @@
 import type { Self } from ".."
-import BaseStream, { type BaseHandlerParams } from "./base"
+import type { BaseHandlerParams } from "./base"
+
+import BaseStream from "./base"
+import { logger } from "@/rtc/self"
 
 export interface MicStreamParams extends BaseHandlerParams {
 	start: { force?: boolean; deviceId?: string }
@@ -25,7 +28,7 @@ export const MicStream = (self: Self) =>
 				}
 			}
 
-			console.log(`[micStream] created stream:`, this.stream)
+			logger.log(`created stream:`, this.stream)
 
 			return this.stream
 		},

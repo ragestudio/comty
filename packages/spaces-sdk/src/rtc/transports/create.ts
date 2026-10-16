@@ -9,6 +9,10 @@ import type {
 	TransportOptions as _TransportOptions,
 } from "mediasoup-client/types"
 
+import loggerBase from "@/utils/logger"
+
+const logger = loggerBase.child("transport")
+
 export type EventHandlers<TEvents, TContext> = {
 	[K in keyof TEvents]: (
 		this: TContext,
@@ -43,22 +47,34 @@ export const CommonTransportHandlers: EventHandlers<
 
 			callback()
 		} catch (error: unknown) {
-			console.error("Transport connection failed:", error)
+			logger.error("Transport connection failed:", error)
 			errback(error as Error)
 		}
 	},
 
 	connectionstatechange(transport, state) {
-		console.debug(
-			`[webrtc] Transport (${transport.direction})[${transport.id}] state changed: ${state}`,
+		logger.debug(
+			`Transport (${transport.direction})[${transport.id}] state changed: ${state}`,
 		)
+
+		this.core.setState((prev) => {
+			if (transport.direction === "send") {
+				prev.sendTransportState = state
+			}
+
+			if (transport.direction === "recv") {
+				prev.recvTransportState = state
+			}
+
+			return prev
+		})
 
 		if (state === "failed") this.core._handleTransportFailure()
 	},
 
 	async close(transport) {
-		console.debug(
-			`[webrtc] Transport (${transport.direction})[${transport.id}] closed`,
+		logger.debug(
+			`Transport (${transport.direction})[${transport.id}] closed`,
 		)
 
 		if (!this.core.socket) return
@@ -91,7 +107,7 @@ export const CommonTransportHandlers: EventHandlers<
 
 			callback({ id: result.id })
 		} catch (error: any) {
-			console.error("Producer creation failed:", error)
+			logger.error("Producer creation failed:", error)
 			errback(error)
 		}
 	},
@@ -105,7 +121,7 @@ export async function create(this: Transports, direction: "send" | "recv") {
 		throw new Error(`Invalid transport direction: ${direction}`)
 	}
 
-	console.debug(`[webrtc] Creating (${direction}) new transport`)
+	logger.debug(`Creating (${direction}) new transport`)
 
 	const transportData =
 		await this.core.socket.call<SerializedCreateTransport>(

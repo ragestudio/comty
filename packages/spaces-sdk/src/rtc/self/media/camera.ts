@@ -4,6 +4,7 @@ import type { RtpCodecCapability } from "mediasoup-client/types"
 import { SelfMedia } from "."
 import defaults from "@/rtc/defaults"
 import { pickVideoCodec } from "../utils"
+import { logger } from "@/rtc/self"
 
 export interface CameraParams {
 	create?: {
@@ -74,6 +75,8 @@ export const Camera = (self: Self) =>
 			cameraProducer.observer.on("close", () => {
 				this.self.core.setState({ cameraProducerId: null })
 			})
+
+			logger.debug("camera media created")
 
 			return { cameraProducer, cam }
 		},

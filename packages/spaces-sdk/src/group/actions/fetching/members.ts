@@ -1,9 +1,10 @@
 import type FetchingActions from "./index"
 
-import GroupsModel from "@comty/api-lib/models/groups"
+import GroupsModel from "comty.js/endpoints/groups"
 
 import { INITIAL_CACHE_PAGE_SIZE } from "@/group/constants"
 import { cacheMembers, cacheTotalMembers } from "@/helpers/cache"
+import logger from "@/utils/logger"
 
 export default async function (this: FetchingActions): Promise<void> {
 	if (!this.state.groupId) return
@@ -29,6 +30,6 @@ export default async function (this: FetchingActions): Promise<void> {
 			this.state.actions.evaluateDecorations(response.items)
 		}
 	} catch (err: any) {
-		console.error("fetchMembers failed", err)
+		logger.error("fetchMembers failed", err)
 	}
 }

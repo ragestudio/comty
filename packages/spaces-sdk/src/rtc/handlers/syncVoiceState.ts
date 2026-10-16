@@ -23,7 +23,7 @@ export function syncVoiceState(this: RTC) {
 				},
 			})
 		} catch (e) {
-			console.error(e)
+			this.logger.error(e)
 		}
 	}
 }

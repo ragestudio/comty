@@ -1,7 +1,10 @@
 import type { RTC } from ".."
 import type { Transport } from "mediasoup-client/types"
 
+import loggerBase from "@/utils/logger"
 import createTransport from "./create"
+
+export const logger = loggerBase.child("transports")
 
 export class Transports {
 	core: RTC

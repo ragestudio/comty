@@ -1,10 +1,11 @@
 import type LifecycleActions from "./index"
 import type { GroupStoreActions, CachedGroup } from "@/group/types"
 
-import GroupsModel from "@comty/api-lib/models/groups"
+import GroupsModel from "comty.js/endpoints/groups"
 import { createDefaultChannels, createDefaultMembers } from "@/group/constants"
 import { resolveCachedMembersUsers } from "@/helpers/cache"
 import db from "@/db"
+import logger from "@/utils/logger"
 
 async function deferredCacheCheck(
 	groupId: string,
@@ -39,7 +40,7 @@ async function deferredCacheCheck(
 			await actions.fetchChannels()
 		}
 	} catch (err) {
-		console.error("deferredCacheCheck failed", err)
+		logger.error("deferredCacheCheck failed", err)
 	}
 }
 
@@ -107,7 +108,7 @@ export default async function (
 			this.state.actions.evaluateDecorations(populatedMembers)
 		}
 
-		this.state.actions.syncRTCChannels().catch(console.error)
+		this.state.actions.syncRTCChannels().catch(logger.error)
 
 		const hasAllCache =
 			cached.group && cached.channels && cached.memberships
@@ -134,11 +135,11 @@ export default async function (
 				cached,
 				this.state.actions,
 				isCurrentGeneration,
-			).catch(console.error)
+			).catch(logger.error)
 		}
 	} catch (err: any) {
 		if (isCurrentGeneration()) {
-			console.error("Failed to init group", err)
+			logger.error("Failed to init group", err)
 			this.setState({ error: err, loading: false })
 		}
 	}

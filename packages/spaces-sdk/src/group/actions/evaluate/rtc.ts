@@ -1,6 +1,7 @@
 import type EvaluateActions from "./index"
 
-import GroupsModel from "@comty/api-lib/models/groups"
+import GroupsModel from "comty.js/endpoints/groups"
+import logger from "@/utils/logger"
 
 export default async function (this: EvaluateActions): Promise<void> {
 	if (!this.state.groupId) return
@@ -34,6 +35,6 @@ export default async function (this: EvaluateActions): Promise<void> {
 			}
 		}
 	} catch (err: any) {
-		console.error("syncRTCChannels failed", err)
+		logger.error("syncRTCChannels failed", err)
 	}
 }

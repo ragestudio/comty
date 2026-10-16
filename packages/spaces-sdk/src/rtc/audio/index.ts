@@ -5,6 +5,9 @@ import BaseStore from "@/classes/BaseStore"
 
 import nativeStrategy from "./strategies/native"
 import webStrategy from "./strategies/web"
+import loggerBase from "@/utils/logger"
+
+export const logger = loggerBase.child("audio-manager")
 
 interface AudioReactiveState {
 	devices: AudioDevice[]
@@ -114,7 +117,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 				// coalesce the burst of events fired by a single routing change
 				this.devicesTimer = setTimeout(() => {
 					this.devicesTimer = undefined
-					this.handleDevicesChanged().catch(console.error)
+					this.handleDevicesChanged().catch(logger.error)
 				}, DEVICES_DEBOUNCE_MS)
 			}) ?? (() => {})
 
@@ -214,7 +217,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 
 			return devices
 		} catch (error) {
-			console.error("[audio] failed to refresh devices", error)
+			logger.error("failed to refresh devices", error)
 			return []
 		}
 	}
@@ -338,7 +341,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 			await strategy.setSpeakerEnabled(enabled)
 			this.setState({ speakerEnabled: enabled })
 		} catch (error) {
-			console.error("[audio] failed to set speaker", error)
+			logger.error("failed to set speaker", error)
 		}
 	}
 
@@ -375,7 +378,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 
 			return true
 		} catch (error) {
-			console.error("[audio] failed to set output device", error)
+			logger.error("failed to set output device", error)
 			return false
 		}
 	}
@@ -403,7 +406,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 
 			return applied
 		} catch (error) {
-			console.error("[audio] failed to set input device", error)
+			logger.error("failed to set input device", error)
 			return false
 		}
 	}
@@ -446,7 +449,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 
 			return true
 		} catch (error) {
-			console.error("[audio] failed to set route mode", error)
+			logger.error("failed to set route mode", error)
 			return false
 		}
 	}

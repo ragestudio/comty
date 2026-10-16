@@ -1,5 +1,7 @@
 import type { RTC } from "@/rtc"
 
 export default async function (this: RTC, data: any) {
-	console.debug("disconnected from channel:", data)
+	this.logger.debug("disconnected from channel:", data)
+
+	this.eventBus.emit("rtc:channel:disconnected", data)
 }

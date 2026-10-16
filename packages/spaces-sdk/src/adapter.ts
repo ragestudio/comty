@@ -1,5 +1,9 @@
 import type { AudioDevice, AudioRouteMode } from "./rtc/audio/types"
 import type { AudioProcessingAdapter } from "./rtc/audio/processing/types"
+import type { LogLevel, LoggerSink } from "./utils/logger"
+
+import session from "comty.js/core/session"
+import logger from "./utils/logger"
 
 export interface WebRtcObjects {
 	RTCIceCandidate: RTCIceCandidate
@@ -63,22 +67,18 @@ export type AudioProcessing = AudioProcessingAdapter
 export class Adapter {
 	constructor() {}
 
-	baseApiUrl: string = "https://api.comty.app"
-	//baseApiUrl: string = "https://indev-api.comty.app"
-	websocketPath: string = "/ws"
-
 	webRtcObjects?: WebRtcObjects
 
-	sessionGetter?: () => Promise<SessionData>
+	// defaults to the comty.js session, can be overridden by the host app
+	sessionGetter: () => Promise<SessionData> = async () => ({
+		token: session.token,
+		user_id: session.user_id,
+	})
 	frameTransformEvents?: FrameTransformEvents
 	audioRouting?: AudioRouting
 	audioDevicesEvents?: AudioDevicesEvents
 	audioProcessing?: AudioProcessing
 	trackVolume?: TrackVolume
-
-	get webSocketEndpoint(): string {
-		return new URL(this.websocketPath, this.baseApiUrl).toString()
-	}
 
 	registerWebRtcGlobals(objects: WebRtcObjects) {
 		this.webRtcObjects = objects
@@ -107,8 +107,21 @@ export class Adapter {
 	registerTrackVolume(trackVolume: TrackVolume) {
 		this.trackVolume = trackVolume
 	}
+
+	// route the sdk logs to a custom sink, e.g. the host app console or a
+	// crash reporter, defaults to the global console
+	registerLogger(sink: LoggerSink) {
+		logger.setSink(sink)
+	}
+
+	// set the sdk log verbosity, defaults to "debug"
+	registerLogLevel(level: LogLevel) {
+		logger.setLevel(level)
+	}
 }
 
 export const adapter = new Adapter()
+
+export type { LogLevel, LoggerSink } from "./utils/logger"
 
 export default adapter

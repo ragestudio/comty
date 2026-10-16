@@ -1,6 +1,6 @@
 import type { ChatConfig } from "@/chat/types"
 
-import ChatsModel from "@comty/api-lib/models/chats"
+import ChatsModel from "comty.js/endpoints/chats"
 
 const config: ChatConfig = {
 	events: {

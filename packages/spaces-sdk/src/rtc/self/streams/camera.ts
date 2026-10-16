@@ -1,5 +1,8 @@
 import type { Self } from ".."
-import BaseStream, { type BaseHandlerParams } from "./base"
+import type { BaseHandlerParams } from "./base"
+
+import BaseStream from "./base"
+import { logger } from "@/rtc/self"
 
 export interface CameraStreamParams extends BaseHandlerParams {
 	start: {
@@ -30,7 +33,7 @@ export const CameraStream = (self: Self) =>
 				},
 			})
 
-			console.log(`[cameraStream] created stream:`, this.stream)
+			logger.log(`created stream:`, this.stream)
 
 			return this.stream
 		},

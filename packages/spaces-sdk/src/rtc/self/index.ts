@@ -11,6 +11,7 @@ import CameraStream from "./streams/camera"
 import Microphone from "./media/mic"
 import Screen from "./media/screen"
 import Camera from "./media/camera"
+import Logger from "@/utils/logger"
 
 export const StreamsKinds = {
 	mic: MicStream,
@@ -38,6 +39,8 @@ type MediaCreateParams<Kind extends keyof typeof MediaKinds> = Parameters<
 type MediaDestroyParams<Kind extends keyof typeof MediaKinds> = Parameters<
 	ReturnType<(typeof MediaKinds)[Kind]>["destroy"]
 >[0]
+
+export const logger = Logger.child("self")
 
 export class Self {
 	constructor(core: RTC) {
@@ -77,29 +80,36 @@ export class Self {
 		return this.streams[index]?.stream ?? null
 	}
 
+	// apply new constraints to the live screen video track, e.g. resolution
+	async updateScreenConstraints(constraints: MediaTrackConstraints) {
+		const [track] = this.screenStream?.getVideoTracks() ?? []
+
+		if (!track) return false
+
+		await track.applyConstraints(constraints)
+
+		return true
+	}
+
 	toggleMute(to?: boolean) {
 		if (to === undefined) to = !this.isMuted
 
-		// itterate all over streams of kind "mic"
-		for (const stream of this.streams) {
-			if (stream.kind !== "mic" || !stream.stream) continue
+		const changed = this.localState.isMuted !== to
 
-			for (const track of stream.stream?.getAudioTracks()) {
-				if (to) {
-					track.enabled = false
-				} else {
-					track.enabled = true
-				}
-			}
+		this.applyMute(to)
+
+		if (changed) {
+			this.core.eventBus.emit(to ? "rtc:mute" : "rtc:unmute")
 		}
 
 		// sync voice state
-		this.localState.isMuted = to
 		this.core.handlers.syncVoiceState()
 	}
 
 	toggleDeafened(to?: boolean) {
 		if (to === undefined) to = !this.isDeafened
+
+		const changed = this.localState.isDeafened !== to
 
 		// deafen only silences microphones, screen shares keep playing
 		for (const [_id, consumer] of this.core.consumers) {
@@ -116,10 +126,30 @@ export class Self {
 			}
 		}
 
-		// sync voice state
 		this.localState.isDeafened = to
-		this.toggleMute(to)
+
+		// deafening also mutes the microphone
+		this.applyMute(to)
+
+		if (changed) {
+			this.core.eventBus.emit(to ? "rtc:deafen" : "rtc:undeafen")
+		}
+
+		// sync voice state
 		this.core.handlers.syncVoiceState()
+	}
+
+	// enable or disable the local microphone tracks
+	private applyMute(to: boolean) {
+		for (const stream of this.streams) {
+			if (stream.kind !== "mic" || !stream.stream) continue
+
+			for (const track of stream.stream.getAudioTracks()) {
+				track.enabled = !to
+			}
+		}
+
+		this.localState.isMuted = to
 	}
 
 	async createStream<Kind extends keyof typeof StreamsKinds>(
@@ -147,6 +177,8 @@ export class Self {
 
 		this.streams.delete(stream)
 		this.streams_ref.delete(kind)
+
+		logger.debug("deleted stream", stream)
 
 		return stream
 	}
@@ -193,6 +225,8 @@ export class Self {
 
 		await media.destroy(handler)
 		this.media.delete(type)
+
+		logger.debug("deleted media", media)
 	}
 
 	async deleteAll() {

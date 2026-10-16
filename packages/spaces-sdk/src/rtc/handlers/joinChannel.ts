@@ -3,7 +3,7 @@ import type { RTC_JoinPayload } from "@comty/shared/types/rtc/events/index"
 import type { JoinChannelResult } from "@comty/shared/types/rtc/handlers/joinChannel"
 
 import { Device } from "mediasoup-client"
-import GroupModel from "@comty/api-lib/models/groups"
+import GroupEndpoint from "comty.js/endpoints/groups"
 
 export async function joinChannel(
 	this: RTC,
@@ -14,7 +14,7 @@ export async function joinChannel(
 	}: { groupId?: string; channelId: string; dmPair?: string },
 ) {
 	if (!this.socket) {
-		console.error("Cannot join without socket")
+		this.logger.error("Cannot join without socket")
 		return null
 	}
 
@@ -29,11 +29,11 @@ export async function joinChannel(
 	try {
 		this.setState({ state: "loading" })
 
-		const channelData = await GroupModel.channels.get(groupId, channelId)
+		const channelData = await GroupEndpoint.channels.get(groupId, channelId)
 
 		this.setState({ channel: channelData })
 
-		console.debug("Joining channel...", {
+		this.logger.debug("Joining channel...", {
 			groupId,
 			channelId,
 			self: this,
@@ -57,10 +57,10 @@ export async function joinChannel(
 			routerRtpCapabilities: data.rtpCapabilities,
 		})
 
-		console.debug("Channel join data:", data)
+		this.logger.debug("Channel join data:", data)
 
 		if (!data) {
-			console.error(
+			this.logger.error(
 				"Server did not respond with a valid channel join data",
 			)
 			throw new Error("Invalid server response")
@@ -68,12 +68,14 @@ export async function joinChannel(
 
 		await this.handlers.attachChannel(data)
 
-		// TODO: dispatch sfx
+		this.eventBus.emit("rtc:channel:joined", this.channel)
 	} catch (err: any) {
-		console.error("Failed to Join Channel:", err)
+		this.logger.error("Failed to Join Channel:", err)
 		this.setState({
 			state: "failed",
 		})
+
+		this.eventBus.emit("rtc:channel:join_failed", { error: err })
 	}
 }
 

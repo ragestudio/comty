@@ -1,6 +1,6 @@
 import type { ChatStoreType } from "@/chat/types"
 import ActionsBase from "@/classes/BaseActions"
-import wsManager from "@/ws"
+import { getSocket } from "@/helpers/socket"
 import db from "@/db"
 
 import * as cache from "@/helpers/cache"
@@ -24,7 +24,7 @@ class ChatActionsBase extends ActionsBase<ChatStoreType> {
 	}
 
 	get socket() {
-		return wsManager.socket
+		return getSocket()
 	}
 }
 

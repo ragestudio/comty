@@ -3,13 +3,14 @@ import "@comty/shared/utils/index"
 import type { Channel } from "@comty/shared/types/spaces/channel"
 import type { Client } from "./clients/client"
 import type { SerializedRemoteMedia } from "./remote/media"
-import type { RtpCapabilities } from "mediasoup-client/types"
+import type { ConnectionState, RtpCapabilities } from "mediasoup-client/types"
 
 import * as mediasoupClient from "mediasoup-client"
 import { EventEmitter } from "tseep"
 import BaseStore from "@/classes/BaseStore"
-import wsManager from "@/ws"
-import session from "@comty/api-lib/session"
+import client from "comty.js/core/client"
+import session from "comty.js/core/session"
+import logger from "@/utils/logger"
 
 import Self from "./self"
 import Producers from "./producers"
@@ -20,17 +21,29 @@ import Screens from "./screens"
 import Cameras from "./cameras"
 import Events from "./events"
 
+import type Producer from "./producers/producer"
+
 import joinChannel from "./handlers/joinChannel"
 import leaveChannel from "./handlers/leaveChannel"
 import attachChannel from "./handlers/attachChannel"
 import syncVoiceState from "./handlers/syncVoiceState"
+import emitClientEvent from "./handlers/emitClientEvent"
 import reset from "./handlers/reset"
 
 export type { SerializedRemoteMedia } from "./remote/media"
 
-interface RTCReactiveState {
+type ConnState =
+	| "disconnected"
+	| "loading"
+	| "connecting"
+	| "connected"
+	| "failed"
+
+type TransportConnState = ConnectionState & {}
+
+export interface RTCReactiveState {
 	initialized: boolean
-	state: "disconnected" | "loading" | "connecting" | "connected" | "failed"
+	state: ConnState
 	connectedAt: Date | null
 	channel: Channel | null
 	voiceState: {
@@ -52,11 +65,49 @@ interface RTCReactiveState {
 	cameraProducerId: string | null
 	screenVideoProducerId: string | null
 	screenAudioProducerId: string | null
+
+	sendTransportState: TransportConnState
+	recvTransportState: TransportConnState
 }
 
-type InternalEvents = {
-	"channel:attached": (data: Channel) => void
-	"rtc:vc:soundpad:ended": (payload: any) => any
+// payload of a soundpad dispatch
+export interface RTCDispatchPayload {
+	userId: string
+	src: string
+	icon?: string
+}
+
+// events emitted on the rtc event bus, consumers can subscribe to react to
+// any relevant session change (sounds, notifications, analytics, ...)
+export type RTCEventMap = {
+	// session lifecycle
+	"rtc:channel:joined": (channel: Channel | null) => void
+	"rtc:channel:join_failed": (payload: { error: unknown }) => void
+	"rtc:channel:left": () => void
+	"rtc:channel:leave_failed": (payload: { error: unknown }) => void
+	"rtc:channel:disconnected": (payload: any) => void
+	"channel:attached": (channel: Channel) => void
+
+	// local voice state
+	"rtc:mute": () => void
+	"rtc:unmute": () => void
+	"rtc:deafen": () => void
+	"rtc:undeafen": () => void
+
+	// remote clients
+	"rtc:client:joined": (client: Client) => void
+	"rtc:client:left": (client: Client) => void
+
+	// producers, local and remote
+	"rtc:producer:joined": (producer: Producer) => void
+	"rtc:producer:left": (producer: Producer) => void
+	"rtc:producer:error": (payload: { error: unknown }) => void
+
+	// soundpad
+	"rtc:vc:soundpad": (payload: RTCDispatchPayload) => void
+	"rtc:vc:soundpad:ended": (payload: RTCDispatchPayload) => void
+
+	// any other dynamic event
 	[key: string]: (...args: any[]) => void
 }
 
@@ -70,11 +121,13 @@ export class RTC extends BaseStore<RTCReactiveState> {
 	clients = new Clients(this)
 	screens = new Screens(this)
 	cameras = new Cameras(this)
-	eventBus = new EventEmitter<InternalEvents>()
+	eventBus = new EventEmitter<RTCEventMap>()
 
 	channel!: RTCReactiveState["channel"]
 
 	rtpCapabilities: RtpCapabilities = {}
+
+	logger = logger.child("rtc-core")
 
 	constructor() {
 		super({
@@ -100,15 +153,18 @@ export class RTC extends BaseStore<RTCReactiveState> {
 			cameraProducerId: null,
 			screenVideoProducerId: null,
 			screenAudioProducerId: null,
+
+			sendTransportState: "disconnected",
+			recvTransportState: "disconnected",
 		})
 	}
 
 	get socket() {
-		return wsManager.socket
+		return client.ws.get("main")
 	}
 
 	get userId() {
-		return session.user._id
+		return session.user?._id
 	}
 
 	get isConnected(): boolean {
@@ -123,6 +179,8 @@ export class RTC extends BaseStore<RTCReactiveState> {
 		attachChannel: Bind(this, attachChannel),
 
 		leaveChannel: Bind(this, leaveChannel),
+
+		emitClientEvent: Bind(this, emitClientEvent),
 
 		/**
 		 * Syncronizes the local voice state with the server
@@ -149,11 +207,11 @@ export class RTC extends BaseStore<RTCReactiveState> {
 			this.socket.on(event, Bind(this, handler))
 		}
 
-		console.log("rtc loaded!")
+		this.logger.log("rtc loaded!")
 	}
 
 	async _handleTransportFailure() {
-		console.error("Transport failure, triggering recovery")
+		logger.error("Transport failure, triggering recovery")
 	}
 }
 

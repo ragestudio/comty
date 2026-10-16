@@ -1,6 +1,7 @@
 import type SyncActions from "./index"
 
-import ChatsService from "@comty/api-lib/models/chats"
+import ChatsService from "comty.js/endpoints/chats"
+import logger from "@/utils/logger"
 
 export default async function (this: SyncActions): Promise<void> {
 	if (!this.adapter) return
@@ -66,6 +67,6 @@ export default async function (this: SyncActions): Promise<void> {
 			})
 		}
 	} catch (err) {
-		console.error("Sync failed", err)
+		logger.error("Sync failed", err)
 	}
 }

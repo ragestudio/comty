@@ -1,10 +1,11 @@
 import type FetchingActions from "./index"
 import type { Channels } from "@comty/shared/types/spaces/channel"
 
-import GroupsModel from "@comty/api-lib/models/groups"
+import GroupsModel from "comty.js/endpoints/groups"
 
 import { VALID_CHANNEL_KINDS } from "@/group/constants"
 import { cacheChannels } from "@/helpers/cache"
+import logger from "@/utils/logger"
 
 export default async function (
 	this: FetchingActions,
@@ -33,7 +34,7 @@ export default async function (
 
 		return null
 	} catch (err: any) {
-		console.error("fetchChannels failed", err)
+		logger.error("fetchChannels failed", err)
 		return null
 	}
 }

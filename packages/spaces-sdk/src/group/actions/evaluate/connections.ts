@@ -1,7 +1,8 @@
 import type EvaluateActions from "./index"
 import type { Member } from "@comty/shared/types/spaces/member"
 
-import GroupsModel from "@comty/api-lib/models/groups"
+import GroupsModel from "comty.js/endpoints/groups"
+import logger from "@/utils/logger"
 
 export default async function (
 	this: EvaluateActions,
@@ -31,7 +32,7 @@ export default async function (
 				})
 			}
 		} catch (err) {
-			console.error("Failed to evaluate member connections", err)
+			logger.error("Failed to evaluate member connections", err)
 		}
 	}
 

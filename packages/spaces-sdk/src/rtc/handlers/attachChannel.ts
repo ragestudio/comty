@@ -50,10 +50,10 @@ export async function attachChannel(this: RTC, join: JoinChannelResult) {
 		this.handlers.syncVoiceState()
 
 		this.eventBus.emit("channel:attached", this.channel)
-		console.debug("[webrtc] Channel attached successfully")
+		this.logger.debug("Channel attached successfully")
 	} catch (err: any) {
-		console.error(err)
-		console.error(err.stack)
+		this.logger.error(err)
+		this.logger.error(err.stack)
 
 		this.setState({
 			state: "failed",

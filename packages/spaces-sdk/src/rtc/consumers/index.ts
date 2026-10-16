@@ -3,6 +3,10 @@ import type { Producer } from "../producers/producer"
 import type { Consumer } from "./consumer"
 
 import { attachSpeakingDetection } from "../speaking"
+import { ConsumerOptions } from "mediasoup-client/types"
+import loggerBase from "@/utils/logger"
+
+export const logger = loggerBase.child("consumers")
 
 export class Consumers extends Map<string, Consumer> {
 	constructor(core: RTC) {
@@ -43,7 +47,7 @@ export class Consumers extends Map<string, Consumer> {
 				return existingConsumer
 			}
 
-			console.debug("Starting consumer", {
+			logger.debug("Starting consumer", {
 				producerId,
 				userId,
 				kind,
@@ -62,8 +66,9 @@ export class Consumers extends Map<string, Consumer> {
 				},
 			)) as Consumer
 
-			// create the local consumer
-			const consumer = (await this.core.transports.recv.consume({
+			let detachSpeaking: (() => void) | null = null
+
+			const consumeParams: ConsumerOptions = {
 				id: consumerInfo.id,
 				producerId: consumerInfo.producerId,
 				kind: consumerInfo.kind,
@@ -71,7 +76,26 @@ export class Consumers extends Map<string, Consumer> {
 					...consumerInfo.rtpParameters,
 				},
 				appData: appData,
-			})) as Consumer
+			}
+
+			if (appData?.mediaTag === "user-mic") {
+				consumeParams.onRtpReceiver = (rtpReceiver) => {
+					detachSpeaking = attachSpeakingDetection(
+						{
+							id: consumerInfo.id,
+							role: "receiver",
+							rtpReceiver,
+						},
+						(isSpeaking) =>
+							this.onSpeakingChange(consumer, isSpeaking),
+					)
+				}
+			}
+
+			// create the local consumer
+			const consumer = (await this.core.transports.recv.consume(
+				consumeParams,
+			)) as Consumer
 
 			// set the consumer userId
 			consumer.userId = userId
@@ -79,9 +103,13 @@ export class Consumers extends Map<string, Consumer> {
 			// track the consumer so it can be paused, resumed or stopped later
 			this.set(consumer.id, consumer)
 
+			if (detachSpeaking) {
+				this.speakingDetectors.set(consumer.id, detachSpeaking)
+			}
+
 			// Consumer event handlers
 			consumer.on("transportclose", () => {
-				console.debug(`Consumer [${consumer.id}] transport closed`)
+				logger.debug(`Consumer [${consumer.id}] transport closed`)
 				this.stop(consumer.id)
 			})
 
@@ -99,13 +127,9 @@ export class Consumers extends Map<string, Consumer> {
 				consumer.pause()
 			}
 
-			if (consumer.appData.mediaTag === "user-mic") {
-				this.setupSpeakingDetection(consumer)
-			}
-
 			return consumer
 		} catch (error) {
-			console.error("Error creating consumer:", error)
+			logger.error("Error creating consumer:", error)
 		}
 	}
 
@@ -129,7 +153,7 @@ export class Consumers extends Map<string, Consumer> {
 				return
 			}
 
-			console.log("Stopping consumer", {
+			logger.log("Stopping consumer", {
 				consumerId: consumerId,
 				consumer: consumer,
 			})
@@ -140,14 +164,14 @@ export class Consumers extends Map<string, Consumer> {
 					producer_id: consumer.producerId,
 				})
 			} catch (err) {
-				console.error(`Failed to signal consumer stopped`, err)
+				logger.error(`Failed to signal consumer stopped`, err)
 			}
 
 			consumer.close()
 
 			return
 		} catch (error) {
-			console.error("Error stopping consumer:", error)
+			logger.error("Error stopping consumer:", error)
 			throw error
 		}
 	}
@@ -160,7 +184,7 @@ export class Consumers extends Map<string, Consumer> {
 				}
 			}
 		} catch (error) {
-			console.error("Error stopping consumers:", error)
+			logger.error("Error stopping consumers:", error)
 			throw error
 		}
 	}
@@ -171,7 +195,7 @@ export class Consumers extends Map<string, Consumer> {
 				await this.stop(consumer.id)
 			}
 		} catch (error) {
-			console.error("Error stopping all consumers:", error)
+			logger.error("Error stopping all consumers:", error)
 		}
 	}
 
@@ -183,21 +207,6 @@ export class Consumers extends Map<string, Consumer> {
 		}
 
 		return undefined
-	}
-
-	setupSpeakingDetection(consumer: Consumer) {
-		const detach = attachSpeakingDetection(
-			{
-				id: consumer.id,
-				role: "receiver",
-				rtpReceiver: consumer.rtpReceiver,
-			},
-			(isSpeaking) => this.onSpeakingChange(consumer, isSpeaking),
-		)
-
-		if (detach) {
-			this.speakingDetectors.set(consumer.id, detach)
-		}
 	}
 
 	detachSpeakingDetection(consumer: Consumer) {
@@ -216,7 +225,7 @@ export class Consumers extends Map<string, Consumer> {
 	}
 
 	onSpeakingChange(consumer: Consumer, isSpeaking: boolean) {
-		console.log("onSpeakingChange", consumer.id, isSpeaking)
+		logger.log("onSpeakingChange", consumer.id, isSpeaking)
 
 		consumer.isSpeaking = isSpeaking
 

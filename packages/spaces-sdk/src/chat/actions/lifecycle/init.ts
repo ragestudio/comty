@@ -2,6 +2,7 @@ import type LifecycleActions from "./index"
 
 import { CHAT_CONFIGS } from "@/chat/constants"
 import sortMessages from "@/utils/sortMessages"
+import logger from "@/utils/logger"
 
 export default async function (
 	this: LifecycleActions,
@@ -28,7 +29,7 @@ export default async function (
 		this.setState({ timeline: sortMessages(cachedMessages) })
 	}
 
-	this.state.actions.sync().catch(console.error)
+	this.state.actions.sync().catch(logger.error)
 
 	if (cachedMessages.length === 0) {
 		await this.state.actions.load()

@@ -2,14 +2,21 @@ import type { Self } from ".."
 import type { ProduceParams } from "@/rtc/producers"
 import type { RtpCodecCapability } from "mediasoup-client/types"
 
+import type { ScreenContentHint } from "@/rtc/self/constants"
+
 import defaults from "@/rtc/defaults"
 import Producer from "@/rtc/producers/producer"
 import { SelfMedia } from "."
-import { pickVideoCodec } from "../utils"
+import { computeScreenEncoding, pickVideoCodec } from "../utils"
+import { logger } from "@/rtc/self"
 
 export interface ScreenParams {
 	create?: {
 		codec?: RtpCodecCapability
+		resolution?: { width?: number; height?: number }
+		framerate?: number
+		contentHint?: ScreenContentHint
+		systemAudio?: boolean
 	}
 }
 
@@ -20,7 +27,12 @@ export const Screen = (self: Self) =>
 				throw new Error("Device not available")
 			}
 
-			const screen = await this.self.createStream<"screen">("screen")
+			const screen = await this.self.createStream<"screen">("screen", {
+				resolution: params?.resolution,
+				framerate: params?.framerate,
+				contentHint: params?.contentHint,
+				systemAudio: params?.systemAudio,
+			})
 
 			if (!screen.stream) {
 				throw new Error("screen stream not available")
@@ -43,7 +55,7 @@ export const Screen = (self: Self) =>
 			const audioTrack =
 				screen.stream.getAudioTracks()[0] as unknown as MediaStreamTrack
 
-			console.log("screen stream", screen.stream)
+			logger.debug("screen stream", screen.stream)
 
 			const videoCodec = pickVideoCodec(
 				this.self.core.device.sendRtpCapabilities,
@@ -54,7 +66,7 @@ export const Screen = (self: Self) =>
 				(codec) => codec.kind === "audio",
 			)
 
-			console.log("using codecs", { videoCodec, audioCodec })
+			logger.debug("using codecs", { videoCodec, audioCodec })
 
 			if (!videoCodec) {
 				throw new Error("video codec not found")
@@ -87,7 +99,9 @@ export const Screen = (self: Self) =>
 					childrens: [],
 				},
 				codec: videoCodec,
-				encodings: [{ ...defaults.screenVideoEncodingParams }],
+				encodings: [
+					computeScreenEncoding(videoTrack, params?.framerate),
+				],
 				track: videoTrack,
 			}
 
@@ -110,6 +124,8 @@ export const Screen = (self: Self) =>
 			audioProducer?.observer.on("close", () => {
 				this.self.core.setState({ screenAudioProducerId: null })
 			})
+
+			logger.debug("scream media created")
 
 			return { videoProducer, audioProducer, screen }
 		},

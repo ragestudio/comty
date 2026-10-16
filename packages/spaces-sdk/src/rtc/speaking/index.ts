@@ -6,6 +6,9 @@ import type {
 
 import nativeStrategy from "./strategies/native"
 import webStrategy from "./strategies/web"
+import loggerBase from "@/utils/logger"
+
+export const logger = loggerBase.child("voice-detection")
 
 // ordered by priority, the first supported strategy wins, so we prefer the
 // native frame transform when available and fall back to the web api
@@ -30,8 +33,8 @@ export function attachSpeakingDetection(
 	const strategy = resolveSpeakingStrategy(target)
 
 	if (!strategy) {
-		console.debug(
-			`[webrtc] no speaking detection strategy for ${target.role} [${target.id}]`,
+		logger.debug(
+			`no speaking detection strategy for ${target.role} [${target.id}]`,
 		)
 
 		return null
@@ -44,8 +47,8 @@ export function attachSpeakingDetection(
 	} catch (error) {
 		// attach must never break the media setup, for example when the native
 		// binary does not expose the transform api yet
-		console.warn(
-			`[webrtc] failed to attach peaking detection to ${target.role} [${target.id}]`,
+		logger.warn(
+			`failed to attach peaking detection to ${target.role} [${target.id}]`,
 			error,
 		)
 
@@ -53,8 +56,8 @@ export function attachSpeakingDetection(
 	}
 
 	if (detach) {
-		console.debug(
-			`[webrtc] speaking detection attached to ${target.role} [${target.id}] using ${strategy.name}`,
+		logger.debug(
+			`speaking detection attached to ${target.role} [${target.id}] using ${strategy.name}`,
 		)
 	}
 

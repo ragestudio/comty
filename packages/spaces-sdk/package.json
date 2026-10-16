@@ -18,17 +18,17 @@
 		"valibot": "^1.5.0",
 		"zustand": "^5.0.15",
 		"@comty/shared": "workspace:*",
-		"@comty/api-lib": "workspace:*",
+		"comty.js": "workspace:*",
 		"@linebridge/client": "workspace:*"
 	},
 	"devDependencies": {
 		"react": "^19.1.0",
 		"@types/node": "^26.6.4",
+		"@types/react": "^19.2.18",
 		"typescript": "^7.0.2"
 	},
 	"exports": {
 		".": "./src/index.ts",
-		"./ws": "./src/ws/index.ts",
 		"./classes": "./src/classes/index.ts",
 		"./classes/*": "./src/classes/*",
 		"./rtc": "./src/rtc/index.ts",

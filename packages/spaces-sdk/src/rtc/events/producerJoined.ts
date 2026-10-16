@@ -15,7 +15,7 @@ export default async function (this: RTC, data: Producer) {
 			return null
 		}
 
-		console.debug(`Remote producer joined:`, data)
+		this.logger.debug(`Remote producer joined:`, data)
 
 		// add as remote producer
 		this.producers.setRemote(data)
@@ -46,7 +46,11 @@ export default async function (this: RTC, data: Producer) {
 				this.screens.add(data)
 			}
 		}
+
+		this.eventBus.emit("rtc:producer:joined", data)
 	} catch (error) {
-		console.error("Error handling producer joined:", error)
+		this.logger.error("Error handling producer joined:", error)
+
+		this.eventBus.emit("rtc:producer:error", { error })
 	}
 }

@@ -3,6 +3,7 @@ import type { Channel, Channels } from "@comty/shared/types/spaces/channel"
 
 import { persistChannelsCache } from "./utils"
 import db from "@/db"
+import logger from "@/utils/logger"
 
 export default function (this: EventsActions, payload: Channel): void {
 	this.setState((state) => {
@@ -21,7 +22,7 @@ export default function (this: EventsActions, payload: Channel): void {
 			.equals(payload._id)
 			.delete()
 			.catch((err) => {
-				console.error("Failed to delete channel messages", err)
+				logger.error("Failed to delete channel messages", err)
 			})
 
 		return { channels: updatedChannels }

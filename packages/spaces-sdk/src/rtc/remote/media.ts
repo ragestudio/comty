@@ -4,8 +4,11 @@ import type { Consumer } from "@/rtc/consumers/consumer"
 
 import adapter from "@/adapter"
 import volumeToGain from "@/utils/volumeToGain"
+import loggerBase from "@/utils/logger"
 
 import { MIN_VOLUME_DB } from "./constants"
+
+export const logger = loggerBase.child("remote-media")
 
 export type MediaRole = "audio" | "video"
 
@@ -244,9 +247,7 @@ export class RemoteMedia {
 					})
 				}
 			} catch (err: any) {
-				console.error(
-					`[remote-media] failed to request keyframe: ${err.message}`,
-				)
+				logger.error(`failed to request keyframe: ${err.message}`)
 			}
 		}
 

@@ -3,6 +3,7 @@ import type { RTC } from ".."
 import { JoinChannelResult } from "@comty/shared/types/rtc/handlers/joinChannel"
 
 import Client from "./client"
+import logger from "@/utils/logger"
 
 export class Clients extends Map<string, Client> {
 	constructor(core: RTC, data?: Iterable<readonly [string, Client]>) {
@@ -15,7 +16,7 @@ export class Clients extends Map<string, Client> {
 	async join(data: Partial<Client>): Promise<Client | null> {
 		// check if userid is already in clients
 		if (data.userId && this.has(data.userId)) {
-			console.error("User already in the clients map")
+			logger.error("User already in the clients map")
 			return null
 		}
 
@@ -25,7 +26,7 @@ export class Clients extends Map<string, Client> {
 
 		this.set(client.userId, client)
 
-		console.debug("Client joined to channel:", client)
+		logger.debug("Client joined to channel:", client)
 
 		return client
 	}
@@ -51,7 +52,7 @@ export class Clients extends Map<string, Client> {
 
 		this.delete(userIdOrClient)
 
-		console.debug("Client left from channel:", client)
+		logger.debug("Client left from channel:", client)
 
 		return
 	}

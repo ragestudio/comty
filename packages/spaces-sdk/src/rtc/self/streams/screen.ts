@@ -1,12 +1,17 @@
 import type { Self } from ".."
+import type { ScreenContentHint } from "@/rtc/self/constants"
+import type { BaseHandlerParams } from "./base"
 
-import BaseStream, { type BaseHandlerParams } from "./base"
+import BaseStream from "./base"
+import { logger } from "@/rtc/self"
 
 export interface ScreenStreamParams extends BaseHandlerParams {
 	start: {
+		force?: boolean
 		resolution?: { width?: number; height?: number }
 		framerate?: number
-		force?: boolean
+		systemAudio?: boolean
+		contentHint?: ScreenContentHint
 	}
 	close: { force?: boolean; reason?: string }
 }
@@ -20,11 +25,19 @@ export const ScreenStream = (self: Self) =>
 					height: { max: params?.resolution?.height ?? 1080 },
 					frameRate: { max: params?.framerate ?? 30 },
 				},
-				//@ts-ignore
-				systemAudio: "include",
+				// browsers only expose tab or system audio when an audio track is
+				// requested, the desktop app can also request it this way
+				audio: !!params?.systemAudio,
 			})
 
-			console.log(`[screenStream] created stream:`, this.stream)
+			const [videoTrack] = this.stream.getVideoTracks()
+
+			// hint the encoder about the kind of content being shared
+			if (videoTrack && params?.contentHint) {
+				videoTrack.contentHint = params.contentHint
+			}
+
+			logger.log(`created stream:`, this.stream)
 
 			return this.stream
 		},

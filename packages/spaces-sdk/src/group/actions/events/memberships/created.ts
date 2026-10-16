@@ -2,8 +2,9 @@ import type EventsActions from "../index"
 import type { MembershipCreatedPayload } from "@/group/types"
 import type { Member } from "@comty/shared/types/spaces/member"
 
-import UserModel from "@comty/api-lib/models/user"
+import UserModel from "comty.js/endpoints/user"
 import db from "@/db"
+import logger from "@/utils/logger"
 
 export default async function (
 	this: EventsActions,
@@ -35,6 +36,6 @@ export default async function (
 	}))
 
 	db.members.put(newMember).catch((err) => {
-		console.error("Failed to cache new member", err)
+		logger.error("Failed to cache new member", err)
 	})
 }

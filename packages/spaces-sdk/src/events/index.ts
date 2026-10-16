@@ -1,4 +1,4 @@
-import { wsManager } from "@/ws"
+import { getSocket } from "@/helpers/socket"
 
 import { GroupStore } from "../group"
 import { ChatStore } from "../chat"
@@ -6,6 +6,7 @@ import { GroupsListStore } from "../groupsList"
 
 import GROUP_CONFIG from "../chat/configs/group"
 import DM_CONFIG from "../chat/configs/dm"
+import logger from "@/utils/logger"
 
 const CHAT_CONFIGS: Record<string, any> = {
 	group: GROUP_CONFIG,
@@ -70,12 +71,10 @@ export function buildGroupSocketEvents(
 }
 
 export function subscribeGroupSocket(groupId: string): () => void {
-	const socket = wsManager.socket
+	const socket = getSocket()
 
 	if (!socket) {
-		console.warn(
-			"[socket] Socket not available, skipping group subscription",
-		)
+		logger.warn("Socket not available, skipping group subscription")
 		return () => {}
 	}
 
@@ -91,16 +90,16 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		const state = GroupStore.getState()
 
 		if (state.groupId === groupId) {
-			console.log("[socket] Reconnected! Triggering resilience sync...")
-			state.actions.syncRTCChannels().catch(console.error)
+			logger.log("Reconnected! Triggering resilience sync...")
+			state.actions.syncRTCChannels().catch(logger.error)
 
 			if (state.members.items.length > 0) {
 				state.actions
 					.evaluateConnections(state.members.items)
-					.catch(console.error)
+					.catch(logger.error)
 				state.actions
 					.evaluateDecorations(state.members.items)
-					.catch(console.error)
+					.catch(logger.error)
 			}
 		}
 	}
@@ -119,12 +118,10 @@ export function subscribeGroupSocket(groupId: string): () => void {
 }
 
 export function subscribeUserSocket(): () => void {
-	const socket = wsManager.socket
+	const socket = getSocket()
 
 	if (!socket) {
-		console.warn(
-			"[socket] Socket not available, skipping user subscription",
-		)
+		logger.warn("Socket not available, skipping user subscription")
 		return () => {}
 	}
 
@@ -151,11 +148,11 @@ export function subscribeChatSocket(
 	params: any,
 	events?: { onNewMessage?: (data: any) => void },
 ) {
-	const socket = wsManager.socket
+	const socket = getSocket()
 	const config = CHAT_CONFIGS[type]
 
 	if (!socket || !config) {
-		console.warn("Chat websocket not available or invalid config")
+		logger.warn("Chat websocket not available or invalid config")
 		return () => {}
 	}
 
@@ -179,7 +176,7 @@ export function subscribeChatSocket(
 
 	socket.topics
 		.subscribe(config.methods.subscribe, subscribeParams)
-		.catch(console.error)
+		.catch(logger.error)
 
 	return () => {
 		socket.off(config.events.message, handleNewMessage)
@@ -189,6 +186,6 @@ export function subscribeChatSocket(
 
 		socket.topics
 			.unsubscribe(config.methods.unsubscribe, subscribeParams)
-			.catch(console.error)
+			.catch(logger.error)
 	}
 }

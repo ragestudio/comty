@@ -1,5 +1,6 @@
-import adapter from "@/adapter"
 import type { RTC } from "@/rtc"
+
+import adapter from "@/adapter"
 
 export default async function (this: RTC, data: any) {
 	if (!adapter.sessionGetter) return null
@@ -13,7 +14,7 @@ export default async function (this: RTC, data: any) {
 			return null
 		}
 
-		console.log("Remote producer left", data)
+		this.logger.log("Remote producer left", data)
 
 		// delete from producers
 		this.producers.delRemote(data)
@@ -45,7 +46,11 @@ export default async function (this: RTC, data: any) {
 				await this.screens.removeProducer(data.userId, "audio")
 			}
 		}
+
+		this.eventBus.emit("rtc:producer:left", data)
 	} catch (error) {
-		console.error("Error handling producer left:", error)
+		this.logger.error("Error handling producer left:", error)
+
+		this.eventBus.emit("rtc:producer:error", { error })
 	}
 }

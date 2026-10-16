@@ -2,6 +2,7 @@ import type { Self } from ".."
 
 import { SelfMedia } from "."
 import defaults from "@/rtc/defaults"
+import { logger } from "@/rtc/self"
 
 export const Microphone = (self: Self) =>
 	new SelfMedia(self, {
@@ -27,23 +28,30 @@ export const Microphone = (self: Self) =>
 				throw new Error("audio codec not found")
 			}
 
-			console.log("using audio codec", audioCodec)
+			logger.debug("using audio codec", audioCodec)
 
-			const producer = await this.self.core.producers.produce({
-				appData: { mediaTag: "user-mic" },
-				track: audioTrack,
-				codec: audioCodec,
-				codecOptions: {
-					opusStereo: false,
-					opusDtx: true,
-				},
-				encodings: [
-					{
-						...defaults.audioEncodingParams,
-						dtx: true,
+			const producer = await this.self.core.producers.produce(
+				{
+					appData: { mediaTag: "user-mic" },
+					track: audioTrack,
+					codec: audioCodec,
+					codecOptions: {
+						opusStereo: false,
+						opusDtx: true,
 					},
-				],
-			})
+					encodings: [
+						{
+							...defaults.audioEncodingParams,
+							dtx: true,
+						},
+					],
+				},
+				{
+					onSpeaking: (isSpeaking) => {
+						this.self.core.setState({ isSpeaking })
+					},
+				},
+			)
 
 			// set the mic producer id
 			this.self.core.setState({ micProducerId: producer.id })
@@ -54,15 +62,7 @@ export const Microphone = (self: Self) =>
 				this.self.core.setState({ isSpeaking: false })
 			})
 
-			// setup speaking detection
-			this.self.core.producers.setupSpeakingDetection(
-				producer,
-				(isSpeaking) => {
-					this.self.core.setState({
-						isSpeaking: isSpeaking,
-					})
-				},
-			)
+			logger.debug("mic media created")
 
 			return { mic, producer }
 		},
