@@ -1,0 +1,39 @@
+---
+id: storage
+title: Storage
+sidebar_label: Storage
+---
+
+El motor de almacenamiento guarda valores en memoria y los escribe a través de
+un driver intercambiable. Funciona en cualquier plataforma y cae a memoria si no
+hay almacenamiento seguro disponible.
+
+## Drivers
+
+| Driver | Plataforma |
+| --- | --- |
+| `MemoryStorageDriver` | Cualquiera (último recurso) |
+| `CookieStorageDriver` | Navegador (usa `js-cookie`) |
+| `SecureStoreStorageDriver` | React Native / Expo (con `expo-secure-store`) |
+
+```ts
+import { SecureStoreStorageDriver, registerStorageDriver } from "comty.js/storage"
+import * as SecureStore from "expo-secure-store"
+
+// registra un driver por defecto antes de usar el cliente
+registerStorageDriver(new SecureStoreStorageDriver(SecureStore))
+```
+
+## `Storage`
+
+| Método | Descripción |
+| --- | --- |
+| `get(key)` | Lee del espejo en memoria |
+| `set(key, value)` | Escribe en memoria y persiste (async) |
+| `delete(key)` | Elimina de memoria y del driver |
+| `prime(keys)` | Carga los drivers síncronos en memoria |
+| `hydrate(keys)` | Carga cualquier driver en memoria (async) |
+| `setDriver(driver)` | Reemplaza el driver actual |
+
+`resolveStorageDriver()` elige el driver: gana el registrado, luego las cookies
+en el navegador, luego memoria.

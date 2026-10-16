@@ -1,0 +1,32 @@
+---
+id: addons
+title: Addons
+sidebar_label: Addons
+---
+
+Addons let third parties extend the results of some endpoints.
+
+```ts
+import client from "comty.js/client"
+
+client.addons.register("my-addon", myAddon)
+```
+
+## AddonsManager
+
+`client.addons` is an `AddonsManager`:
+
+| Method | Description |
+| --- | --- |
+| `register(name, addon)` | Register an addon by name |
+| `get(name)` | Get a registered addon |
+| `getByOperation(operation)` | List the addons that implement an operation |
+
+An addon implements an operation by exposing a method with that name. Its
+`constructor.id` is used as the addon id.
+
+## `processAddons`
+
+`processAddons` runs every addon implementing an operation and merges their
+results. It is used internally by endpoints such as `music.getMyLibrary` and
+`search`.

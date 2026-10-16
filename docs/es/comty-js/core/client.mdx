@@ -1,0 +1,46 @@
+---
+id: client
+title: Client
+sidebar_label: Client
+---
+
+El `Client` encapsula la capa HTTP. Se crea una sola vez y se comparte como el
+singleton `baseClient`.
+
+```ts
+import client from "comty.js/client"
+
+client.origin = "https://api.comty.app"
+```
+
+## Propiedades
+
+| Propiedad | Tipo | Descripción |
+| --- | --- | --- |
+| `instance` | `AxiosInstance` | Instancia axios subyacente |
+| `origin` | `string` | Url base de la API (actualiza también el origin de los sockets) |
+| `eventBus` | `EventEmitter` | Bus de eventos compartido (auth/session) |
+| `addons` | `AddonsManager` | Addons registrados |
+| `ws` | `WebsocketManager` | Gestor de websockets |
+
+## Pipeline de peticiones
+
+Toda petición hecha a través de `client.instance` (o de un endpoint) pasa por
+los interceptores:
+
+1. Si la sesión tiene token expirado o a punto de expirar, el plugin de auth lo
+   refresca antes (se omite en endpoints `/auth`).
+2. Se añade la cabecera `Authorization: Bearer <token>` si falta.
+3. Ante un `401`, `onUnauthorized` refresca el token una vez y reintenta.
+4. Ante un `5xx`, la petición se reintenta con backoff.
+
+El comportamiento de auth lo aporta el gestor de autenticación mediante
+`client.registerAuthPlugin({ ensureFreshToken, onUnauthorized })`.
+
+## Opciones por petición
+
+| Opción | Por defecto | Descripción |
+| --- | --- | --- |
+| `skipAuth` | `false` | Omite el manejo de auth y los reintentos |
+| `maxRetries` | `2` | Reintentos para errores `5xx` transitorios |
+| `retryDelay` | `1000` | Retardo base entre reintentos, en ms |

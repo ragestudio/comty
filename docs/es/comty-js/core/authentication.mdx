@@ -1,0 +1,57 @@
+---
+id: authentication
+title: Autenticación
+sidebar_label: Autenticación
+---
+
+El singleton `authManager` gestiona el ciclo de vida de la sesión: arranque,
+login, logout y el refresco automático del token.
+
+```ts
+import { authManager } from "comty.js"
+
+authManager.on("session:invalid", () => console.log("sesión cerrada"))
+
+await authManager.start()
+```
+
+## Métodos
+
+| Método | Descripción |
+| --- | --- |
+| `start()` | Carga la sesión persistida, refresca si hace falta y carga el usuario |
+| `login(payload)` | Login con `{ username, password, mfa_code? }` |
+| `logout()` | Destruye la sesión remota y limpia el estado local |
+| `refresh()` | Refresca los tokens (llamadas concurrentes comparten una petición) |
+| `ensureFreshToken()` | Refresca solo si expiró o está por expirar |
+| `handleUnauthorized()` | Refresca una vez, usado por el pipeline de peticiones |
+| `wake()` | Revisa al recuperar el foco (los timers se throttlean en background) |
+| `stop()` | Detiene el refresco proactivo, mantiene la sesión |
+
+## Eventos
+
+`auth:ready`, `auth:login_success`, `auth:logout_success`, `auth:mfa_required`,
+`auth:activation_required`, `session:refreshing`, `session:refreshed`,
+`session:invalid`.
+
+## Store de estado
+
+El estado se expone mediante un store de zustand, usable desde cualquier
+framework.
+
+```ts
+import useAuth from "comty.js/auth/use"
+
+const status = useAuth((state) => state.status)
+```
+
+Campos: `status`, `initialized`, `authenticated`, `refreshing`, `user`,
+`user_id`, `token`, `error`, `last_refresh`.
+
+## Opciones
+
+`AuthManager` acepta `transport` (sobrescribe `login`, `refresh`, `fetchUser`,
+`logout`), `eventBus`, `logger` y los ajustes de refresco (`autoRefresh`,
+`refreshThreshold`, `minRefreshDelay`, `maxRefreshDelay`, `retryDelay`,
+`maxRetries`). Sobrescribir el transport permite reutilizar el gestor contra
+otro backend (por ejemplo Expo).

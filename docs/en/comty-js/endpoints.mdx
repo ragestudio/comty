@@ -1,0 +1,56 @@
+---
+id: endpoints
+title: Endpoints
+sidebar_label: Endpoints
+---
+
+Endpoints are typed wrappers around the backend routes. Each domain exports a
+singleton whose methods are bound to a route with the `@Definition` decorator
+and validated with `@Validate` when a schema is declared.
+
+```ts
+import UsersModel from "comty.js/endpoints/user"
+import FollowsModel from "comty.js/endpoints/follows"
+
+const user = await UsersModel.self()
+const followers = await FollowsModel.getFollowers(user._id)
+```
+
+The methods resolve with the response `data`. Arguments are validated with
+[valibot](https://valibot.dev) when a `@Validate` schema is present.
+
+## Available endpoints
+
+| Import | Singleton | Description |
+| --- | --- | --- |
+| `comty.js/endpoints/api` | `APIModel` | Server keys |
+| `comty.js/endpoints/auth` | `AuthModel` | Authentication and account |
+| `comty.js/endpoints/badges` | `Badges` | Badges |
+| `comty.js/endpoints/chats` | `ChatsModel` | Chats (`channels`, `dm`, `ack`) |
+| `comty.js/endpoints/decorations` | `DecorationsModel` | User decorations |
+| `comty.js/endpoints/e2e` | `E2EModel` | End to end encryption keypair |
+| `comty.js/endpoints/events` | `EventsModel` | Events |
+| `comty.js/endpoints/feed` | `FeedModel` | Music and posts feeds |
+| `comty.js/endpoints/files` | `Files` | File upload |
+| `comty.js/endpoints/follows` | `FollowsModel` | Follows and followers |
+| `comty.js/endpoints/groups` | `GroupsModel` | Groups (`members`, `channels`, `invites`, `soundpad`, `rtc`) |
+| `comty.js/endpoints/music` | `MusicModel` | Music (tracks, releases, library) |
+| `comty.js/endpoints/nfc` | `NfcModel` | NFC tags |
+| `comty.js/endpoints/oauth` | `OAuth` | OAuth applications |
+| `comty.js/endpoints/post` | `PostModel` | Posts |
+| `comty.js/endpoints/radio` | `RadioModel` | Radio |
+| `comty.js/endpoints/search` | `SearchModel` | Global search |
+| `comty.js/endpoints/session` | `Session` | Server sessions |
+| `comty.js/endpoints/spectrum` | `SpectrumModel` | Spectrum live |
+| `comty.js/endpoints/stickers` | `Stickers` | Stickers |
+| `comty.js/endpoints/user` | `UserModel` | Users and self data |
+
+:::note
+
+`comty.js/endpoints/session` exposes the **server** sessions, while the current
+local session is the [Session](core/session) singleton.
+
+:::
+
+Each endpoint extends the internal `BaseEndpoint`, which resolves the HTTP call
+through the shared [Client](core/client).

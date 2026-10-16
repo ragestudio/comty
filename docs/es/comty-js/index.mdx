@@ -4,41 +4,60 @@ title: Librería Comty.js
 sidebar_label: Introducción
 ---
 
-Bienvenido a la documentación de la librería `comty.js`. Esta librería proporciona un conjunto de módulos y clases para interactuar con la plataforma Comty.
+`comty.js` es el cliente JavaScript oficial de la API de Comty.
 
-## Modelos principales
+Incluye un cliente HTTP con pipeline de autenticación automático, un gestor de autenticación autónomo, un motor de almacenamiento agnóstico, un gestor de websockets auto-gestionado y wrappers tipados de los endpoints del backend.
 
-Los siguientes son los modelos principales disponibles en la librería `comty.js`:
-
-*   [AddonsManager](models/addons): Gestiona los addons dentro de la librería.
-*   [AuthModel](models/auth): Gestiona la autenticación de usuarios y las sesiones.
-*   [MusicModel](models/music): Gestiona los datos de música.
-*   [Post](models/post): Gestiona los datos de posts.
-*   [Search](models/search): Gestiona las peticiones de búsqueda.
-*   [SessionModel](models/session): Gestiona las sesiones de usuario y los tokens.
-*   [UserModel](models/user): Gestiona los datos de usuario.
-
-## Helpers
-
-*   [Remotes](remotes): Describe todos los remotes.
-*   [Settings](settings): Describe todos los ajustes.
-*   [Storage](storage): Describe todo el almacenamiento.
-*   [WebsocketManager](ws): Gestiona las conexiones websocket.
-
-## Primeros pasos
-
-Para empezar con la librería `comty.js`, puedes instalarla usando pnpm:
+## Instalación
 
 ```bash
 pnpm add comty.js
 ```
 
-Luego puedes importar los módulos que necesites en tu proyecto:
+## Inicio rápido
 
-```javascript
-import { AuthModel, SessionModel } from 'comty.js';
+```ts
+import { authManager } from "comty.js"
+import UsersModel from "comty.js/endpoints/user"
 
-// Usa los módulos
-AuthModel.login({ username: 'myuser', password: 'mypassword' })
-  .then(data => console.log(data));
+// carga la sesión persistida y arranca el auto refresh
+await authManager.start()
+
+const user = await UsersModel.self()
+```
+
+## Arquitectura
+
+### Núcleo
+
+| Módulo | Descripción |
+| --- | --- |
+| [Client](core/client) | Cliente HTTP y pipeline de peticiones |
+| [Session](core/session) | Sesión actual y acceso a los tokens |
+| [Storage](core/storage) | Motor de almacenamiento agnóstico (memoria, cookies, expo secure store) |
+| [Authentication](core/authentication) | Gestor de autenticación autónomo, auto refresh y store de estado |
+| [Realtime](core/realtime) | Gestor de websockets auto-gestionado |
+
+### Endpoints
+
+Wrappers tipados de los endpoints del backend, un singleton por dominio. Ver [Endpoints](endpoints).
+
+### Addons
+
+Registra addons de terceros que extienden los resultados de los endpoints. Ver [Addons](addons).
+
+## Imports
+
+El paquete expone un mapa `exports`, por lo que están disponibles tanto el barrel como los subpaths individuales:
+
+```ts
+import { Client, session, authManager } from "comty.js"
+
+import client from "comty.js/client"
+import { authManager } from "comty.js/auth"
+import useAuth from "comty.js/auth/use"
+import WebsocketManager from "comty.js/realtime"
+import UsersModel from "comty.js/endpoints/user"
+import use from "comty.js/hooks/use"
+import measurePing from "comty.js/utils/measurePing"
 ```

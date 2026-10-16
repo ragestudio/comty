@@ -1,0 +1,56 @@
+---
+id: endpoints
+title: Endpoints
+sidebar_label: Endpoints
+---
+
+Los endpoints son wrappers tipados de las rutas del backend. Cada dominio
+exporta un singleton cuyos métodos se enlazan a una ruta con el decorador
+`@Definition` y se validan con `@Validate` cuando hay un schema.
+
+```ts
+import UsersModel from "comty.js/endpoints/user"
+import FollowsModel from "comty.js/endpoints/follows"
+
+const user = await UsersModel.self()
+const followers = await FollowsModel.getFollowers(user._id)
+```
+
+Los métodos resuelven con el `data` de la respuesta. Los argumentos se validan
+con [valibot](https://valibot.dev) cuando hay un schema `@Validate`.
+
+## Endpoints disponibles
+
+| Import | Singleton | Descripción |
+| --- | --- | --- |
+| `comty.js/endpoints/api` | `APIModel` | Server keys |
+| `comty.js/endpoints/auth` | `AuthModel` | Autenticación y cuenta |
+| `comty.js/endpoints/badges` | `Badges` | Insignias |
+| `comty.js/endpoints/chats` | `ChatsModel` | Chats (`channels`, `dm`, `ack`) |
+| `comty.js/endpoints/decorations` | `DecorationsModel` | Decoraciones de usuario |
+| `comty.js/endpoints/e2e` | `E2EModel` | Par de claves de cifrado extremo a extremo |
+| `comty.js/endpoints/events` | `EventsModel` | Eventos |
+| `comty.js/endpoints/feed` | `FeedModel` | Feeds de música y posts |
+| `comty.js/endpoints/files` | `Files` | Subida de ficheros |
+| `comty.js/endpoints/follows` | `FollowsModel` | Seguidos y seguidores |
+| `comty.js/endpoints/groups` | `GroupsModel` | Grupos (`members`, `channels`, `invites`, `soundpad`, `rtc`) |
+| `comty.js/endpoints/music` | `MusicModel` | Música (tracks, releases, librería) |
+| `comty.js/endpoints/nfc` | `NfcModel` | Etiquetas NFC |
+| `comty.js/endpoints/oauth` | `OAuth` | Aplicaciones OAuth |
+| `comty.js/endpoints/post` | `PostModel` | Posts |
+| `comty.js/endpoints/radio` | `RadioModel` | Radio |
+| `comty.js/endpoints/search` | `SearchModel` | Búsqueda global |
+| `comty.js/endpoints/session` | `Session` | Sesiones del servidor |
+| `comty.js/endpoints/spectrum` | `SpectrumModel` | Spectrum live |
+| `comty.js/endpoints/stickers` | `Stickers` | Stickers |
+| `comty.js/endpoints/user` | `UserModel` | Usuarios y datos propios |
+
+:::note
+
+`comty.js/endpoints/session` expone las sesiones del **servidor**, mientras que
+la sesión local actual es el singleton [Session](core/session).
+
+:::
+
+Cada endpoint extiende el `BaseEndpoint` interno, que resuelve la llamada HTTP a
+través del [Client](core/client) compartido.

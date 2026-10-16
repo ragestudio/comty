@@ -1,0 +1,46 @@
+---
+id: client
+title: Client
+sidebar_label: Client
+---
+
+The `Client` holds the HTTP layer. It is created once and shared as the
+`baseClient` singleton.
+
+```ts
+import client from "comty.js/client"
+
+client.origin = "https://api.comty.app"
+```
+
+## Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `instance` | `AxiosInstance` | Underlying axios instance |
+| `origin` | `string` | API base url (updates the sockets origin too) |
+| `eventBus` | `EventEmitter` | Shared event bus for auth/session events |
+| `addons` | `AddonsManager` | Registered addons |
+| `ws` | `WebsocketManager` | Websocket manager |
+
+## Request pipeline
+
+Every request made through `client.instance` (or an endpoint) goes through the
+interceptors:
+
+1. If the session has a token, expired or about to expire, the auth plugin
+   refreshes it first (skipped for `/auth` endpoints).
+2. The `Authorization: Bearer <token>` header is attached when missing.
+3. On a `401`, `onUnauthorized` refreshes the token once and replays the request.
+4. On a `5xx`, the request is retried with a backoff.
+
+The auth behaviour is provided by the auth manager through
+`client.registerAuthPlugin({ ensureFreshToken, onUnauthorized })`.
+
+## Per request options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `skipAuth` | `false` | Skip the auth handling and retries |
+| `maxRetries` | `2` | Retries for transient `5xx` errors |
+| `retryDelay` | `1000` | Base delay between retries, in ms |

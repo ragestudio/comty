@@ -4,42 +4,60 @@ title: Comty.js Library
 sidebar_label: Introduction
 ---
 
-Welcome to the documentation for the `comty.js` library. This library provides a set of modules and classes for interacting with the Comty platform.
+`comty.js` is the official JavaScript client for the Comty API.
 
-## Core Models
+It bundles an HTTP client with an automatic auth pipeline, an autonomous auth manager, an agnostic storage engine, a self-managed websocket manager and typed wrappers for the backend endpoints.
 
-The following are the core models available in the `comty.js` library:
-
-- [AddonsManager](models/addons): Manages addons within the library.
-- [AuthModel](models/auth): Handles user authentication and session management.
-- [MusicModel](models/music): Handles Music Data.
-- [Post](models/post): Handles Post Data.
-- [Search](models/search): Handles Search requests.
-- [SessionModel](models/session): Manages user sessions and tokens.
-- [UserModel](models/user): Manages User Data.
-
-## Helpers
-
-- [Remotes](remotes): Describes all the remotes.
-- [Settings](settings): Describes all the settings.
-- [Storage](storage): Describes all the storage.
-- [WebsocketManager](ws): Handles websocket connections.
-
-## Getting Started
-
-To get started with the `comty.js` library, you can install it using pnpm:
+## Install
 
 ```bash
 pnpm add comty.js
 ```
 
-Then, you can import the modules you need into your project:
+## Quick start
 
-```javascript
-import { AuthModel, SessionModel } from "comty.js"
+```ts
+import { authManager } from "comty.js"
+import UsersModel from "comty.js/endpoints/user"
 
-// Use the modules
-AuthModel.login({ username: "myuser", password: "mypassword" }).then((data) =>
-	console.log(data),
-)
+// load the persisted session and start the auto refresh
+await authManager.start()
+
+const user = await UsersModel.self()
+```
+
+## Architecture
+
+### Core
+
+| Module | Description |
+| --- | --- |
+| [Client](core/client) | HTTP client and request pipeline |
+| [Session](core/session) | Current session and token access |
+| [Storage](core/storage) | Agnostic storage engine (memory, cookies, expo secure store) |
+| [Authentication](core/authentication) | Autonomous auth manager, auto refresh and state store |
+| [Realtime](core/realtime) | Self-managed websocket manager |
+
+### Endpoints
+
+Typed wrappers around the backend endpoints, one singleton per domain. See [Endpoints](endpoints).
+
+### Addons
+
+Register third party addons that extend the endpoint results. See [Addons](addons).
+
+## Importing
+
+The package exposes an `exports` map, so both the barrel and individual subpaths are available:
+
+```ts
+import { Client, session, authManager } from "comty.js"
+
+import client from "comty.js/client"
+import { authManager } from "comty.js/auth"
+import useAuth from "comty.js/auth/use"
+import WebsocketManager from "comty.js/realtime"
+import UsersModel from "comty.js/endpoints/user"
+import use from "comty.js/hooks/use"
+import measurePing from "comty.js/utils/measurePing"
 ```

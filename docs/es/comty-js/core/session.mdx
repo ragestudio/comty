@@ -1,0 +1,33 @@
+---
+id: session
+title: Session
+sidebar_label: Session
+---
+
+El singleton `session` expone la sesión actual y sus tokens.
+
+```ts
+import session from "comty.js/session"
+```
+
+## Getters
+
+| Getter | Tipo | Descripción |
+| --- | --- | --- |
+| `token` | `string \| undefined` | Token de auth (get/set) |
+| `refreshToken` | `string \| undefined` | Refresh token (get/set) |
+| `decodedToken` | `DecodedAuthToken \| null` | Payload del token decodificado |
+| `isTokenExpired` | `boolean \| null` | Si el token está expirado |
+| `tokenExpiration` | `number \| undefined` | Timestamp de expiración (segundos) |
+| `user_id` | `string \| undefined` | Id de usuario del token |
+| `user` | `Partial<User>` | Datos de usuario cacheados |
+
+## Métodos
+
+- `deleteToken()` / `deleteRefreshToken()`: elimina un token.
+- `restore()`: carga los tokens persistidos en memoria (llamar al arrancar).
+- `useStorageDriver(driver)`: sobrescribe el driver de almacenamiento
+  autodetectado.
+
+Los tokens se persisten a través del motor de [storage](storage), por lo que las
+lecturas son siempre síncronas desde un espejo en memoria.

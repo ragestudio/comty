@@ -1,0 +1,46 @@
+---
+id: realtime
+title: Realtime
+sidebar_label: Realtime
+---
+
+`client.ws` is a self-managed websocket manager built on `@linebridge/client`.
+
+```ts
+import client from "comty.js/client"
+
+await client.ws.connectAll()
+
+client.ws.get("main")?.emit("ping")
+```
+
+## Methods
+
+| Method | Description |
+| --- | --- |
+| `connect(namespace)` / `connectAll()` | Connect one or every socket |
+| `disconnect(namespace)` / `disconnectAll()` | Close one or every socket |
+| `reauthenticate(namespace?)` | Re-send the token on connected sockets |
+| `get(namespace)` / `has(namespace)` | Access a socket by namespace |
+| `setOrigin(origin)` | Point the sockets to another origin |
+
+## Auto management
+
+When `autoManage` is enabled (default), the manager reacts to the auth events on
+the shared event bus:
+
+- `auth:ready` / `auth:login_success` → connect
+- `session:refreshed` → reauthenticate
+- `auth:logout_success` / `session:invalid` → disconnect
+
+## Events
+
+Socket events are re-emitted on the event bus as
+`wsmanager:<namespace>:<event>` (`open`, `close`, `connected`, `reconnecting`,
+`reconnected`, `reconnection_failed`, `error`), plus `wsmanager:all:connected`
+and `wsmanager:all:disconnected`.
+
+## Options
+
+`origin`, `remotes`, `eventBus`, `getToken`, `worker`, `autoReconnect`,
+`heartbeat`, `maxConnectRetries`, `autoManage`, `logger`.
