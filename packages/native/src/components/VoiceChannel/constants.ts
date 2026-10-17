@@ -1,9 +1,10 @@
-import type { SerializedScreen } from "@/rtc/screens/screen"
+import type { SerializedRemoteMedia } from "@comty/spaces-sdk/rtc"
 import type { Client } from "@comty/shared/types/rtc/client"
 
 export type GridItem =
-	| { kind: "local" }
-	| { kind: "screen"; screen: SerializedScreen }
+	| { kind: "local"; media: "screen" | "camera" }
+	| { kind: "screen"; screen: SerializedRemoteMedia }
+	| { kind: "camera"; camera: SerializedRemoteMedia }
 	| { kind: "client"; client: Client }
 
 export const GAP = 10

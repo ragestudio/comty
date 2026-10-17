@@ -1,4 +1,4 @@
-import type { SerializedScreen } from "@/rtc/screens/screen"
+import type { SerializedRemoteMedia } from "@comty/spaces-sdk/rtc"
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native"
 
 import React from "react"
@@ -12,8 +12,8 @@ import { useScreenFullscreen } from "@/components/ScreenFullscreen/store"
 import clientName from "@/utils/clientName"
 
 import ClientTile from "./ClientTile"
-import ScreenPromptTile from "./ScreenPromptTile"
-import ScreenViewTile from "./ScreenViewTile"
+import VideoPromptTile from "./VideoPromptTile"
+import VideoViewTile from "./VideoViewTile"
 
 import { chunkRows, columnsFor, idOf } from "./utils"
 import {
@@ -39,11 +39,19 @@ const ChannelGrid = () => {
 	const speaking = rtc.speakingClients ?? []
 
 	const screens = rtc.statedScreens ?? []
-	const localStreamURL = rtc.localScreenStreamURL
+	const cameras = rtc.statedCameras ?? []
+	const localScreenStreamURL = rtc.localScreenStreamURL
+	const localCameraStreamURL = rtc.localCameraStreamURL
 
 	const items: GridItem[] = [
-		...(localStreamURL ? [{ kind: "local" as const }] : []),
+		...(localScreenStreamURL
+			? [{ kind: "local" as const, media: "screen" as const }]
+			: []),
 		...screens.map((screen) => ({ kind: "screen" as const, screen })),
+		...(localCameraStreamURL
+			? [{ kind: "local" as const, media: "camera" as const }]
+			: []),
+		...cameras.map((camera) => ({ kind: "camera" as const, camera })),
 		...clients.map((client) => ({ kind: "client" as const, client })),
 	]
 
@@ -74,11 +82,18 @@ const ChannelGrid = () => {
 		setFocusedId((prev) => (prev === id ? null : id))
 	}
 
-	const handlePromptPress =
-		(screen: SerializedScreen) => (event: GestureResponderEvent) => {
+	const handleScreenPromptPress =
+		(screen: SerializedRemoteMedia) => (event: GestureResponderEvent) => {
 			event.stopPropagation()
 			rtcService.screens.enable(screen.userId)
 			setFocusedId(idOf({ kind: "screen", screen }))
+		}
+
+	const handleCameraPromptPress =
+		(camera: SerializedRemoteMedia) => (event: GestureResponderEvent) => {
+			event.stopPropagation()
+			rtcService.cameras.enable(camera.userId)
+			setFocusedId(idOf({ kind: "camera", camera }))
 		}
 
 	const handleBackgroundPress = () => {
@@ -86,29 +101,42 @@ const ChannelGrid = () => {
 	}
 
 	const handleOnFullscreenItem = (item: GridItem) => {
-		if (item.kind !== "screen" && item.kind !== "local") {
-			return
-		}
+		if (item.kind === "local") {
+			const id = idOf(item)
+			const isScreen = item.media === "screen"
+			const streamURL = isScreen ? localScreenStreamURL : localCameraStreamURL
 
-		const id = idOf(item)
+			if (!streamURL) return
 
-		if (item.kind === "local" && localStreamURL) {
 			fullscreen.open(id, {
-				streamURL: localStreamURL,
-				label: "Your screen",
+				streamURL,
+				label: isScreen ? "Your screen" : "Your camera",
 				hasAudio: false,
 				volume: 0,
 			})
+
+			return
 		}
 
 		if (item.kind === "screen") {
-			fullscreen.open(id, {
+			fullscreen.open(idOf(item), {
 				streamURL: item.screen.streamURL,
 				label: nameOf(item.screen.userId),
 				hasAudio: item.screen.hasAudio,
 				volume: item.screen.volume,
 				onVolume: (value) =>
 					rtcService.screens.setVolume(item.screen.userId, value),
+			})
+
+			return
+		}
+
+		if (item.kind === "camera") {
+			fullscreen.open(idOf(item), {
+				streamURL: item.camera.streamURL,
+				label: nameOf(item.camera.userId),
+				hasAudio: item.camera.hasAudio,
+				volume: item.camera.volume,
 			})
 		}
 	}
@@ -125,14 +153,18 @@ const ChannelGrid = () => {
 		const id = idOf(item)
 
 		if (item.kind === "local") {
+			const isScreen = item.media === "screen"
+
 			return (
-				<ScreenViewTile
+				<VideoViewTile
 					key={id}
 					width={width}
 					height={height}
-					streamURL={localStreamURL}
-					label="Your screen"
-					onStop={() => rtcService.self.destroyMedia("screen")}
+					streamURL={isScreen ? localScreenStreamURL : localCameraStreamURL}
+					label={isScreen ? "Your screen" : "Your camera"}
+					onStop={() =>
+						rtcService.self.destroyMedia(isScreen ? "screen" : "cam")
+					}
 					onExpand={() => handleOnFullscreenItem(item)}
 					hidden={fullscreen.id === id}
 					onPress={handleCardPress(id)}
@@ -143,7 +175,7 @@ const ChannelGrid = () => {
 		if (item.kind === "screen") {
 			if (item.screen.enabled) {
 				return (
-					<ScreenViewTile
+					<VideoViewTile
 						key={id}
 						width={width}
 						height={height}
@@ -166,12 +198,44 @@ const ChannelGrid = () => {
 			}
 
 			return (
-				<ScreenPromptTile
+				<VideoPromptTile
 					key={id}
 					width={width}
 					height={height}
 					label={nameOf(item.screen.userId)}
-					onPress={handlePromptPress(item.screen)}
+					onPress={handleScreenPromptPress(item.screen)}
+				/>
+			)
+		}
+
+		if (item.kind === "camera") {
+			if (item.camera.enabled) {
+				return (
+					<VideoViewTile
+						key={id}
+						width={width}
+						height={height}
+						streamURL={item.camera.streamURL}
+						label={nameOf(item.camera.userId)}
+						onStop={() => {
+							rtcService.cameras.disable(item.camera.userId)
+							setFocusedId((prev) => (prev === id ? null : prev))
+						}}
+						onExpand={() => handleOnFullscreenItem(item)}
+						hidden={fullscreen.id === id}
+						onPress={handleCardPress(id)}
+					/>
+				)
+			}
+
+			return (
+				<VideoPromptTile
+					key={id}
+					width={width}
+					height={height}
+					label={nameOf(item.camera.userId)}
+					hint="tap to view"
+					onPress={handleCameraPromptPress(item.camera)}
 				/>
 			)
 		}

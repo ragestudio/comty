@@ -1,19 +1,21 @@
 import type { PressHandler } from "@/types"
 
-import { TvMinimalPlayIcon } from "lucide-react-native"
 import { useTheme, YStack } from "tamagui"
+import { TvMinimalPlayIcon } from "lucide-react-native"
 import AppText from "@/ui/Text"
 import TileFrame from "./TileFrame"
 
-export const ScreenPromptTile = ({
+export const VideoPromptTile = ({
 	width,
 	height,
 	label,
+	hint = "tap to watch",
 	onPress,
 }: {
 	width: number
 	height: number
 	label: string
+	hint?: string
 	onPress: PressHandler
 }) => {
 	const theme = useTheme()
@@ -44,11 +46,11 @@ export const ScreenPromptTile = ({
 					fontSize={10}
 					opacity={0.5}
 				>
-					tap to watch
+					{hint}
 				</AppText>
 			</YStack>
 		</TileFrame>
 	)
 }
 
-export default ScreenPromptTile
+export default VideoPromptTile

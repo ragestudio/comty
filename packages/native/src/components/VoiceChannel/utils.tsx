@@ -1,8 +1,9 @@
 import { type GridItem } from "./constants"
 
 export const idOf = (item: GridItem) => {
-	if (item.kind === "local") return "local"
+	if (item.kind === "local") return `local:${item.media}`
 	if (item.kind === "screen") return `screen:${item.screen.userId}`
+	if (item.kind === "camera") return `camera:${item.camera.userId}`
 	return `client:${item.client.userId}`
 }
 

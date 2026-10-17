@@ -8,7 +8,7 @@ import { Slider } from "panelui-native"
 import AppText from "@/ui/Text"
 import TileButton from "./TileButton"
 
-export const ScreenViewTile = ({
+export const VideoViewTile = ({
 	width,
 	height,
 	streamURL,
@@ -155,4 +155,4 @@ export const ScreenViewTile = ({
 	)
 }
 
-export default ScreenViewTile
+export default VideoViewTile
