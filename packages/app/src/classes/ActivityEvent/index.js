@@ -1,3 +1,5 @@
+import client from "comty.js/core/client"
+
 export default class ActivityEvent {
 	constructor(id, payload) {
 		if (typeof id !== "string") {
@@ -12,7 +14,7 @@ export default class ActivityEvent {
 	}
 
 	send = async () => {
-		return await app.cores.api.customRequest({
+		return await client.instance({
 			url: "/activity/client",
 			method: "POST",
 			data: {
