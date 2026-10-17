@@ -15,14 +15,10 @@ export default async function (
 			this.updateClientVoiceState(client, payload.data)
 			break
 		}
-
-		default: {
-			throw new Error("Invalid event")
-		}
 	}
 
 	// broadcast to other clients
-	this.sendToClients(client, `media:channel:client_event`, {
+	this.broadcastToClients(`media:channel:client_event`, {
 		userId: client.userId,
 		event: payload.event,
 		data: payload.data,
