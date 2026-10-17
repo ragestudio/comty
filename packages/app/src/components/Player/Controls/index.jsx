@@ -54,7 +54,9 @@ const EventsHandlers = {
 }
 
 const Controls = (props) => {
-	const [trackManifest, setTrackManifest] = React.useState({})
+	const [trackManifest, setTrackManifest] = React.useState(
+		/** @type {any} */ ({}),
+	)
 
 	const onPlayerStateChange = React.useCallback(() => {
 		const track = app.cores.player.track()

@@ -1,7 +1,8 @@
 import React from "react"
 import StickerRender from "@components/StickerRender"
 import { Grid, AutoSizer } from "react-virtualized"
-import StickersModel from "@models/stickers"
+import StickersModel from "@endpoints/stickers"
+import useRequest from "comty.js/hooks/useRequest"
 
 import "./index.less"
 
@@ -105,7 +106,7 @@ const StickersPackList = ({ pack, onSelect }) => {
 }
 
 const StickersBrowser = ({ onClickItem, close }) => {
-	const [isLoading, response, error] = app.cores.api.useRequest(
+	const [isLoading, response, error] = useRequest(
 		StickersModel.getFavStickersSet,
 	)
 

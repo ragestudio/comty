@@ -5,7 +5,7 @@ import classnames from "classnames"
 import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 
-import User from "@models/user"
+import User from "@endpoints/user"
 
 import "./index.less"
 

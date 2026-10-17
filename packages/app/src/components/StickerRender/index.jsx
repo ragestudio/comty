@@ -1,7 +1,7 @@
 import React from "react"
 import { Skeleton } from "antd"
 import Lottie from "lottie-react"
-import StickersModel from "@models/stickers"
+import StickersModel from "@endpoints/stickers"
 
 import "./index.less"
 
@@ -33,7 +33,12 @@ const StickerRender = ({ obj }) => {
 	return <img src={obj.file_url} />
 }
 
-const Sticker = ({ id, sticker, onClick, onDoubleClick }) => {
+const Sticker = ({
+	id = null,
+	sticker = null,
+	onClick = null,
+	onDoubleClick = null,
+}) => {
 	const [obj, setObj] = React.useState(sticker)
 
 	const handleDoubleClick = React.useCallback(() => {

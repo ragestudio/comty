@@ -6,6 +6,7 @@ import { Icons } from "@components/Icons"
 import LiveChat from "@components/LiveChat"
 
 import "./index.less"
+import client from "comty.js/core/client"
 
 const eventsToDispatch = {
 	kick: (user) => {
@@ -53,7 +54,7 @@ export default class SyncRoomCard extends React.Component {
 	}
 
 	checkLatency = () => {
-		const instance = app.cores.api.instance().sockets.music
+		const instance = client.ws.sockets.music
 
 		if (instance) {
 			this.setState({
@@ -68,7 +69,7 @@ export default class SyncRoomCard extends React.Component {
 		})
 
 		// chat instance
-		const chatInstance = app.cores.api.instance().sockets.chat
+		const chatInstance = client.ws.sockets.chat
 
 		if (chatInstance) {
 			Object.keys(this.chatEvents).forEach((event) => {
@@ -93,7 +94,7 @@ export default class SyncRoomCard extends React.Component {
 		}
 
 		// chat instance
-		const chatInstance = app.cores.api.instance().sockets.chat
+		const chatInstance = client.ws.sockets.chat
 
 		if (chatInstance) {
 			Object.keys(this.chatEvents).forEach((event) => {
@@ -252,7 +253,7 @@ export default class SyncRoomCard extends React.Component {
 
 					<div className="latency_display">
 						<span>
-							{app.cores.api.instance().sockets.music.latency ??
+							{client.ws.sockets.music.latency ??
 								"..."}
 							ms
 						</span>

@@ -7,6 +7,7 @@ import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 
 import "./GifPicker.less"
+import client from "comty.js/core/client"
 
 export const GifItem = ({ item, fav, onClick }) => {
 	const { _id, resource_url, metadata } = item
@@ -16,7 +17,7 @@ export const GifItem = ({ item, fav, onClick }) => {
 	const onClickFav = async (item) => {
 		setIsFav(!isFav)
 
-		await app.cores.api.customRequest({
+		await client.instance({
 			url: "/expressions/gif/fav",
 			method: "POST",
 			data: {
@@ -57,7 +58,7 @@ const GifPicker = ({ send, close }) => {
 			return
 		}
 
-		const response = await app.cores.api.customRequest({
+		const response = await client.instance({
 			url: "/expressions/gif/search",
 			method: "GET",
 			params: {
@@ -80,7 +81,7 @@ const GifPicker = ({ send, close }) => {
 	}
 
 	const doGetFavs = async () => {
-		const response = await app.cores.api.customRequest({
+		const response = await client.instance({
 			url: "/expressions/gif/fav",
 			method: "GET",
 		})

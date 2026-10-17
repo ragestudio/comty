@@ -4,6 +4,7 @@ import SSEEvents from "@classes/SSEEvents"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
+import client from "comty.js/core/client"
 
 const LiveInfo = ({ radioId, initialData }) => {
 	const [data, setData] = React.useState(initialData ?? {})
@@ -16,7 +17,7 @@ const LiveInfo = ({ radioId, initialData }) => {
 		}
 
 		eventManager.current = new SSEEvents(
-			`${app.cores.api.client().origin}/music/radio/sse/radio:${radioId}`,
+			`${client.origin}/music/radio/sse/radio:${radioId}`,
 			{
 				update: (data) => {
 					if (typeof data.now_playing === "string") {

@@ -70,9 +70,11 @@ const App = ({ item, close }) => {
 
 				<Popover
 					content={<AppInfo item={item} />}
-					classNames={{
-						body: "apps-menu-item-info-extra",
-					}}
+					classNames={
+						/** @type {any} */ ({
+							body: "apps-menu-item-info-extra",
+						})
+					}
 				>
 					<Icons.Info />
 				</Popover>

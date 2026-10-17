@@ -2,7 +2,7 @@ import { Button } from "antd"
 
 import Skeleton from "@components/Skeleton"
 
-import GroupsModel from "@models/groups"
+import GroupsModel from "@endpoints/groups"
 import use from "comty.js/hooks/use"
 
 import "./index.less"

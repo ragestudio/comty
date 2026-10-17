@@ -6,7 +6,7 @@ import UserPreview from "@components/UserPreview"
 import { Icons, createIconRender } from "@components/Icons"
 
 import useRequest from "comty.js/hooks/useRequest"
-import SearchModel from "comty.js/models/search"
+import SearchModel from "comty.js/endpoints/search"
 
 import "./index.less"
 

@@ -1,4 +1,4 @@
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 
 export default {
 	like: async (ctx, track) => {

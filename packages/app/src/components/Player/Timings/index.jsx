@@ -12,8 +12,8 @@ const Timings = ({ track, currentTimingIndex }) => {
 	}
 
 	const [isTextOverflown, setIsTextOverflown] = React.useState(false)
-	const timingsContainerRef = React.useRef()
-	const currentTimingRef = React.useRef()
+	const timingsContainerRef = React.useRef(null)
+	const currentTimingRef = React.useRef(null)
 	const currentTiming = track.timings[currentTimingIndex]
 
 	React.useEffect(() => {

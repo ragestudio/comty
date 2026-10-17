@@ -6,7 +6,7 @@ import { motion } from "motion/react"
 
 import useWsEvents from "@hooks/useWsEvents"
 
-import PostModel from "@models/post"
+import PostModel from "@endpoints/post"
 
 import "./index.less"
 

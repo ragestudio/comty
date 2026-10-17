@@ -1,3 +1,4 @@
+import React from "react"
 import Slider from "@ui/Slider"
 
 import "./index.less"

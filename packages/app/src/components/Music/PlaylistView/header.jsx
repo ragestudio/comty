@@ -7,7 +7,7 @@ import Image from "@components/Image"
 import LikeButton from "@components/LikeButton"
 import seekToTimeLabel from "@utils/seekToTimeLabel"
 
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 
 import PlaylistTypeDecorators from "./decorators"
 

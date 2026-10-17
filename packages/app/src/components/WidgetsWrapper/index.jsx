@@ -146,6 +146,7 @@ const generateRemoteComponent = (props) => {
 
 				// check if static storagedStateKey exists on RenderComponent
 				if (RenderComponent.storagedStateKey) {
+					/** @type {any} */
 					const storagedStateEngine = new StoragedState()
 
 					const defaultValue = await storagedStateEngine.getState(
@@ -267,21 +268,14 @@ export default class WidgetsWrapper extends React.Component {
 					renderItem={(item, index) => {
 						const RenderItem = item.RenderItem
 						return (
-							<SortableItem id={item.id}>
+							<SortableItem
+								id={item.id}
+								index={index}
+							>
 								<RenderItem />
 							</SortableItem>
 						)
 					}}
-					useDragOverlay
-					activeDragActions={[
-						{
-							id: "settings",
-							icon: "Settings",
-							onClick: () => {
-								app.location.push("/settings?tab=widgets")
-							},
-						},
-					]}
 				/>
 			</div>
 		)

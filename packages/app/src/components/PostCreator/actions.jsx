@@ -1,3 +1,4 @@
+import React from "react"
 import { Select, Upload } from "antd"
 import Button from "@ui/Button"
 import { Icons } from "@components/Icons"
@@ -54,7 +55,7 @@ const PostCreatorActions = ({
 		}
 
 		if (postObj?.reply_to) {
-			return <Icons.ReplyOutlined />
+			return <Icons.Reply />
 		}
 
 		return <Icons.Send />
@@ -65,7 +66,7 @@ const PostCreatorActions = ({
 			<Upload
 				customRequest={(upload) => handleUploadMedia(upload.file)}
 				multiple
-				progress={false}
+				progress={/** @type {any} */ (false)}
 				fileList={[]}
 			>
 				<Button icon={<Icons.Upload />} />

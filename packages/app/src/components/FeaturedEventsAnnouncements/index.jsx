@@ -1,9 +1,10 @@
 import React from "react"
 
 import Announcement from "../FeaturedEventAnnouncement"
-import EventsModel from "@models/events"
+import EventsModel from "@endpoints/events"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const FeaturedEventsAnnouncements = React.memo((props) => {
 	const [
@@ -11,7 +12,7 @@ const FeaturedEventsAnnouncements = React.memo((props) => {
 		R_FeaturedEvents,
 		E_FeaturedEvents,
 		M_FeaturedEvents,
-	] = app.cores.api.useRequest(EventsModel.getFeatured)
+	] = useRequest(EventsModel.getFeatured)
 
 	if (!Array.isArray(R_FeaturedEvents)) {
 		return null

@@ -68,7 +68,7 @@ const GenericFile = ({ attachment }) => {
 				{metadata.size && (
 					<span>
 						<Icons.WeightTilde /> Size:
-						{hr.fromBytes(metadata.size)}
+						{hr.fromBytes(Number(metadata.size ?? 0), {})}
 					</span>
 				)}
 			</div>
@@ -88,7 +88,15 @@ const GenericFile = ({ attachment }) => {
 	)
 }
 
-const Attachment = React.memo((props) => {
+/**
+ * @typedef {object} AttachmentProps
+ * @property {any} attachment
+ * @property {any[]} attachments
+ * @property {number} index
+ */
+
+/** @param {AttachmentProps} props */
+const AttachmentComponent = (props) => {
 	const [loaded, setLoaded] = React.useState(false)
 	const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
 	const [mimeType, setMimeType] = React.useState(null)
@@ -187,7 +195,6 @@ const Attachment = React.memo((props) => {
 						<video
 							controls
 							src={url}
-							type={mimeType}
 						/>
 					)
 				}
@@ -196,7 +203,6 @@ const Attachment = React.memo((props) => {
 						<audio
 							controls
 							src={url}
-							type={mimeType}
 						/>
 					)
 				}
@@ -259,11 +265,13 @@ const Attachment = React.memo((props) => {
 			</div>
 		)
 	}
-})
+}
+
+const Attachment = React.memo(AttachmentComponent)
 
 Attachment.displayName = "Attachment"
 
-const AttachmentsGrid = ({ attachments, className, style }) => {
+const AttachmentsGrid = ({ attachments, className, style = {} }) => {
 	return (
 		<div
 			data-count={attachments.length}

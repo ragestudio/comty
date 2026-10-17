@@ -3,7 +3,7 @@ import { Form, Input, Button, Alert } from "antd"
 import classnames from "classnames"
 import { Icons } from "@components/Icons"
 
-import AuthModel from "@models/auth"
+import AuthModel from "@endpoints/auth"
 import config from "@config"
 
 import "./index.less"
@@ -15,8 +15,10 @@ const STEPS_ON_ERROR = {
 
 const STEPS_VALIDATIONS = {
 	username: async (username) => {
-		const check = await AuthModel.usernameValidation(username).catch(
-			() => ({ exists: false }),
+		const check = /** @type {any} */ (
+			await AuthModel.usernameValidation(username).catch(() => ({
+				exists: false,
+			}))
 		)
 
 		return check.exists
@@ -30,13 +32,15 @@ const PHASES_TO_STEPS = {
 
 const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 	const [loading, setLoading] = React.useState(false)
-	const [loginInputs, setLoginInputs] = React.useState({})
+	const [loginInputs, setLoginInputs] = React.useState(
+		/** @type {any} */ ({}),
+	)
 	const [error, setError] = React.useState(null)
 	const [phase, setPhase] = React.useState(0)
 
 	const [mfaRequired, setMfaRequired] = React.useState(null)
 	const [activation, setActivation] = React.useState(null)
-	const [forbidden, setForbidden] = React.useState(false)
+	const [forbidden, setForbidden] = React.useState(/** @type {any} */ (false))
 
 	const formRef = React.useRef(null)
 	const usernameInputRef = React.useRef(null)
@@ -99,12 +103,14 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 
 		try {
 			// AuthModel.login callback is called if mfa is required
-			const result = await AuthModel.login(payload, async (res) => {
-				if (res?.mfa_required) {
-					// State update is scheduled
-					setMfaRequired(res.mfa_required)
-				}
-			})
+			const result = /** @type {any} */ (
+				await AuthModel.login(payload, async (res) => {
+					if (res?.mfa_required) {
+						// State update is scheduled
+						setMfaRequired(res.mfa_required)
+					}
+				})
+			)
 
 			// If we get a result (token), it's a success
 			if (result && result.token) {
@@ -429,7 +435,9 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 							length={mfaRequired?.method === "totp" ? 6 : 4}
 							formatter={(str) => str.toUpperCase()}
 							onChange={(code) => onUpdateInput("mfa_code", code)}
-							onPressEnter={nextStep}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") nextStep()
+							}}
 						/>
 					</Form.Item>
 				</Form>

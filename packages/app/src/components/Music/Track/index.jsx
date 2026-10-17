@@ -21,7 +21,19 @@ function secondsToIsoTime(seconds) {
 		.padStart(2, "0")}`
 }
 
-const Track = React.memo((props) => {
+/**
+ * @typedef {object} TrackProps
+ * @property {any} track
+ * @property {boolean} [isCurrent]
+ * @property {boolean} [isPlaying]
+ * @property {number} [order]
+ * @property {(track: any) => void} [onPlay]
+ * @property {(track: any) => void} [onClickPlayBtn]
+ * @property {(track: any) => void} [onClick]
+ */
+
+/** @param {TrackProps} props */
+const TrackComponent = (props) => {
 	const playlist_ctx = React.useContext(PlaylistContext)
 
 	const [moreMenuOpened, setMoreMenuOpened] = React.useState(false)
@@ -32,6 +44,7 @@ const Track = React.memo((props) => {
 	}, [props.track])
 
 	const menuItems = React.useMemo(() => {
+		/** @type {any[]} */
 		const items = [...MenuItemsBase]
 
 		if (props.track.liked) {
@@ -206,7 +219,9 @@ const Track = React.memo((props) => {
 			</div>
 		</div>
 	)
-})
+}
+
+const Track = React.memo(TrackComponent)
 
 Track.displayName = "Track"
 

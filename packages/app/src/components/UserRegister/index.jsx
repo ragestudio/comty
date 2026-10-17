@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import AuthModel from "@models/auth"
+import AuthModel from "@endpoints/auth"
 
 import { Icons } from "@components/Icons"
 

@@ -5,7 +5,9 @@ import "./index.less"
 const ANIM_DURATION = 3000
 
 const SkeletonRunRender = (props) => {
-	const sfx = React.useRef(new Audio(new URL("./sfx.mp3", import.meta.url)))
+	const sfx = React.useRef(
+		new Audio(new URL("./sfx.mp3", import.meta.url).href),
+	)
 	const body = React.useRef(null)
 	const eyes = React.useRef(null)
 
@@ -45,7 +47,7 @@ const SkeletonRunRender = (props) => {
 				className="skeleton-run__body"
 				ref={body}
 			>
-				<img src={new URL("./body.gif", import.meta.url)} />
+				<img src={new URL("./body.gif", import.meta.url).href} />
 			</div>
 		</>
 	)

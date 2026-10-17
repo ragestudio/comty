@@ -1,6 +1,6 @@
 import React from "react"
 import { Skeleton, Result } from "antd"
-import RadioModel from "@models/radio"
+import RadioModel from "@endpoints/radio"
 import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 

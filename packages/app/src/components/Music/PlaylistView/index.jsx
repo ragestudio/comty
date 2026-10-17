@@ -7,7 +7,7 @@ import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
 import checkUserIdIsSelf from "@utils/checkUserIdIsSelf"
 
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 
 import PlaylistHeader from "./header"
 import TrackList from "./list"

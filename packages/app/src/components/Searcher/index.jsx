@@ -11,7 +11,7 @@ import UserPreview from "@components/UserPreview"
 import MusicTrack from "@components/Music/Track"
 import Playlist from "@components/Music/Playlist"
 
-import SearchModel from "@models/search"
+import SearchModel from "@endpoints/search"
 
 import "./index.less"
 

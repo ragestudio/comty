@@ -2,12 +2,13 @@ import React from "react"
 
 import { Skeleton } from "antd"
 import { Icons } from "@components/Icons"
-import PostsModel from "@models/post"
+import PostsModel from "@endpoints/post"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const TrendingsCard = (props) => {
-	const [L_Trendings, R_Trendings, E_Trendings] = app.cores.api.useRequest(
+	const [L_Trendings, R_Trendings, E_Trendings] = useRequest(
 		PostsModel.getTrendings,
 	)
 

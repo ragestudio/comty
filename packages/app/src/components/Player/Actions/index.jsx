@@ -9,7 +9,7 @@ import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 import "./index.less"
 
 const ExtraActions = (props) => {
-	const [track, setTrack] = React.useState({})
+	const [track, setTrack] = React.useState(/** @type {any} */ ({}))
 
 	const onPlayerStateChange = React.useCallback((state) => {
 		const track = app.cores.player.track()

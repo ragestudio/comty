@@ -4,6 +4,7 @@ import * as antd from "antd"
 import { createIconRender } from "@components/Icons"
 
 import "./index.less"
+import measurePing from "comty.js/utils/measurePing"
 
 const latencyToColor = (latency, type) => {
 	switch (type) {
@@ -54,13 +55,11 @@ const LatencyIndicator = (props) => {
 			return setLatencyMs(props.calculateLatency())
 		}
 
-		app.cores.api
-			.measurePing({
-				select: [type],
-			})
-			.then((result) => {
-				setLatencyMs(result)
-			})
+		measurePing({
+			select: [type],
+		}).then((result) => {
+			setLatencyMs(result)
+		})
 	}
 
 	React.useEffect(() => {

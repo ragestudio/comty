@@ -5,6 +5,7 @@ import Image from "@components/Image"
 import excuses from "@config/excuses"
 import randomErrorImages from "@config/randomErrorImages"
 
+/** @type {React.CSSProperties} */
 const detailsPreStyle = {
 	overflow: "hidden",
 	wordBreak: "break-word",
@@ -74,7 +75,6 @@ const PageErrorBoundary = (props) => {
 			}}
 		>
 			<Flex
-				horizontal
 				gap={20}
 				align="center"
 			>
@@ -153,10 +153,7 @@ const PageErrorBoundary = (props) => {
 				</details>
 			</Flex>
 
-			<Flex
-				horizontal
-				gap={10}
-			>
+			<Flex gap={10}>
 				<Button onClick={handleRetry}>🔄 Retry</Button>
 				<Button onClick={handleReload}>🔄 Reload Page</Button>
 				<Button onClick={copyErrorDetails}>

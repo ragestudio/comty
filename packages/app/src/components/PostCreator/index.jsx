@@ -3,8 +3,8 @@ import classNames from "classnames"
 import { Mentions } from "antd"
 import { DateTime } from "luxon"
 
-import PostModel from "@models/post"
-//import SearchModel from "@models/search"
+import PostModel from "@endpoints/post"
+//import SearchModel from "@endpoints/search"
 
 import Poll from "@components/Poll"
 import PostCreatorActions from "./actions"
@@ -33,10 +33,15 @@ const DEFAULT_POST_POLICY = {
 // TODO: Cleanup methods
 // TODO: Support for user mentions load
 // TODO: Use a context instead of passing props down (no bueno)
-const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
+const PostCreator = ({
+	edit_post = null,
+	reply_to = null,
+	close = null,
+	onPost = null,
+}) => {
 	const [loading, setLoading] = React.useState(false)
 	const [pendingFiles, setPendingFiles] = React.useState([])
-	const [postObj, setPostObj] = React.useState({})
+	const [postObj, setPostObj] = React.useState(/** @type {any} */ ({}))
 
 	const [poll, setPoll] = React.useState(null)
 	const pollRef = React.useRef(null)
@@ -309,7 +314,7 @@ const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
 
 		setLoading(true)
 
-		PostModel.post({ post_id: edit_post })
+		PostModel.get(edit_post)
 			.then((post) => {
 				setPostObj(post)
 

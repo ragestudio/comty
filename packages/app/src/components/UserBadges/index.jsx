@@ -3,7 +3,7 @@ import { Tooltip } from "antd"
 import DOMPurify from "dompurify"
 import { createIconRender } from "@components/Icons"
 
-import BadgesModel from "@models/badges"
+import BadgesModel from "@endpoints/badges"
 import svgCss from "@utils/svgCss"
 
 import "./index.less"

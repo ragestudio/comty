@@ -1,5 +1,5 @@
 import React from "react"
-import UserModel from "@models/user"
+import UserModel from "@endpoints/user"
 
 const UserAvatar = ({ user_id }) => {
 	const [avatarUrl, setAvatarUrl] = React.useState(null)

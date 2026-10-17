@@ -8,7 +8,8 @@ import { AnimatePresence } from "motion/react"
 import PostCard from "@components/PostCard"
 import LoadMore from "@components/LoadMore"
 
-import PostModel from "@models/post"
+import PostModel from "@endpoints/post"
+import client from "comty.js/core/client"
 
 import "./index.less"
 
@@ -253,13 +254,12 @@ const PostsListsComponent = (props) => {
 			for (const [event, handler] of Object.entries(
 				timelineWsEvents.current,
 			)) {
-				app.cores.api.listenEvent(event, handler)
+				client.ws.get("main")?.on(event, handler)
 			}
 
-			app.cores.api.emitEvent(
-				"posts:subscribe",
-				props.customTopic ?? "realtime:feed",
-			)
+			client.ws
+				.get("main")
+				?.emit("posts:subscribe", props.customTopic ?? "realtime:feed")
 		}
 
 		return () => {
@@ -267,13 +267,15 @@ const PostsListsComponent = (props) => {
 				for (const [event, handler] of Object.entries(
 					timelineWsEvents.current,
 				)) {
-					app.cores.api.unlistenEvent(event, handler)
+					client.ws.get("main")?.off(event, handler)
 				}
 
-				app.cores.api.emitEvent(
-					"posts:unsubscribe",
-					props.customTopic ?? "realtime:feed",
-				)
+				client.ws
+					.get("main")
+					?.emit(
+						"posts:unsubscribe",
+						props.customTopic ?? "realtime:feed",
+					)
 			}
 		}
 	}, [])

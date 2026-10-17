@@ -4,7 +4,7 @@ import { Icons } from "@components/Icons"
 import LoadMore from "@components/LoadMore"
 import UserPreview from "@components/UserPreview"
 
-import FollowsModel from "@models/follows"
+import FollowsModel from "@endpoints/follows"
 
 import "./index.less"
 

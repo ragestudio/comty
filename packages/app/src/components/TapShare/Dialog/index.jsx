@@ -3,11 +3,12 @@ import * as antd from "antd"
 
 import { Icons } from "@components/Icons"
 //import { MobileUserCard } from "@components/UserCard"
-import NFCModel from "comty.js/models/nfc"
+import NFCModel from "comty.js/endpoints/nfc"
 
-import FollowsModel from "@models/follows"
+import FollowsModel from "@endpoints/follows"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const BehaviorTypeToAction = {
 	url: "Open an URL",
@@ -27,7 +28,7 @@ const handleAction = {
 }
 
 export default (props) => {
-	const [L_Tag, R_Tag, E_Tag] = app.cores.api.useRequest(
+	const [L_Tag, R_Tag, E_Tag] = useRequest(
 		NFCModel.getTagBySerial,
 		props.tag.serialNumber,
 	)

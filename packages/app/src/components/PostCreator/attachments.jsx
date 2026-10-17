@@ -42,6 +42,9 @@ const ItemMediaPreview = ({ attachment }) => {
 	}
 }
 
+/**
+ * @param {{ file?: any, attachment?: any, uploading?: boolean, onClickDelete?: any }} props
+ */
 const Item = ({ file, attachment, uploading, onClickDelete }) => {
 	return (
 		<div className="post-creator__attachments__item">

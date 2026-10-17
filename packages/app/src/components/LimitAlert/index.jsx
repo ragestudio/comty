@@ -1,11 +1,13 @@
 import { Alert } from "antd"
+import useRequest from "comty.js/hooks/useRequest"
+import client from "comty.js/core/client"
 
 const FetchLimit = async (limit_id) => {
     if (!limit_id) {
         throw new Error("limit_id is required")
     }
 
-    const response = await app.cores.api.customRequest({
+    const response = await client.instance({
         method: "GET",
         url: `/global_server_limits/${limit_id}`,
     })
@@ -21,7 +23,7 @@ const Limit = (props) => {
         return null
     }
 
-    const [L_Limit, R_Limit, E_Limit, M_Limit] = app.cores.api.useRequest(FetchLimit, limit_id)
+    const [L_Limit, R_Limit, E_Limit, M_Limit] = useRequest(FetchLimit, limit_id)
 
     if (E_Limit) {
         console.log(`Failed to fetch limit ${limit_id} >`, E_Limit)
