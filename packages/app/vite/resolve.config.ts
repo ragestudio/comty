@@ -26,7 +26,7 @@ export default {
 
 		"@comty/spaces-lib": path.join(packagesPath, "spaces-lib/src"),
 		"@ragestudio/vessel": path.join(modulesPath, "vessel/src"),
-		"@models": path.join(modulesPath, "comty.js/src/models"),
+		"@endpoints": path.join(modulesPath, "comty.js/src/endpoints"),
 		"comty.js": path.join(modulesPath, "comty.js/src"),
 	},
 	mainFields: ["browser", "module", "main"],
