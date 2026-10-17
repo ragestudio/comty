@@ -17,8 +17,8 @@
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"paths": {
-			"@/*": ["./src/*"],
-			"@config/*": ["./config/*"],
+			"@/*": ["./src/*", "../../packages/spaces-sdk/src/*"],
+			"@config/*": ["./config/*", "./config/*.json"],
 			"@config": ["./config/index.js"],
 
 			"@ui/*": ["./src/ui/*"],
@@ -31,13 +31,14 @@
 			"@layouts/*": ["./src/layouts/*"],
 			"@hooks/*": ["./src/hooks/*"],
 			"@classes/*": ["./src/classes/*"],
-			"@models/*": ["../../modules/comty.js/src/models/*"],
+			"@endpoints/*": ["../../modules/comty.js/src/endpoints/*"],
 
 			"comty.js/*": ["../../modules/comty.js/src/*"],
-			"vessel/*": ["../../modules/vessel/src/*"],
+			"@ragestudio/vessel": ["../../modules/vessel/src/index.ts"],
+			"@ragestudio/vessel/*": ["../../modules/vessel/src/*"],
 			"@comty/shared/*": ["../shared/*"],
 		},
 	},
-	"files": ["./src/global.d.ts", "./src/declarations.d.ts"],
+	"files": ["src/env.d.ts"],
 	"include": ["./src/**/*.ts", "./src/**/*.tsx"],
 }
