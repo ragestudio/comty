@@ -187,6 +187,9 @@ const Slider = ({
 	const renderMarks = () => {
 		if (!marks) return null
 
+		/** @type {any} */
+		const marksMap = marks
+
 		const markCount = max === min ? 1 : Math.floor((max - min) / step) + 1
 		const marksArray = []
 
@@ -202,11 +205,11 @@ const Slider = ({
 					className={`slider-mark ${isActive ? "active" : ""}`}
 					style={{ left: `${markPercentage}%` }}
 				>
-					{typeof marks === "object" && marks[markValue] && (
+					{marksMap[markValue] && (
 						<div
 							className={`slider-mark-label ${isActive ? "active" : ""}`}
 						>
-							{marks[markValue]}
+							{marksMap[markValue]}
 						</div>
 					)}
 				</div>,
