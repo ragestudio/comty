@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 					compileSdkVersion: 36,
 					targetSdkVersion: 36,
 					buildToolsVersion: "36.0.0",
-					buildArchs: ["arm64-v8a"],
+					buildArchs: ["arm64-v8a", "x86_64"],
 				},
 			},
 		],
@@ -97,6 +97,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 				microphonePermission: "Allow access to your microphone",
 			},
 		],
+		"./plugins/withMediaProjection",
 		[
 			"react-native-notify-kit",
 			{
