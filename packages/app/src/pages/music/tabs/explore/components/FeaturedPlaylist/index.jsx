@@ -2,7 +2,7 @@ import React from "react"
 
 import Image from "@components/Image"
 
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 
 const FeaturedPlaylist = (props) => {
     const [featuredPlaylist, setFeaturedPlaylist] = React.useState(false)

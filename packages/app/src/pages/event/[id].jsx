@@ -6,7 +6,7 @@ import { DateTime } from "luxon"
 
 import { Icons } from "@components/Icons"
 
-import EventsModel from "@models/events"
+import EventsModel from "@endpoints/events"
 import useCenteredContainer from "@hooks/useCenteredContainer"
 
 import createGoogleCalendarEvent from "@utils/createGoogleCalendarEvent"
@@ -14,6 +14,7 @@ import ContrastYIQ from "@utils/contrastYIQ"
 import ProcessString from "@utils/processString"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const LocationProcessRegexs = [
 	{
@@ -135,7 +136,7 @@ const EventHeader = ({ pageConfig, event, contrastColor }) => {
 const EventPage = (props) => {
 	useCenteredContainer(false)
 
-	const [L_Event, R_Event, E_Event, M_Event] = app.cores.api.useRequest(
+	const [L_Event, R_Event, E_Event, M_Event] = useRequest(
 		EventsModel.data,
 		props.params["id"],
 	)

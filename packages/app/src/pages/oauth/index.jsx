@@ -3,10 +3,11 @@ import Button from "@ui/Button"
 import { Image } from "@/components"
 import { Icons } from "@/components/Icons"
 
-import OAuth from "@models/oauth"
+import OAuth from "@endpoints/oauth"
 
 import "./index.less"
 import { Tag } from "antd"
+import client from "comty.js/core/client"
 
 const ScopesBlocks = {
 	openid: {
@@ -156,8 +157,8 @@ OAuthPage.loader = async () => {
 
 	const scope_list = query.get("scope")?.split(" ") ?? ["openid"]
 
-	const clientValidation = await app.cores.api
-		.customRequest({
+	const clientValidation = await client
+		.instance({
 			method: "GET",
 			url: `/oauth/apps/${client_id}`,
 		})

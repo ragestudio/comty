@@ -6,18 +6,19 @@ import { Icons } from "@components/Icons"
 import PostCard from "@components/PostCard"
 import PostsList from "@components/PostsList"
 
-import PostService from "@models/post"
+import PostService from "@endpoints/post"
 
 import useCenteredContainer from "@hooks/useCenteredContainer"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const PostPage = ({ params }) => {
 	const post_id = params.post_id
 
 	useCenteredContainer(true)
 
-	const [loading, result, error, repeat] = app.cores.api.useRequest(
+	const [loading, result, error, repeat] = useRequest(
 		PostService.getPost,
 		{
 			post_id,

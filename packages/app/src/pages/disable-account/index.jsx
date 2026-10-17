@@ -1,7 +1,7 @@
 import React from "react"
 import { Alert, Divider, Checkbox, Button } from "antd"
 
-import AuthModel from "@models/auth"
+import AuthModel from "@endpoints/auth"
 
 const DisableAccountPage = () => {
     const [confirm, setConfirm] = React.useState(false)

@@ -8,11 +8,19 @@ import binarySearchTime from "@utils/binarySearchTime"
 import "./index.less"
 
 // eslint-disable-next-line
-const LyricsText = React.forwardRef((props, forwardedRef) => {
+/**
+ * @typedef {object} LyricsTextProps
+ * @property {any} [lyrics]
+ * @property {boolean} [static]
+ */
+
+/** @type {React.ForwardRefRenderFunction<any, LyricsTextProps>} */
+const LyricsTextRender = (props, forwardedRef) => {
 	const [playerState] = usePlayerStateContext()
 
 	const { lyrics } = props
 
+	/** @type {any} */
 	const textRef = forwardedRef ?? React.useRef(null)
 	const currentTrackId = React.useRef(null)
 
@@ -268,6 +276,8 @@ const LyricsText = React.forwardRef((props, forwardedRef) => {
 			</AnimatePresence>
 		</div>
 	)
-})
+}
+
+const LyricsText = React.forwardRef(LyricsTextRender)
 
 export default LyricsText

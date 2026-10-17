@@ -1,24 +1,24 @@
-import React from "react";
-import * as antd from "antd";
-import { Translation } from "react-i18next";
+import React from "react"
+import * as antd from "antd"
+import { Translation } from "react-i18next"
 
-import DonativeSelector from "@components/DonativeSelector";
-import PageTransition from "@components/PageTransition";
-import { createIconRender } from "@components/Icons";
+import DonativeSelector from "@components/DonativeSelector"
+import PageTransition from "@components/PageTransition"
+import { createIconRender } from "@components/Icons"
 
-import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey";
-import useUserRemoteConfig from "@hooks/useUserRemoteConfig";
+import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
+import useUserRemoteConfig from "@hooks/useUserRemoteConfig"
 
-import { composedSettingsByGroups as settings } from "@/settings";
+import { composedSettingsByGroups as settings } from "@/settings"
 
-import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators";
+import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators"
 
-import SettingTab from "./components/SettingTab";
-import { SettingsGroup } from "./types";
+import SettingTab from "./components/SettingTab"
+import { SettingsGroup } from "./types"
 
-import "./index.less";
+import "./index.less"
 
-declare const app: any;
+declare const app: any
 
 const extraMenuItems = [
 	{
@@ -45,16 +45,16 @@ const extraMenuItems = [
 		),
 		danger: true,
 	},
-];
+]
 
 const menuEvents: Record<string, () => void> = {
 	donate: () => {
-		app.layout.modal.open("donate", DonativeSelector);
+		app.layout.modal.open("donate", DonativeSelector)
 	},
 	logout: () => {
-		app.auth.logout();
+		app.auth.logout()
 	},
-};
+}
 
 const generateMenuItems = () => {
 	const items = (settings as SettingsGroup[]).map((entry, index) => {
@@ -70,13 +70,13 @@ const generateMenuItems = () => {
 				),
 				danger: (item as any).danger,
 				disabled: (item as any).disabled,
-			};
-		});
+			}
+		})
 
 		if (index !== settings.length - 1) {
 			children.push({
 				type: "divider",
-			});
+			})
 		}
 
 		return {
@@ -87,82 +87,93 @@ const generateMenuItems = () => {
 				entry.group === "bottom" ? null : (
 					<>
 						{(menuGroupsDecorators as any)[entry.group]?.icon &&
-							createIconRender((menuGroupsDecorators as any)[entry.group]?.icon ?? "Settings")}
+							createIconRender(
+								(menuGroupsDecorators as any)[entry.group]?.icon ?? "Settings",
+							)}
 						<Translation>
-							{(t) => t((menuGroupsDecorators as any)[entry.group]?.label ?? entry.group)}
+							{(t) =>
+								t(
+									(menuGroupsDecorators as any)[entry.group]?.label ??
+										entry.group,
+								)
+							}
 						</Translation>
 					</>
 				),
-		};
-	});
+		}
+	})
 
-	const keys = Object.keys(menuGroupsDecorators);
+	const keys = Object.keys(menuGroupsDecorators)
 
 	// sort by keys
 	items.sort((a, b) => {
-		const aIndex = keys.indexOf(a.key);
-		const bIndex = keys.indexOf(b.key);
+		const aIndex = keys.indexOf(a.key)
+		const bIndex = keys.indexOf(b.key)
 
-		return aIndex - bIndex;
-	});
+		return aIndex - bIndex
+	})
 
-	return items;
-};
+	return items
+}
 
 const SettingsPage = () => {
-	const [config, setConfig, loading] = useUserRemoteConfig() as [any, (config: any) => void, boolean];
+	const [config, setConfig, loading] = useUserRemoteConfig() as [
+		any,
+		(config: any) => void,
+		boolean,
+	]
 	const [activeKey, setActiveKey] = useUrlQueryActiveKey({
 		defaultKey: "general",
 		queryKey: "tab",
-	}) as [string, (key: string) => void];
+	}) as [string, (key: string) => void]
 
 	const onChangeTab = (event: any) => {
 		if (typeof menuEvents[event.key] === "function") {
-			return menuEvents[event.key]();
+			return menuEvents[event.key]()
 		}
 
-		app.cores.sfx.play("settings.navigation");
+		app.cores.sfx.play("settings.navigation")
 
-		setActiveKey(event.key);
-	};
+		setActiveKey(event.key)
+	}
 
 	const menuItems = React.useMemo(() => {
-		const items = generateMenuItems();
+		const items = generateMenuItems()
 
 		extraMenuItems.forEach((item) => {
-			(items[settings.length - 1].children as any[]).push(item);
-		});
+			;(items[settings.length - 1].children as any[]).push(item)
+		})
 
-		return items;
-	}, []);
+		return items
+	}, [])
 
 	function handleOnUpdate(key: string, value: any) {
 		setConfig({
 			...config,
 			[key]: value,
-		});
+		})
 	}
 
 	React.useEffect(() => {
 		if (app.layout.tools_bar) {
-			app.layout.tools_bar.toggleVisibility(false);
+			app.layout.tools_bar.toggleVisibility(false)
 		}
-	}, [activeKey]);
+	}, [activeKey])
 
 	React.useEffect(() => {
 		return () => {
 			if (app.layout.tools_bar) {
-				app.layout.tools_bar.toggleVisibility(true);
+				app.layout.tools_bar.toggleVisibility(true)
 			}
-		};
-	}, []);
+		}
+	}, [])
 
 	return (
 		<div className="settings_wrapper">
 			<div className="settings_menu">
 				<antd.Menu
 					mode="vertical"
-					items={menuItems}
+					items={menuItems as any}
 					onClick={onChangeTab}
 					selectedKeys={[activeKey]}
 				/>
@@ -184,13 +195,13 @@ const SettingsPage = () => {
 				)}
 			</PageTransition>
 		</div>
-	);
-};
+	)
+}
 
-(SettingsPage as any).options = {
+;(SettingsPage as any).options = {
 	layout: {
 		maxHeight: true,
 	},
-};
+}
 
-export default SettingsPage;
+export default SettingsPage

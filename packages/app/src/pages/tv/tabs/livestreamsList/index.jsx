@@ -5,12 +5,13 @@ import { Icons } from "@components/Icons"
 
 import UserPreview from "@components/UserPreview"
 
-import SpectrumModel from "@models/spectrum"
+import SpectrumModel from "@endpoints/spectrum"
 
 import useCenteredContainer from "@hooks/useCenteredContainer"
 
 import "./index.less"
 import classNames from "classnames"
+import useRequest from "comty.js/hooks/useRequest"
 
 const fac = new FastAverageColor()
 
@@ -25,8 +26,8 @@ const LivestreamItemSkeleton = (props) => {
 const LivestreamItem = (props) => {
 	const { livestream = {} } = props
 
-	const itemRef = React.useRef()
-	const imageRef = React.useRef()
+	const itemRef = React.useRef(null)
+	const imageRef = React.useRef(null)
 
 	const handleOnClick = async () => {
 		if (typeof props.onClick !== "function") {
@@ -104,7 +105,7 @@ const LivestreamItem = (props) => {
 }
 
 export default (props) => {
-	const [L_Streams, R_Streams, E_Streams] = app.cores.api.useRequest(
+	const [L_Streams, R_Streams, E_Streams] = useRequest(
 		SpectrumModel.list,
 	)
 

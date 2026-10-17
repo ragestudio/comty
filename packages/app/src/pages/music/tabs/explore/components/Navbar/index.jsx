@@ -1,7 +1,7 @@
 import React from "react"
 
 import Searcher from "@components/Searcher"
-import SearchModel from "@models/search"
+import SearchModel from "@endpoints/search"
 
 const MusicNavbar = React.forwardRef((props, ref) => {
 	return (

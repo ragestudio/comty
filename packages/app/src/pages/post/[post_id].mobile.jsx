@@ -3,7 +3,7 @@ import * as antd from "antd"
 
 import PostCard from "@components/PostCard"
 
-import Post from "@models/post"
+import Post from "@endpoints/post"
 
 import "./index.less"
 

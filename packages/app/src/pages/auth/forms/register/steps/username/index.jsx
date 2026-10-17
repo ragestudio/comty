@@ -3,7 +3,7 @@ import * as antd from "antd"
 
 import { Icons } from "@components/Icons"
 
-import AuthModel from "@models/auth"
+import AuthModel from "@endpoints/auth"
 
 export const UsernameStepComponent = (props) => {
 	const [loading, setLoading] = React.useState(false)

@@ -27,7 +27,7 @@ function isOverflown(element) {
 const PlayerController = (props) => {
 	const [playerState] = usePlayerStateContext()
 
-	const titleRef = React.useRef()
+	const titleRef = React.useRef(null)
 
 	const [hide, onMouseEnter, onMouseLeave, isHovered] = useHideOnMouseStop({
 		delay: 3000,

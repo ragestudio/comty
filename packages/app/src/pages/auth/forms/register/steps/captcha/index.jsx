@@ -1,5 +1,6 @@
 import React from "react"
 import Turnstile from "react-turnstile"
+import client from "comty.js/core/client"
 
 const CaptchaStepComponent = (props) => {
 	const [sitekey, setSitekey] = React.useState(
@@ -7,7 +8,7 @@ const CaptchaStepComponent = (props) => {
 	)
 
 	React.useEffect(() => {
-		fetch(app.cores.api.client().origin + "/main/turnstile").then((res) => {
+		fetch(client.origin + "/main/turnstile").then((res) => {
 			if (res.ok) {
 				res.json().then((data) => {
 					setSitekey(data.siteKey)

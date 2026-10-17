@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import Streaming from "@models/spectrum"
+import Streaming from "@endpoints/spectrum"
 
 import "./index.less"
 

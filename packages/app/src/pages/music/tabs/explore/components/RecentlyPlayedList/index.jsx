@@ -3,9 +3,10 @@ import * as antd from "antd"
 
 import Image from "@components/Image"
 import { Icons } from "@components/Icons"
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const RecentlyPlayedItem = (props) => {
 	const { track } = props
@@ -31,7 +32,7 @@ const RecentlyPlayedItem = (props) => {
 }
 
 const RecentlyPlayedList = (props) => {
-	const [L_Tracks, R_Tracks, E_Tracks, M_Tracks] = app.cores.api.useRequest(
+	const [L_Tracks, R_Tracks, E_Tracks, M_Tracks] = useRequest(
 		MusicModel.getRecentyPlayed,
 		{
 			limit: 6,

@@ -8,9 +8,10 @@ import SelectableText from "@components/SelectableText"
 
 import useGetMainOrigin from "@hooks/useGetMainOrigin"
 import textToDownload from "@utils/textToDownload"
-import ServerKeysModel from "@models/api"
+import ServerKeysModel from "@endpoints/api"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const ServerKeyCreator = (props) => {
 	const [name, setName] = React.useState("")
@@ -241,7 +242,7 @@ const ServerKeyItem = (props) => {
 const ApiTab = () => {
 	const mainOrigin = useGetMainOrigin()
 
-	const [L_Keys, R_Keys, E_Keys, F_Keys] = app.cores.api.useRequest(
+	const [L_Keys, R_Keys, E_Keys, F_Keys] = useRequest(
 		ServerKeysModel.getMyServerKeys,
 	)
 

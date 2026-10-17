@@ -1,14 +1,15 @@
 import React from "react"
 import { Skeleton, Result } from "antd"
 
-import RadioModel from "@models/radio"
+import RadioModel from "@endpoints/radio"
 
 import Radio from "@components/Music/Radio"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const RadioTab = () => {
-	const [L_Radios, R_Radios, E_Radios, M_Radios] = app.cores.api.useRequest(
+	const [L_Radios, R_Radios, E_Radios, M_Radios] = useRequest(
 		RadioModel.getRadioList,
 	)
 

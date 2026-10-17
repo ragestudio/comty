@@ -4,9 +4,9 @@ import classnames from "classnames"
 import Searcher from "@components/Searcher"
 import { Icons } from "@components/Icons"
 
-import SearchModel from "@models/search"
-import MusicModel from "@models/music"
-import RadioModel from "@models/radio"
+import SearchModel from "@endpoints/search"
+import MusicModel from "@endpoints/music"
+import RadioModel from "@endpoints/radio"
 
 import Navbar from "./components/Navbar"
 import RecentlyPlayedList from "./components/RecentlyPlayedList"

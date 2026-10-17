@@ -2,7 +2,7 @@ import React from "react"
 import { Input } from "antd"
 
 import FormWithSteps from "@components/FormWithSteps"
-import AuthModel from "@models/auth"
+import AuthModel from "@endpoints/auth"
 
 const Steps = [
 	{

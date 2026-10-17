@@ -6,12 +6,13 @@ import Skeleton from "@components/Skeleton"
 import ProfileCreator from "./components/ProfileCreator"
 import ProfileItem from "./components/ProfileItem"
 
-import Streaming from "@models/spectrum"
+import Streaming from "@endpoints/spectrum"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const TVStudioPage = (props) => {
-	const [loading, list, error, repeat] = app.cores.api.useRequest(
+	const [loading, list, error, repeat] = useRequest(
 		Streaming.getOwnProfiles,
 	)
 

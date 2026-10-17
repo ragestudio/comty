@@ -2,7 +2,7 @@ import React from "react"
 
 import { PostsList } from "@components"
 
-import Feed from "@models/feed"
+import Feed from "@endpoints/feed"
 
 import "./index.less"
 

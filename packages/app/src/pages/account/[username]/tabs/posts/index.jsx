@@ -6,7 +6,7 @@ import { useNavigation } from "react-router"
 import PostsList from "@components/PostsList"
 import { Icons } from "@components/Icons"
 
-import PostModel from "@models/post"
+import PostModel from "@endpoints/post"
 
 const emptyListRender = () => {
 	return (

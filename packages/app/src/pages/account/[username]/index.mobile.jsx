@@ -8,8 +8,8 @@ import Skeleton from "@components/Skeleton"
 import { PagePanelWithNavMenu } from "@components/PagePanels"
 //import { MobileUserCard } from "@components/UserCard"
 
-import UserModel from "@models/user"
-import FollowsModel from "@models/follows"
+import UserModel from "@endpoints/user"
+import FollowsModel from "@endpoints/follows"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"

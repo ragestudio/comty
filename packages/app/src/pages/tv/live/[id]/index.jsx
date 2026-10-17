@@ -7,7 +7,7 @@ import classnames from "classnames"
 import UserPreview from "@components/UserPreview"
 import { Icons } from "@components/Icons"
 
-import SpectrumModel from "@models/spectrum"
+import SpectrumModel from "@endpoints/spectrum"
 
 import * as Decoders from "./decoders"
 

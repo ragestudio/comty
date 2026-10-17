@@ -12,7 +12,7 @@ import GenerateMenuItems from "@utils/generateMenuItems"
 import useTitle from "@hooks/useTitle"
 import useUserData from "@hooks/useUserData"
 
-import FollowsModel from "@models/follows"
+import FollowsModel from "@endpoints/follows"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
@@ -32,7 +32,7 @@ const Account = ({ params }) => {
 
 	const [tabActiveKey, setTabActiveKey] = React.useState("posts")
 	const [coverExpanded, setCoverExpanded] = React.useState(false)
-	const contentRef = React.useRef()
+	const contentRef = React.useRef(null)
 
 	const onClickFollow = React.useCallback(async () => {
 		if (!user) {

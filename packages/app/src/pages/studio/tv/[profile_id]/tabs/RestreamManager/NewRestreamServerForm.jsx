@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "@components/Icons"
-import Streaming from "@models/spectrum"
+import Streaming from "@endpoints/spectrum"
 
 const NewRestreamServerForm = ({ profile, loading, handleProfileUpdate }) => {
 	const [newRestreamHost, setNewRestreamHost] = React.useState("")

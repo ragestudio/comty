@@ -23,7 +23,7 @@ const ServiceIndicator = (props) => {
 		case "tidal": {
 			return (
 				<div className="service_indicator">
-					<Icons.SiTidal /> Playing from Tidal
+					<Icons.Music /> Playing from Tidal
 				</div>
 			)
 		}

@@ -1,7 +1,7 @@
 import React from "react"
 
 import PostList from "@components/PostsList"
-import PostModel from "@models/post"
+import PostModel from "@endpoints/post"
 
 import "./index.less"
 

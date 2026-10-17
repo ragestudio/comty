@@ -4,7 +4,7 @@ import classnames from "classnames"
 
 import { Icons, createIconRender } from "@components/Icons"
 
-import AuthModel from "@models/auth"
+import AuthModel from "@endpoints/auth"
 
 import "./index.less"
 

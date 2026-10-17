@@ -3,7 +3,8 @@ import * as antd from "antd"
 
 import Playlist from "@components/Music/Playlist"
 
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
+import useRequest from "comty.js/hooks/useRequest"
 
 const loadLimit = 50
 
@@ -14,7 +15,7 @@ const MyLibraryReleases = () => {
 	const [initialLoading, setInitialLoading] = React.useState(true)
 
 	const [L_Library, R_Library, E_Library, M_Library] =
-		app.cores.api.useRequest(MusicModel.getMyLibrary, {
+		useRequest(MusicModel.getMyLibrary, {
 			offset: offset,
 			limit: loadLimit,
 			kind: "releases",

@@ -22,8 +22,8 @@ const EnhancedLyricsPage = () => {
 
 	const [playerState] = usePlayerStateContext()
 
-	const videoRef = React.useRef()
-	const textRef = React.useRef()
+	const videoRef = React.useRef(null)
+	const textRef = React.useRef(null)
 
 	const { toggleFullScreen } = useFullScreen({
 		onExit: () => app.location.back(),

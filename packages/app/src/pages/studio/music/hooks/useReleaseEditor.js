@@ -1,5 +1,5 @@
 import React from "react"
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 import TrackManifest from "@cores/player/classes/TrackManifest"
 
 const DEFAULT_RELEASE_STATE = {

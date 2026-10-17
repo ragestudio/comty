@@ -11,6 +11,7 @@ import Track from "@components/Music/Track"
 import Radio from "@components/Music/Radio"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const FeedItems = (props) => {
 	const maxItems = props.itemsPerPage ?? 10
@@ -18,7 +19,7 @@ const FeedItems = (props) => {
 	const [page, setPage] = React.useState(0)
 	const [ended, setEnded] = React.useState(false)
 
-	const [loading, result, error, makeRequest] = app.cores.api.useRequest(
+	const [loading, result, error, makeRequest] = useRequest(
 		props.fetchMethod,
 		{
 			limit: maxItems,

@@ -3,9 +3,10 @@ import * as antd from "antd"
 
 import PlaylistView from "@components/Music/PlaylistView"
 
-import MusicService from "@models/music"
+import MusicService from "@endpoints/music"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const ListView = (props) => {
 	const { id } = props.params
@@ -14,7 +15,7 @@ const ListView = (props) => {
 	const type = query.get("type")
 	const service = query.get("service")
 
-	const [loading, result, error] = app.cores.api.useRequest(
+	const [loading, result, error] = useRequest(
 		MusicService.getReleaseData,
 		id,
 		{

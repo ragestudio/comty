@@ -3,12 +3,13 @@ import * as antd from "antd"
 
 import ReleaseItem from "../ReleaseItem"
 
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
 
 const MyReleasesList = () => {
-	const [loading, response, error] = app.cores.api.useRequest(MusicModel.getMyReleases, {
+	const [loading, response, error] = useRequest(MusicModel.getMyReleases, {
 		offset: 0,
 		limit: 100,
 	})

@@ -9,7 +9,7 @@ import isURL from "@utils/isURL"
 import { Icons } from "@components/Icons"
 
 import use from "comty.js/hooks/use"
-import OAuthModel from "@models/oauth"
+import OAuthModel from "@endpoints/oauth"
 
 import "./index.less"
 

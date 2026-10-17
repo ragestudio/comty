@@ -14,7 +14,7 @@ import Skeleton from "@components/Skeleton"
 import VideoEditor from "./tabs/videos"
 import LyricsEditor from "./tabs/lyrics"
 import InlinePlayer from "./components/InlinePlayer"
-import MusicModel from "@models/music"
+import MusicModel from "@endpoints/music"
 
 import "./index.less"
 

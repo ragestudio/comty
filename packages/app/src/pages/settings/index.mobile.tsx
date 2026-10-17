@@ -1,30 +1,38 @@
-import React from "react";
-import * as antd from "antd";
-import { Translation } from "react-i18next";
+import React from "react"
+import * as antd from "antd"
+import { Translation } from "react-i18next"
 
-import { Icons, createIconRender } from "@components/Icons";
+import { Icons, createIconRender } from "@components/Icons"
 
-import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey";
-import UseTopBar from "@hooks/useTopBar";
+import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
+import UseTopBar from "@hooks/useTopBar"
 
-import { composedSettingsByGroups as settingsGroups, composedTabs } from "@/settings";
+import {
+	composedSettingsByGroups as settingsGroups,
+	composedTabs,
+} from "@/settings"
 
-import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators";
+import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators"
 
-import SettingTab from "./components/SettingTab";
-import { SettingsGroup, SettingTabModule } from "./types";
+import SettingTab from "./components/SettingTab"
+import { SettingsGroup, SettingTabModule } from "./types"
 
-import "./index.mobile.less";
+import "./index.mobile.less"
 
-declare const app: any;
+declare const app: any
 
 interface SettingsHeaderProps {
-	activeKey: string | null;
-	back?: () => void;
+	activeKey: string | null
+	back?: () => void
 }
 
-const SettingsHeader: React.FC<SettingsHeaderProps> = ({ activeKey, back = () => {} }) => {
-	const currentTab = activeKey ? ((composedTabs as any)[activeKey] as SettingTabModule) : null;
+const SettingsHeader: React.FC<SettingsHeaderProps> = ({
+	activeKey,
+	back = () => {},
+}) => {
+	const currentTab = activeKey
+		? ((composedTabs as any)[activeKey] as SettingTabModule)
+		: null
 
 	return (
 		<UseTopBar
@@ -37,50 +45,52 @@ const SettingsHeader: React.FC<SettingsHeaderProps> = ({ activeKey, back = () =>
 					icon={<Icons.ChevronLeft />}
 					onClick={back}
 					size="large"
-					type="ghost"
+					ghost
 				/>
 			)}
 
 			<h1>
 				{createIconRender(currentTab?.icon ?? "Settings")}
-				<Translation>{(t) => t(currentTab?.label ?? activeKey ?? "Settings")}</Translation>
+				<Translation>
+					{(t) => t(currentTab?.label ?? activeKey ?? "Settings")}
+				</Translation>
 			</h1>
 		</UseTopBar>
-	);
-};
+	)
+}
 
 const SettingsMobilePage = () => {
-	let lastKey: string | null = null;
+	let lastKey: string | null = null
 
 	const [activeKey, setActiveKey] = useUrlQueryActiveKey({
 		queryKey: "tab",
 		defaultKey: null,
-	}) as [string | null, (key: string | null) => void];
+	}) as [string | null, (key: string | null) => void]
 
 	const changeTab = (key: string | null) => {
-		lastKey = key;
-		setActiveKey(key);
+		lastKey = key
+		setActiveKey(key)
 
 		// scroll to top
 		app.layout.scrollTo({
 			top: 0,
-		});
-	};
+		})
+	}
 
 	const handleTabChange = (key: string | null) => {
 		// star page transition using new chrome transition api
 		if ((document as any).startViewTransition) {
 			return (document as any).startViewTransition(() => {
-				changeTab(key);
-			});
+				changeTab(key)
+			})
 		}
 
-		return changeTab(key);
-	};
+		return changeTab(key)
+	}
 
 	const goBack = () => {
-		handleTabChange(lastKey);
-	};
+		handleTabChange(lastKey)
+	}
 
 	return (
 		<div className="__mobile__settings">
@@ -92,7 +102,7 @@ const SettingsMobilePage = () => {
 			<div className="settings_list">
 				{!activeKey &&
 					(settingsGroups as SettingsGroup[]).map((entry, index) => {
-						const groupDecorator = (menuGroupsDecorators as any)[entry.group];
+						const groupDecorator = (menuGroupsDecorators as any)[entry.group]
 
 						return (
 							<div
@@ -100,7 +110,9 @@ const SettingsMobilePage = () => {
 								key={index}
 							>
 								<span>
-									<Translation>{(t) => t(groupDecorator?.label ?? entry.group)}</Translation>
+									<Translation>
+										{(t) => t(groupDecorator?.label ?? entry.group)}
+									</Translation>
 								</span>
 
 								<div className="settings_list_group_items">
@@ -112,16 +124,18 @@ const SettingsMobilePage = () => {
 												id={settingsModule.id}
 												icon={createIconRender(settingsModule.icon)}
 												onClick={() => {
-													handleTabChange(settingsModule.id);
+													handleTabChange(settingsModule.id)
 												}}
 											>
-												<Translation>{(t) => t(settingsModule.label)}</Translation>
+												<Translation>
+													{(t) => t(settingsModule.label)}
+												</Translation>
 											</antd.Button>
-										);
+										)
 									})}
 								</div>
 							</div>
-						);
+						)
 					})}
 
 				{activeKey && (
@@ -131,7 +145,7 @@ const SettingsMobilePage = () => {
 				)}
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export default SettingsMobilePage;
+export default SettingsMobilePage

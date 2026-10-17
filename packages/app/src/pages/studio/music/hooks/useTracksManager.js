@@ -1,5 +1,5 @@
 import React from "react"
-import FilesModel from "@models/files"
+import FilesModel from "@endpoints/files"
 import TrackManifest from "@cores/player/classes/TrackManifest"
 
 const useTracksManager = (initialTracks = [], updater) => {
