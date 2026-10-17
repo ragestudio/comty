@@ -13,7 +13,7 @@ import {
 } from "@ragestudio/react-native-webrtc"
 registerRtcGlobals()
 
-import session from "@comty/api-lib/session"
+import session from "comty.js/session"
 
 import { app } from "@/engine/app"
 import { adapter } from "@comty/spaces-sdk"
