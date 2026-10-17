@@ -6,8 +6,8 @@ import throttle from "@utils/throttle"
 const useDraggableElement = (containerRef = null, bounds = true) => {
 	const [pressed, setPressed] = React.useState(false)
 
-	const ref = React.useRef()
-	const unsubscribe = React.useRef()
+	const ref = React.useRef(null)
+	const unsubscribe = React.useRef(null)
 	const position = React.useRef({ x: 0, y: 0 })
 	const dragStart = React.useRef({ x: 0, y: 0 })
 	const initialPosition = React.useRef({ x: 0, y: 0 })

@@ -1,14 +1,11 @@
 import React from "react"
+import client from "comty.js/core/client"
 
 const useGetMainOrigin = () => {
 	const [mainOrigin, setMainOrigin] = React.useState(null)
 
 	React.useEffect(() => {
-		const instance = app.cores.api.client()
-
-		if (instance) {
-			setMainOrigin(instance.origin)
-		}
+		setMainOrigin(client.origin)
 
 		return () => {
 			setMainOrigin(null)

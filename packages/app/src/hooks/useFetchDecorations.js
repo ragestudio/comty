@@ -1,4 +1,4 @@
-import UsersModel from "@models/user"
+import UsersModel from "@endpoints/user"
 import use from "comty.js/hooks/use"
 
 const useFetchUserDecorations = (user_id) => {

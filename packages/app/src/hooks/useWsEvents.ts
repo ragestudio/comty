@@ -1,15 +1,32 @@
 import React from "react"
 
-export default (wsEvents, { socketName }: { socketName?: string } = {}) => {
+import client from "comty.js/core/client"
+
+export default (
+	wsEvents: any,
+	{ socketName }: { socketName?: string } = {},
+) => {
 	function registerEvents() {
-		for (const [eventName, eventHandler] of Object.entries(wsEvents)) {
-			app.cores.api.listenEvent(eventName, eventHandler, socketName)
+		const socket = client.ws.get(socketName ?? "main")
+
+		if (!socket) return
+
+		for (const [eventName, eventHandler] of Object.entries(
+			wsEvents as Record<string, any>,
+		)) {
+			socket.on(eventName, eventHandler)
 		}
 	}
 
 	function unregisterEvents() {
-		for (const [eventName, eventHandler] of Object.entries(wsEvents)) {
-			app.cores.api.unlistenEvent(eventName, eventHandler, socketName)
+		const socket = client.ws.get(socketName ?? "main")
+
+		if (!socket) return
+
+		for (const [eventName, eventHandler] of Object.entries(
+			wsEvents as Record<string, any>,
+		)) {
+			socket.off(eventName, eventHandler)
 		}
 	}
 

@@ -11,8 +11,8 @@ export default (
     } = {}
 ) => {
     const [longPressTriggered, setLongPressTriggered] = useState(false)
-    const timeout = useRef()
-    const target = useRef()
+    const timeout = useRef(null)
+    const target = useRef(null)
 
     const start = useCallback(
         event => {

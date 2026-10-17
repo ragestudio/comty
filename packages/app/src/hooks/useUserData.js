@@ -1,7 +1,7 @@
 import React from "react"
 
-import UserModel from "@models/user"
-import FollowsModel from "@models/follows"
+import UserModel from "@endpoints/user"
+import FollowsModel from "@endpoints/follows"
 
 const useUserData = (username) => {
 	if (!username) {

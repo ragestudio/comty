@@ -32,6 +32,9 @@ export const handleLayout = (layout) => {
 	app.layout.set(layout)
 }
 
+/**
+ * @param {boolean | { mobile?: boolean, desktop?: boolean } | null} option
+ */
 export const handleCenteredContent = (option) => {
 	if (!app.layout || !app.layout?.toggleCenteredContent) {
 		return null
@@ -39,19 +42,6 @@ export const handleCenteredContent = (option) => {
 
 	if (typeof option !== "boolean") {
 		return app.layout.toggleCenteredContent(false)
-	}
-
-	if (typeof option === "object") {
-		if (
-			typeof option.mobile === "boolean" ||
-			typeof option.desktop === "boolean"
-		) {
-			if (app.isMobile) {
-				return app.layout.toggleCenteredContent(option.mobile)
-			}
-
-			return app.layout.toggleCenteredContent(option.desktop)
-		}
 	}
 
 	return app.layout.toggleCenteredContent(option)

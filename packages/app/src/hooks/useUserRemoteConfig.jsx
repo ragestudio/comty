@@ -1,7 +1,7 @@
 import React from "react"
 import lodash from "lodash"
 
-import UserModel from "@models/user"
+import UserModel from "@endpoints/user"
 
 const pushToServer = lodash.debounce(async (update) => {
     return await UserModel.updateConfig(update)
