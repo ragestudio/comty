@@ -1,7 +1,7 @@
 import { Tag } from "antd"
 
 import UserPreview from "@components/UserPreview"
-import GroupsModel from "@models/groups"
+import GroupsModel from "@endpoints/groups"
 
 export default {
 	"group-member": async (items, parent, element, control) => {

@@ -1,5 +1,5 @@
 import copyToClipboard from "@utils/copyToClipboard"
-import ChatsModel from "@models/chats"
+import ChatsModel from "@endpoints/chats"
 
 export default {
 	"chat-line": (items, parent, element, control) => {
