@@ -1,6 +1,6 @@
 import React from "react"
 
-import Layouts from "@layouts"
+import Layouts from "@/layouts"
 import ErrorCatcher from "@components/ErrorCatcher"
 
 export const LAYOUT_DEFAULT_CONTEXT = {
@@ -15,7 +15,7 @@ export default class Layout extends React.PureComponent {
 		renderError: null,
 	}
 
-	interfacesProperties = React.createRef({})
+	interfacesProperties = React.createRef()
 
 	events = {
 		"layout.forceUpdate": () => {
