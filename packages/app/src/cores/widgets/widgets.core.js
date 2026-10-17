@@ -1,12 +1,13 @@
 import Core from "@ragestudio/vessel/core"
 import store from "store"
+import client from "comty.js/core/client"
 
 export default class WidgetsCore extends Core {
 	static namespace = "widgets"
 	static storeKey = "widgets"
 
 	static get apiInstance() {
-		return app.cores.api.client().baseRequest
+		return client.instance
 	}
 
 	public = {
