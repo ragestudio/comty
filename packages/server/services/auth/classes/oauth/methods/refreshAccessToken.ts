@@ -1,4 +1,4 @@
-import AuthToken from "@shared-classes/AuthToken"
+import { AuthToken, SIGN_OPTIONS } from "@shared-classes/AuthToken"
 import { parseExpiresIn } from "../utils"
 
 export default async function (refreshToken: string) {
@@ -21,13 +21,13 @@ export default async function (refreshToken: string) {
 			scope: data.scope,
 			type: "oauth_access",
 		},
-		"authStrategy",
+		"auth",
 	)
 
 	return {
 		access_token: newAccessToken,
 		token_type: "Bearer",
-		expires_in: parseExpiresIn(AuthToken.authStrategy.expiresIn),
+		expires_in: parseExpiresIn(String(SIGN_OPTIONS.auth.expiresIn)),
 		scope: data.scope,
 	}
 }

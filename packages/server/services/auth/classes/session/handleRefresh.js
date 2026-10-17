@@ -39,12 +39,12 @@ export default async function (req) {
 			...validation.data,
 			session_id: session._id,
 		},
-		"authStrategy",
+		"auth",
 	)
 
 	const newRefreshToken = await AuthToken.signToken(
 		validation.data,
-		"refreshStrategy",
+		"refresh",
 	)
 
 	// update session token

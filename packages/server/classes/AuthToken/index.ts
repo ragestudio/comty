@@ -1,35 +1,43 @@
+import type { DecodedAuthToken } from "@comty/shared/types/session"
+import type { User as I_User } from "@comty/shared/types/user"
+import type { Algorithm, PrivateKey, SignOptions } from "jsonwebtoken"
+import type { InferDoc } from "@ragestudio/scylla-odm/types"
+
 import jwt from "jsonwebtoken"
 import User from "@db_models/user"
 import AuthSessionModel from "@db/auth_session"
 
-export default class AuthToken {
-	static get authStrategy() {
-		return {
-			expiresIn: process.env.JWT_EXPIRES_IN ?? "1h",
-			algorithm: process.env.JWT_ALGORITHM ?? "ES256",
-			header: {
-				kid: process.env.JWT_KID,
-			},
-		}
-	}
+export const JWT_ALGORITHM = (process.env.JWT_ALGORITHM ??
+	"ES256") as unknown as Algorithm
+export const SIGN_OPTIONS: Record<string, SignOptions> = {
+	auth: {
+		// @ts-ignore
+		expiresIn: String(process.env.JWT_EXPIRES_IN ?? "1h"),
+		algorithm: JWT_ALGORITHM,
+		header: {
+			kid: String(process.env.JWT_KID),
+			alg: JWT_ALGORITHM,
+		},
+	},
+	refresh: {
+		// @ts-ignore
+		expiresIn: String(process.env.JWT_REFRESH_EXPIRES_IN ?? "30d"),
+		algorithm: JWT_ALGORITHM,
+		header: {
+			kid: String(process.env.JWT_KID),
+			alg: JWT_ALGORITHM,
+		},
+	},
+}
 
-	static get refreshStrategy() {
-		return {
-			expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "30d",
-			algorithm: process.env.JWT_ALGORITHM ?? "ES256",
-			header: {
-				kid: process.env.JWT_KID,
-			},
-		}
-	}
-
+export class AuthToken {
 	static async basicDecode(token) {
 		return new Promise((resolve, reject) => {
 			jwt.verify(
 				token,
 				process.env.ECDSA_PRIVATE_KEY,
 				{
-					algorithms: [process.env.JWT_ALGORITHM ?? "ES256"],
+					algorithms: [JWT_ALGORITHM],
 				},
 				async (err, decoded) => {
 					if (err) {
@@ -54,18 +62,33 @@ export default class AuthToken {
 		).toString("utf-8")
 	}
 
-	static async signToken(payload, strategy = "authStrategy") {
-		strategy = AuthToken[strategy]
-
-		return jwt.sign(payload, process.env.ECDSA_PRIVATE_KEY, strategy)
+	static async signToken(
+		payload: DecodedAuthToken,
+		strategy: keyof typeof SIGN_OPTIONS = "auth",
+	): Promise<string> {
+		console.log("signing token with alg:", JWT_ALGORITHM)
+		return jwt.sign(
+			payload,
+			process.env.ECDSA_PRIVATE_KEY as PrivateKey,
+			SIGN_OPTIONS[strategy],
+		)
 	}
 
-	static async validate(token) {
-		let result = {
+	static async validate(token: string) {
+		let result: {
+			expired: boolean
+			valid: boolean
+			error: null | string
+			data: null | DecodedAuthToken
+			session: null | InferDoc<typeof AuthSessionModel>
+			user: null | (() => Promise<I_User>)
+		} = {
 			expired: false,
 			valid: true,
 			error: null,
 			data: null,
+			session: null,
+			user: null,
 		}
 
 		if (typeof token === "undefined") {
@@ -120,28 +143,32 @@ export default class AuthToken {
 		return result
 	}
 
-	static async jwtVerify(token) {
+	static async jwtVerify(
+		token: string,
+	): Promise<{ error?: any; data: DecodedAuthToken }> {
 		return await new Promise((resolve) => {
 			jwt.verify(
 				token,
 				process.env.ECDSA_PRIVATE_KEY,
 				{
-					algorithms: [process.env.JWT_ALGORITHM ?? "ES256"],
+					algorithms: [JWT_ALGORITHM],
 				},
 				(err, decoded) => {
 					if (err) {
 						return resolve({
 							error: err,
-							data: decoded,
+							data: decoded as DecodedAuthToken,
 						})
 					}
 
 					return resolve({
 						error: err,
-						data: decoded,
+						data: decoded as DecodedAuthToken,
 					})
 				},
 			)
 		})
 	}
 }
+
+export default AuthToken

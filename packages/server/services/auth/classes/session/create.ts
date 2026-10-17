@@ -1,4 +1,4 @@
-import AuthToken from "@shared-classes/AuthToken"
+import { AuthToken, SIGN_OPTIONS } from "@shared-classes/AuthToken"
 
 import SessionModel from "@db/auth_session"
 import UserSessionModel from "@db/user_sessions"
@@ -26,7 +26,7 @@ export default async function (payload) {
 			...payload,
 			session_id: session_id,
 		},
-		"authStrategy",
+		"auth",
 	)
 
 	const signedRefreshToken = await AuthToken.signToken(
@@ -34,7 +34,7 @@ export default async function (payload) {
 			...payload,
 			session_id: session_id,
 		},
-		"refreshStrategy",
+		"auth",
 	)
 
 	// set the token on the session
@@ -58,6 +58,6 @@ export default async function (payload) {
 		data: session,
 		authToken: signedAuthToken,
 		refreshToken: signedRefreshToken,
-		expiresIn: AuthToken.authStrategy.expiresIn,
+		expiresIn: SIGN_OPTIONS.auth.expiresIn,
 	}
 }

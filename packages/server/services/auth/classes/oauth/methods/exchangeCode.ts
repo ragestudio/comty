@@ -3,7 +3,7 @@ import crypto from "node:crypto"
 import User from "@db_models/user"
 import OauthCode from "@db_models/oauth_code"
 
-import AuthToken from "@shared-classes/AuthToken"
+import { AuthToken, SIGN_OPTIONS } from "@shared-classes/AuthToken"
 import { parseExpiresIn, buildClaims } from "../utils"
 
 export default async function (params: {
@@ -71,7 +71,7 @@ export default async function (params: {
 			scope: stored.scope,
 			type: "oauth_access",
 		},
-		"authStrategy",
+		"auth",
 	)
 
 	const refreshToken = await AuthToken.signToken(
@@ -81,13 +81,13 @@ export default async function (params: {
 			scope: stored.scope,
 			type: "oauth_refresh",
 		},
-		"refreshStrategy",
+		"refresh",
 	)
 
 	const result: Record<string, any> = {
 		access_token: accessToken,
 		token_type: "Bearer",
-		expires_in: parseExpiresIn(AuthToken.authStrategy.expiresIn),
+		expires_in: parseExpiresIn(String(SIGN_OPTIONS.auth.expiresIn)),
 		refresh_token: refreshToken,
 		scope: stored.scope,
 	}
