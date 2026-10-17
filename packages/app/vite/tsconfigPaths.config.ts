@@ -8,7 +8,10 @@ const tsconfigCache = new Map<string, { dir: string; config: any } | null>()
 
 const parseTsconfig = (file: string) => {
 	try {
-		return JSON.parse(stripJsonComments(fs.readFileSync(file, "utf8")))
+		const raw = stripJsonComments(fs.readFileSync(file, "utf8"))
+		const cleaned = raw.replace(/,(\s*[}\]])/g, "$1")
+
+		return JSON.parse(cleaned)
 	} catch {
 		return null
 	}
