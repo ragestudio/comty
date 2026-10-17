@@ -4,14 +4,14 @@ import type {
 } from "@comty/shared/types/multipart"
 import type { UploadTask } from "./task"
 
-import request from "comty.js/request"
+import client from "comty.js/core/client"
 
 export async function initializeUpload(this: UploadTask) {
 	this.chunksNumber = Math.ceil(this.file.size / this.chunkSizeInBytes)
 
 	this.pendingChunks = Array.from({ length: this.chunksNumber }, (_, i) => i)
 
-	const response = await request({
+	const response = await client.instance({
 		method: "GET",
 		url: "/upload/parts/url",
 		headers: {
@@ -41,7 +41,7 @@ export async function initializeUpload(this: UploadTask) {
 
 export async function completeUpload(this: UploadTask) {
 	try {
-		const response = await request({
+		const response = await client.instance({
 			method: "POST",
 			url: "/upload/parts/complete",
 			headers: {

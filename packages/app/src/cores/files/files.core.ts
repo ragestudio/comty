@@ -8,7 +8,7 @@ import hashFileHandler from "./handlers/hashFile"
 
 export class FilesCore extends Core {
 	static namespace = "files"
-	static dependencies = ["api", "settings", "notifications", "tasksQueue"]
+	static dependencies = ["settings", "notifications", "tasksQueue"]
 
 	xxhashInstance: XXHashAPI
 	tasks = new UploadTasksManager(this)

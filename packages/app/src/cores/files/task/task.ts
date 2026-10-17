@@ -8,6 +8,8 @@ import { uploadChunk } from "./chunk"
 import { initializeUpload, completeUpload } from "./operations"
 import { handleChunkError } from "./error"
 
+import client from "comty.js/core/client"
+
 export interface CompletedPart {
 	PartNumber: number
 	ETag: string
@@ -100,7 +102,7 @@ export class UploadTask extends EventEmitter implements UploadTaskInternals {
 	}
 
 	get websocket() {
-		return globalThis.__comty_shared_state?.ws?.sockets?.get("main") ?? null
+		return client.ws.get("main") ?? null
 	}
 
 	get chunkSizeInBytes() {
