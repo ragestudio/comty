@@ -1,3 +1,4 @@
+import client from "comty.js/core/client"
 export default class SyncRoom {
 	constructor(player) {
 		this.player = player
@@ -182,6 +183,6 @@ export default class SyncRoom {
 	}
 
 	createSocket = async () => {
-		this.socket = app.cores.api.socket()
+		this.socket = client.ws.get("main")
 	}
 }
