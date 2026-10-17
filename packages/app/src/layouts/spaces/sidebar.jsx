@@ -12,7 +12,7 @@ import GenerateMenuItems from "@utils/generateMenuItems"
 
 import TopMenuItems from "@config/sidebar/TopItems"
 
-import { useNavigation } from "@comty/spaces-lib"
+import { useNavigation } from "@/stores/spaces/navigation"
 import config from "@config"
 
 import "./sidebar.less"
@@ -20,7 +20,7 @@ import "./sidebar.less"
 const SpacesSidebar = () => {
 	const [defaultItemsVisible, setDefaultItemsVisible] = React.useState(false)
 	const [compact, setCompact] = React.useState(false)
-	const autoHideDefaultItemsTimeout = React.useRef()
+	const autoHideDefaultItemsTimeout = React.useRef(null)
 
 	const { type, room } = useNavigation()
 
@@ -223,7 +223,9 @@ const SpacesSidebarBottomItems = () => {
 			</div>
 
 			<div className={classNames("group-list__item-other", "bg-accent")}>
-				{AccountButton && React.cloneElement(AccountButton.label, {})}
+				{AccountButton &&
+					React.isValidElement(AccountButton.label) &&
+					React.cloneElement(AccountButton.label, {})}
 			</div>
 		</div>
 	)

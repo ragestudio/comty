@@ -11,6 +11,7 @@ import NotificationsButton from "@components/NotificationsButton"
 
 import "./index.less"
 
+/** @type {any[]} */
 const ActionMenuItems = [
 	{
 		key: "profile",

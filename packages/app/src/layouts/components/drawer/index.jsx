@@ -16,7 +16,7 @@ import Drawer from "./component"
 import "./index.less"
 
 // Context for drawer management
-const DrawerContext = createContext()
+const DrawerContext = createContext(null)
 
 // Hook to use drawer context
 export const useDrawer = () => {

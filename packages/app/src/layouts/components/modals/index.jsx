@@ -7,6 +7,10 @@ import useLayoutInterface from "@hooks/useLayoutInterface"
 function ConfirmModal(props) {
 	const [loading, setLoading] = React.useState(false)
 
+	/**
+	 * @param {object} [options]
+	 * @param {boolean} [options.confirm]
+	 */
 	async function close({ confirm } = {}) {
 		props.close()
 
@@ -76,6 +80,18 @@ export default () => {
 		})
 	}
 
+	/**
+	 * @param {string} id
+	 * @param {any} render
+	 * @param {object} [options]
+	 * @param {boolean} [options.framed]
+	 * @param {boolean} [options.confirmOnOutsideClick]
+	 * @param {any} [options.confirmOnClickTitle]
+	 * @param {any} [options.confirmOnClickContent]
+	 * @param {any} [options.onClose]
+	 * @param {string} [options.className]
+	 * @param {any} [options.props]
+	 */
 	function open(
 		id,
 		render,

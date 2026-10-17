@@ -85,7 +85,7 @@ export class BottomBar extends React.Component {
 			if (!isTourFinished) {
 				this.toggleTour(true)
 
-				localStorage.setItem("mobile_tour", true)
+				localStorage.setItem("mobile_tour", "true")
 			}
 		}, 500)
 	}
@@ -244,7 +244,7 @@ export class BottomBar extends React.Component {
 				{this.state.tourOpen && (
 					<antd.Tour
 						open
-						steps={this.getTourSteps()}
+						steps={/** @type {any} */ (this.getTourSteps())}
 						onClose={() => this.setState({ tourOpen: false })}
 					/>
 				)}

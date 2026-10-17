@@ -12,137 +12,144 @@ import { motion } from "motion/react"
 
 import DrawerHeader from "./header"
 
-const Drawer = React.memo(
-	forwardRef(({ id, children, options = {}, controller }, ref) => {
-		const [header, setHeader] = useState(options.header)
+/**
+ * @typedef {object} DrawerProps
+ * @property {string} id
+ * @property {any} children
+ * @property {any} [options]
+ * @property {any} controller
+ */
 
-		const {
-			position = "left",
-			style = {},
-			props: componentProps = {},
-			onDone,
-			onFail,
-		} = options
+/** @type {React.ForwardRefRenderFunction<any, DrawerProps>} */
+const DrawerRender = ({ id, children, options = {}, controller }, ref) => {
+	const [header, setHeader] = useState(options.header)
 
-		const setExtraActions = useCallback((actions) => {
-			setHeader((prev) => ({ ...prev, actions: actions }))
-		}, [])
+	const {
+		position = "left",
+		style = {},
+		props: componentProps = {},
+		onDone,
+		onFail,
+	} = options
 
-		const setDrawerHeader = useCallback((header) => {
-			setHeader(header)
-		}, [])
+	const setExtraActions = useCallback((actions) => {
+		setHeader((prev) => ({ ...prev, actions: actions }))
+	}, [])
 
-		const handleClose = useCallback(async () => {
-			if (typeof options.onClose === "function") {
-				options.onClose()
+	const setDrawerHeader = useCallback((header) => {
+		setHeader(header)
+	}, [])
+
+	const handleClose = useCallback(async () => {
+		if (typeof options.onClose === "function") {
+			options.onClose()
+		}
+
+		setTimeout(() => {
+			controller.close(id, { transition: 150 })
+		}, 150)
+	}, [id, controller, options.onClose])
+
+	const handleDone = useCallback(
+		(...context) => {
+			if (typeof onDone === "function") {
+				onDone(context)
 			}
+		},
+		[onDone],
+	)
 
-			setTimeout(() => {
-				controller.close(id, { transition: 150 })
-			}, 150)
-		}, [id, controller, options.onClose])
+	const handleFail = useCallback(
+		(...context) => {
+			if (typeof onFail === "function") {
+				onFail(context)
+			}
+		},
+		[onFail],
+	)
 
-		const handleDone = useCallback(
-			(...context) => {
-				if (typeof onDone === "function") {
-					onDone(context)
-				}
+	const animationVariants = useMemo(() => {
+		const slideDirection = position === "right" ? 100 : -100
+
+		return {
+			initial: {
+				x: slideDirection,
+				opacity: 0,
 			},
-			[onDone],
-		)
-
-		const handleFail = useCallback(
-			(...context) => {
-				if (typeof onFail === "function") {
-					onFail(context)
-				}
+			animate: {
+				x: 0,
+				opacity: 1,
 			},
-			[onFail],
-		)
+			exit: {
+				x: slideDirection,
+				opacity: 0,
+			},
+		}
+	}, [position])
 
-		const animationVariants = useMemo(() => {
-			const slideDirection = position === "right" ? 100 : -100
+	const enhancedComponentProps = useMemo(
+		() => ({
+			...componentProps,
+			setHeader,
+			close: handleClose,
+			handleDone,
+			handleFail,
+		}),
+		[componentProps, handleClose, handleDone, handleFail],
+	)
 
-			return {
-				initial: {
-					x: slideDirection,
-					opacity: 0,
-				},
-				animate: {
-					x: 0,
-					opacity: 1,
-				},
-				exit: {
-					x: slideDirection,
-					opacity: 0,
-				},
-			}
-		}, [position])
+	useImperativeHandle(
+		ref,
+		() => ({
+			close: handleClose,
+			handleDone,
+			handleFail,
+			options,
+			id,
+		}),
+		[handleClose, handleDone, handleFail, options, id],
+	)
 
-		const enhancedComponentProps = useMemo(
-			() => ({
-				...componentProps,
-				setHeader,
-				close: handleClose,
-				handleDone,
-				handleFail,
-			}),
-			[componentProps, handleClose, handleDone, handleFail],
-		)
+	useEffect(() => {
+		if (!controller) {
+			throw new Error(`Cannot mount a drawer without a controller`)
+		}
 
-		useImperativeHandle(
-			ref,
-			() => ({
-				close: handleClose,
-				handleDone,
-				handleFail,
-				options,
-				id,
-			}),
-			[handleClose, handleDone, handleFail, options, id],
-		)
+		if (!children) {
+			throw new Error(`Empty component`)
+		}
+	}, [controller, children])
 
-		useEffect(() => {
-			if (!controller) {
-				throw new Error(`Cannot mount a drawer without a controller`)
-			}
+	return (
+		<motion.div
+			ref={ref}
+			key={id}
+			id={id}
+			className={classnames("drawer", `drawer-${position}`)}
+			style={style}
+			{...animationVariants}
+			transition={{
+				type: "spring",
+				stiffness: 100,
+				damping: 20,
+			}}
+		>
+			{header && (
+				<DrawerHeader
+					{...header}
+					onClose={handleClose}
+				/>
+			)}
 
-			if (!children) {
-				throw new Error(`Empty component`)
-			}
-		}, [controller, children])
+			<div className="drawer-content">
+				{React.createElement(children, enhancedComponentProps)}
+			</div>
+		</motion.div>
+	)
+}
 
-		return (
-			<motion.div
-				ref={ref}
-				key={id}
-				id={id}
-				className={classnames("drawer", `drawer-${position}`)}
-				style={style}
-				{...animationVariants}
-				transition={{
-					type: "spring",
-					stiffness: 100,
-					damping: 20,
-				}}
-			>
-				{header && <DrawerHeader {...header} onClose={handleClose} />}
-
-				<div className="drawer-content">
-					{React.createElement(children, enhancedComponentProps)}
-				</div>
-			</motion.div>
-		)
-	}),
-)
+const Drawer = React.memo(React.forwardRef(DrawerRender))
 
 Drawer.displayName = "Drawer"
-
-Drawer.propTypes = {
-	id: PropTypes.string.isRequired,
-	children: PropTypes.elementType.isRequired,
-	options: PropTypes.object,
-	controller: PropTypes.object.isRequired,
-}
 
 export default Drawer

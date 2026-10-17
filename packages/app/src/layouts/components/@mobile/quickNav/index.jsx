@@ -38,8 +38,10 @@ export const QuickNavMenu = ({ visible }) => {
 						className={classnames("quick-nav_item", {
 							["disabled"]: item.disabled,
 						})}
-						quicknav-item={item.id}
-						disabled={item.disabled}
+						{...{
+							"quicknav-item": item.id,
+							disabled: item.disabled,
+						}}
 					>
 						{createIconRender(item.icon)}
 						<h1>{item.label}</h1>

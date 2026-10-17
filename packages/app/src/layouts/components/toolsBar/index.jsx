@@ -10,6 +10,9 @@ import WidgetsWrapper from "@components/WidgetsWrapper"
 
 import "./index.less"
 
+/**
+ * @param {{ renders?: { top?: any[], bottom?: any[] } }} props
+ */
 const ToolsBar = ({ renders = {} }) => {
 	const isPresent = useIsPresent()
 

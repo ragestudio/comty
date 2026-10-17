@@ -33,7 +33,7 @@ const DesktopLayout = (props) => {
 				id="app_layout"
 				className="app_layout"
 			>
-				<Sidebar user={props.user} />
+				<Sidebar />
 
 				<Layout.Content
 					id="content_layout"

@@ -14,13 +14,14 @@ import TopBar from "@layouts/components/@mobile/topBar"
 import BottomBar from "@layouts/components/@mobile/bottomBar"
 import OptInDialog from "../../components/Spaces/OptInDialog"
 
-import { NavigationStore } from "@comty/spaces-lib"
+import { NavigationStore } from "@/stores/spaces/navigation"
 
 import "./index.less"
+import client from "comty.js/core/client"
 
 const useIsConnectedToMainSocket = () => {
 	const [connected, setConnected] = React.useState(
-		app.cores.api.socket()?.state.connected,
+		client.ws.get("main")?.state.connected,
 	)
 
 	const events = {

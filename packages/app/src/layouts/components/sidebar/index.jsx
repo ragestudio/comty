@@ -147,9 +147,7 @@ const Sidebar = () => {
 	const toggleVisibility = React.useCallback(
 		(to) => {
 			if (to === false) {
-				toggleExpanded(false, {
-					instant: true,
-				})
+				toggleExpanded(false)
 			}
 
 			setVisible((prev) => to ?? !prev)
@@ -294,7 +292,6 @@ const Sidebar = () => {
 					onHandleClick={handleClick}
 					onDropdownOpenChange={onDropdownOpenChange}
 					onClickDropdownItem={onClickDropdownItem}
-					dropdownOpen={dropdownOpen}
 				/>
 			)}
 		</AnimatePresence>
