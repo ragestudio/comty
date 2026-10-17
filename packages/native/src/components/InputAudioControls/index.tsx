@@ -62,18 +62,6 @@ const InputAudioControls = () => {
 
 	return (
 		<YStack gap={6}>
-			{audioState.speakerAvailable && (
-				<OptionRow
-					label="Earpiece"
-					icon={<EarIcon />}
-				>
-					<Switch
-						onValueChange={handleToggleSpeaker}
-						value={!audioState.speakerEnabled}
-					/>
-				</OptionRow>
-			)}
-
 			{outputDevices.length > 0 && (
 				<OptionRow
 					label="Output device"
