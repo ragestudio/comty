@@ -14,7 +14,6 @@
 		"eslint": "eslint"
 	},
 	"dependencies": {
-		"@comty/api-lib": "workspace:*",
 		"@comty/shared": "workspace:*",
 		"@comty/spaces-sdk": "workspace:*",
 		"@dnd-kit/abstract": "^0.5.0",
