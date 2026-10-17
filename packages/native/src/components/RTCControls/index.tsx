@@ -14,6 +14,7 @@ import { useTheme, XStack, YStack } from "tamagui"
 import TextureBg from "@/ui/TextureBg"
 import AppButton from "@/ui/Button"
 import InputAudioControls from "@/components/InputAudioControls"
+import CameraControls from "@/components/CameraControls"
 import SectionTitle from "./SectionTitle"
 
 import {
@@ -31,6 +32,10 @@ import {
 import { useRTCStore, rtcService } from "@comty/spaces-sdk/rtc"
 import { audioManager } from "@comty/spaces-sdk/rtc/audio"
 import { useRTCControls } from "./store"
+import {
+	CAMERA_RESOLUTIONS,
+	useCameraControls,
+} from "@/components/CameraControls/store"
 
 import { CONTAINER_ANIM_SPRING, DRAG_THRESHOLD } from "./constants"
 
@@ -39,6 +44,7 @@ export const RTCControls = () => {
 	const theme = useTheme()
 	const insets = useSafeAreaInsets()
 	const controls = useRTCControls()
+	const cameraControls = useCameraControls()
 
 	const expanded = controls.expanded
 	const progress = useSharedValue(expanded ? 1 : 0)
@@ -107,7 +113,18 @@ export const RTCControls = () => {
 		}
 	}
 
-	const handleToggleCamera = () => {}
+	const handleToggleCamera = () => {
+		if (rtc.cameraProducerId) {
+			rtcService.self.destroyMedia("cam").catch(console.error)
+		} else {
+			rtcService.self
+				.createMedia<"cam">("cam", {
+					facingMode: cameraControls.facing,
+					resolution: CAMERA_RESOLUTIONS[cameraControls.quality],
+				})
+				.catch(console.error)
+		}
+	}
 
 	return (
 		<Animated.View style={containerStyle}>
@@ -225,6 +242,11 @@ export const RTCControls = () => {
 							<YStack gap={6}>
 								<SectionTitle>Audio</SectionTitle>
 								<InputAudioControls />
+							</YStack>
+
+							<YStack gap={6}>
+								<SectionTitle>Camera</SectionTitle>
+								<CameraControls />
 							</YStack>
 						</YStack>
 					</Animated.View>
