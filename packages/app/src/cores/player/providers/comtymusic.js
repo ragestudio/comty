@@ -1,4 +1,4 @@
-import MusicModel from "comty.js/models/music"
+import MusicModel from "comty.js/endpoints/music"
 
 export default class ComtyMusicServiceInterface {
 	static id = "default"
