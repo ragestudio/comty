@@ -7,7 +7,7 @@ import { UAParser } from "ua-parser-js"
 
 import { Icons } from "@components/Icons"
 
-import SessionModel from "@models/session"
+import authSession from "comty.js/core/session"
 
 import ChromeIcon from "./icons/chrome"
 import MobileIcon from "./icons/mobile"
@@ -55,8 +55,8 @@ const SessionItem = (props) => {
 	}
 
 	const isCurrentSession = React.useMemo(() => {
-		const currentToken = SessionModel.getDecodedToken()
-		return session._id === currentToken.session_id
+		const currentToken = authSession.decodedToken
+		return session._id === currentToken?.session_id
 	}, [session])
 
 	const ua = React.useMemo(() => {

@@ -1,5 +1,5 @@
 import loadable from "@loadable/component"
-import UserModel from "@models/user"
+import UserModel from "@endpoints/user"
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
 

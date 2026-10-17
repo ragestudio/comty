@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import NFCModel from "comty.js/models/nfc"
+import NFCModel from "comty.js/endpoints/nfc"
 
 import { Icons } from "@components/Icons"
 

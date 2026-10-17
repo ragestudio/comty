@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 
 import AnimationPlayer from "@components/AnimationPlayer"
-import NFCModel from "comty.js/models/nfc"
+import NFCModel from "comty.js/endpoints/nfc"
 
 import NFC_ERRORS from "../../errors"
 import StepsContext from "../../context"

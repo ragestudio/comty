@@ -5,6 +5,8 @@ import { Icons } from "@components/Icons"
 import LatencyIndicator from "@components/PerformanceIndicators/latency"
 import SponsorsList from "@components/SponsorsList"
 
+import client from "comty.js/core/client"
+
 import config from "@config"
 
 import "./index.less"
@@ -31,13 +33,13 @@ export default {
 		const [capInfo, setCapInfo] = React.useState(null)
 
 		const checkServerVersion = async () => {
-			const serverManifest = await app.cores.api.customRequest()
+			const serverManifest = await client.instance()
 
 			setServerManifest(serverManifest.data)
 		}
 
 		const checkServerOrigin = async () => {
-			const instance = app.cores.api.client()
+			const instance = client
 
 			if (instance) {
 				setServerOrigin(instance.origin)
@@ -245,7 +247,7 @@ export default {
 						</div>
 
 						<div className="field_value">
-							{__comty_shared_state.version ?? "Unknown"}
+							{client.version ?? "Unknown"}
 						</div>
 					</div>
 

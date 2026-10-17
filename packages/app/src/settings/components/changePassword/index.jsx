@@ -3,7 +3,7 @@ import * as antd from "antd"
 
 import { Icons } from "@components/Icons"
 
-import AuthModel from "@models/auth"
+import AuthModel from "@endpoints/auth"
 
 import "./index.less"
 

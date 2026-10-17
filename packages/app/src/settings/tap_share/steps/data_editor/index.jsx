@@ -3,7 +3,7 @@ import * as antd from "antd"
 
 import { Icons } from "@components/Icons"
 
-import NFCModel from "comty.js/models/nfc"
+import NFCModel from "comty.js/endpoints/nfc"
 
 import StepsContext from "../../context"
 
@@ -11,7 +11,7 @@ import "./index.less"
 
 export default (props) => {
 	const context = React.useContext(StepsContext)
-	const ref = React.useRef()
+	const ref = React.useRef(null)
 	const [form] = antd.Form.useForm()
 
 	const behaviorType = antd.Form.useWatch("behavior", form)

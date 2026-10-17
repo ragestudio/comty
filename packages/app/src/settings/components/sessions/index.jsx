@@ -3,7 +3,7 @@ import * as antd from "antd"
 
 import SessionItem from "../sessionItem"
 
-import SessionModel from "@models/session"
+import SessionModel from "@endpoints/session"
 
 import "./index.less"
 

@@ -7,9 +7,11 @@ import { Icons } from "@/components/Icons"
 import config from "@config"
 
 import "./index.less"
+import useRequest from "comty.js/hooks/useRequest"
+import client from "comty.js/core/client"
 
 const FetchChangelogs = async () => {
-	const response = await app.cores.api.customRequest({
+	const response = await client.instance({
 		method: "GET",
 		url: `/repo/releases-notes`,
 	})
@@ -24,7 +26,7 @@ export default {
 	group: "bottom",
 	render: () => {
 		const [L_Changelogs, R_Changelogs, E_Changelogs] =
-			app.cores.api.useRequest(FetchChangelogs)
+			useRequest(FetchChangelogs)
 
 		console.log(R_Changelogs, E_Changelogs)
 

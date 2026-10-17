@@ -3,7 +3,7 @@ import * as antd from "antd"
 import Button from "@ui/Button"
 import { Icons } from "@components/Icons"
 
-import UserModel from "@models/user"
+import UserModel from "@endpoints/user"
 
 import "./index.less"
 import SelectableText from "@/components/SelectableText"
