@@ -16,7 +16,7 @@ import AudioPlayerStorage from "./player.storage"
 
 export default class Player extends Core {
 	// core config
-	static dependencies = ["api", "settings"]
+	static dependencies = ["settings"]
 	static namespace = "player"
 	static bgColor = "aquamarine"
 	static textColor = "black"
