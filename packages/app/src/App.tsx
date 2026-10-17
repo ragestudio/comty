@@ -1,4 +1,4 @@
-import { Runtime, VesselApp } from "@ragestudio/vessel/runtime"
+import { Runtime, VesselApp, VesselAppProps } from "@ragestudio/vessel/runtime"
 import ReactAdapter from "@ragestudio/vessel/adapters/react"
 
 import React from "react"
@@ -8,12 +8,16 @@ import * as Sentry from "@sentry/browser"
 import { ThemeProvider } from "@cores/style/style.core"
 import NotificationsRenderer from "./cores/notifications/render"
 
+import { rtcService } from "@comty/spaces-sdk/rtc"
+
 import AppCrash from "@components/AppCrash"
-import AuthManager from "@classes/AuthManager"
 import Layout from "./layout"
 import StaticMethods from "./statics/methods"
 import StaticEvents from "./statics/events"
 import StaticRenders from "./statics/renders"
+import initAuth from "./auth"
+import initRealtime from "./realtime"
+import initRtcEvents from "./realtime/rtcEvents"
 
 import config from "@config"
 import routesDeclarations from "@config/routes"
@@ -21,7 +25,7 @@ import onPageMount from "@hooks/onPageMount"
 
 import "@styles/index.less"
 
-class ComtyApp extends React.Component implements VesselApp {
+class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 	// "mierda conocida, mejor que mierda por conocer" - yugel nunca dijo. 2025.
 	static readonly publicEvents = StaticEvents
 	static readonly publicMethods = StaticMethods
@@ -32,21 +36,18 @@ class ComtyApp extends React.Component implements VesselApp {
 		firstInitialized: false,
 	}
 
-	// @ts-ignore
-	auth = new AuthManager(this.props.runtime, {
-		behaviors: {
-			onLogin: async () => {
-				app.navigation.goMain()
-			},
-			onLogout: async () => {
-				app.navigation.goAuth()
-			},
-			onInvalidSession: async () => {
-				app.navigation.goAuth()
-			},
-			onDisabledAccount: async () => {
-				app.navigation.goAuth()
-			},
+	auth = initAuth(this.props.runtime, {
+		onLogin: async () => {
+			app.navigation.goMain()
+		},
+		onLogout: async () => {
+			app.navigation.goAuth()
+		},
+		onInvalidSession: async () => {
+			app.navigation.goAuth()
+		},
+		onDisabledAccount: async () => {
+			app.navigation.goAuth()
 		},
 	})
 
@@ -93,7 +94,11 @@ class ComtyApp extends React.Component implements VesselApp {
 	initialization = async () => {
 		app.eventBus.emit("app.initialization.start")
 
+		initRealtime()
+		initRtcEvents()
+
 		await this.auth.initialize()
+		await rtcService.initialize()
 
 		app.eventBus.emit("app.initialization.finish")
 	}
