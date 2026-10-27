@@ -101,23 +101,25 @@ export class PagePanelWithNavMenu extends React.Component {
 				this.state.renders.length > 0 ||
 				this.props.navMenuHeader
 			) {
-				app.layout.header.render(
-					<NavMenu
-						header={this.props.navMenuHeader}
-						activeKey={this.state.activeTab}
-						items={navMenuItems}
-						onClickItem={(key) => this.handleTabChange(key)}
-						renderNames
-					>
-						{this.state.renders.map((renderItem) =>
-							React.createElement(renderItem.component, {
-								...(renderItem.options.props ?? {}),
-								ref: renderItem.ref,
-								key: renderItem.id,
-							}),
-						)}
-					</NavMenu>,
-				)
+				if (typeof app.layout.header?.render === "function") {
+					app.layout.header.render(
+						<NavMenu
+							header={this.props.navMenuHeader}
+							activeKey={this.state.activeTab}
+							items={navMenuItems}
+							onClickItem={(key) => this.handleTabChange(key)}
+							renderNames
+						>
+							{this.state.renders.map((renderItem) =>
+								React.createElement(renderItem.component, {
+									...(renderItem.options.props ?? {}),
+									ref: renderItem.ref,
+									key: renderItem.id,
+								}),
+							)}
+						</NavMenu>,
+					)
+				}
 			} else {
 				app.layout.header.render(null)
 			}
