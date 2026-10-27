@@ -40,5 +40,10 @@
 		},
 	},
 	"files": ["src/env.d.ts"],
-	"include": ["./src/**/*.ts", "./src/**/*.tsx"],
+	"include": [
+		"./src/**/*.ts",
+		"./src/**/*.js",
+		"./src/**/*.tsx",
+		"./src/**/*.jsx",
+	],
 }
