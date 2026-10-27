@@ -9,7 +9,7 @@ import { useSortable } from "@dnd-kit/react/sortable"
 import { move } from "@dnd-kit/helpers"
 
 //import useAckNotifications from "@hooks/useAckNotifications"
-import { useGroupsList } from "@comty/spaces-lib"
+import { useGroupsList } from "@comty/spaces-sdk/groupsList"
 
 import GroupListItem from "../GroupListItem"
 
