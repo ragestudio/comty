@@ -1,12 +1,17 @@
 import type { RTC } from ".."
 import type { Producer } from "../producers/producer"
 import type { Consumer } from "./consumer"
+import type { ConsumerOptions } from "mediasoup-client/types"
 
 import { attachSpeakingDetection } from "../speaking"
-import { ConsumerOptions } from "mediasoup-client/types"
 import loggerBase from "@/utils/logger"
 
 export const logger = loggerBase.child("consumers")
+
+// time to wait for the socket, device and recv transport to exist. events can
+// arrive while the channel is still attaching, so waiting avoids losing them
+const READY_TIMEOUT = 10000
+const READY_POLL_INTERVAL = 100
 
 export class Consumers extends Map<string, Consumer> {
 	constructor(core: RTC) {
@@ -18,119 +23,170 @@ export class Consumers extends Map<string, Consumer> {
 
 	speakingDetectors: Map<string, () => void> = new Map()
 
+	// consumers being created, keyed by producer id, to avoid racing events
+	private pendingStarts: Map<string, Promise<Consumer | void>> = new Map()
+
 	async start({
 		producerId,
 		userId,
 		kind,
 		appData,
 	}: Partial<Producer>): Promise<Consumer | void> {
-		try {
-			if (!this.core.socket) {
-				throw new Error("Socket not available or ready")
-			}
+		if (typeof producerId !== "string") {
+			logger.error("Cannot start consumer without a producerId")
+			return
+		}
 
-			if (!this.core.device || !this.core.transports.recv) {
-				throw new Error("Device or transport not ready")
-			}
+		if (typeof userId !== "string") {
+			logger.error("Cannot start consumer without a userId")
+			return
+		}
 
-			if (typeof producerId !== "string") {
-				throw new Error("Must contain a producerId")
-			}
+		const existingConsumer = this.findByProducerId(producerId)
 
-			if (typeof userId !== "string") {
-				throw new Error("Must contain a userId")
-			}
-
-			const existingConsumer = this.findByProducerId(producerId)
-
-			if (existingConsumer) {
+		if (existingConsumer) {
+			if (!existingConsumer.closed) {
+				// heal consumers whose detection never got attached
+				this.ensureSpeakingDetection(existingConsumer)
 				return existingConsumer
 			}
 
-			logger.debug("Starting consumer", {
-				producerId,
-				userId,
-				kind,
-				appData,
+			this.delete(existingConsumer.id)
+		}
+
+		const pending = this.pendingStarts.get(producerId)
+
+		if (pending) return pending
+
+		const task = this.startConsumer({ producerId, userId, kind, appData })
+			.catch((error) => {
+				logger.error("Error creating consumer:", error)
 			})
+			.finally(() => this.pendingStarts.delete(producerId))
 
-			// create a new remote consumer
-			// IMPORTANT: we need to set paused to true.
-			const consumerInfo = (await this.core.socket.call(
-				"channel:consume",
-				{
-					producerId: producerId,
-					transportId: this.core.transports.recv.id,
-					rtpCapabilities: this.core.device.rtpCapabilities,
-					paused: true,
-				},
-			)) as Consumer
+		this.pendingStarts.set(producerId, task)
 
-			let detachSpeaking: (() => void) | null = null
+		return task
+	}
 
-			const consumeParams: ConsumerOptions = {
-				id: consumerInfo.id,
-				producerId: consumerInfo.producerId,
-				kind: consumerInfo.kind,
-				rtpParameters: {
-					...consumerInfo.rtpParameters,
-				},
-				appData: appData,
+	private async startConsumer({
+		producerId,
+		userId,
+		kind,
+		appData,
+	}: Partial<Producer>): Promise<Consumer | void> {
+		if (!(await this.waitForReady())) {
+			logger.error("Device or transport not ready, cannot start consumer")
+			return
+		}
+
+		if (
+			!this.core.socket ||
+			!this.core.device ||
+			!this.core.transports.recv
+		) {
+			logger.error("Device or transport not ready, cannot start consumer")
+			return
+		}
+
+		if (typeof producerId !== "string" || typeof userId !== "string") {
+			return
+		}
+
+		logger.debug("Starting consumer", {
+			producerId,
+			userId,
+			kind,
+			appData,
+		})
+
+		// create a new remote consumer
+		// IMPORTANT: we need to set paused to true.
+		const consumerInfo = (await this.core.socket.call("channel:consume", {
+			producerId: producerId,
+			transportId: this.core.transports.recv.id,
+			rtpCapabilities: this.core.device.rtpCapabilities,
+			paused: true,
+		})) as Consumer
+
+		const consumeParams: ConsumerOptions = {
+			id: consumerInfo.id,
+			producerId: consumerInfo.producerId,
+			kind: consumerInfo.kind,
+			rtpParameters: {
+				...consumerInfo.rtpParameters,
+			},
+			appData: appData,
+		}
+
+		// create the local consumer
+		const consumer = (await this.core.transports.recv.consume(
+			consumeParams,
+		)) as Consumer
+
+		// set the consumer userId
+		consumer.userId = userId
+
+		// track the consumer so it can be paused, resumed or stopped later
+		this.set(consumer.id, consumer)
+
+		// attach detection after creation so it never depends on callback timing
+		this.ensureSpeakingDetection(consumer)
+
+		// Consumer event handlers
+		consumer.on("transportclose", () => {
+			logger.debug(`Consumer [${consumer.id}] transport closed`)
+			this.stop(consumer.id)
+		})
+
+		consumer.on("trackended", () => {
+			logger.debug(`Consumer [${consumer.id}] track ended`)
+			this.stop(consumer.id)
+		})
+
+		// important to call the sfu to resume the remote consumer
+		await this.core.socket.call("channel:consumer_control", {
+			consumer_id: consumer.id,
+			paused: false,
+		})
+
+		if (
+			this.core.self.isDeafened &&
+			consumer.kind === "audio" &&
+			consumer.appData.mediaTag === "user-mic"
+		) {
+			consumer.pause()
+		}
+
+		return consumer
+	}
+
+	private async waitForReady(): Promise<boolean> {
+		const startedAt = Date.now()
+
+		while (Date.now() - startedAt < READY_TIMEOUT) {
+			const state = this.core.getState().state
+
+			// no channel in progress, do not wait for transports that will never
+			// be created
+			if (state === "disconnected" || state === "failed") {
+				return false
 			}
-
-			if (appData?.mediaTag === "user-mic") {
-				consumeParams.onRtpReceiver = (rtpReceiver) => {
-					detachSpeaking = attachSpeakingDetection(
-						{
-							id: consumerInfo.id,
-							role: "receiver",
-							rtpReceiver,
-						},
-						(isSpeaking) =>
-							this.onSpeakingChange(consumer, isSpeaking),
-					)
-				}
-			}
-
-			// create the local consumer
-			const consumer = (await this.core.transports.recv.consume(
-				consumeParams,
-			)) as Consumer
-
-			// set the consumer userId
-			consumer.userId = userId
-
-			// track the consumer so it can be paused, resumed or stopped later
-			this.set(consumer.id, consumer)
-
-			if (detachSpeaking) {
-				this.speakingDetectors.set(consumer.id, detachSpeaking)
-			}
-
-			// Consumer event handlers
-			consumer.on("transportclose", () => {
-				logger.debug(`Consumer [${consumer.id}] transport closed`)
-				this.stop(consumer.id)
-			})
-
-			// important to call the sfu to resume the remote consumer
-			await this.core.socket.call("channel:consumer_control", {
-				consumer_id: consumer.id,
-				paused: false,
-			})
 
 			if (
-				this.core.self.isDeafened &&
-				consumer.kind === "audio" &&
-				consumer.appData.mediaTag === "user-mic"
+				this.core.socket &&
+				this.core.device &&
+				this.core.transports.recv
 			) {
-				consumer.pause()
+				return true
 			}
 
-			return consumer
-		} catch (error) {
-			logger.error("Error creating consumer:", error)
+			await new Promise((resolve) =>
+				setTimeout(resolve, READY_POLL_INTERVAL),
+			)
 		}
+
+		return false
 	}
 
 	async stop(consumerId: string): Promise<void> {
@@ -209,6 +265,31 @@ export class Consumers extends Map<string, Consumer> {
 		return undefined
 	}
 
+	// attaches detection to a mic consumer, safe to call more than once
+	ensureSpeakingDetection(consumer: Consumer) {
+		if (consumer.closed) return
+		if (consumer.kind !== "audio") return
+		if (consumer.appData?.mediaTag !== "user-mic") return
+		if (this.speakingDetectors.has(consumer.id)) return
+
+		const rtpReceiver = consumer.rtpReceiver
+		const track = consumer.track ?? rtpReceiver?.track ?? null
+
+		const detach = attachSpeakingDetection(
+			{
+				id: consumer.id,
+				role: "receiver",
+				rtpReceiver,
+				track,
+			},
+			(isSpeaking) => this.onSpeakingChange(consumer, isSpeaking),
+		)
+
+		if (detach) {
+			this.speakingDetectors.set(consumer.id, detach)
+		}
+	}
+
 	detachSpeakingDetection(consumer: Consumer) {
 		const detach = this.speakingDetectors.get(consumer.id)
 
@@ -217,17 +298,32 @@ export class Consumers extends Map<string, Consumer> {
 			this.speakingDetectors.delete(consumer.id)
 		}
 
-		if (consumer.isSpeaking) {
-			consumer.isSpeaking = false
+		consumer.isSpeaking = false
+
+		if (!this.hasOtherSpeakingConsumer(consumer)) {
+			this.removeSpeakingClient(consumer.userId)
+		}
+	}
+
+	private hasOtherSpeakingConsumer(consumer: Consumer): boolean {
+		for (const other of this.values()) {
+			if (other.id === consumer.id) continue
+			if (other.userId !== consumer.userId) continue
+			if (other.isSpeaking) return true
 		}
 
-		this.removeSpeakingClient(consumer.userId)
+		return false
 	}
 
 	onSpeakingChange(consumer: Consumer, isSpeaking: boolean) {
 		logger.log("onSpeakingChange", consumer.id, isSpeaking)
 
 		consumer.isSpeaking = isSpeaking
+
+		// another stream of the same user is still speaking
+		if (!isSpeaking && this.hasOtherSpeakingConsumer(consumer)) {
+			return
+		}
 
 		const userId = consumer.userId
 
