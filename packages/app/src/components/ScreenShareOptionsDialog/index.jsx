@@ -1,11 +1,16 @@
-import React from "react"
 import Button from "@ui/Button"
 import { Select } from "antd"
 import { Icons } from "@components/Icons"
 
+import {
+	SCREEN_FRAMERATES,
+	SCREEN_RESOLUTIONS,
+} from "@comty/spaces-sdk/rtc/self/constants.js"
+
+import { rtcService } from "@comty/spaces-sdk/rtc"
+
 function getCurrentVideoSettings() {
-	const instance = app.cores.mediartc.instance()
-	const stream = instance.self.screenStream
+	const stream = rtcService.self.screenStream
 
 	if (!stream) {
 		return null
@@ -17,7 +22,7 @@ function getCurrentVideoSettings() {
 		return null
 	}
 
-	const track = videoTracks[0]
+	const [track] = videoTracks
 
 	if (!track) {
 		return null
@@ -25,22 +30,17 @@ function getCurrentVideoSettings() {
 
 	const settings = track.getSettings()
 
-	settings.resolution = `${settings.width}x${settings.height}`
-
-	return settings
+	return {
+		...settings,
+		resolution: `${settings.width}x${settings.height}`,
+	}
 }
 
 const ScreenShareOptionsDialog = ({ close }) => {
-	const { resolutionsList, frameratesList } = React.useMemo(
-		() => app.cores.mediartc.vars(),
-		[],
-	)
 	const currentTrackSettings = getCurrentVideoSettings()
 
-	const stopScreenShare = () => {
-		const handlers = app.cores.mediartc.handlers()
-
-		handlers.stopScreenShare()
+	const stopScreenShare = async () => {
+		await rtcService.self.destroyMedia("screen")
 
 		if (typeof close === "function") {
 			close()
@@ -51,14 +51,11 @@ const ScreenShareOptionsDialog = ({ close }) => {
 		if (type === "resolution") {
 			const [width, height] = value.split("x").map(Number)
 
-			app.cores.mediartc.handlers().changeScreenParams({
-				width: width,
-				height: height,
-			})
+			rtcService.self.updateScreenConstraints({ width, height })
 		}
 
 		if (type === "framerate") {
-			app.cores.mediartc.handlers().changeScreenParams({
+			rtcService.self.updateScreenConstraints({
 				frameRate: parseInt(value),
 			})
 		}
@@ -77,8 +74,8 @@ const ScreenShareOptionsDialog = ({ close }) => {
 					</div>
 
 					<Select
-						options={resolutionsList}
-						value={currentTrackSettings.resolution}
+						options={SCREEN_RESOLUTIONS}
+						value={currentTrackSettings?.resolution}
 						onChange={(value) =>
 							changeVideoStreamConstraints("resolution", value)
 						}
@@ -95,8 +92,8 @@ const ScreenShareOptionsDialog = ({ close }) => {
 					</div>
 
 					<Select
-						options={frameratesList}
-						value={currentTrackSettings.frameRate}
+						options={SCREEN_FRAMERATES}
+						value={currentTrackSettings?.frameRate}
 						onChange={(value) =>
 							changeVideoStreamConstraints("framerate", value)
 						}

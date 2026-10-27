@@ -3,36 +3,32 @@ import Button from "@ui/Button"
 import { Select, Switch } from "antd"
 import { Icons } from "@components/Icons"
 
+import {
+	SCREEN_CONTENT_HINTS,
+	SCREEN_FRAMERATES,
+	SCREEN_RESOLUTIONS,
+} from "@comty/spaces-sdk/rtc/self/constants.js"
+
+import { rtcService } from "@comty/spaces-sdk/rtc"
+
 import "./index.less"
 
-function retreiveAvailableVideoCodecs() {
-	const core = app.cores.mediartc.instance()
+function retrieveAvailableVideoCodecs() {
+	const codecs = rtcService.device?.sendRtpCapabilities?.codecs ?? []
 
-	if (!core.device) {
-		return []
-	}
-
-	if (!core.device.sendRtpCapabilities) {
-		return []
-	}
-
-	return core.device.sendRtpCapabilities.codecs.filter(
-		(cap) => cap.kind === "video",
-	)
+	return codecs.filter((codec) => codec.kind === "video")
 }
 
 const excludedCodecs = ["rtx"]
 
 const ScreenShareDialog = ({ close }) => {
-	const { resolutionsList, frameratesList, contentHintsList } = React.useMemo(
-		() => app.cores.mediartc.vars(),
-		[],
+	const [resolution, setResolution] = React.useState(
+		SCREEN_RESOLUTIONS[1].value,
 	)
-	const [resolution, setResolution] = React.useState(resolutionsList[1].value)
-	const [framerate, setFramerate] = React.useState(frameratesList[2].value)
-	const [systemAudio, setSystemAudio] = React.useState(!!app.isDesktop)
+	const [framerate, setFramerate] = React.useState(SCREEN_FRAMERATES[2].value)
+	const [systemAudio, setSystemAudio] = React.useState(true)
 	const [contentHint, setContentHint] = React.useState(
-		contentHintsList[0].value,
+		SCREEN_CONTENT_HINTS[0].value,
 	)
 	const [preferredCodec, setPreferredCodec] = React.useState("auto")
 
@@ -41,11 +37,10 @@ const ScreenShareDialog = ({ close }) => {
 			{
 				label: "Auto Select",
 				value: "auto",
-				data: {},
 			},
 		])
 
-		for (const codec of retreiveAvailableVideoCodecs()) {
+		for (const codec of retrieveAvailableVideoCodecs()) {
 			const mime = codec.mimeType.split("/")
 
 			if (excludedCodecs.includes(mime[1])) {
@@ -55,7 +50,6 @@ const ScreenShareDialog = ({ close }) => {
 			codecs.add({
 				label: mime[1].toUpperCase(),
 				value: mime[1],
-				data: codec,
 			})
 		}
 
@@ -65,19 +59,21 @@ const ScreenShareDialog = ({ close }) => {
 	const startScreenShare = React.useCallback(async () => {
 		const [width, height] = resolution.split("x").map(Number)
 
-		const options = {
-			resolution: {
-				height: height,
-				width: width,
-			},
-			framerate: framerate,
-			systemAudio: systemAudio,
-			preferredCodec: preferredCodec,
-			contentHint: contentHint,
-		}
+		const codec =
+			preferredCodec === "auto"
+				? undefined
+				: retrieveAvailableVideoCodecs().find(
+						(item) => item.mimeType === `video/${preferredCodec}`,
+					)
 
 		try {
-			app.cores.mediartc.handlers().startScreenShare(options)
+			await rtcService.self.createMedia("screen", {
+				resolution: { width, height },
+				framerate,
+				systemAudio,
+				contentHint,
+				codec,
+			})
 		} catch (error) {
 			console.error("Error starting screen share", error)
 		}
@@ -107,7 +103,7 @@ const ScreenShareDialog = ({ close }) => {
 
 						<div className="screenshare-dialog__selectors__field__content">
 							<Select
-								options={resolutionsList}
+								options={SCREEN_RESOLUTIONS}
 								value={resolution}
 								onChange={setResolution}
 							/>
@@ -125,7 +121,7 @@ const ScreenShareDialog = ({ close }) => {
 
 						<div className="screenshare-dialog__selectors__field__content">
 							<Select
-								options={frameratesList}
+								options={SCREEN_FRAMERATES}
 								value={framerate}
 								onChange={setFramerate}
 							/>
@@ -145,7 +141,7 @@ const ScreenShareDialog = ({ close }) => {
 
 						<div className="screenshare-dialog__selectors__field__content">
 							<Select
-								options={contentHintsList}
+								options={SCREEN_CONTENT_HINTS}
 								value={contentHint}
 								onChange={setContentHint}
 							/>
@@ -182,8 +178,8 @@ const ScreenShareDialog = ({ close }) => {
 
 							{!app.isDesktop && (
 								<span style={{ fontSize: "0.8rem" }}>
-									Not supported in browsers, use desktop
-									application instead.
+									Browser support for tab or system audio may
+									vary.
 								</span>
 							)}
 						</div>
@@ -191,7 +187,6 @@ const ScreenShareDialog = ({ close }) => {
 
 					<div className="screenshare-dialog__selectors__field__content">
 						<Switch
-							disabled={!app.isDesktop}
 							checked={systemAudio}
 							onChange={(value) => setSystemAudio(value)}
 						/>
