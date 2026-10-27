@@ -14,10 +14,16 @@ export class Clients extends Map<string, Client> {
 	core: RTC
 
 	async join(data: Partial<Client>): Promise<Client | null> {
-		// check if userid is already in clients
-		if (data.userId && this.has(data.userId)) {
-			logger.error("User already in the clients map")
-			return null
+		// reconnections and duplicated events must not drop the client, update
+		// the existing instance instead
+		const existingClient = data.userId ? this.get(data.userId) : undefined
+
+		if (existingClient) {
+			if (data.voiceState) {
+				existingClient.updateVoiceState(data.voiceState)
+			}
+
+			return existingClient
 		}
 
 		//app.cores.sfx.play("media_channel_join")
@@ -58,7 +64,17 @@ export class Clients extends Map<string, Client> {
 	}
 
 	async restore(state: JoinChannelResult) {
-		for (let client of state.clients) {
+		for (const client of state.clients) {
+			const existingClient = this.get(client.userId)
+
+			if (existingClient) {
+				if (client.voiceState) {
+					existingClient.updateVoiceState(client.voiceState)
+				}
+
+				continue
+			}
+
 			this.set(client.userId, new Client(this.core, client))
 		}
 
@@ -71,15 +87,21 @@ export class Clients extends Map<string, Client> {
 
 				// add to producers
 				this.core.producers.setRemote(producer)
+			}
 
-				const client = this.get(producer.userId)
+			// attach mics first, creating the client on demand so a missing entry
+			// in the restored state does not skip the speaking detection
+			for (const producer of state.producers) {
+				if (producer.userId === this.core.userId) continue
+				if (producer.appData?.mediaTag !== "user-mic") continue
 
-				if (client) {
-					// attach current client mic
-					if (producer.appData?.mediaTag === "user-mic") {
-						await client.attachMic(producer)
-					}
-				}
+				const client =
+					this.get(producer.userId) ??
+					(await this.join({ userId: producer.userId }))
+
+				if (!client) continue
+
+				await client.attachMic(producer)
 			}
 
 			for (const producer of state.producers) {

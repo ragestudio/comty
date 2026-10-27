@@ -3,9 +3,10 @@ import type { VoiceState } from "@comty/shared/types/rtc/voiceState"
 import type { Producer } from "../producers/producer"
 import type { Consumer } from "../consumers/consumer"
 import type { SoundpadDispatch } from "@comty/shared/types/rtc/clientEvent"
+import type { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
 
 import loggerBase from "@/utils/logger"
-import { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
+import adapter from "@/adapter"
 
 export const logger = loggerBase.child("clients")
 
@@ -61,6 +62,16 @@ export class Client {
 	}
 
 	async attachMic(producer: Producer) {
+		// already attached to this producer
+		if (this.micConsumer?.producerId === producer.producerId) {
+			return
+		}
+
+		// a new producer for the same media means the previous one is stale
+		if (this.micConsumer) {
+			await this.dettachMic()
+		}
+
 		const consumer = await this.core.consumers.start({
 			kind: "audio",
 			producerId: producer.producerId,
@@ -75,19 +86,33 @@ export class Client {
 
 		this.micConsumer = consumer
 
+		// route the remote track through the host audio output. on web this is
+		// what actually plays the track, on native it just applies the volume
+		if (consumer.track) {
+			adapter.trackVolume?.setVolume(
+				consumer.track,
+				this.localState.volume,
+			)
+		}
+
 		this.setState({ micConsumerId: this.micConsumer.id })
 
 		logger.debug(`Attached client mic[${this.userId}]`)
 	}
 
-	async dettachMic() {
-		if (!this.micConsumer) {
-			logger.error("Cannot dettach mic without consumer")
-			return
-		}
+	async dettachMic(producerId?: string) {
+		const consumer = this.micConsumer
 
-		await this.core.consumers.stop(this.micConsumer.id)
+		if (!consumer) return
+
+		// ignore stale events for a producer we are no longer consuming
+		if (producerId && consumer.producerId !== producerId) return
+
 		delete this.micConsumer
+
+		this.setState({ micConsumerId: null })
+
+		await this.core.consumers.stop(consumer.id)
 
 		logger.debug(`Detached client mic[${this.userId}]`)
 	}
