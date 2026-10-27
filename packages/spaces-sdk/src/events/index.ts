@@ -1,3 +1,5 @@
+import type { ChatParams, ChatType } from "@/chat/types"
+
 import { getSocket } from "@/helpers/socket"
 
 import { GroupStore } from "../group"
@@ -143,11 +145,7 @@ export function subscribeUserSocket(): () => void {
 	}
 }
 
-export function subscribeChatSocket(
-	type: "group" | "dm",
-	params: any,
-	events?: { onNewMessage?: (data: any) => void },
-) {
+export function subscribeChatSocket(type: ChatType, params: ChatParams) {
 	const socket = getSocket()
 	const config = CHAT_CONFIGS[type]
 
@@ -159,16 +157,20 @@ export function subscribeChatSocket(
 	const subscribeParams = config.params.subscribe(params)
 	const actions = ChatStore.getState().actions
 
-	const handleNewMessage = (data: any) => {
-		actions.handleNewMessage(data)
-		if (events?.onNewMessage) events.onNewMessage(data)
-	}
+	const handleNewMessage = (data: any) => actions.handleNewMessage(data)
 	const handleMessageUpdated = (data: any) =>
 		actions.handleMessageUpdated(data)
 	const handleMessageDeleted = (data: any) =>
 		actions.handleMessageDeleted(data)
 	const handleTypingEvent = (data: any) => actions.handleTypingEvent(data)
 
+	const handleReconnect = () => {
+		// a reconnect may have missed messages, force a recovery pass
+		ChatStore.setState({ hasMoreAfter: true })
+		actions.loadAfter().catch(logger.error)
+	}
+
+	socket.on("connect", handleReconnect)
 	socket.on(config.events.message, handleNewMessage)
 	socket.on(config.events.messageUpdated, handleMessageUpdated)
 	socket.on(config.events.messageDeleted, handleMessageDeleted)
@@ -179,6 +181,7 @@ export function subscribeChatSocket(
 		.catch(logger.error)
 
 	return () => {
+		socket.off("connect", handleReconnect)
 		socket.off(config.events.message, handleNewMessage)
 		socket.off(config.events.messageUpdated, handleMessageUpdated)
 		socket.off(config.events.messageDeleted, handleMessageDeleted)
