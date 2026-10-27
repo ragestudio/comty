@@ -2,10 +2,12 @@ import type { App } from "./app"
 
 import * as SecureStore from "expo-secure-store"
 
-import AuthModel from "@comty/api-lib/models/auth"
-import UserModel from "@comty/api-lib/models/user"
-import session from "@comty/api-lib/session"
-import wsManager from "@/ws"
+import AuthEndpoint from "comty.js/endpoints/auth"
+import UserEndpoint from "comty.js/endpoints/user"
+
+import session from "comty.js/session"
+import Realtime from "comty.js/realtime"
+import client from "comty.js/client"
 
 export enum AuthStoreKeys {
 	Token = "session-token",
@@ -53,13 +55,13 @@ export class AuthManager {
 
 			session.token = token
 			session.refreshToken = refreshToken ?? ""
-			session.user = await UserModel.self()
+			session.user = await UserEndpoint.self()
 
 			this.app.setState({
 				userData: session.user,
 			})
 
-			wsManager.socket?.authenticate(token)
+			client.ws.socket?.authenticate(token)
 
 			console.log("Session loaded :", session)
 		} catch (err) {
@@ -69,11 +71,11 @@ export class AuthManager {
 	}
 
 	async login(usernameOrEmail: string, password: string, code?: string) {
-		const response: AuthResult = await AuthModel.login(
-			usernameOrEmail,
-			password,
-			code,
-		)
+		const response = await AuthEndpoint.login({
+			username: usernameOrEmail,
+			password: password,
+			mfa_code: code,
+		})
 
 		if (response.activation_required) {
 			throw {
@@ -85,6 +87,12 @@ export class AuthManager {
 			throw {
 				action_required: "code",
 			}
+		}
+
+		if (!response.token || !response.refreshToken) {
+			throw new Error(
+				"Invalid server response. Missing 'token' or/and 'refreshToken'",
+			)
 		}
 
 		await SecureStore.setItemAsync(AuthStoreKeys.Token, response.token)

@@ -9,9 +9,9 @@ import { reconnectionToastStore } from "./reconnectionToast"
 import ThemeController from "./theme"
 import AuthManager from "./auth"
 
-import session from "@comty/api-lib/session"
+import session from "comty.js/session"
+import client from "comty.js/client"
 import { BaseStore } from "@comty/spaces-sdk/classes"
-import { wsManager } from "@comty/spaces-sdk/ws"
 import { rtcService } from "@comty/spaces-sdk/rtc"
 
 SplashScreen.preventAutoHideAsync()
@@ -77,28 +77,29 @@ export class App extends BaseStore<AppState> {
 		// run auth manager
 		await this.auth.initialize()
 
-		// run websocket manager
-		await wsManager.initialize()
+		const socket = client.ws.get("main")
 
-		if (wsManager.socket) {
-			wsManager.socket.on("close", () => {
+		if (socket) {
+			socket.on("close", () => {
 				this.setState({ connected: false })
 			})
-			wsManager.socket.on("error", () => {
+			socket.on("error", () => {
 				this.setState({ connected: false })
 			})
-			wsManager.socket.on("reconnecting", () => {
+			socket.on("reconnecting", () => {
 				this.setState({ connected: false })
 				reconnectionToastStore.getState().open()
 			})
-			wsManager.socket.on("connected", () => {
+			socket.on("connected", () => {
 				this.setState({ connected: true })
 				reconnectionToastStore.getState().close()
 			})
-			wsManager.socket.on("reconnected", () => {
+			socket.on("reconnected", () => {
 				this.setState({ connected: true })
 				reconnectionToastStore.getState().close()
 			})
+
+			await client.ws.connect("main")
 		}
 
 		// run rtc service
