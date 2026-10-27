@@ -2,6 +2,7 @@ import type { Self } from ".."
 import type { BaseHandlerParams } from "./base"
 
 import BaseStream from "./base"
+import adapter from "@/adapter"
 import { logger } from "@/rtc/self"
 
 export interface MicStreamParams extends BaseHandlerParams {
@@ -12,14 +13,21 @@ export interface MicStreamParams extends BaseHandlerParams {
 export const MicStream = (self: Self) =>
 	new BaseStream<MicStreamParams>(self, "mic", {
 		async onStart() {
-			this.stream = await navigator.mediaDevices.getUserMedia({
+			const captured = await navigator.mediaDevices.getUserMedia({
 				video: false,
 				audio: {
 					echoCancellation: true,
 					noiseSuppression: true,
 					autoGainControl: true,
+					...(adapter.audioProcessing?.getMicrophoneConstraints?.() ??
+						{}),
 				},
 			})
+
+			// let the host post-process the captured stream (gain, gate, rnnoise)
+			this.stream = adapter.mediaStreamProcessor
+				? await adapter.mediaStreamProcessor(captured, "mic")
+				: captured
 
 			// if is muted, disable audio tracks
 			if (this.self.isMuted) {
@@ -34,6 +42,9 @@ export const MicStream = (self: Self) =>
 		},
 		async onClose() {
 			if (this.stream) {
+				// release the processing chain and the raw capture behind it
+				adapter.mediaStreamReleaser?.(this.stream)
+
 				for (const track of this.stream.getTracks()) {
 					if (!track.stop) continue
 					track.stop()

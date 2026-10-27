@@ -73,6 +73,9 @@ export const Microphone = (self: Self) =>
 				const micProducer = this.self.core.producers.get(micProducerId)
 				micProducer?.close()
 			}
+
+			// stop the microphone capture, otherwise the device keeps recording
+			await this.self.deleteStreamByKind("mic")
 		},
 	})
 

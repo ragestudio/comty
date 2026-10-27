@@ -2,8 +2,6 @@ import type { RTC } from ".."
 import type { BaseStream } from "./streams/base"
 import type { SelfMedia } from "./media"
 
-import IndexedArray from "@/classes/IndexedArray"
-
 import MicStream from "./streams/mic"
 import ScreenStream from "./streams/screen"
 import CameraStream from "./streams/camera"
@@ -12,6 +10,7 @@ import Microphone from "./media/mic"
 import Screen from "./media/screen"
 import Camera from "./media/camera"
 import Logger from "@/utils/logger"
+import { releaseMediaStreamURL } from "@/utils/mediaStreamURL"
 
 export const StreamsKinds = {
 	mic: MicStream,
@@ -48,8 +47,7 @@ export class Self {
 	}
 
 	core: RTC
-	streams: IndexedArray<BaseStream> = new IndexedArray()
-	streams_ref: Map<string, number> = new Map()
+	streams: Map<keyof typeof StreamsKinds, BaseStream> = new Map()
 
 	media: Map<keyof typeof MediaKinds, SelfMedia<any>> = new Map()
 
@@ -60,9 +58,8 @@ export class Self {
 
 	// get the state from streams instead of a value, this is more reliable & secure
 	get isMuted() {
-		const micStreamIndex = this.streams_ref.get("mic")
-		if (micStreamIndex === undefined) return false
-		const micStream = this.streams[micStreamIndex]
+		const micStream = this.streams.get("mic")
+
 		return micStream?.stream?.getAudioTracks()[0]?.enabled === false
 	}
 
@@ -73,11 +70,7 @@ export class Self {
 
 	// the local screen share stream, null while not sharing
 	get screenStream(): MediaStream | null {
-		const index = this.streams_ref.get("screen")
-
-		if (index === undefined) return null
-
-		return this.streams[index]?.stream ?? null
+		return this.streams.get("screen")?.stream ?? null
 	}
 
 	// apply new constraints to the live screen video track, e.g. resolution
@@ -141,7 +134,7 @@ export class Self {
 
 	// enable or disable the local microphone tracks
 	private applyMute(to: boolean) {
-		for (const stream of this.streams) {
+		for (const stream of this.streams.values()) {
 			if (stream.kind !== "mic" || !stream.stream) continue
 
 			for (const track of stream.stream.getAudioTracks()) {
@@ -160,10 +153,22 @@ export class Self {
 			throw new Error(`Stream of kind [${kind}] is not available`)
 		}
 
-		const stream = StreamsKinds[kind](this)
-		await stream.start(params)
+		// never leave a previous stream of the same kind capturing
+		if (this.streams.has(kind)) {
+			await this.deleteStreamByKind(kind)
+		}
 
-		this.streams_ref.set(kind, this.streams.insert(stream))
+		const stream = StreamsKinds[kind](this)
+
+		try {
+			await stream.start(params)
+		} catch (error) {
+			// release anything captured before the failure
+			await stream.close().catch(() => {})
+			throw error
+		}
+
+		this.streams.set(kind, stream)
 
 		return stream
 	}
@@ -173,10 +178,16 @@ export class Self {
 		stream: T,
 		params?: StreamStopParams<keyof typeof StreamsKinds>,
 	) {
-		await stream.close(params)
+		try {
+			await stream.close(params)
+		} finally {
+			releaseMediaStreamURL(stream.stream)
 
-		this.streams.delete(stream)
-		this.streams_ref.delete(kind)
+			// only remove the map entry if it still points to this stream
+			if (this.streams.get(kind) === stream) {
+				this.streams.delete(kind)
+			}
+		}
 
 		logger.debug("deleted stream", stream)
 
@@ -184,11 +195,7 @@ export class Self {
 	}
 
 	async deleteStreamByKind(kind: keyof typeof StreamsKinds) {
-		const index = this.streams_ref.get(kind)
-
-		if (index === undefined) return
-
-		const stream = this.streams[index]
+		const stream = this.streams.get(kind)
 
 		if (!stream) return
 
@@ -208,7 +215,14 @@ export class Self {
 		}
 
 		const media = MediaKinds[kind](this)
-		await media.create(params)
+
+		try {
+			await media.create(params)
+		} catch (error) {
+			// do not leak a stream captured before the producer failed
+			await this.deleteStreamByKind(kind).catch(() => {})
+			throw error
+		}
 
 		this.media.set(kind, media)
 
@@ -223,23 +237,35 @@ export class Self {
 
 		if (!media) return
 
-		await media.destroy(handler)
-		this.media.delete(type)
+		try {
+			await media.destroy(handler)
+		} finally {
+			this.media.delete(type)
+		}
 
 		logger.debug("deleted media", media)
 	}
 
 	async deleteAll() {
-		for (const [key, media] of this.media) {
-			await this.destroyMedia(key)
+		for (const kind of Array.from(this.media.keys())) {
+			try {
+				await this.destroyMedia(kind)
+			} catch (error) {
+				logger.error(`failed to destroy ${kind} media`, error)
+			}
 		}
 
-		for (const stream of this.streams) {
-			this.streams.delete(stream)
+		// close any stream that was not owned by a media instance (for example
+		// when the media creation failed halfway) so the capture always stops
+		for (const [kind, stream] of Array.from(this.streams.entries())) {
+			try {
+				await this.deleteStream(kind, stream)
+			} catch (error) {
+				logger.error(`failed to close ${kind} stream`, error)
+			}
 		}
 
 		this.streams.clear()
-		this.streams_ref.clear()
 	}
 }
 

@@ -3,6 +3,7 @@ import type { RtpCodecCapability } from "mediasoup-client/types"
 
 import { SelfMedia } from "."
 import defaults from "@/rtc/defaults"
+import { getMediaStreamURL } from "@/utils/mediaStreamURL"
 import { pickVideoCodec } from "../utils"
 import { logger } from "@/rtc/self"
 
@@ -32,15 +33,9 @@ export const Camera = (self: Self) =>
 				throw new Error("camera stream not available")
 			}
 
-			const localStream = cam.stream as MediaStream & {
-				toURL?: () => string
-			}
-
 			this.self.core.setState({
-				localCameraStreamURL:
-					typeof localStream.toURL === "function"
-						? localStream.toURL()
-						: null,
+				localCameraStreamURL: getMediaStreamURL(cam.stream),
+				localCameraStream: cam.stream,
 			})
 
 			const videoTrack =
@@ -49,6 +44,17 @@ export const Camera = (self: Self) =>
 			if (!videoTrack) {
 				throw new Error("video track not found")
 			}
+
+			// the device may end the track (unplugged camera, revoked permission)
+			videoTrack.addEventListener(
+				"ended",
+				() => {
+					this.self.destroyMedia("cam").catch((error) => {
+						logger.error("failed to destroy camera media", error)
+					})
+				},
+				{ once: true },
+			)
 
 			const videoCodec = pickVideoCodec(
 				this.self.core.device.sendRtpCapabilities,
@@ -92,7 +98,10 @@ export const Camera = (self: Self) =>
 
 			await this.self.deleteStreamByKind("cam")
 
-			this.self.core.setState({ localCameraStreamURL: null })
+			this.self.core.setState({
+				localCameraStreamURL: null,
+				localCameraStream: null,
+			})
 		},
 	})
 

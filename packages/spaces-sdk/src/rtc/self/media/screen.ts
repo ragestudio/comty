@@ -7,6 +7,7 @@ import type { ScreenContentHint } from "@/rtc/self/constants"
 import defaults from "@/rtc/defaults"
 import Producer from "@/rtc/producers/producer"
 import { SelfMedia } from "."
+import { getMediaStreamURL } from "@/utils/mediaStreamURL"
 import { computeScreenEncoding, pickVideoCodec } from "../utils"
 import { logger } from "@/rtc/self"
 
@@ -38,15 +39,9 @@ export const Screen = (self: Self) =>
 				throw new Error("screen stream not available")
 			}
 
-			const localStream = screen.stream as MediaStream & {
-				toURL?: () => string
-			}
-
 			this.self.core.setState({
-				localScreenStreamURL:
-					typeof localStream.toURL === "function"
-						? localStream.toURL()
-						: null,
+				localScreenStreamURL: getMediaStreamURL(screen.stream),
+				localScreenStream: screen.stream,
 			})
 
 			const videoTrack =
@@ -54,6 +49,17 @@ export const Screen = (self: Self) =>
 
 			const audioTrack =
 				screen.stream.getAudioTracks()[0] as unknown as MediaStreamTrack
+
+			// stop sharing from the browser ui ends the video track
+			videoTrack?.addEventListener(
+				"ended",
+				() => {
+					this.self.destroyMedia("screen").catch((error) => {
+						logger.error("failed to destroy screen media", error)
+					})
+				},
+				{ once: true },
+			)
 
 			logger.debug("screen stream", screen.stream)
 
@@ -151,7 +157,10 @@ export const Screen = (self: Self) =>
 
 			await this.self.deleteStreamByKind("screen")
 
-			this.self.core.setState({ localScreenStreamURL: null })
+			this.self.core.setState({
+				localScreenStreamURL: null,
+				localScreenStream: null,
+			})
 		},
 	})
 
