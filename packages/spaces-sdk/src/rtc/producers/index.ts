@@ -46,6 +46,8 @@ export class Producers extends Map<string, Producer> {
 			throw new Error("User ID not available")
 		}
 
+		const speakerId = options.onSpeaking ? nextSpeakerId() : null
+
 		let detachSpeaking: (() => void) | null = null
 
 		let producer: Producer
@@ -54,9 +56,10 @@ export class Producers extends Map<string, Producer> {
 			payload.onRtpSender = (rtpSender) => {
 				detachSpeaking = attachSpeakingDetection(
 					{
-						id: nextSpeakerId(),
+						id: speakerId!,
 						role: "sender",
 						rtpSender,
+						track: payload.track,
 					},
 					options.onSpeaking!,
 				)
@@ -88,6 +91,20 @@ export class Producers extends Map<string, Producer> {
 		}
 
 		this.set(producer.id, producer)
+
+		// the sender callback may have failed or may not have been invoked, so
+		// try once more with the rtp sender exposed by the created producer
+		if (options.onSpeaking && !detachSpeaking) {
+			detachSpeaking = attachSpeakingDetection(
+				{
+					id: speakerId!,
+					role: "sender",
+					rtpSender: producer.rtpSender,
+					track: producer.track,
+				},
+				options.onSpeaking,
+			)
+		}
 
 		if (detachSpeaking) {
 			this.speakingDetectors.set(producer.id, detachSpeaking)
