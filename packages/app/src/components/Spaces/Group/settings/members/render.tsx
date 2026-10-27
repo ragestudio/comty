@@ -4,7 +4,7 @@ import React from "react"
 import { Flex, Listy, Tag } from "antd"
 
 import { Icons } from "@components/Icons"
-import { useGroupMembers } from "@comty/spaces-lib"
+import { useGroupMembers } from "@comty/spaces-sdk/group"
 import Image from "@components/Image"
 
 import "./index.less"

@@ -3,8 +3,8 @@ import Button from "@ui/Button"
 import ConfirmButton from "@ui/ConfirmButton"
 import { Icons } from "@components/Icons"
 
-import GroupsModel from "@models/groups"
-import { useGroupData } from "@comty/spaces-lib"
+import GroupsModel from "@endpoints/groups"
+import { useGroupData } from "@comty/spaces-sdk/group"
 
 import use from "comty.js/hooks/use"
 import copyToClipboard from "@utils/copyToClipboard"

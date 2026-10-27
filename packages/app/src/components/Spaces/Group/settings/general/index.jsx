@@ -6,8 +6,8 @@ import ConfirmButton from "@ui/ConfirmButton"
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
 
-import { useGroupData } from "@comty/spaces-lib"
-import GroupsModel from "@models/groups"
+import { useGroupData } from "@comty/spaces-sdk/group"
+import GroupsModel from "@endpoints/groups"
 
 import "./index.less"
 

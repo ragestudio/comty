@@ -6,8 +6,8 @@ import ConfirmButton from "@ui/ConfirmButton"
 import { Icons } from "@components/Icons"
 import SortableList from "@components/SortableList"
 
-import GroupsModel from "@models/groups"
-import { useGroupData, useGroupChannels } from "@comty/spaces-lib"
+import GroupsModel from "@endpoints/groups"
+import { useGroupData, useGroupChannels } from "@comty/spaces-sdk/group"
 
 import "./index.less"
 
