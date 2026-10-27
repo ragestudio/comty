@@ -5,7 +5,7 @@ import Button from "@ui/Button"
 import Icons from "@components/Icons"
 import UploadButton from "@components/UploadButton"
 
-import GroupModel from "@models/groups"
+import GroupModel from "@endpoints/groups"
 
 import "./index.less"
 
