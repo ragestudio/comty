@@ -3,6 +3,32 @@ import type { Message } from "@comty/shared/types/spaces/message"
 
 export type MessageStatus = "sending" | "sent" | "error"
 
+export type ChatType = "group" | "dm"
+
+export interface GroupChatParams {
+	group_id: string
+	channel_id: string
+	to_user_id?: never
+}
+
+export interface DmChatParams {
+	to_user_id: string
+	group_id?: never
+	channel_id?: never
+}
+
+export type ChatParams = GroupChatParams | DmChatParams
+
+export function getChatSessionKey(type: ChatType, params: ChatParams) {
+	if (type === "group") {
+		const groupParams = params as GroupChatParams
+
+		return `group:${groupParams.group_id}:${groupParams.channel_id}`
+	}
+
+	return `dm:${(params as DmChatParams).to_user_id}`
+}
+
 export interface ExtendedMessage extends Message {
 	status?: MessageStatus
 	nonce?: string
@@ -17,13 +43,18 @@ export interface ChatSyncState {
 }
 
 export interface ChatStoreState {
-	type: "group" | "dm" | null
-	params: any
+	type: ChatType | null
+	params: ChatParams | null
+	sessionKey: string | null
 	initialLoading: boolean
 	loading: boolean
+	loadingAfter: boolean
+	afterLoadVersion: number
 	error: any
 	timeline: ExtendedMessage[]
-	hasMore: boolean
+	pendingMessages: ExtendedMessage[]
+	hasMoreBefore: boolean
+	hasMoreAfter: boolean
 	usersTyping: any[]
 	isTyping: boolean
 	pausedUpdates: boolean
@@ -34,7 +65,7 @@ export interface ChatStoreState {
 }
 
 export interface ChatStoreActions {
-	init: (type: "group" | "dm", params: any) => Promise<void>
+	init: (type: ChatType, params: ChatParams) => Promise<void>
 	reset: () => void
 	setPausedUpdates: (paused: boolean) => void
 

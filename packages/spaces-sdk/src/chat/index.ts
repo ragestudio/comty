@@ -23,11 +23,16 @@ export const ChatStore = create<ChatStoreType>()((set, get) => {
 	return {
 		type: null,
 		params: null,
+		sessionKey: null,
 		initialLoading: true,
 		loading: false,
+		loadingAfter: false,
+		afterLoadVersion: 0,
 		error: null,
 		timeline: [],
-		hasMore: true,
+		pendingMessages: [],
+		hasMoreBefore: true,
+		hasMoreAfter: true,
 		usersTyping: [],
 		isTyping: false,
 		pausedUpdates: false,
@@ -68,13 +73,50 @@ export const useChatState = () =>
 			timeline: s.timeline,
 			error: s.error,
 			loading: s.loading,
+			loadingAfter: s.loadingAfter,
 			initialLoading: s.initialLoading,
 			usersTyping: s.usersTyping,
 			isTyping: s.isTyping,
-			hasMore: s.hasMore,
+			hasMoreBefore: s.hasMoreBefore,
+			hasMoreAfter: s.hasMoreAfter,
 			type: s.type,
+			sessionKey: s.sessionKey,
 			pausedUpdates: s.pausedUpdates,
 		})),
 	)
 
 export const useChatActions = () => ChatStore((s) => s.actions)
+
+export const useChatTimeline = () => ChatStore((s) => s.timeline)
+
+export const useChatTypingUsers = () => ChatStore((s) => s.usersTyping)
+
+export const useChatStatus = () =>
+	ChatStore(
+		useShallow((s) => ({
+			error: s.error,
+			type: s.type,
+			sessionKey: s.sessionKey,
+			initialLoading: s.initialLoading,
+		})),
+	)
+
+export const useChatPagination = () =>
+	ChatStore(
+		useShallow((s) => ({
+			loading: s.loading,
+			loadingAfter: s.loadingAfter,
+			afterLoadVersion: s.afterLoadVersion,
+			initialLoading: s.initialLoading,
+			hasMoreBefore: s.hasMoreBefore,
+			hasMoreAfter: s.hasMoreAfter,
+		})),
+	)
+
+export type {
+	ChatParams,
+	ChatType,
+	DmChatParams,
+	GroupChatParams,
+} from "./types"
+export { getChatSessionKey } from "./types"
