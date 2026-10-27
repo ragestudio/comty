@@ -1,13 +1,32 @@
 .setting-rtc-volume-gate {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+
+	width: 100%;
+
 	.slider-track {
 		height: 10px;
 		border-radius: 12px;
 	}
+
+	&__values {
+		display: flex;
+		justify-content: space-between;
+
+		font-size: 11px;
+		opacity: 0.6;
+	}
+
+	&__error {
+		font-size: 12px;
+		color: var(--danger-color, #ff4d4f);
+	}
 }
 
 .setting-rtc-volume-gate__indicator {
-	--rms: 0;
-	--threshold: 0;
+	--rms: 0%;
+	--threshold: 0%;
 
 	width: 100%;
 	height: 10px;
