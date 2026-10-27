@@ -35,17 +35,19 @@ export default class MFAStage extends LoginStage {
 		if (userTotp) {
 			context.result = {
 				message: "MFA required, using [totp] method.",
-				method: "totp",
-				mfa_required: true,
+				mfa_required: {
+					method: "totp",
+				},
 			}
 		} else {
-			const mfaData = await this.createEmailMFASession(user, request)
+			await this.createEmailMFASession(user, request)
 
 			context.result = {
 				message: `MFA required, using [email] method.`,
-				method: "email",
-				sended_to: obscureEmail(user.email),
-				mfa_required: true,
+				mfa_required: {
+					method: "email",
+					sended_to: obscureEmail(user.email),
+				},
 			}
 		}
 
