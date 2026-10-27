@@ -4,14 +4,16 @@ import { Icons } from "@components/Icons"
 
 import ChannelsListItem from "./item"
 
+import { VALID_CHANNEL_KINDS } from "@comty/spaces-sdk/group/constants"
 import {
-	useNavigation,
 	useGroupLoading,
 	useGroupChannels,
 	useGroupRTC,
 	useGroupData,
-	VALID_CHANNEL_KINDS,
-} from "@comty/spaces-lib"
+} from "@comty/spaces-sdk/group"
+import { rtcService, useRTCStore } from "@/rtc"
+
+import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import "./index.less"
 
@@ -21,7 +23,8 @@ const ChannelsPanel = () => {
 	const statedChannels = useGroupRTC()
 	const data = useGroupData()
 
-	const spaces = useNavigation()
+	const nav = useSpacesNavigation()
+	const state = useRTCStore()
 
 	const handleOnClickChannel = React.useCallback(
 		(channel) => {
@@ -30,21 +33,22 @@ const ChannelsPanel = () => {
 			}
 
 			if (channel.kind === "voice") {
-				if (app.cores.mediartc.state().channelId === channel._id) {
-					spaces.navigate({
-						channel: channel._id,
+				if (state.channel?._id === channel._id) {
+					nav.actions.navigate({
+						channel: state.channel?._id,
 						subview: "voice",
 					})
 					return
 				}
 
-				return app.cores.mediartc
-					.handlers()
-					.joinChannel(data._id, channel._id)
+				return rtcService.handlers.joinChannel({
+					groupId: data._id,
+					channelId: channel._id,
+				})
 			}
 
 			if (channel.kind === "chat") {
-				spaces.navigate({
+				nav.actions.navigate({
 					channel: channel._id,
 					subview: null,
 				})
@@ -67,19 +71,11 @@ const ChannelsPanel = () => {
 				{!loading &&
 					channels &&
 					channels.items.map((channel) => {
-						const channelState = statedChannels?.[channel._id]
-						const clients = channelState?.clients || []
-						const producers = channelState?.producers || []
-						const startedAt = channelState?.started_at
-
 						return (
 							<ChannelsListItem
 								key={channel._id}
 								channel={channel}
-								clients={clients}
-								producers={producers}
-								startedAt={startedAt}
-								selected={spaces.channel === channel._id}
+								selected={nav.channel === channel._id}
 								handleOnClick={() =>
 									handleOnClickChannel(channel)
 								}

@@ -1,86 +1,75 @@
+import type { Channel } from "@comty/shared/types/spaces/channel"
+import type { MouseEventHandler } from "react"
+import type { Client } from "@comty/shared/types/rtc/client"
+
+import React from "react"
 import classnames from "classnames"
 import { AnimatePresence } from "motion/react"
 
 import TimeAgo from "@components/TimeAgo"
 import VoiceClient from "@components/Spaces/VoiceClient"
-import useMediaRTCState from "@hooks/useMediaRTCState"
-
 import { Icons } from "@components/Icons"
+
+import { useRTCStore } from "@/rtc"
+import { GroupStore } from "@/group"
 
 import "./index.less"
 
 const ChannelsListItem = ({
 	channel,
-	clients,
-	producers,
-	startedAt,
 	invalid,
 	selected,
 	handleOnClick,
-	hasUnread,
+	hasUnread = false,
+}: {
+	channel: Channel
+	invalid?: boolean
+	selected?: boolean
+	hasUnread?: boolean
+	handleOnClick?: MouseEventHandler
 }) => {
 	if (!channel) {
 		return null
 	}
 
-	const rtcState = useMediaRTCState()
-	const isJoined = rtcState.channelId === channel._id
+	const channelState = GroupStore((s) => s.statedChannels[channel._id])
+	const rtcState = useRTCStore()
 
-	const getRtcClient = React.useCallback(
-		(client) => {
-			if (!isJoined || !client) {
-				return null
-			}
+	const isJoined = rtcState.channel?._id === channel._id
 
-			return app.cores.mediartc.instance().clients.get(client.userId)
-		},
-		[isJoined, rtcState],
-	)
-
+	// only return true if the client is speaking and is joined to the channel
 	const isClientSpeaking = React.useCallback(
-		(client) => {
-			const rtcClient = getRtcClient(client)
+		(client: Client) => {
+			if (!isJoined) return null
+			if (client.self) return rtcState.isSpeaking
 
-			if (!rtcClient) {
-				return null
-			}
-
-			if (rtcClient.self) {
-				return rtcState.isSpeaking
-			}
-
-			return rtcClient.micConsumer?.isSpeaking
+			return rtcState.speakingClients.includes(client.userId)
 		},
 		[isJoined, rtcState],
 	)
 
 	const getClientProducers = React.useCallback(
-		(client) => {
-			const rtcClient = getRtcClient(client)
-
-			if (!rtcClient) {
-				return [...producers].filter(
-					(producer) => producer.user_id === client.userId,
-				)
+		(client: Client) => {
+			if (!channelState || !Array.isArray(channelState.producers)) {
+				return []
 			}
 
-			return rtcClient.getAvailableProducers()
+			return channelState.producers.filter(
+				(producer) => producer.userId === client.userId,
+			)
 		},
-		[isJoined, rtcState],
+		[channelState],
 	)
 
 	return (
 		<div
-			className={classnames(
-				"group-page__channels-panel__list-item bg-accent",
-				{
-					["invalid"]: invalid,
-					["selected"]: selected,
-					["joined"]: isJoined,
-					["empty"]: clients?.length === 0,
-					["has-unread"]: hasUnread,
-				},
-			)}
+			className={classnames("group-page__channels-panel__list-item bg-accent", {
+				["invalid"]: invalid,
+				["selected"]: selected,
+				["joined"]: isJoined,
+				["empty"]: channelState?.clients?.length === 0,
+				["has-unread"]: hasUnread,
+			})}
 		>
 			<div
 				className="group-page__channels-panel__list-item__content"
@@ -109,10 +98,10 @@ const ChannelsListItem = ({
 						</div>
 					)}
 
-					{startedAt && (
+					{channelState?.started_at && (
 						<div className="group-page__channels-panel__list-item__content__info__timer">
 							<TimeAgo
-								time={startedAt}
+								time={channelState?.started_at}
 								counterMode={true}
 							/>
 						</div>
@@ -121,17 +110,17 @@ const ChannelsListItem = ({
 			</div>
 
 			<AnimatePresence mode="sync">
-				{(clients?.length ?? 0) !== 0 && (
+				{(channelState?.clients?.length ?? 0) !== 0 && (
 					<div
 						key={`clients-list-${channel._id}`}
 						className="group-page__channels-panel__list-item__clients bg-accent"
 						data-channel-id={channel._id}
 						data-group-id={channel.group_id}
 					>
-						{clients?.map((client, index) => {
+						{channelState?.clients?.map((client, index) => {
 							return (
 								<VoiceClient
-									key={client._id}
+									key={client.userId}
 									client={client}
 									speaking={isClientSpeaking(client)}
 									producers={getClientProducers(client)}
