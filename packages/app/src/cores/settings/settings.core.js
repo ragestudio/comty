@@ -19,8 +19,9 @@ export default class SettingsCore extends Core {
 		withEvent: this.withEvent,
 	}
 
-	onInitialize() {
+	async onInitialize() {
 		if ("__ELECTRON__" in window) {
+			// @ts-ignore
 			this.storeInstance = window["__ELECTRON__"].settings
 		} else {
 			this.storeInstance = store
