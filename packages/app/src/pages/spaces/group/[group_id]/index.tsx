@@ -14,37 +14,39 @@ import {
 } from "@components/Spaces/Group/ContentPanel"
 
 import {
-	useNavigation,
 	useGroupActions,
 	useGroupLoading,
 	useGroupError,
 	useGroupData,
 	useGroupChannels,
-	subscribeGroupSocket,
-} from "@comty/spaces-lib"
+} from "@comty/spaces-sdk/group"
 
-import useRtcChannelId from "@hooks/useRtcChannelId"
+import useSpacesNavigation from "@/stores/spaces/navigation"
+import { subscribeGroupSocket } from "@comty/spaces-sdk/events"
+
 import useTitle from "@hooks/useTitle"
 
 import SplitterSizes from "./splitter_sizes"
 
-import "./index.less"
 import {
 	SettingsMenu,
 	SettingsRender,
 	useGroupSettingsPage,
 } from "@/components/Spaces/Group/SettingsPanel"
+import useRTCStore from "@/rtc"
+
+import "./index.less"
 
 const GroupPage = (props) => {
 	const [documentTitle, setDocumentTitle] = useTitle()
 
-	const nav = useNavigation()
+	const nav = useSpacesNavigation()
 	const actions = useGroupActions()
 	const loading = useGroupLoading()
 	const error = useGroupError()
 	const data = useGroupData()
 	const channels = useGroupChannels()
-	const rtcChannelId = useRtcChannelId()
+	const rtcState = useRTCStore((s) => s.state)
 
 	const savedSizes = React.useMemo(() => SplitterSizes.loadSizes(), [])
 
@@ -81,12 +83,17 @@ const GroupPage = (props) => {
 			)
 
 			if (firstTextChannel) {
-				nav.navigate({ channel: firstTextChannel._id })
+				nav.actions.navigate({ channel: firstTextChannel._id })
 			}
 		}
 	}, [data, loading])
 
-	console.log("nav", nav)
+	React.useEffect(() => {
+		nav.actions.initFromUrl()
+		window.addEventListener("popstate", nav.actions.initFromUrl)
+
+		return () => window.removeEventListener("popstate", nav.actions.initFromUrl)
+	}, [])
 
 	return (
 		<Splitter
@@ -109,9 +116,11 @@ const GroupPage = (props) => {
 					/>
 				)}
 
-				<div className="group-page__leftbar__bottom">
-					{rtcChannelId && <VoiceChannelCard />}
-				</div>
+				{rtcState !== "disconnected" && (
+					<div className="group-page__leftbar__bottom">
+						<VoiceChannelCard />
+					</div>
+				)}
 			</Splitter.Panel>
 
 			<Splitter.Panel
@@ -159,7 +168,7 @@ const GroupPage = (props) => {
 
 GroupPage.options = {
 	layout: {
-		type: "spaces",
+		type: "default",
 		centeredContent: false,
 		maxHeight: true,
 	},
