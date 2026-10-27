@@ -1,6 +1,6 @@
 {
 	"name": "@comty/spaces-sdk",
-	"version": "0.1.0",
+	"version": "2.0.0",
 	"description": "Agnostic SDK for Comty Spaces",
 	"author": "ragestudio",
 	"license": "MIT",
@@ -11,6 +11,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@timephy/rnnoise-wasm": "^1.0.0",
 		"axios": "^1.20.0",
 		"mediasoup-client": "^3.24.4",
 		"tinybase": "^10.0.1",
@@ -35,17 +36,22 @@
 		"./rtc/audio": "./src/rtc/audio/index.ts",
 		"./rtc/audio/processing": "./src/rtc/audio/processing/index.ts",
 		"./rtc/*": "./src/rtc/*",
+		"./rtc/web": "./src/rtc/web/index.ts",
+		"./rtc/web/*": "./src/rtc/web/*",
 		"./group/constants": "./src/group/constants.ts",
 		"./group/types": "./src/group/types.ts",
 		"./group": "./src/group/index.ts",
 		"./group/*": "./src/group/*",
 		"./chat/types": "./src/chat/types.ts",
+		"./chat/session": "./src/chat/session.ts",
 		"./chat": "./src/chat/index.ts",
 		"./chat/*": "./src/chat/*",
 		"./groupsList": "./src/groupsList/index.ts",
 		"./groupsList/*": "./src/groupsList/*",
 		"./events": "./src/events/index.ts",
 		"./events/*": "./src/events/*",
-		"./db": "./src/db/index.ts"
+		"./db": "./src/db/index.ts",
+		"./db/react": "./src/db/useLiveQuery.ts",
+		"./db/persister-web": "./src/db/persister-web.ts"
 	}
 }
