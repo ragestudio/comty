@@ -4,6 +4,10 @@ import type { Consumer } from "@/rtc/consumers/consumer"
 
 import adapter from "@/adapter"
 import volumeToGain from "@/utils/volumeToGain"
+import {
+	getMediaStreamURL,
+	releaseMediaStreamURL,
+} from "@/utils/mediaStreamURL"
 import loggerBase from "@/utils/logger"
 
 import { MIN_VOLUME_DB } from "./constants"
@@ -15,6 +19,8 @@ export type MediaRole = "audio" | "video"
 export interface SerializedRemoteMedia {
 	userId: string
 	streamURL: string | null
+	// the aggregated video stream, used on web with srcObject
+	stream: MediaStream | null
 	hasAudio: boolean
 	enabled: boolean
 	volume: number
@@ -64,19 +70,18 @@ export class RemoteMedia {
 	}
 
 	get streamURL(): string | null {
-		const media = this.media as MediaStream & { toURL?: () => string }
-
 		if (this.media.getVideoTracks().length === 0) {
 			return null
 		}
 
-		return typeof media.toURL === "function" ? media.toURL() : null
+		return getMediaStreamURL(this.media)
 	}
 
 	serialize(): SerializedRemoteMedia {
 		return {
 			userId: this.userId,
 			streamURL: this.streamURL,
+			stream: this.media.getVideoTracks().length > 0 ? this.media : null,
 			hasAudio: this.hasAudio,
 			enabled: this.enabled,
 			volume: this.volume,
@@ -93,7 +98,14 @@ export class RemoteMedia {
 		}
 	}
 
-	async removeProducer(role: MediaRole) {
+	async removeProducer(role: MediaRole, producerId?: string) {
+		const currentProducer = this.producers.get(role)
+
+		// ignore stale events for a producer that was already replaced
+		if (producerId && currentProducer?.producerId !== producerId) {
+			return
+		}
+
 		this.producers.delete(role)
 
 		const consumer = this.consumers.get(role)
@@ -101,6 +113,12 @@ export class RemoteMedia {
 
 		if (consumer) {
 			await this.core.consumers.stop(consumer.id)
+		}
+
+		// no media left, drop the whole entity
+		if (this.producers.size === 0) {
+			await this.destroy()
+			return
 		}
 
 		this.collection.syncState()
@@ -208,6 +226,8 @@ export class RemoteMedia {
 			}
 
 			releasable.release?.(false)
+
+			releaseMediaStreamURL(media)
 		}
 
 		const consumers = Array.from(this.consumers.values())

@@ -53,8 +53,12 @@ export abstract class RemoteMedias<T extends RemoteMedia> extends Map<
 		return media
 	}
 
-	async removeProducer(userId: string, role: MediaRole): Promise<void> {
-		await this.get(userId)?.removeProducer(role)
+	async removeProducer(
+		userId: string,
+		role: MediaRole,
+		producerId?: string,
+	): Promise<void> {
+		await this.get(userId)?.removeProducer(role, producerId)
 	}
 
 	async enable(userId: string): Promise<void> {
