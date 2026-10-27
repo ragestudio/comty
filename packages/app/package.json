@@ -11,7 +11,8 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"release": "node ./scripts/release.js",
-		"eslint": "eslint"
+		"eslint": "eslint",
+		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@comty/shared": "workspace:*",
@@ -98,6 +99,7 @@
 		"zustand": "^5.0.15"
 	},
 	"devDependencies": {
+		"typescript": "^7.0.2",
 		"@eslint/js": "^10.0.1",
 		"@types/audioworklet": "^0.0.100",
 		"@types/node": "^26.6.4",
