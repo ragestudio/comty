@@ -9,6 +9,8 @@ import { ThemeProvider } from "@cores/style/style.core"
 import NotificationsRenderer from "./cores/notifications/render"
 
 import { rtcService } from "@comty/spaces-sdk/rtc"
+import { startWebPersistence } from "@comty/spaces-sdk/db/persister-web"
+import { initializeRtcAdapter } from "@comty/spaces-sdk/rtc/web"
 
 import AppCrash from "@components/AppCrash"
 import Layout from "./layout"
@@ -56,6 +58,12 @@ class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 	static async initialize() {
 		window.app.version = config.package.version
 		window.app.isCapacitor = window["IS_MOBILE_HOST"]
+
+		// restore the spaces cache before any store starts querying it
+		await startWebPersistence()
+
+		// register the web rtc adapter (audio playback, processing and routing)
+		await initializeRtcAdapter()
 
 		// if in production, initialize Sentry (if VITE_SENTRY_DSN is set)
 		if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.PROD) {
@@ -108,15 +116,15 @@ class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 			<ThemeProvider>
 				<AppCrash>
 					<NotificationsRenderer ref={this.notificationsRef} />
-					<Layout staticRenders={ComtyApp.staticRenders}>
-						{this.state.firstInitialized && (
-							<Router.Render
-								declarations={routesDeclarations}
-								staticRenders={ComtyApp.staticRenders}
-								onPageMount={onPageMount}
-							/>
-						)}
-					</Layout>
+					<Router.Router
+						declarations={routesDeclarations}
+						staticRenders={ComtyApp.staticRenders}
+						onPageMount={onPageMount}
+					>
+						<Layout staticRenders={ComtyApp.staticRenders}>
+							{this.state.firstInitialized && <Router.Render />}
+						</Layout>
+					</Router.Router>
 				</AppCrash>
 			</ThemeProvider>
 		)
