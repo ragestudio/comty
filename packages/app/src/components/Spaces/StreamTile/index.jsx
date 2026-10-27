@@ -10,8 +10,24 @@ import { useStreamVolumePersistence } from "@hooks/useStreamVolumePersistence"
 
 import "./index.less"
 
-const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
-	const rtc = app.cores.mediartc.instance()
+const StreamTile = ({
+	stream,
+	userData = null,
+	mode = "grid",
+	onTileClick = null,
+}) => {
+	// sdk streams carry the media directly, the legacy core resolves it by user
+	const isSdkStream = stream?.mediaStream !== undefined
+
+	const rtc = React.useMemo(() => {
+		if (isSdkStream) return null
+
+		try {
+			return app.cores.mediartc?.instance?.() ?? null
+		} catch {
+			return null
+		}
+	}, [isSdkStream])
 
 	const videoRef = React.useRef(null)
 	const containerRef = React.useRef(null)
@@ -30,18 +46,29 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 	const showControls = mode !== "preview"
 
 	React.useEffect(() => {
+		if (stream.volume !== undefined) {
+			setLocalVolume(stream.volume)
+			return
+		}
+
 		if (stream.userId) {
 			setLocalVolume(getVolume(stream.userId) ?? 100)
 		}
-	}, [stream.userId, getVolume])
+	}, [stream.userId, stream.volume, getVolume])
 
 	const checkMedia = React.useCallback(() => {
+		if (isSdkStream) {
+			setMediaStream(stream.mediaStream ?? null)
+			setHasError(false)
+			return
+		}
+
 		if (stream.isSelf && stream.stream) {
 			setMediaStream(stream.stream)
 			return
 		}
 
-		const screen = rtc.screens.get(stream.userId)
+		const screen = rtc?.screens.get(stream.userId)
 
 		if (screen?.media) {
 			setMediaStream(screen.media)
@@ -49,7 +76,7 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 		} else {
 			setMediaStream(null)
 		}
-	}, [stream, rtc])
+	}, [stream, rtc, isSdkStream])
 
 	React.useEffect(() => checkMedia(), [checkMedia])
 
@@ -74,7 +101,14 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 
 	React.useEffect(() => {
 		if (videoRef.current) {
-			const screen = rtc.screens.get(stream.userId)
+			if (isSdkStream) {
+				// sdk routes remote audio through the audio adapter, keep the
+				// video element muted to avoid double playback
+				videoRef.current.muted = true
+				return
+			}
+
+			const screen = rtc?.screens.get(stream.userId)
 
 			if (stream.isSelf) {
 				videoRef.current.muted = true
@@ -83,7 +117,7 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 				videoRef.current.volume = volume / 100
 			}
 		}
-	}, [volume, stream.userId, stream.isSelf, rtc])
+	}, [volume, stream.userId, stream.isSelf, rtc, isSdkStream])
 
 	React.useEffect(() => {
 		const handleFullscreenChange = () => {
@@ -152,12 +186,17 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 				setVolume(stream.userId, value)
 			}
 
-			const screen = rtc.screens.get(stream.userId)
+			if (typeof stream.onVolume === "function") {
+				stream.onVolume(value)
+				return
+			}
+
+			const screen = rtc?.screens.get(stream.userId)
 			if (screen?.setVolume) {
 				screen.setVolume(value)
 			}
 		},
-		[stream.userId, setVolume, rtc],
+		[stream, setVolume, rtc],
 	)
 
 	const handleStart = React.useCallback(
@@ -172,8 +211,12 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 			setHasError(false)
 
 			try {
-				await rtc.screens.start(stream.producer.id)
-				checkMedia()
+				if (typeof stream.onStart === "function") {
+					await stream.onStart()
+				} else if (rtc) {
+					await rtc.screens.start(stream.producer.id)
+					checkMedia()
+				}
 			} catch (error) {
 				setHasError(true)
 			} finally {
@@ -192,7 +235,12 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 			}
 
 			try {
-				const screen = rtc.screens.get(stream.userId)
+				if (typeof stream.onStop === "function") {
+					await stream.onStop()
+					return
+				}
+
+				const screen = rtc?.screens.get(stream.userId)
 
 				if (screen) {
 					await screen.stop()
@@ -313,16 +361,18 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 
 				{hasVideo && !hasError && showControls && (
 					<div className="video-stream-tile__controls">
-						{!stream.isSelf && (
-							<div className="video-stream-tile__controls__volume bg-accent">
-								<Icons.Volume2 />
-								<Slider
-									value={volume}
-									onChange={onVolumeChange}
-									onChangeComplete={onVolumeChange}
-								/>
-							</div>
-						)}
+						{!stream.isSelf &&
+							(!isSdkStream ||
+								typeof stream.onVolume === "function") && (
+								<div className="video-stream-tile__controls__volume bg-accent">
+									<Icons.Volume2 />
+									<Slider
+										value={volume}
+										onChange={onVolumeChange}
+										onChangeComplete={onVolumeChange}
+									/>
+								</div>
+							)}
 
 						<Button
 							icon={<Icons.Fullscreen />}
