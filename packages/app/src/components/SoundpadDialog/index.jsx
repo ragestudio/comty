@@ -5,11 +5,13 @@ import SoundpadLocalVolume from "@components/SoundpadLocalVolume"
 import SoundpadRandomKanker from "@components/SoundpadRandomKanker"
 import SoundpadCustomUrl from "@components/SoundpadCustomUrl"
 
+import { rtcService } from "@/rtc"
+
 import "./index.less"
 
 const SoundpadDialog = ({ close, group_id }) => {
 	const dispatchSrc = (item) => {
-		app.cores.mediartc.handlers().soundpadDispatch({
+		rtcService.handlers.emitClientEvent("soundpad", {
 			src: item.src,
 			icon: item.icon,
 		})
@@ -30,15 +32,9 @@ const SoundpadDialog = ({ close, group_id }) => {
 				dispatch={dispatchSrc}
 			/>
 
-			<SoundpadCustomUrl
-				group_id={group_id}
-				dispatch={dispatchSrc}
-			/>
+			<SoundpadCustomUrl dispatch={dispatchSrc} />
 
-			<SoundpadRandomKanker
-				group_id={group_id}
-				dispatch={dispatchSrc}
-			/>
+			<SoundpadRandomKanker dispatch={dispatchSrc} />
 		</div>
 	)
 }
