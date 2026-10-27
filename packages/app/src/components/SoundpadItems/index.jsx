@@ -1,10 +1,11 @@
-import GroupModel from "@models/groups"
+import useRequest from "comty.js/hooks/useRequest"
+import GroupModel from "@endpoints/groups"
 import SoundpadItem from "@components/SoundpadItem"
 
 import "./index.less"
 
 const SoundpadItems = ({ group_id, dispatch }) => {
-	const [L_Items, R_Items, E_Items] = app.cores.api.useRequest(
+	const [L_Items, R_Items, E_Items] = useRequest(
 		GroupModel.soundpad.getItems,
 		group_id,
 	)
