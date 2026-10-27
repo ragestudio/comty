@@ -2,6 +2,11 @@ import type Redis from "ioredis"
 import type { UserPresenceConnection } from "@comty/shared/types/user"
 import type { Server } from "linebridge"
 
+/** current unix time in seconds, the presence zset stores expiry scores */
+function now(): number {
+	return Math.floor(Date.now() / 1000)
+}
+
 export type ConnectionEventParams = {
 	socket_id: string
 	user_id: string | number
@@ -17,6 +22,24 @@ export default class UserConnections {
 	static USER_CONNECTIONS_PREFIX = "presence:user:"
 	static SOCKETS_PREFIX = "presence:sockets:"
 	static fetchHardLimit = 200
+
+	/**
+	 * Counts the sockets of a user that still hold a live presence hash.
+	 * Stale members left behind by an instance that died are removed here,
+	 * so a presence read never reports a connection that no longer exists.
+	 */
+	static liveConnectionsScript = `
+		local members = redis.call('SMEMBERS', KEYS[1])
+		local count = 0
+		for i = 1, #members do
+			if redis.call('EXISTS', ARGV[1] .. members[i]) == 1 then
+				count = count + 1
+			else
+				redis.call('SREM', KEYS[1], members[i])
+			end
+		end
+		return count
+	`
 
 	constructor(server: Server) {
 		if (!server) {
@@ -63,10 +86,13 @@ export default class UserConnections {
 			limit = UserConnections.fetchHardLimit
 		}
 
-		return await this.redis.zrange(
+		return await this.redis.zrangebyscore(
 			UserConnections.GLOBAL_USERS_ZSET,
+			`(${now()}`,
+			"+inf",
+			"LIMIT",
 			offset,
-			offset + limit - 1,
+			limit,
 		)
 	}
 
@@ -93,11 +119,15 @@ export default class UserConnections {
 
 		socketIds.forEach((socketId, index) => {
 			const res = results[index]
-			if (res[0] === null && res[1]) {
-				parsedConnections[socketId] = res[1]
-			} else {
-				parsedConnections[socketId] = { error: "invalid data" }
+			const data = res && res[0] === null ? res[1] : null
+
+			// a missing hash belongs to a dead connection, drop it
+			if (!data || Object.keys(data).length === 0) {
+				this.redis.srem(userSetKey, socketId).catch(() => {})
+				return
 			}
+
+			parsedConnections[socketId] = data
 		})
 
 		return parsedConnections
@@ -111,7 +141,12 @@ export default class UserConnections {
 		}
 
 		const userSetKey = `${UserConnections.USER_CONNECTIONS_PREFIX}${userId}`
-		const connectionsCount = await this.redis.scard(userSetKey)
+		const connectionsCount = (await this.redis.eval(
+			UserConnections.liveConnectionsScript,
+			1,
+			userSetKey,
+			UserConnections.SOCKETS_PREFIX,
+		)) as number
 
 		return {
 			userId: userId,
@@ -134,15 +169,18 @@ export default class UserConnections {
 		const pipeline = this.redis.pipeline()
 
 		for (const userId of userIds) {
-			pipeline.scard(
+			pipeline.eval(
+				UserConnections.liveConnectionsScript,
+				1,
 				`${UserConnections.USER_CONNECTIONS_PREFIX}${userId}`,
+				UserConnections.SOCKETS_PREFIX,
 			)
 		}
 
 		const results = await pipeline.exec()
 
 		return results.map((result, index) => {
-			const count = result[1] as number
+			const count = result ? Number(result[1]) || 0 : 0
 			return {
 				userId: userIds[index],
 				connected: count > 0,
@@ -152,6 +190,10 @@ export default class UserConnections {
 	}
 
 	async getTotalConnectedUsers() {
-		return this.redis.zcard(UserConnections.GLOBAL_USERS_ZSET)
+		return this.redis.zcount(
+			UserConnections.GLOBAL_USERS_ZSET,
+			`(${now()}`,
+			"+inf",
+		)
 	}
 }
