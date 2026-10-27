@@ -2,6 +2,7 @@ import React from "react"
 import { Checkbox } from "antd"
 import Button from "@ui/Button"
 import MarkdownReader from "@components/MarkdownReader"
+import client from "comty.js/core/client"
 
 import "./index.less"
 
@@ -14,11 +15,11 @@ const OptInDialog = ({ close }) => {
 		setSubmitErr(null)
 		setSubmitLoading(true)
 
-		const ok = await app.cores.api
-			.customRequest({
+		const ok = await client
+			.instance({
 				method: "POST",
 				url: "/flags/ack/spaces_preview",
-				body: {
+				data: {
 					tos_accept: termsAccept,
 				},
 			})
