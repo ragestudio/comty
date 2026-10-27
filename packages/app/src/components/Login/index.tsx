@@ -14,12 +14,8 @@ const STEPS_ON_ERROR = {
 }
 
 const STEPS_VALIDATIONS = {
-	username: async (username) => {
-		const check = /** @type {any} */ (
-			await AuthModel.usernameValidation(username).catch(() => ({
-				exists: false,
-			}))
-		)
+	username: async (username: string) => {
+		const check = await AuthModel.usernameValidation(username)
 
 		return check.exists
 	},
@@ -30,17 +26,21 @@ const PHASES_TO_STEPS = {
 	1: "password",
 }
 
+type LoginInputs = {
+	username?: string
+	password?: string
+	mfa_code?: string
+}
+
 const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 	const [loading, setLoading] = React.useState(false)
-	const [loginInputs, setLoginInputs] = React.useState(
-		/** @type {any} */ ({}),
-	)
+	const [loginInputs, setLoginInputs] = React.useState<LoginInputs>({})
 	const [error, setError] = React.useState(null)
 	const [phase, setPhase] = React.useState(0)
 
 	const [mfaRequired, setMfaRequired] = React.useState(null)
 	const [activation, setActivation] = React.useState(null)
-	const [forbidden, setForbidden] = React.useState(/** @type {any} */ (false))
+	const [forbidden, setForbidden] = React.useState(false)
 
 	const formRef = React.useRef(null)
 	const usernameInputRef = React.useRef(null)
@@ -80,15 +80,7 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 
 			return true
 		},
-		[
-			close,
-			onDoneProp,
-			loginInputs,
-			phase,
-			mfaRequired,
-			activation,
-			forbidden,
-		],
+		[close, onDoneProp, loginInputs, phase, mfaRequired, activation, forbidden],
 	)
 
 	const handleFinish = async () => {
@@ -102,21 +94,15 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 		setLoading(true)
 
 		try {
-			// AuthModel.login callback is called if mfa is required
-			const result = /** @type {any} */ (
-				await AuthModel.login(payload, async (res) => {
-					if (res?.mfa_required) {
-						// State update is scheduled
-						setMfaRequired(res.mfa_required)
-					}
-				})
-			)
+			const result = await AuthModel.login(payload, async (res) => {
+				if (res?.mfa_required) {
+					setMfaRequired(res.mfa_required)
+				}
+			})
 
-			// If we get a result (token), it's a success
 			if (result && result.token) {
 				await onDone(result)
 			} else {
-				// If result is false (MFA required) or no token, stop loading
 				setLoading(false)
 			}
 		} catch (err) {
@@ -128,14 +114,6 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 
 				if (data.violation) {
 					setForbidden(data.violation)
-					return
-				}
-
-				if (data.activation_required) {
-					setActivation({
-						required: true,
-						user_id: data.user_id,
-					})
 					return
 				}
 
@@ -248,9 +226,7 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 		if (!activation) return
 
 		try {
-			const resendObj = await AuthModel.resendActivationCode(
-				activation.user_id,
-			)
+			const resendObj = await AuthModel.resendActivationCode(activation.user_id)
 			if (resendObj) {
 				setActivation((prev) => ({
 					...prev,
@@ -283,10 +259,9 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 				<div className="content">
 					<h1>Access denied</h1>
 					<h3>
-						Your account has been disabled due a violation to our
-						terms of service
+						Your account has been disabled due a violation to our terms of
+						service
 					</h3>
-					<div className="field-error">{forbidden.reason}</div>
 					<p>If you think this is an error, please contact support</p>
 				</div>
 			</div>
@@ -299,15 +274,12 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 				<div className="content">
 					<h1>Activate your Account</h1>
 					<p>
-						We have sent you an email with a code that you need to
-						enter below.
+						We have sent you an email with a code that you need to enter below.
 					</p>
 
 					<Input.OTP
 						length={6}
-						onChange={(code) =>
-							setActivation((prev) => ({ ...prev, code }))
-						}
+						onChange={(code) => setActivation((prev) => ({ ...prev, code }))}
 					/>
 
 					<div className="resend">
@@ -372,9 +344,7 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 						<Input
 							ref={usernameInputRef}
 							placeholder="myusername / myemail@example.com"
-							onChange={(e) =>
-								onUpdateInput("username", e.target.value)
-							}
+							onChange={(e) => onUpdateInput("username", e.target.value)}
 							onPressEnter={nextStep}
 							autoFocus
 						/>
@@ -391,9 +361,7 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 						</span>
 						<Input.Password
 							ref={passwordInputRef}
-							onChange={(e) =>
-								onUpdateInput("password", e.target.value)
-							}
+							onChange={(e) => onUpdateInput("password", e.target.value)}
 							onPressEnter={nextStep}
 						/>
 					</Form.Item>
@@ -411,15 +379,11 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 						{mfaRequired && (
 							<div style={{ marginBottom: 10 }}>
 								{mfaRequired.method === "totp" ? (
-									<p>
-										Enter the 6-digit code from your
-										authenticator app.
-									</p>
+									<p>Enter the 6-digit code from your authenticator app.</p>
 								) : (
 									<>
 										<p>
-											We send a verification code to [
-											{mfaRequired.sended_to}]
+											We send a verification code to [{mfaRequired.sended_to}]
 										</p>
 										<p>
 											Didn't receive the code?{" "}
