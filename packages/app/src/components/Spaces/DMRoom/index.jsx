@@ -4,14 +4,14 @@ import { Button } from "antd"
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 
-import { useNavigation } from "@comty/spaces-lib"
+import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import Chat from "@components/Spaces/Chat"
 
 import "./index.less"
 
 const DMChat = ({ to_user_id }) => {
-	const spaces = useNavigation()
+	const nav = useSpacesNavigation()
 
 	const onClickCall = React.useCallback(() => {
 		app.cores.mediartc.handlers().callUser(to_user_id, {
@@ -20,8 +20,8 @@ const DMChat = ({ to_user_id }) => {
 	}, [to_user_id])
 
 	const onClickBack = React.useCallback(() => {
-		spaces.navigate({ type: null, room: null })
-	}, [spaces])
+		nav.actions.navigate({ type: null, room: null })
+	}, [nav])
 
 	return (
 		<div className="chat-page">
@@ -40,7 +40,7 @@ const DMChat = ({ to_user_id }) => {
 					/>
 				</div>
 				<div className="chat-page__header__right">
-					{spaces.headerContent && spaces.headerContent()}
+					{nav.headerContent && nav.headerContent()}
 
 					<Button
 						icon={<Icons.Phone />}
