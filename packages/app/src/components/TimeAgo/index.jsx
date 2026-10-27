@@ -3,7 +3,6 @@ import React from "react"
 import { DateTime } from "luxon"
 
 const TimeAgo = (props) => {
-	const [calculationInterval, setCalculationInterval] = React.useState(null)
 	const [text, setText] = React.useState("")
 
 	function formatAsCounter(diffMs) {
@@ -15,10 +14,17 @@ const TimeAgo = (props) => {
 		return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
 	}
 
-	async function calculateRelative() {
-		const dateTime = DateTime.fromISO(props.time, {
+	function calculateRelative() {
+		const options = {
 			locale: app.cores.settings.get("language"),
-		})
+		}
+
+		const dateTime =
+			props.time instanceof Date
+				? DateTime.fromJSDate(props.time, options)
+				: typeof props.time === "number"
+					? DateTime.fromMillis(props.time, options)
+					: DateTime.fromISO(props.time ?? "", options)
 
 		if (props.counterMode) {
 			const now = DateTime.now()
@@ -34,14 +40,12 @@ const TimeAgo = (props) => {
 			? (props.interval ?? 1000)
 			: (props.interval ?? 3000)
 
-		setCalculationInterval(setInterval(calculateRelative, interval))
+		const timer = setInterval(calculateRelative, interval)
 
 		calculateRelative()
 
-		return () => {
-			clearInterval(calculationInterval)
-		}
-	}, [props.counterMode, props.interval])
+		return () => clearInterval(timer)
+	}, [props.time, props.counterMode, props.interval])
 
 	return text
 }
