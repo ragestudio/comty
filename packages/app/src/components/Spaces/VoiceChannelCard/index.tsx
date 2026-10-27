@@ -11,8 +11,9 @@ import { openDialog as openScreenShareDialog } from "@components/ScreenShareDial
 import { openDialog as openScreenShareOptionsDialog } from "@components/ScreenShareOptionsDialog"
 import { openDialog as openSoundpadDialog } from "@components/SoundpadDialog"
 import { openDialog as openShareCameraDialog } from "@components/ShareCameraDialog"
+import { openModal as openQuickVoiceSettingsModal } from "@/components/Spaces/QuickVoiceSettings"
 
-import useMediaRTCState from "@hooks/useMediaRTCState"
+import { type RTCReactiveState, useRTCStore, rtcService } from "@/rtc"
 
 import VoiceChannelStats from "./stats"
 
@@ -25,11 +26,13 @@ const stateToText = {
 	connected: "Connected",
 }
 
-const ConnectionStateIndicator = ({ state }) => {
+const ConnectionStateIndicator = ({ state }: { state: RTCReactiveState }) => {
+	const isLoading = state.state === "loading"
+
 	return (
 		<div
 			className={classNames("connection-indicator", {
-				loading: state.isLoading,
+				loading: isLoading,
 				connected: state.sendTransportState === "connected",
 			})}
 		>
@@ -39,20 +42,24 @@ const ConnectionStateIndicator = ({ state }) => {
 				content={() => <VoiceChannelStats state={state} />}
 				autoAdjust={true}
 			>
-				{state.isLoading && <Icons.LoadingOutlined />}
-				{!state.isLoading && <Icons.Connection />}
+				{isLoading && <Icons.LoadingOutlined />}
+				{!isLoading && <Icons.Connection />}
 
-				{state.isLoading && "Connecting..."}
-				{!state.isLoading &&
-					(stateToText[state.sendTransportState] ??
-						state.sendTransportState)}
+				{isLoading && "Connecting..."}
+				{!isLoading &&
+					(stateToText[state.sendTransportState] ?? state.sendTransportState)}
 			</Popover>
 		</div>
 	)
 }
 
 const VoiceChannelCard = () => {
-	const state = useMediaRTCState()
+	const state = useRTCStore()
+
+	const isScreensharing =
+		state.screenVideoProducerId || state.screenAudioProducerId
+	const isMuted = state.voiceState.muted
+	const isDeafened = state.voiceState.deafened
 
 	const handleGoToChannel = () => {
 		app.location.push(
@@ -61,31 +68,23 @@ const VoiceChannelCard = () => {
 	}
 
 	const toggleScreenShare = async () => {
-		if (state.isProducingScreen) {
+		if (isScreensharing) {
 			openScreenShareOptionsDialog()
 		} else {
 			openScreenShareDialog()
 		}
 	}
 
-	const handleToggleCamera = () => {
-		if (state.isProducingCamera) {
-			app.cores.mediartc.handlers().stopCameraShare()
-		} else {
-			openShareCameraDialog()
-		}
-	}
-
 	const handleLeaveChannel = () => {
-		return app.cores.mediartc.handlers().leaveChannel()
+		return rtcService.handlers.leaveChannel()
 	}
 
 	const handleToggleMute = () => {
-		return app.cores.mediartc.handlers().toggleMute()
+		return rtcService.self.toggleMute()
 	}
 
 	const handleToggleDeafen = () => {
-		return app.cores.mediartc.handlers().toggleDeafen()
+		return rtcService.self.toggleDeafened()
 	}
 
 	return (
@@ -93,12 +92,7 @@ const VoiceChannelCard = () => {
 			<div className="rtc-vc-card__header">
 				<div className="rtc-vc-card__header__titles">
 					<div className="rtc-vc-card__header__titles__indicators">
-						<ConnectionStateIndicator
-							state={state}
-							loading={state.isLoading}
-							send={state.sendTransportState}
-							recv={state.recvTransportState}
-						/>
+						<ConnectionStateIndicator state={state} />
 
 						{state?.connectedAt && (
 							<>
@@ -128,48 +122,29 @@ const VoiceChannelCard = () => {
 
 			<div className="rtc-vc-card__controls">
 				<Button
-					icon={state.isMuted ? <Icons.MicOff /> : <Icons.Mic />}
+					icon={isMuted ? <Icons.MicOff /> : <Icons.Mic />}
 					onClick={handleToggleMute}
-					type={state.isMuted ? "primary" : "default"}
+					type={isMuted ? "primary" : "default"}
 					className={classNames("mic-button", {
 						speaking: state.isSpeaking,
 					})}
 				/>
 
 				<Button
-					icon={
-						state.isDeafened ? (
-							<Icons.VolumeOff />
-						) : (
-							<Icons.Volume2 />
-						)
-					}
-					type={state.isDeafened ? "primary" : "default"}
+					icon={isDeafened ? <Icons.VolumeOff /> : <Icons.Volume2 />}
+					type={isDeafened ? "primary" : "default"}
 					onClick={handleToggleDeafen}
 				/>
 
 				<Button
-					disabled
 					icon={
-						state.isProducingCamera ? (
-							<Icons.CameraOff />
-						) : (
-							<Icons.Camera />
-						)
-					}
-					type={state.isProducingCamera ? "primary" : "default"}
-					onClick={handleToggleCamera}
-				/>
-
-				<Button
-					icon={
-						state.isProducingScreen ? (
+						state.screenVideoProducerId || state.screenAudioProducerId ? (
 							<Icons.ScreenShareOff />
 						) : (
 							<Icons.ScreenShare />
 						)
 					}
-					type={state.isProducingScreen ? "primary" : "default"}
+					type={isScreensharing ? "primary" : "default"}
 					onClick={toggleScreenShare}
 				/>
 
@@ -178,6 +153,11 @@ const VoiceChannelCard = () => {
 					onClick={() =>
 						openSoundpadDialog({ group_id: state.channel.group_id })
 					}
+				/>
+
+				<Button
+					icon={<Icons.Settings />}
+					onClick={openQuickVoiceSettingsModal}
 				/>
 			</div>
 		</div>
