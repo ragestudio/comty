@@ -11,6 +11,15 @@ export function initRtcEvents() {
 
 	const bus = rtcService.eventBus
 
+	bus.on("rtc:channel:join_failed", (error: any) => {
+		app.cores.notifications.new({
+			type: "error",
+			title: "Failed to join",
+			description: error.message,
+			duration: 5,
+		})
+	})
+
 	bus.on("rtc:channel:joined", () => {
 		app.cores.sfx.play("media_channel_join")
 	})
