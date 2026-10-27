@@ -21,15 +21,15 @@ export default {
 				const channelElement = parent.closest("[data-channel-id]")
 				if (!channelElement) return
 
-				const messageTextElement =
-					parent.querySelector("#message-content")
-				const messageText =
-					messageTextElement?.textContent?.trim() || ""
-
-				const userNameElement = parent.querySelector(
-					".channel-chat__timeline__line__content__header__username span",
+				const messageTextElement = parent.querySelector(
+					"[data-message-content]",
 				)
-				const userName = userNameElement?.textContent?.trim() || ""
+				const messageText =
+					messageTextElement?.dataset?.messageText?.trim() ||
+					messageTextElement?.textContent?.trim() ||
+					""
+
+				const userName = parent.dataset.messageUserName?.trim() || ""
 
 				const event = new CustomEvent("chat:reply", {
 					bubbles: true,
@@ -59,10 +59,14 @@ export default {
 		})
 
 		// check if can copy message text
-		const messageContentElement = parent.querySelector("#message-content")
+		const messageContentElement = parent.querySelector(
+			"[data-message-content]",
+		)
 
 		if (messageContentElement) {
-			const messageContentText = messageContentElement.textContent
+			const messageContentText =
+				messageContentElement.dataset?.messageText ||
+				messageContentElement.textContent
 
 			items.push({
 				label: "Copy message",
