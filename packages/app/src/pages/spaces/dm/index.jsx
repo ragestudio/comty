@@ -4,13 +4,13 @@ import DMRoom from "@components/Spaces/DMRoom"
 import ToolsBar from "@components/Spaces/ToolsBar"
 import { Result, Splitter } from "antd"
 
-import { useNavigation } from "@comty/spaces-lib"
+import useNavigation from "@/stores/spaces/navigation"
 
 import "@pages/spaces/index.less"
 import "./index.less"
 
 const DirectMessageMainPage = () => {
-	const spaces = useNavigation()
+	const nav = useNavigation()
 
 	return (
 		<Splitter className="dm-page">
@@ -19,9 +19,10 @@ const DirectMessageMainPage = () => {
 				min={70}
 			>
 				<DMRoomsList
-					selectedRoom={spaces.room}
+					compact={false}
+					selectedRoom={nav.room}
 					onClickItem={(room) => {
-						spaces.navigate({
+						nav.actions.navigate({
 							type: "dm",
 							room: room.to_user_id,
 						})
@@ -33,7 +34,7 @@ const DirectMessageMainPage = () => {
 				className="dm-page__panel"
 				min={500}
 			>
-				{spaces.room && <DMRoom to_user_id={spaces.room} />}
+				{nav.room && <DMRoom to_user_id={nav.room} />}
 			</Splitter.Panel>
 
 			<Splitter.Panel
@@ -49,7 +50,7 @@ const DirectMessageMainPage = () => {
 
 DirectMessageMainPage.options = {
 	layout: {
-		type: "spaces",
+		type: "default",
 		centeredContent: false,
 		maxHeight: true,
 	},
