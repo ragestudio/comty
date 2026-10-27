@@ -3,33 +3,58 @@ import PropTypes from "prop-types"
 import axios from "axios"
 
 import Attachments from "@components/AttachmentsGrid"
+import client from "comty.js/core/client"
 
-const LinkPreview = React.memo(({ url }) => {
+const headersCache = new Map()
+
+/** @param {{ url: string }} props */
+const LinkPreviewComponent = ({ url }) => {
 	const [headers, setHeaders] = React.useState(null)
 
-	const loadHead = React.useCallback(async () => {
-		if (!url) {
+	React.useEffect(() => {
+		if (!url) return
+
+		const cached = headersCache.get(url)
+
+		if (cached) {
+			setHeaders(cached)
 			return
 		}
 
-		const composedUrl =
-			app.cores.api.client().origin + "/main/query_url" + "?url=" + url
+		const controller = new AbortController()
+		let active = true
 
-		const result = await axios({
-			method: "GET",
-			url: composedUrl,
-		}).catch(() => {
-			return null
-		})
+		const loadHead = async () => {
+			const composedUrl =
+				client.origin +
+				"/main/query_url" +
+				"?url=" +
+				encodeURIComponent(url)
 
-		if (result) {
-			setHeaders(result.data.remoteHeaders)
+			const result = await axios({
+				method: "GET",
+				url: composedUrl,
+				signal: controller.signal,
+			}).catch(() => null)
+
+			if (!active || !result) return
+
+			const remoteHeaders = result.data?.remoteHeaders ?? null
+
+			if (remoteHeaders) {
+				headersCache.set(url, remoteHeaders)
+			}
+
+			setHeaders(remoteHeaders)
+		}
+
+		loadHead()
+
+		return () => {
+			active = false
+			controller.abort()
 		}
 	}, [url])
-
-	React.useEffect(() => {
-		loadHead()
-	}, [url, loadHead])
 
 	if (headers && headers["content-type"]) {
 		const [type] = headers["content-type"].split("/")
@@ -62,12 +87,10 @@ const LinkPreview = React.memo(({ url }) => {
 			{url}
 		</a>
 	)
-})
+}
+
+const LinkPreview = React.memo(LinkPreviewComponent)
 
 LinkPreview.displayName = "LinkPreview"
-
-LinkPreview.propTypes = {
-	url: PropTypes.string.isRequired,
-}
 
 export default LinkPreview

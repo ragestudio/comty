@@ -1,194 +1,47 @@
-import type { ExtendedMessage as Message } from "@comty/spaces-lib/stores/chat/types"
+import type { ExtendedMessage as Message } from "@comty/spaces-sdk/chat/types"
 
 import React from "react"
 import classnames from "classnames"
-import ReactPlayer from "react-player"
 
 import Attachments from "@components/AttachmentsGrid"
 import TimeAgo from "@components/TimeAgo"
 import Image from "@components/Image"
 import StickerRender from "@components/StickerRender"
 import { Icons } from "@components/Icons"
-import Markdown from "react-markdown"
-import { ShikiHighlighter, isInlineCode } from "react-shiki"
 
-import LinkPreview from "./LinkPreview"
-import { useLiveQuery } from "dexie-react-hooks"
+import MessageContent from "./MessageContent"
 
-import db from "@comty/spaces-lib/db/index"
+import type { ReplyData } from "../hooks/useTimelineReplies"
 
 import "./Line.less"
 
 interface LineProps {
 	data: Message
 	headless: boolean
-	type?: "group" | "dm"
+	user?: Message["user"] | null
+	reply?: ReplyData | null
 	onReplyPreviewClick?: (replyToId: string) => void
-	isLast?: boolean
-	onReadAck?: (messageId: string) => void
-}
-
-const CodeHighlight = ({ className, children, node, ...props }) => {
-	const code = String(children).trim()
-	const match = className?.match(/language-(\w+)/)
-	const language = match ? match[1] : undefined
-	const isInline = node ? isInlineCode(node) : undefined
-
-	console.log({
-		children,
-		node,
-		isInline,
-	})
-
-	return !isInline ? (
-		<ShikiHighlighter
-			language={language}
-			theme="one-dark-pro"
-			{...props}
-		>
-			{code}
-		</ShikiHighlighter>
-	) : (
-		<code
-			className={className}
-			{...props}
-		>
-			{code}
-		</code>
-	)
-}
-const messageRegexs = [
-	{
-		regex:
-			/(?:https?:)?(?:\/\/)?(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/,
-		fn: (result: RegExpExecArray) => {
-			return (
-				<ReactPlayer
-					width="50%"
-					height="100%"
-					style={{
-						aspectRatio: "16/9",
-						minHeight: "300px",
-						borderRadius: "12px",
-						overflow: "hidden",
-					}}
-					url={result[0]}
-					controls
-					config={{
-						youtube: {
-							host: "https://youtube-nocookie.com",
-						},
-					}}
-				/>
-			)
-		},
-	},
-	{
-		regex:
-			/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
-		fn: (result: RegExpExecArray) => {
-			return <LinkPreview url={result[1]} />
-		},
-	},
-	// {
-	// 	regex: /(@[a-zA-Z0-9_]+)/gi,
-	// 	fn: (result: RegExpExecArray) => {
-	// 		return (
-	// 			<a
-	// 				onClick={() =>
-	// 					(globalThis as any).app.navigation.goToAccount(result[1].substr(1))
-	// 				}
-	// 			>
-	// 				{result[1]}
-	// 			</a>
-	// 		)
-	// 	},
-	// },
-]
-
-const RenderMessage = ({ messageStr }: { messageStr: string }) => {
-	const regexs = React.useMemo(() => {
-		if (!messageRegexs) {
-			return []
-		}
-
-		return messageRegexs
-			.map((option) => {
-				const result = option.regex.exec(messageStr)
-
-				if (!result) {
-					return null
-				}
-
-				return {
-					result: result,
-					regex: option.regex,
-					fn: option.fn,
-				}
-			})
-			.filter((item) => item !== null)
-	}, [messageStr])
-
-	const firstMatch = regexs[0]
-
-	if (firstMatch && typeof firstMatch.fn === "function") {
-		return firstMatch.fn(firstMatch.result)
-	}
-
-	return (
-		<Markdown
-			components={{
-				pre: (props) => {
-					return props.children
-				},
-				code: CodeHighlight,
-			}}
-		>
-			{messageStr}
-		</Markdown>
-	)
 }
 
 const Line = ({
 	data,
 	headless,
-	type,
+	user,
+	reply,
 	onReplyPreviewClick,
-	// isLast,
-	// onReadAck,
 }: LineProps) => {
-	const dbUserData = useLiveQuery(
-		() => (data.user_id ? db.users.get(data.user_id) : undefined),
-		[data.user_id],
-	)
 	const appUserData =
 		(globalThis as any).app?.userData || (window as any).app?.userData
 
-	// const intersectionRef = useMessageIntersection({
-	// 	messageId: data._id,
-	// 	onAck: isLast ? onReadAck : undefined,
-	// 	delayMs: 5000,
-	// })
+	const userData =
+		user ??
+		(appUserData && appUserData._id === data.user_id ? appUserData : null)
 
-	const replyData = useLiveQuery(async () => {
-		if (!data.reply_to_id || !type) return null
+	const displayName =
+		userData?.public_name ??
+		(userData?.username ? `@${userData.username}` : "...")
 
-		const table = type === "group" ? db.channel_messages : db.direct_messages
-
-		const repliedMsg = await table.get(data.reply_to_id)
-		if (!repliedMsg) return null
-
-		const repliedUsr = await db.users.get(repliedMsg.user_id)
-
-		return { message: repliedMsg, user: repliedUsr ?? null }
-	}, [data.reply_to_id, type])
-
-	const userData = React.useMemo(() => {
-		if (dbUserData) return dbUserData
-		if (appUserData && appUserData._id === data.user_id) return appUserData
-
-		return null
-	}, [dbUserData, appUserData, data.user_id])
+	const replyData = reply
 
 	const handleReplyPreviewClick = React.useCallback(() => {
 		if (!data.reply_to_id || typeof onReplyPreviewClick !== "function") return
@@ -200,7 +53,6 @@ const Line = ({
 	if (isSystemMessage) {
 		return (
 			<div
-				//ref={intersectionRef}
 				data-message-id={data._id}
 				className={classnames(
 					"channel-chat__timeline__line",
@@ -208,7 +60,11 @@ const Line = ({
 				)}
 			>
 				<div className="channel-chat__timeline__line__content">
-					<div className="channel-chat__timeline__line__content__body">
+					<div
+						className="channel-chat__timeline__line__content__body"
+						data-message-content=""
+						data-message-text={data.message ?? ""}
+					>
 						<p className="channel-chat__timeline__line--system__text">
 							{data.message}
 						</p>
@@ -220,9 +76,9 @@ const Line = ({
 
 	return (
 		<div
-			//ref={intersectionRef}
 			data-message-id={data._id}
 			data-message-user-id={data.user_id ?? "unknown"}
+			data-message-user-name={userData ? displayName : ""}
 			context-menu="chat-line"
 			className={classnames("channel-chat__timeline__line", {
 				["headless"]: headless,
@@ -243,10 +99,7 @@ const Line = ({
 				{!headless && (
 					<div className="channel-chat__timeline__line__content__header">
 						<div className="channel-chat__timeline__line__content__header__username">
-							<span>
-								{userData?.public_name ??
-									(userData?.username ? `@${userData?.username}` : "...")}
-							</span>
+							<span>{displayName}</span>
 
 							{userData?.bot && (
 								<div className="channel-chat__timeline__line__content__header__username__bot-indicator">
@@ -269,7 +122,8 @@ const Line = ({
 
 				<div
 					className="channel-chat__timeline__line__content__body"
-					id="message-content"
+					data-message-content=""
+					data-message-text={data.message ?? ""}
 				>
 					{replyData && (
 						<div
@@ -291,7 +145,7 @@ const Line = ({
 						</div>
 					)}
 
-					{data.message && <RenderMessage messageStr={data.message} />}
+					{data.message && <MessageContent messageStr={data.message} />}
 
 					{data.attachments && data.attachments.length > 0 && (
 						<Attachments
@@ -307,10 +161,15 @@ const Line = ({
 	)
 }
 
-export const LineMemo = React.memo(Line, (prev, next) => {
-	if (prev.headless !== next.headless) return true
-	return false
-})
+export const LineMemo = React.memo(
+	Line,
+	(prev, next) =>
+		prev.data === next.data &&
+		prev.headless === next.headless &&
+		prev.user === next.user &&
+		prev.reply === next.reply &&
+		prev.onReplyPreviewClick === next.onReplyPreviewClick,
+)
 
 LineMemo.displayName = "Line"
 

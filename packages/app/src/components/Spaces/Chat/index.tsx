@@ -1,22 +1,20 @@
-import type { ExtendedMessage as Message } from "@comty/spaces-lib/stores/chat/types"
+import type { ChatParams } from "@comty/spaces-sdk/chat"
 
 import React from "react"
-import { Result, Skeleton } from "antd"
-import { DateTime } from "luxon"
-import { AnimatePresence, motion } from "motion/react"
-import { useOnInView } from "react-intersection-observer"
+import { Result } from "antd"
 
-import Icons from "@components/Icons"
-import Button from "@ui/Button"
 import ChatInputBar from "./components/InputBar"
-import Line from "./components/Line"
+import Timeline from "./components/Timeline"
 
+import { useGroupData } from "@comty/spaces-sdk/group"
 import {
-	useGroupData,
-	useChatState,
+	getChatSessionKey,
+	useChatStatus,
 	useChatActions,
-	subscribeChatSocket,
-} from "@comty/spaces-lib"
+} from "@comty/spaces-sdk/chat"
+import { useChatSession } from "@comty/spaces-sdk/chat/session"
+
+import type { ReplyTarget } from "./types"
 
 import "./index.less"
 
@@ -28,335 +26,64 @@ interface ChatProps {
 interface ChatInnerProps {
 	_id: string
 	type: "group" | "dm"
-	useChatParam: any
+	useChatParam: ChatParams
+	sessionKey: string
+	groupId?: string
 }
 
-interface ReplyTarget {
-	messageId: string
-	messageUserId: string
-	messageText: string
-	userName: string
-}
-
-// if is the same user, in a 3 minutes window, merge with the previous one
-function shouldMergeWithNextItem(nextItem: Message | undefined, item: Message) {
-	if (!nextItem) {
-		return false
-	}
-
-	if (nextItem.user_id !== item.user_id) {
-		return false
-	}
-
-	const nextItemCreatedAt = DateTime.fromISO(nextItem.created_at as any)
-	const currentCreatedAt = DateTime.fromISO(item.created_at as any)
-
-	const timeDiff = currentCreatedAt.diff(nextItemCreatedAt).as("minutes")
-
-	if (timeDiff > 3) {
-		return false
-	}
-
-	return true
-}
-
-const useTriggerValue = (callback: () => void) => {
-	const prevValueRef = React.useRef(false)
-	const callbackRef = React.useRef(callback)
-	callbackRef.current = callback
-
-	return React.useCallback((value: boolean) => {
-		if (value === true && prevValueRef.current === false) {
-			callbackRef.current()
-		}
-
-		prevValueRef.current = value
-	}, [])
-}
-
-const ChatInner = ({ _id, type, useChatParam }: ChatInnerProps) => {
-	const data = useGroupData()
-
+const ChatInner = ({
+	_id,
+	type,
+	useChatParam,
+	sessionKey,
+	groupId,
+}: ChatInnerProps) => {
 	const chatContainerRef = React.useRef<HTMLDivElement>(null)
-	const timelineRef = React.useRef<HTMLDivElement>(null)
 	const [replyTo, setReplyTo] = React.useState<ReplyTarget | null>(null)
-	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
 
-	const {
-		timeline,
-		loading,
-		error,
-		usersTyping,
-		initialLoading,
-		pausedUpdates,
-	} = useChatState()
+	const chatStatus = useChatStatus()
+	const chatActions = useChatActions()
 
-	const {
-		send,
-		loadBefore,
-		loadAfter,
-		loadAround,
-		typing,
-		setPausedUpdates,
-		sendReadAck,
-		init,
-		reset,
-	} = useChatActions()
-
-	const pausedUpdatesRef = React.useRef(pausedUpdates)
-	pausedUpdatesRef.current = pausedUpdates
-
-	const scrollableToBottomRef = React.useRef(scrollableToBottom)
-	scrollableToBottomRef.current = scrollableToBottom
+	useChatSession(type, useChatParam)
 
 	React.useEffect(() => {
-		init(type as any, useChatParam)
-
-		const cleanup = subscribeChatSocket(type as any, useChatParam, {
-			onNewMessage: () => {
-				if (!timelineRef.current || pausedUpdatesRef.current) {
-					return
-				}
-
-				if (!scrollableToBottomRef.current) {
-					requestAnimationFrame(() => {
-						requestAnimationFrame(() => {
-							timelineRef.current?.scrollTo(0, 0)
-						})
-					})
-				}
-			},
-		})
-
-		return () => {
-			cleanup()
-			reset()
-		}
-	}, [_id, type])
-
-	const bottomTrigger = useTriggerValue(() => {
-		console.debug("View is BOTTOM, loading lasts messages")
-		loadAfter()
-	})
-
-	const topTrigger = useTriggerValue(() => {
-		console.debug("View is TOP, loading older messages")
-		loadBefore()
-	})
-
-	const [timelineRoot, setTimelineRoot] = React.useState<HTMLDivElement | null>(
-		null,
-	)
-
-	const hasInitialScrolledRef = React.useRef(false)
-
-	React.useEffect(() => {
-		setTimelineRoot(timelineRef.current)
-	}, [])
-
-	React.useEffect(() => {
-		hasInitialScrolledRef.current = false
 		setReplyTo(null)
-	}, [_id])
+	}, [sessionKey])
 
-	React.useEffect(() => {
-		if (initialLoading || timeline.length === 0) return
-		if (hasInitialScrolledRef.current) return
-
-		hasInitialScrolledRef.current = true
-
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				timelineRef.current?.scrollTo(0, 0)
-			})
-		})
-	}, [initialLoading, timeline.length])
-
-	const topTriggerRef = useOnInView((inView) => topTrigger(inView), {
-		root: timelineRoot,
-	})
-
-	const goToBottom = React.useCallback(() => {
-		if (timelineRef.current) {
-			setPausedUpdates(false)
-			setScrollableToBottom(false)
-			timelineRef.current.scrollTo(0, 0)
-		}
-	}, [setPausedUpdates, setScrollableToBottom])
-
-	const bottomTriggerRef = React.useRef(bottomTrigger)
-	bottomTriggerRef.current = bottomTrigger
-
-	const setPausedUpdatesRef = React.useRef(setPausedUpdates)
-	setPausedUpdatesRef.current = setPausedUpdates
-
-	const bottomDebounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-		null,
-	)
-
-	const handleOnScroll = React.useCallback(() => {
-		if (!timelineRef.current) return
-		const scrollPosition = Math.abs(timelineRef.current.scrollTop)
-		const isOnBottom = scrollPosition < 100
-
-		if (isOnBottom) {
-			if (bottomDebounceRef.current) {
-				clearTimeout(bottomDebounceRef.current)
-			}
-			bottomDebounceRef.current = setTimeout(() => {
-				bottomTriggerRef.current(true)
-			}, 300)
-		} else {
-			if (bottomDebounceRef.current) {
-				clearTimeout(bottomDebounceRef.current)
-				bottomDebounceRef.current = null
-			}
-			bottomTriggerRef.current(false)
-		}
-
-		if (isOnBottom) {
-			if (scrollableToBottomRef.current) {
-				setScrollableToBottom(false)
-			}
-		} else if (!scrollableToBottomRef.current) {
-			setScrollableToBottom(true)
-		}
-	}, [setScrollableToBottom])
-
-	const handleReplyEvent = React.useCallback((e: Event) => {
-		const detail = (e as CustomEvent).detail as ReplyTarget
-		setReplyTo(detail)
+	const handleReplyEvent = React.useCallback((event: Event) => {
+		setReplyTo((event as CustomEvent<ReplyTarget>).detail)
 	}, [])
 
 	const cancelReply = React.useCallback(() => {
 		setReplyTo(null)
 	}, [])
 
-	const scrollToMessage = React.useCallback((messageId: string) => {
-		const container = timelineRef.current
-
-		const targetEl = document.querySelector(`[data-message-id="${messageId}"]`)
-
-		if (!container || !targetEl) return false
-
-		let applied = false
-
-		const applyHighlight = () => {
-			if (applied) return
-			applied = true
-
-			const onAnimationEnd = () => {
-				targetEl.classList.remove("channel-chat__timeline__line--highlight")
-				targetEl.removeEventListener("animationend", onAnimationEnd)
-			}
-
-			targetEl.addEventListener("animationend", onAnimationEnd)
-			targetEl.classList.add("channel-chat__timeline__line--highlight")
-		}
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				const entry = entries[0]
-				if (entry && entry.isIntersecting) {
-					observer.disconnect()
-					applyHighlight()
-				}
-			},
-			{ root: container, threshold: 0.6 },
-		)
-
-		observer.observe(targetEl)
-
-		targetEl.scrollIntoView({ behavior: "smooth", block: "center" })
-
-		return true
-	}, [])
-
-	const jumpToMessage = React.useCallback(
-		async (messageId: string) => {
-			// first try to scroll to it if it's already in the dom
-			if (scrollToMessage(messageId)) return
-
-			// not in dom, load messages around it
-			await loadAround(messageId)
-
-			// wait for react to render the new messages
-			await new Promise((resolve) => requestAnimationFrame(resolve))
-			await new Promise((resolve) => requestAnimationFrame(resolve))
-
-			scrollToMessage(messageId)
-		},
-		[loadAround, scrollToMessage],
-	)
-
-	// const handleReadAck = React.useCallback(
-	// 	(messageId: string) => {
-	// 		sendReadAck(messageId)
-	// 	},
-	// 	[sendReadAck],
-	// )
-
-	const handleReplyPreviewClick = React.useCallback(
-		(replyToId: string) => {
-			jumpToMessage(replyToId)
-		},
-		[jumpToMessage],
-	)
-
 	React.useEffect(() => {
-		if (initialLoading) return
+		if (chatStatus.initialLoading) return
 
-		const el = chatContainerRef.current
-		if (!el) return
+		const element = chatContainerRef.current
+		if (!element) return
 
-		el.addEventListener("chat:reply", handleReplyEvent)
+		element.addEventListener("chat:reply", handleReplyEvent)
 
 		return () => {
-			el.removeEventListener("chat:reply", handleReplyEvent)
+			element.removeEventListener("chat:reply", handleReplyEvent)
 		}
-	}, [initialLoading, handleReplyEvent])
+	}, [chatStatus.initialLoading, handleReplyEvent])
 
-	React.useEffect(() => {
-		if (initialLoading) {
-			return
-		}
-
-		const currentRef = timelineRef.current
-		if (currentRef) {
-			currentRef.addEventListener("scroll", handleOnScroll)
-		}
-
-		return () => {
-			if (currentRef) {
-				currentRef.removeEventListener("scroll", handleOnScroll)
-			}
-
-			if (bottomDebounceRef.current) {
-				clearTimeout(bottomDebounceRef.current)
-			}
-		}
-	}, [initialLoading, handleOnScroll])
-
-	if (error) {
+	if (chatStatus.error) {
 		return (
 			<Result
 				status="warning"
 				title="Failed to load messages"
-				subTitle={error.message}
+				subTitle={chatStatus.error.message}
 			/>
 		)
 	}
 
-	if (initialLoading) {
+	if (chatStatus.initialLoading || chatStatus.sessionKey !== sessionKey) {
 		return null
 	}
-
-	const trimmedUsersTyping = usersTyping?.slice(0, 3)
-	const isUsersTypingOverflowing = (usersTyping?.length ?? 0) > 3
-
-	const usernamesTyping = trimmedUsersTyping.reduce((str, user) => {
-		return `${str} ${user.username},`
-	}, "")
 
 	return (
 		<div
@@ -365,109 +92,20 @@ const ChatInner = ({ _id, type, useChatParam }: ChatInnerProps) => {
 			data-is-dm={type === "dm"}
 			data-type={type}
 			data-channel-id={_id}
-			data-group-id={data?._id}
+			data-group-id={groupId}
 		>
-			<div className="channel-chat__wrapper bg-accent">
-				<div
-					id="chat-timeline"
-					className="channel-chat__wrapper__timeline"
-					ref={timelineRef}
-				>
-					<AnimatePresence mode="sync">
-						{usersTyping.length > 0 && (
-							<motion.div
-								className="channel-chat__timeline__typers"
-								animate={{
-									height: "100%",
-									left: 0,
-									y: 0,
-								}}
-								exit={{
-									height: 0,
-									y: 50,
-								}}
-								initial={{
-									height: 0,
-									y: 50,
-								}}
-								style={
-									{
-										"--items": trimmedUsersTyping.length,
-									} as React.CSSProperties
-								}
-							>
-								<div className="channel-chat__timeline__typers__images">
-									{trimmedUsersTyping.map((user) => (
-										<img
-											key={user._id}
-											src={user.avatar}
-											alt={user.username}
-										/>
-									))}
-								</div>
-
-								<span>
-									{usernamesTyping} {isUsersTypingOverflowing && "and more,"}{" "}
-									are typing...
-								</span>
-							</motion.div>
-						)}
-					</AnimatePresence>
-
-					{timeline.map((item, index) => {
-						const headless = shouldMergeWithNextItem(timeline[index + 1], item)
-
-						return (
-							<Line
-								key={item._id}
-								data={item}
-								headless={headless}
-								type={type}
-								onReplyPreviewClick={handleReplyPreviewClick}
-								isLast={index === 0}
-								// onReadAck={handleReadAck}
-							/>
-						)
-					})}
-
-					<div
-						className="channel-chat__timeline__top-trigger"
-						ref={topTriggerRef}
-					>
-						{loading && <Skeleton avatar />}
-					</div>
-				</div>
-
-				<AnimatePresence>
-					{scrollableToBottom && (
-						<motion.div
-							className="channel-chat__timeline__scrollToBottom"
-							animate={{
-								y: 0,
-							}}
-							exit={{
-								y: 50,
-							}}
-							initial={{
-								y: 50,
-							}}
-						>
-							<div className="channel-chat__timeline__scrollToBottom__container bg-accent">
-								<Button
-									type="ghost"
-									onClick={goToBottom}
-								>
-									<Icons.ArrowDownToLine /> Go to recent messages
-								</Button>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</div>
+			<Timeline
+				channelKey={sessionKey}
+				type={type}
+				onLoadBefore={chatActions.loadBefore}
+				onLoadAfter={chatActions.loadAfter}
+				onLoadAround={chatActions.loadAround}
+				onPausedChange={chatActions.setPausedUpdates}
+			/>
 
 			<ChatInputBar
-				send={send}
-				typing={typing}
+				send={chatActions.send}
+				typing={chatActions.typing}
 				channel_id={_id}
 				replyTo={replyTo}
 				onCancelReply={cancelReply}
@@ -479,8 +117,6 @@ const ChatInner = ({ _id, type, useChatParam }: ChatInnerProps) => {
 const Chat = ({ _id, type = "group" }: ChatProps) => {
 	const data = useGroupData()
 
-	console.log("useGroupData():", data)
-
 	if (!_id || !type) {
 		return null
 	}
@@ -490,21 +126,20 @@ const Chat = ({ _id, type = "group" }: ChatProps) => {
 		return null
 	}
 
-	let useChatParam: any = {}
+	const useChatParam: ChatParams =
+		type === "group"
+			? { group_id: data!._id, channel_id: _id }
+			: { to_user_id: _id }
 
-	if (type === "group") {
-		useChatParam = { group_id: data?._id, channel_id: _id }
-	}
-
-	if (type === "dm") {
-		useChatParam = { to_user_id: _id }
-	}
+	const sessionKey = getChatSessionKey(type, useChatParam)
 
 	return (
 		<ChatInner
 			_id={_id}
 			type={type}
 			useChatParam={useChatParam}
+			sessionKey={sessionKey}
+			groupId={type === "group" ? data?._id : undefined}
 		/>
 	)
 }

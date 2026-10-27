@@ -1,19 +1,25 @@
 import React from "react"
 
 const AttachmentMedia = ({ file }) => {
-	if (!(file instanceof File)) {
-		return null
-	}
-
+	const isFile = file instanceof File
 	const [localUrl, setLocalUrl] = React.useState(null)
 
 	React.useEffect(() => {
-		setLocalUrl(URL.createObjectURL(file))
-
-		return () => {
-			URL.revokeObjectURL(localUrl)
+		if (!isFile) {
+			setLocalUrl(null)
+			return
 		}
-	}, [file])
+
+		const url = URL.createObjectURL(file)
+
+		setLocalUrl(url)
+
+		return () => URL.revokeObjectURL(url)
+	}, [file, isFile])
+
+	if (!isFile) {
+		return null
+	}
 
 	switch (file.type.split("/")[0]) {
 		case "image":
