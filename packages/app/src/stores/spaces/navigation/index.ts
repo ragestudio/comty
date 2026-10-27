@@ -5,20 +5,22 @@ import { useShallow } from "zustand/react/shallow"
 import { createActions } from "./actions/navigate"
 import { syncToUrl } from "./urlHelpers"
 
-export const NavigationStore = create<NavigationStoreType>()((set, get) => ({
-	firstLoad: true,
-	type: null,
-	room: null,
-	channel: null,
-	subview: null,
-	headerContent: null,
+export const SpacesNavigationStore = create<NavigationStoreType>()(
+	(set, get) => ({
+		firstLoad: true,
+		type: null,
+		room: null,
+		channel: null,
+		subview: null,
+		headerContent: null,
 
-	actions: {
-		...createActions(set, get),
-	},
-}))
+		actions: {
+			...createActions(set, get),
+		},
+	}),
+)
 
-NavigationStore.subscribe((state, prevState) => {
+SpacesNavigationStore.subscribe((state, prevState) => {
 	if (state.firstLoad) return
 
 	if (
@@ -33,19 +35,9 @@ NavigationStore.subscribe((state, prevState) => {
 	syncToUrl(state)
 })
 
-export const useNavigation = () =>
-	NavigationStore(
-		useShallow((s) => ({
-			firstLoad: s.firstLoad,
-			type: s.type,
-			room: s.room,
-			channel: s.channel,
-			subview: s.subview,
-			navigate: s.actions.navigate,
-			headerContent: s.headerContent,
-			registerHeaderContent: s.actions.registerHeaderContent,
-			unregisterHeaderContent: s.actions.unregisterHeaderContent,
-		})),
-	)
+export const useSpacesNavigation = () => SpacesNavigationStore((s) => s)
 
-export const useNavigationActions = () => NavigationStore((s) => s.actions)
+export default useSpacesNavigation
+
+// export const useNavigationActions = () =>
+// 	SpacesNavigationStore((s) => s.actions)
