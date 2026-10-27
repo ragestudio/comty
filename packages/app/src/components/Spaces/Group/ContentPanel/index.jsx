@@ -5,7 +5,8 @@ import Chat from "@components/Spaces/Chat"
 import VoiceChannel from "@components/Spaces/VoiceChannel"
 import SettingsPanel from "@components/Spaces/Group/SettingsPanel"
 
-import { useNavigation, useGroupChannels } from "@comty/spaces-lib"
+import { useGroupChannels } from "@comty/spaces-sdk/group"
+import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import "./index.less"
 
@@ -55,10 +56,10 @@ const resolveContent = (spaces, channels) => {
 }
 
 export const ContentPanelHeader = () => {
-	const spaces = useNavigation()
+	const nav = useSpacesNavigation()
 	const channels = useGroupChannels()
 
-	const { definition, channelData } = resolveContent(spaces, channels)
+	const { definition, channelData } = resolveContent(nav, channels)
 
 	const title = channelData?.name ?? definition?.title
 	const description = channelData?.description
@@ -78,9 +79,9 @@ export const ContentPanelHeader = () => {
 				</>
 			)}
 
-			{spaces.headerContent && (
+			{nav.headerContent && (
 				<div className="group-page__content-panel__header__content">
-					{spaces.headerContent()}
+					{nav.headerContent()}
 				</div>
 			)}
 		</div>
@@ -88,7 +89,7 @@ export const ContentPanelHeader = () => {
 }
 
 export const ContentPanelRender = () => {
-	const spaces = useNavigation()
+	const spaces = useSpacesNavigation()
 	const channels = useGroupChannels()
 
 	const { type, definition } = resolveContent(spaces, channels)
