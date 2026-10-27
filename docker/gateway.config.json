@@ -14,6 +14,9 @@
 		"enabled": true,
 		"url": "redis://redis:6379"
 	},
+	"presence": {
+		"enabled": true
+	},
 	"jwt": {
 		"use_keys": [
 			{
