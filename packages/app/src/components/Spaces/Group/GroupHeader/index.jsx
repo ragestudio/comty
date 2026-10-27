@@ -8,12 +8,13 @@ import Icons from "@components/Icons"
 
 import imageAverageColor from "@utils/imageAverageColor"
 
-import { useGroupData, useGroupLoading, useNavigation } from "@comty/spaces-lib"
+import { useGroupData, useGroupLoading } from "@comty/spaces-sdk/group"
+import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import "./index.less"
 
 const GroupHeader = () => {
-	const nav = useNavigation()
+	const nav = useSpacesNavigation()
 	const data = useGroupData()
 	const loading = useGroupLoading()
 
@@ -22,11 +23,11 @@ const GroupHeader = () => {
 
 	const onClickSettingsButton = () => {
 		if (nav.subview === "settings") {
-			nav.navigate({ subview: null })
+			nav.actions.navigate({ subview: null })
 			return
 		}
 
-		nav.navigate({ subview: "settings" })
+		nav.actions.navigate({ subview: "settings" })
 	}
 
 	// calculate the average color of the group cover image
