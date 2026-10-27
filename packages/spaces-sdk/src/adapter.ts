@@ -51,6 +51,8 @@ export interface AudioRouting {
 	setAudioRouteMode?(mode: AudioRouteMode): Promise<boolean>
 	isBluetoothAvailable?(): Promise<boolean>
 	resetAudioRouting?(): Promise<boolean>
+	// false on runtimes without an earpiece/speaker concept (web)
+	supportsSpeakerphone?: boolean
 }
 
 // notifies when the set of available audio devices changes (hotplug)
@@ -58,9 +60,37 @@ export interface AudioDevicesEvents {
 	subscribe(handler: () => void): () => void
 }
 
-export interface TrackVolume {
+export type TrackVolume = {
 	setVolume(track: MediaStreamTrack, gain: number): void
 }
+
+export type MediaStreamKind = "mic" | "camera" | "screen"
+
+// synchronous key-value storage for the audio preferences. hosts provide one
+// per runtime (localStorage on web, native preferences on react native)
+export interface AudioSettingsStorage {
+	get<T = unknown>(key: string): T | undefined
+	set(key: string, value: unknown): void
+}
+
+// post-process a captured local stream, e.g. a web audio chain with rnnoise,
+// gain and gate. the host returns the stream that should be published
+export type MediaStreamProcessor = (
+	stream: MediaStream,
+	kind: MediaStreamKind,
+) => Promise<MediaStream> | MediaStream
+
+// native system audio capture (e.g. electron loopback), used for screen share
+// audio when the platform does not expose it through getDisplayMedia
+export interface SystemAudioCapture {
+	isSupported(): boolean | Promise<boolean>
+	start(): Promise<MediaStreamTrack | null>
+	stop(): Promise<void>
+}
+
+// releases the resources behind a processed stream, e.g. the raw capture and
+// the audio graph when the host wraps the mic with a processing chain
+export type MediaStreamReleaser = (stream: MediaStream) => void
 
 export type AudioProcessing = AudioProcessingAdapter
 
@@ -79,6 +109,10 @@ export class Adapter {
 	audioDevicesEvents?: AudioDevicesEvents
 	audioProcessing?: AudioProcessing
 	trackVolume?: TrackVolume
+	mediaStreamProcessor?: MediaStreamProcessor
+	mediaStreamReleaser?: MediaStreamReleaser
+	systemAudio?: SystemAudioCapture
+	audioSettings?: AudioSettingsStorage
 
 	registerWebRtcGlobals(objects: WebRtcObjects) {
 		this.webRtcObjects = objects
@@ -106,6 +140,22 @@ export class Adapter {
 
 	registerTrackVolume(trackVolume: TrackVolume) {
 		this.trackVolume = trackVolume
+	}
+
+	registerMediaStreamProcessor(processor: MediaStreamProcessor) {
+		this.mediaStreamProcessor = processor
+	}
+
+	registerMediaStreamReleaser(releaser: MediaStreamReleaser) {
+		this.mediaStreamReleaser = releaser
+	}
+
+	registerSystemAudio(capture: SystemAudioCapture) {
+		this.systemAudio = capture
+	}
+
+	registerAudioSettingsStorage(storage: AudioSettingsStorage) {
+		this.audioSettings = storage
 	}
 
 	// route the sdk logs to a custom sink, e.g. the host app console or a
