@@ -4,7 +4,9 @@ import adapter from "@/adapter"
 
 const nativeStrategy: AudioStrategy = {
 	name: "native-audio-routing",
-	speakerAvailable: true,
+	get speakerAvailable() {
+		return adapter.audioRouting?.supportsSpeakerphone !== false
+	},
 	supports() {
 		return !!adapter.audioRouting
 	},
