@@ -1,35 +1,14 @@
 import React from "react"
-import { Tag, Switch, Button } from "antd"
+import { Button } from "antd"
 import { Icons } from "@components/Icons"
-import Image from "@components/Image"
 
 import ExtensionItem from "./components/ExtensionItem"
 import InstallCustom from "./components/InstallCustom"
 
 import "./index.less"
 
-function getInstalledExtensions() {
-	let extensions = []
-
-	for (let extension of app.extensions.extensions.values()) {
-		extensions.push(extension)
-	}
-
-	return extensions
-}
-
 const ExtensionsPage = () => {
-	const [loading, setLoading] = React.useState(false)
-	const [extensions, setExtensions] = React.useState([])
-
-	const events = {
-		"extension:installed": () => {
-			setExtensions(getInstalledExtensions())
-		},
-		"extension:uninstalled": () => {
-			setExtensions(getInstalledExtensions())
-		},
-	}
+	const [manifests, setManifests] = React.useState([])
 
 	const onSwitchEnable = (extension, checked) => {
 		app.extensions.toggleExtension(extension.id, checked)
@@ -48,10 +27,25 @@ const ExtensionsPage = () => {
 		})
 	}
 
+	const onClickReload = (extension) => {
+		app.extensions.loadById(extension.id)
+	}
+
+	const loadManifestList = async () => {
+		setManifests(await app.extensions.db.manifest.getAll())
+	}
+
+	const events = {
+		"extension:installed": () => {
+			loadManifestList()
+		},
+		"extension:uninstalled": () => {
+			loadManifestList()
+		},
+	}
+
 	React.useEffect(() => {
-		setLoading(true)
-		setExtensions(getInstalledExtensions())
-		setLoading(false)
+		loadManifestList()
 	}, [])
 
 	React.useEffect(() => {
@@ -88,12 +82,13 @@ const ExtensionsPage = () => {
 			</div>
 
 			<div className="extensions-list">
-				{extensions.map((extension) => (
+				{manifests.map((manifest) => (
 					<ExtensionItem
-						key={extension.id}
-						extension={extension}
+						key={manifest.id}
+						manifest={manifest}
 						onSwitchEnable={onSwitchEnable}
 						onClickUninstall={onClickUninstall}
+						onClickReload={onClickReload}
 					/>
 				))}
 			</div>

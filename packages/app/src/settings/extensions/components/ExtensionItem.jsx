@@ -1,24 +1,33 @@
 import React from "react"
-import { Tag, Switch, Button } from "antd"
+import { Tag, Switch } from "antd"
 import { Icons } from "@components/Icons"
 import Image from "@components/Image"
 
-const ExtensionItem = ({ extension, onClickUninstall, onSwitchEnable }) => {
+import Button from "@/ui/Button"
+
+const ExtensionItem = ({
+	manifest,
+	onClickUninstall,
+	onSwitchEnable,
+	onClickReload,
+}) => {
+	const extensionObj = app.extensions.get(manifest.id)
+
 	return (
 		<div
-			key={extension.id}
+			key={manifest.id}
 			className="extension-item"
 		>
-			{extension.manifest.icon && (
+			{manifest.icon && (
 				<div className="extension-item-icon">
 					<Image
-						src={extension.manifest.icon}
-						alt={extension.manifest.name}
+						src={manifest.icon}
+						alt={manifest.name}
 					/>
 				</div>
 			)}
 
-			{!extension.manifest.icon && (
+			{!manifest.icon && (
 				<div className="extension-item-icon">
 					<Icons.Box />
 				</div>
@@ -26,38 +35,43 @@ const ExtensionItem = ({ extension, onClickUninstall, onSwitchEnable }) => {
 
 			<div className="extension-item-details">
 				<p className="extension-item-name">
-					{extension.manifest.name} [{extension.id}]
+					{manifest.title ?? manifest.name}
 				</p>
 				<p className="extension-item-description">
-					{extension.manifest.description}
+					{manifest.description}
 				</p>
+
 				<div className="extension-item-indicators">
+					<Tag>{manifest.id}</Tag>
+
 					<Tag
 						color="blue"
 						icon={<Icons.Tag />}
 					>
-						v{extension.manifest.version}
+						v{manifest.version}
 					</Tag>
-					<Tag
-						color="green"
-						icon={<Icons.Clock />}
-					>
-						Load {extension.loadDuration.toFixed(2)}ms
-					</Tag>
-					{extension.manifest.author && (
-						<Tag icon={<Icons.User />}>
-							{extension.manifest.author}
-						</Tag>
-					)}
-					{extension.manifest.license && (
-						<Tag icon={<Icons.Lock />}>
-							{extension.manifest.license}
+
+					{extensionObj && extensionObj.loadDuration && (
+						<Tag
+							color="green"
+							icon={<Icons.Clock />}
+						>
+							Load {extensionObj.loadDuration.toFixed(2)}ms
 						</Tag>
 					)}
 
-					{extension.manifest.homepage && (
+					{!extensionObj && <Tag color="error">Not loaded</Tag>}
+
+					{manifest.author && (
+						<Tag icon={<Icons.User />}>{manifest.author}</Tag>
+					)}
+					{manifest.license && (
+						<Tag icon={<Icons.Lock />}>{manifest.license}</Tag>
+					)}
+
+					{manifest.homepage && (
 						<Tag icon={<Icons.ExternalLink />}>
-							{extension.manifest.homepage}
+							{manifest.homepage}
 						</Tag>
 					)}
 				</div>
@@ -65,13 +79,17 @@ const ExtensionItem = ({ extension, onClickUninstall, onSwitchEnable }) => {
 
 			<div className="extension-item-actions">
 				<Switch
-					defaultChecked={extension.enabled}
-					onChange={(checked) => onSwitchEnable(extension, checked)}
+					defaultChecked={manifest.enabled}
+					onChange={(checked) => onSwitchEnable(manifest, checked)}
 				/>
 
 				<Button
 					icon={<Icons.Trash />}
-					onClick={() => onClickUninstall(extension)}
+					onClick={() => onClickUninstall(manifest)}
+				/>
+				<Button
+					icon={<Icons.RefreshCcw />}
+					onClick={() => onClickReload(manifest)}
 				/>
 			</div>
 		</div>
