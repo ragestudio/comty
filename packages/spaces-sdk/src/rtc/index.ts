@@ -60,6 +60,8 @@ export interface RTCReactiveState {
 
 	localScreenStreamURL: string | null
 	localCameraStreamURL: string | null
+	localScreenStream: MediaStream | null
+	localCameraStream: MediaStream | null
 
 	micProducerId: string | null
 	cameraProducerId: string | null
@@ -148,6 +150,8 @@ export class RTC extends BaseStore<RTCReactiveState> {
 
 			localScreenStreamURL: null,
 			localCameraStreamURL: null,
+			localScreenStream: null,
+			localCameraStream: null,
 
 			micProducerId: null,
 			cameraProducerId: null,
