@@ -32,6 +32,8 @@ export interface AudioProcessingCapabilities {
 export interface AudioProcessingAdapter {
 	capabilities: AudioProcessingCapabilities
 	apply(config: AudioProcessingConfig): Promise<void>
+	// optional: constraints to merge into getUserMedia for the microphone
+	getMicrophoneConstraints?(): MediaTrackConstraints
 }
 
 export const GAIN_MIN_DB = -10
@@ -46,7 +48,7 @@ export const DEFAULT_AUDIO_PROCESSING_CONFIG: AudioProcessingConfig = {
 		gateThresholdDb: -50,
 		gainMode: "manual",
 		gainDb: 0,
-		echoCancellation: false,
+		echoCancellation: true,
 	},
 	output: {
 		gainDb: 0,

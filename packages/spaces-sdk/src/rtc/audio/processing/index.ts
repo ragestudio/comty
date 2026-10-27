@@ -12,6 +12,12 @@ import adapter from "@/adapter"
 import BaseStore from "@/classes/BaseStore"
 
 import {
+	AUDIO_SETTINGS_KEYS,
+	readAudioSetting,
+	writeAudioSetting,
+} from "../settings"
+
+import {
 	DEFAULT_AUDIO_PROCESSING_CONFIG,
 	clampGain,
 	clampGateThreshold,
@@ -31,6 +37,8 @@ export class AudioProcessingManager extends BaseStore<AudioProcessingState> {
 	output!: AudioProcessingState["output"]
 
 	config: AudioProcessingConfig
+
+	private loaded = false
 
 	constructor() {
 		super({
@@ -55,6 +63,104 @@ export class AudioProcessingManager extends BaseStore<AudioProcessingState> {
 			available: !!adapter.audioProcessing,
 			capabilities: adapter.audioProcessing?.capabilities ?? null,
 		})
+
+		// restore the persisted preferences once, the first time the adapter is
+		// registered by the host
+		if (!this.loaded) {
+			this.loaded = true
+			void this.load()
+		}
+	}
+
+	private async load(): Promise<void> {
+		const defaults = DEFAULT_AUDIO_PROCESSING_CONFIG
+		const noiseSuppression = readAudioSetting(
+			AUDIO_SETTINGS_KEYS.noiseSuppression,
+			defaults.input.noiseSuppression,
+		)
+		const gainMode = readAudioSetting(
+			AUDIO_SETTINGS_KEYS.gainMode,
+			defaults.input.gainMode,
+		)
+
+		const input: AudioInputProcessingConfig = {
+			noiseSuppression:
+				noiseSuppression === "off" ||
+				noiseSuppression === "system" ||
+				noiseSuppression === "rnnoise"
+					? noiseSuppression
+					: defaults.input.noiseSuppression,
+			echoCancellation: !!readAudioSetting(
+				AUDIO_SETTINGS_KEYS.echoCancellation,
+				defaults.input.echoCancellation,
+			),
+			gainMode: gainMode === "auto" ? "auto" : "manual",
+			gateEnabled: !!readAudioSetting(
+				AUDIO_SETTINGS_KEYS.gateEnabled,
+				defaults.input.gateEnabled,
+			),
+			gateThresholdDb: clampGateThreshold(
+				Number(
+					readAudioSetting(
+						AUDIO_SETTINGS_KEYS.gateThresholdDb,
+						defaults.input.gateThresholdDb,
+					),
+				),
+			),
+			gainDb: clampGain(
+				Number(
+					readAudioSetting(
+						AUDIO_SETTINGS_KEYS.inputGainDb,
+						defaults.input.gainDb,
+					),
+				),
+			),
+		}
+
+		const output: AudioOutputProcessingConfig = {
+			gainDb: clampGain(
+				Number(
+					readAudioSetting(
+						AUDIO_SETTINGS_KEYS.outputGainDb,
+						defaults.output.gainDb,
+					),
+				),
+			),
+		}
+
+		this.config = { input, output }
+
+		this.setState({
+			input: { ...input },
+			output: { ...output },
+		})
+
+		try {
+			await adapter.audioProcessing?.apply(this.config)
+		} catch (error) {
+			logger.error("failed to load processing config", error)
+		}
+	}
+
+	private persist(): void {
+		const { input, output } = this.config
+
+		writeAudioSetting(
+			AUDIO_SETTINGS_KEYS.noiseSuppression,
+			input.noiseSuppression,
+		)
+		writeAudioSetting(
+			AUDIO_SETTINGS_KEYS.echoCancellation,
+			input.echoCancellation,
+		)
+		writeAudioSetting(AUDIO_SETTINGS_KEYS.gainMode, input.gainMode)
+		writeAudioSetting(AUDIO_SETTINGS_KEYS.gateEnabled, input.gateEnabled)
+		writeAudioSetting(
+			AUDIO_SETTINGS_KEYS.gateThresholdDb,
+			input.gateThresholdDb,
+		)
+		writeAudioSetting(AUDIO_SETTINGS_KEYS.inputGainDb, input.gainDb)
+		writeAudioSetting(AUDIO_SETTINGS_KEYS.outputGainDb, output.gainDb)
 	}
 
 	private async commit(
@@ -76,6 +182,8 @@ export class AudioProcessingManager extends BaseStore<AudioProcessingState> {
 			input: { ...this.config.input },
 			output: { ...this.config.output },
 		})
+
+		this.persist()
 
 		try {
 			await adapter.audioProcessing?.apply(this.config)

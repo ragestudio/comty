@@ -5,6 +5,11 @@ import BaseStore from "@/classes/BaseStore"
 
 import nativeStrategy from "./strategies/native"
 import webStrategy from "./strategies/web"
+import {
+	AUDIO_SETTINGS_KEYS,
+	readAudioSetting,
+	writeAudioSetting,
+} from "./settings"
 import loggerBase from "@/utils/logger"
 
 export const logger = loggerBase.child("audio-manager")
@@ -37,7 +42,7 @@ const DEVICES_DEBOUNCE_MS = 400
 const strategies: AudioStrategy[] = [nativeStrategy, webStrategy]
 
 export class AudioManager extends BaseStore<AudioReactiveState> {
-	devices!: AudioReactiveState["devices"]
+	devices: AudioReactiveState["devices"] = []
 	outputDeviceId!: AudioReactiveState["outputDeviceId"]
 	inputDeviceId!: AudioReactiveState["inputDeviceId"]
 	speakerEnabled!: AudioReactiveState["speakerEnabled"]
@@ -222,6 +227,33 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 		}
 	}
 
+	async restore(): Promise<void> {
+		await this.refresh()
+
+		const inputDeviceId = readAudioSetting<string | null>(
+			AUDIO_SETTINGS_KEYS.inputDeviceId,
+			null,
+		)
+		const outputDeviceId = readAudioSetting<string | null>(
+			AUDIO_SETTINGS_KEYS.outputDeviceId,
+			null,
+		)
+
+		if (
+			inputDeviceId &&
+			this.inputs.some((device) => device.id === inputDeviceId)
+		) {
+			await this.setInputDevice(inputDeviceId)
+		}
+
+		if (
+			outputDeviceId &&
+			this.outputs.some((device) => device.id === outputDeviceId)
+		) {
+			await this.setOutputDevice(outputDeviceId)
+		}
+	}
+
 	// keeps an explicit selection while it exists, follows the same physical
 	// bluetooth headset across route changes and falls back to the system device
 	private resolveOutputId(
@@ -371,6 +403,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 			const mode: AudioRouteMode = isBluetooth ? this.routeMode : "call"
 
 			this.setState({ outputDeviceId: deviceId, routeMode: mode })
+			writeAudioSetting(AUDIO_SETTINGS_KEYS.outputDeviceId, deviceId)
 			// keep the native routing aligned with the resolved mode
 			await strategy.setRouteMode?.(mode)
 
@@ -402,6 +435,7 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 
 			if (applied) {
 				this.setState({ inputDeviceId: deviceId })
+				writeAudioSetting(AUDIO_SETTINGS_KEYS.inputDeviceId, deviceId)
 			}
 
 			return applied
