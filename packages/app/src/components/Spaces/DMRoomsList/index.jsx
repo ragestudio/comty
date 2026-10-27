@@ -2,15 +2,18 @@ import React from "react"
 import classnames from "classnames"
 import { Result, Skeleton, Empty } from "antd"
 
-import ChatsModel from "@models/chats"
+import ChatsModel from "@endpoints/chats"
+import client from "comty.js/core/client"
+import useRequest from "comty.js/hooks/useRequest"
 
 import { Member } from "@/components/Spaces/Member"
 
 import "./index.less"
 
 const DMRoomsList = ({ onClickItem, selectedRoom, compact }) => {
-	const [L_DMs, R_DMs, E_DMs, M_Dms, MR_Dms, U_Dms] =
-		app.cores.api.useRequest(ChatsModel.dm.list)
+	const [L_DMs, R_DMs, E_DMs, M_Dms, MR_Dms, U_Dms] = useRequest(
+		ChatsModel.dm.list,
+	)
 
 	const onActivityUpdate = React.useCallback(
 		(data) => {
@@ -48,10 +51,10 @@ const DMRoomsList = ({ onClickItem, selectedRoom, compact }) => {
 	)
 
 	React.useEffect(() => {
-		app.cores.api.listenEvent("dm:activity:update", onActivityUpdate)
+		client.ws.get("main")?.on("dm:activity:update", onActivityUpdate)
 
 		return () => {
-			app.cores.api.unlistenEvent("dm:activity:update", onActivityUpdate)
+			client.ws.get("main")?.off("dm:activity:update", onActivityUpdate)
 		}
 	}, [])
 
