@@ -45,6 +45,10 @@ services:
     image: haproxy:latest
     container_name: comty-haproxy
     restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 1048576
     networks:
       - api_network
     ports:
@@ -79,6 +83,10 @@ services:
       dockerfile: ./packages/server/Dockerfile
     restart: "no"
     stop_grace_period: 60s
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 1048576
     depends_on:
       - mongodb
       - scylla
@@ -110,6 +118,10 @@ services:
       dockerfile: ./packages/server/Dockerfile
     restart: "no"
     stop_grace_period: 60s
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 1048576
     depends_on:
       - mongodb
       - scylla
