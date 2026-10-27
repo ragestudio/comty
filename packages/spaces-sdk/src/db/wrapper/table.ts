@@ -3,6 +3,7 @@ import type { IndexInfo } from "./types"
 
 import { Collection } from "./collection"
 import { WhereClause } from "./where"
+import { serializeRow } from "./serialize"
 
 export class Table<T extends Record<string, any>, TKey = string | number> {
 	constructor(
@@ -34,7 +35,11 @@ export class Table<T extends Record<string, any>, TKey = string | number> {
 		}
 
 		const { [pkName]: _, ...dataToSave } = item
-		this.store.setRow(this.tableName, String(actualKey), dataToSave)
+		this.store.setRow(
+			this.tableName,
+			String(actualKey),
+			serializeRow(dataToSave),
+		)
 
 		return actualKey
 	}
@@ -90,7 +95,11 @@ export class Table<T extends Record<string, any>, TKey = string | number> {
 				}
 
 				const { [pkName]: _, ...dataToSave } = item
-				this.store.setRow(this.tableName, String(actualKey), dataToSave)
+				this.store.setRow(
+					this.tableName,
+					String(actualKey),
+					serializeRow(dataToSave),
+				)
 				resultKeys.push(actualKey)
 			})
 		})

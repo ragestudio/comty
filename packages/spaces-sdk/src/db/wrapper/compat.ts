@@ -39,6 +39,13 @@ export class DexieCompat {
 		}
 	}
 
+	// subscribe to any transaction that finishes in the underlying store
+	subscribe(listener: () => void): () => void {
+		const listenerId = this.store.addDidFinishTransactionListener(listener)
+
+		return () => this.store.delListener(listenerId)
+	}
+
 	table<T extends Record<string, any>, TKey = string | number>(
 		tableName: string,
 	): Table<T, TKey> {
