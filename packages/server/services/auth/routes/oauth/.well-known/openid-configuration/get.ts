@@ -7,7 +7,7 @@ export default defineRoute(API)({
 
 		return {
 			issuer: baseUrl,
-			authorization_endpoint: `https://indev.comty.app/oauth`,
+			authorization_endpoint: `${baseUrl}/oauth`,
 			token_endpoint: `${baseUrl}/oauth/token`,
 			userinfo_endpoint: `${baseUrl}/oauth/userinfo`,
 			jwks_uri: `${baseUrl}/jwks`,
