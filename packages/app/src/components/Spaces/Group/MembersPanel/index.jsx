@@ -9,7 +9,7 @@ import {
 	useGroupConnections,
 	useGroupDecorations,
 	useGroupActions,
-} from "@comty/spaces-lib"
+} from "@comty/spaces-sdk/group"
 
 import Member from "../../Member"
 
