@@ -1,6 +1,7 @@
 import React from "react"
 import classnames from "classnames"
 import { Layout } from "antd"
+import { useLocation } from "react-router"
 
 import Drawer from "@layouts/components/drawer"
 import Sidebar from "@layouts/components/sidebar"
@@ -18,6 +19,8 @@ import TopBar from "@layouts/components/@mobile/topBar"
 import BackgroundDecorator from "@components/BackgroundDecorator"
 
 const DesktopLayout = (props) => {
+	const location = useLocation()
+
 	React.useEffect(() => {
 		app.eventBus.emit("layout:ready")
 	}, [])
@@ -49,7 +52,7 @@ const DesktopLayout = (props) => {
 						React.cloneElement(props.children, props)}
 				</Layout.Content>
 
-				<ToolsBar />
+				{!location.pathname?.startsWith("/spaces") && <ToolsBar />}
 			</Layout>
 
 			<BetaBanner />

@@ -198,12 +198,6 @@ const SidebarInner = ({
 				setGroupsListVisible(false)
 			}
 		}
-
-		// return () =>
-		// 	window.removeEventListener(
-		// 		"popstate",
-		// 		spacesNav.actions.initFromUrl,
-		// 	)
 	}, [location])
 
 	return (
