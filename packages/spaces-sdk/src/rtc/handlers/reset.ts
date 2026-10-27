@@ -28,6 +28,8 @@ export async function reset(this: RTC) {
 
 				localScreenStreamURL: null,
 				localCameraStreamURL: null,
+				localScreenStream: null,
+				localCameraStream: null,
 
 				micProducerId: null,
 				cameraProducerId: null,
@@ -36,13 +38,13 @@ export async function reset(this: RTC) {
 			}),
 	]
 
-	steps.forEach(async (fn) => {
+	for (const fn of steps) {
 		try {
 			await fn()
 		} catch (err: any) {
 			errors.push(err)
 		}
-	})
+	}
 
 	return errors
 }

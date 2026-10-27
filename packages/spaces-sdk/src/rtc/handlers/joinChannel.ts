@@ -70,12 +70,19 @@ export async function joinChannel(
 
 		this.eventBus.emit("rtc:channel:joined", this.channel)
 	} catch (err: any) {
-		this.logger.error("Failed to Join Channel:", err)
+		// release any media captured during the failed join
+		try {
+			await this.handlers.reset()
+		} catch (resetError) {
+			this.logger.error("Error cleaning up failed join:", resetError)
+		}
+
 		this.setState({
 			state: "failed",
 		})
 
-		this.eventBus.emit("rtc:channel:join_failed", { error: err })
+		this.logger.error("Failed to Join Channel:", err)
+		this.eventBus.emit("rtc:channel:join_failed", err)
 	}
 }
 
