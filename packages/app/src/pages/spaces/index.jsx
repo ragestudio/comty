@@ -18,7 +18,7 @@ const SpacesPage = () => {
 
 SpacesPage.options = {
 	layout: {
-		type: "spaces",
+		type: "default",
 		centeredContent: false,
 		maxHeight: true,
 	},
