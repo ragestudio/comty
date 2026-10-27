@@ -4,7 +4,7 @@ export default class ActivityEvent {
 	constructor(id, payload) {
 		if (typeof id !== "string") {
 			console.error("Event id is required")
-			return false
+			return
 		}
 
 		this.id = id
