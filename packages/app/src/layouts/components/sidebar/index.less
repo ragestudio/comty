@@ -24,6 +24,7 @@
 	// padding: @sidebar_wrapper_padding; // animated from motion
 
 	overflow: visible;
+	padding-right: 0 !important;
 
 	&.hidden {
 		overflow: hidden;
@@ -53,6 +54,7 @@
 
 	transition: width 150ms ease-in-out;
 
+	border: 1px solid var(--border-color);
 	border-radius: @sidebar_borderRadius;
 	box-shadow: @card-shadow;
 
@@ -229,4 +231,13 @@
 			}
 		}
 	}
+}
+
+.app_sidebar_menu_groups {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	padding: 0 2px;
 }

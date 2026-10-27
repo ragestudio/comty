@@ -4,10 +4,14 @@ import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { motion, usePresence } from "motion/react"
 import { Menu, Avatar, Dropdown } from "antd"
+import { useLocation } from "react-router"
 
 import { Icons } from "@components/Icons"
 import ProductChannelBadge from "@components/ProductChannelBadge"
 import NotificationsButton from "@components/NotificationsButton"
+
+import GroupsList from "@/components/Spaces/GroupList"
+import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import "./index.less"
 
@@ -128,9 +132,16 @@ const SidebarInner = ({
 	onDropdownOpenChange,
 	onClickDropdownItem,
 }) => {
+	const location = useLocation()
+	const spacesNav = useSpacesNavigation()
+
 	const [isPresent] = usePresence()
 	const [hidden, setHidden] = React.useState(false)
+	const [groupsListVisible, setGroupsListVisible] = React.useState(false)
 	const sidebarRef = React.useRef(null)
+	const autoHideDefaultItemsTimeout = React.useRef(null)
+
+	const selectedKeyId = selectedMenuItem?.id
 
 	const handleOnMouseEnter = () => {
 		if (hidden) {
@@ -148,7 +159,52 @@ const SidebarInner = ({
 		return onMouseLeave()
 	}
 
-	const selectedKeyId = selectedMenuItem?.id
+	const handleOnClickGroupListItem = (group) => {
+		app.location.push(`/spaces/group/${group._id}`)
+	}
+
+	const handleOnClickCreateNewGroup = () => {
+		app.location.push(`/spaces/new`)
+	}
+
+	const onClickHomeButton = () => {
+		if (autoHideDefaultItemsTimeout.current) {
+			clearTimeout(autoHideDefaultItemsTimeout.current)
+		}
+
+		autoHideDefaultItemsTimeout.current = setTimeout(() => {
+			if (app.location.pathname?.startsWith("/spaces")) {
+				setGroupsListVisible(true)
+			}
+		}, 4000)
+
+		if (!groupsListVisible) {
+			app.navigation.goMain()
+			clearTimeout(autoHideDefaultItemsTimeout.current)
+		} else {
+			setGroupsListVisible(false)
+		}
+	}
+
+	React.useEffect(() => {
+		if (
+			location.pathname &&
+			typeof location.pathname?.startsWith === "function"
+		) {
+			if (location.pathname?.startsWith("/spaces")) {
+				setGroupsListVisible(true)
+				spacesNav.actions.initFromUrl()
+			} else {
+				setGroupsListVisible(false)
+			}
+		}
+
+		// return () =>
+		// 	window.removeEventListener(
+		// 		"popstate",
+		// 		spacesNav.actions.initFromUrl,
+		// 	)
+	}, [location])
 
 	return (
 		<motion.div
@@ -200,7 +256,7 @@ const SidebarInner = ({
 					<div className="app_sidebar_header_logo">
 						<img
 							src={config.logo?.alt}
-							onClick={() => app.navigation.goMain()}
+							onClick={onClickHomeButton}
 						/>
 
 						<ProductChannelBadge />
@@ -211,12 +267,29 @@ const SidebarInner = ({
 					key="menu"
 					className="app_sidebar_menu_wrapper"
 				>
-					<Menu
-						mode="inline"
-						onClick={onHandleClick}
-						selectedKeys={[selectedKeyId]}
-						items={topItems}
-					/>
+					{groupsListVisible && (
+						<div className="app_sidebar_menu_groups">
+							<GroupsList
+								compact={!expanded}
+								selected={
+									spacesNav.type === "group"
+										? spacesNav.room
+										: null
+								}
+								onClickItem={handleOnClickGroupListItem}
+								onClickCreateNew={handleOnClickCreateNewGroup}
+								sortable
+							/>
+						</div>
+					)}
+					{!groupsListVisible && (
+						<Menu
+							mode="inline"
+							onClick={onHandleClick}
+							selectedKeys={[selectedKeyId]}
+							items={topItems}
+						/>
+					)}
 				</div>
 
 				<div
