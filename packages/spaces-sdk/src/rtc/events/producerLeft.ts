@@ -25,25 +25,36 @@ export default async function (this: RTC, data: any) {
 		if (data.appData) {
 			const client = this.clients.get(data.userId)
 
-			if (!client) return
-
-			if (data.appData.mediaTag === "user-mic") {
-				client.dettachMic()
+			if (data.appData.mediaTag === "user-mic" && client) {
+				// only detach if the consumer still points to this producer
+				await client.dettachMic(data.producerId)
 			}
 
 			// if a camera stops, drop it
 			if (data.appData.mediaTag === "user-cam") {
-				await this.cameras.stop(data.userId)
+				await this.cameras.removeProducer(
+					data.userId,
+					"video",
+					data.producerId,
+				)
 			}
 
 			// if a screen share ends, stop consuming its tracks
 			if (data.appData.mediaTag === "screen-video") {
 				//app.cores.sfx.play("media_video_leave")
-				await this.screens.stop(data.userId)
+				await this.screens.removeProducer(
+					data.userId,
+					"video",
+					data.producerId,
+				)
 			}
 
 			if (data.appData.mediaTag === "screen-audio") {
-				await this.screens.removeProducer(data.userId, "audio")
+				await this.screens.removeProducer(
+					data.userId,
+					"audio",
+					data.producerId,
+				)
 			}
 		}
 

@@ -4,7 +4,9 @@ import type { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
 export default async function (this: RTC, data: RTC_ClientEvent) {
 	this.logger.debug("received client event:", data)
 
-	const client = this.clients.get(data.userId)
+	const client =
+		this.clients.get(data.userId) ??
+		(await this.clients.join({ userId: data.userId }))
 
 	if (!client) {
 		throw new Error("Client not found")

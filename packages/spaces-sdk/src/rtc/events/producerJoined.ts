@@ -21,15 +21,17 @@ export default async function (this: RTC, data: Producer) {
 		this.producers.setRemote(data)
 
 		if (data.appData) {
-			const client = this.clients.get(data.userId)
+			// ghost clients may not be registered yet (missing join event or a
+			// reconnection), so create them on demand instead of aborting
+			const client =
+				this.clients.get(data.userId) ??
+				(await this.clients.join({ userId: data.userId }))
 
-			if (!client) {
-				throw new Error("Client not found/available")
-			}
-
-			// if is a user mic, start the consumer and attach mic
-			if (data.appData.mediaTag === "user-mic") {
-				client.attachMic(data)
+			if (client && data.appData.mediaTag === "user-mic") {
+				// if is a user mic, start the consumer and attach mic
+				await client.attachMic(data).catch((error) => {
+					this.logger.error("Error attaching client mic:", error)
+				})
 			}
 
 			// if user camera, register it as available
