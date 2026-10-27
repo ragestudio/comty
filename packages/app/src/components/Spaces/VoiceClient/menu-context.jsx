@@ -7,7 +7,7 @@ import UserPreview from "@components/UserPreview"
 
 import copyToClipboard from "@utils/copyToClipboard"
 
-import GroupsModel from "@models/groups"
+import GroupsModel from "@endpoints/groups"
 
 import useMediaRTCState from "@hooks/useMediaRTCState"
 

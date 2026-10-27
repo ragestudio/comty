@@ -7,8 +7,18 @@ import { Icons } from "@components/Icons"
 import ClientContextMenu from "./menu-context"
 
 import "./index.less"
+import { Client } from "@comty/shared/types/rtc/client"
+import { SerializedProducer } from "@comty/shared/types/rtc/producer"
 
-const VoiceClient = ({ client, speaking, producers }) => {
+const VoiceClient = ({
+	client,
+	speaking,
+	producers,
+}: {
+	client: Client
+	speaking: boolean
+	producers: SerializedProducer[]
+}) => {
 	const [soundpadIcon, setSoundpadIcon] = React.useState(null)
 	const soundpadIconClearTimeout = React.useRef(null)
 
@@ -19,12 +29,7 @@ const VoiceClient = ({ client, speaking, producers }) => {
 
 			const { x, y } = app.cores.ctx_menu.calculateFitCordinates(
 				event,
-				parseInt(
-					app.cores.style.vars["context-menu-width"].replace(
-						"px",
-						"",
-					),
-				),
+				parseInt(app.cores.style.vars["context-menu-width"].replace("px", "")),
 				300, // FIXME: calculate height properly
 			)
 
