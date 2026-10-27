@@ -1,3 +1,5 @@
+import React from "react"
+
 import loadable from "@loadable/component"
 import UserModel from "@endpoints/user"
 import UploadButton from "@components/UploadButton"
