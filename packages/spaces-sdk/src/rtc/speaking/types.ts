@@ -7,12 +7,14 @@ export interface SpeakingTarget {
 	role: SpeakingRole
 	rtpSender?: any
 	rtpReceiver?: any
+	// decoded audio track, used by the analyser fallback
+	track?: MediaStreamTrack | null
 }
 
 export type SpeakingChangeHandler = (isSpeaking: boolean) => void
 
-// a strategy knows how to read encoded audio frames from a target for one
-// specific runtime, the sdk picks the first supported one
+// a strategy knows how to read audio frames from a target for one specific
+// runtime, the sdk picks the first supported one that can attach
 export interface SpeakingStrategy {
 	name: string
 	supports(target: SpeakingTarget): boolean

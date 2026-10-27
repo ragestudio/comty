@@ -6,13 +6,18 @@ import type {
 
 import nativeStrategy from "./strategies/native"
 import webStrategy from "./strategies/web"
+import analyserStrategy from "./strategies/analyser"
 import loggerBase from "@/utils/logger"
 
 export const logger = loggerBase.child("voice-detection")
 
-// ordered by priority, the first supported strategy wins, so we prefer the
-// native frame transform when available and fall back to the web api
-const strategies: SpeakingStrategy[] = [nativeStrategy, webStrategy]
+// ordered by priority. the first strategy that supports the target and can
+// attach wins, so a failing strategy never disables detection
+const strategies: SpeakingStrategy[] = [
+	nativeStrategy,
+	webStrategy,
+	analyserStrategy,
+]
 
 export function registerSpeakingStrategy(strategy: SpeakingStrategy) {
 	strategies.unshift(strategy)
@@ -25,43 +30,38 @@ export function resolveSpeakingStrategy(
 }
 
 // attaches speaking detection to a target and returns a detach function, or
-// null when no strategy is supported by the current runtime
+// null when no strategy could be attached by the current runtime
 export function attachSpeakingDetection(
 	target: SpeakingTarget,
 	onChange: SpeakingChangeHandler,
 ): (() => void) | null {
-	const strategy = resolveSpeakingStrategy(target)
+	for (const strategy of strategies) {
+		if (!strategy.supports(target)) continue
 
-	if (!strategy) {
-		logger.debug(
-			`no speaking detection strategy for ${target.role} [${target.id}]`,
-		)
+		try {
+			const detach = strategy.attach(target, onChange)
 
-		return null
+			if (!detach) continue
+
+			logger.debug(
+				`speaking detection attached to ${target.role} [${target.id}] using ${strategy.name}`,
+			)
+
+			return detach
+		} catch (error) {
+			// a strategy must never break the media setup, so try the next one
+			logger.warn(
+				`${strategy.name} failed to attach to ${target.role} [${target.id}]`,
+				error,
+			)
+		}
 	}
 
-	let detach: (() => void) | null = null
+	logger.debug(
+		`no speaking detection strategy available for ${target.role} [${target.id}]`,
+	)
 
-	try {
-		detach = strategy.attach(target, onChange)
-	} catch (error) {
-		// attach must never break the media setup, for example when the native
-		// binary does not expose the transform api yet
-		logger.warn(
-			`failed to attach peaking detection to ${target.role} [${target.id}]`,
-			error,
-		)
-
-		return null
-	}
-
-	if (detach) {
-		logger.debug(
-			`speaking detection attached to ${target.role} [${target.id}] using ${strategy.name}`,
-		)
-	}
-
-	return detach
+	return null
 }
 
 export type {
