@@ -11,22 +11,28 @@ export default async function (this: SyncActions): Promise<void> {
 	if (!type || !params) return
 	if (type !== "group") return
 
-	const chatId = params.channel_id
+	const chatId = params.channel_id!
+	const generation = this.state.initGeneration
 
 	const syncState = await this.adapter.getSyncState(chatId)
+
+	if (generation !== this.state.initGeneration) return
+
 	const lastId = syncState?.last_message_id
 	const lastSyncAt = syncState?.last_synced_at || 0
 
 	try {
 		const { logs, newMessages, updatedMessages, users } =
 			await ChatsService.channels.sync(
-				params.group_id,
-				params.channel_id,
+				params.group_id!,
+				params.channel_id!,
 				{
 					last_synced_at: lastSyncAt,
 					last_message_id: lastId,
 				},
 			)
+
+		if (generation !== this.state.initGeneration) return
 
 		for (const log of logs) {
 			if (log.type === "message:deleted") {

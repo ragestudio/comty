@@ -8,5 +8,8 @@ export default function (this: EventsActions, data: { _id: string }): void {
 
 	this.setState((state) => ({
 		timeline: state.timeline.filter((msg) => msg._id !== data._id),
+		pendingMessages: state.pendingMessages.filter(
+			(msg) => msg._id !== data._id,
+		),
 	}))
 }

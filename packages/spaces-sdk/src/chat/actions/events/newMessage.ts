@@ -7,7 +7,7 @@ export default function (this: EventsActions, data: any): void {
 	const { type, params } = this.getState()
 	if (!type || !params) return
 
-	const chatId = type === "group" ? params.channel_id : params.to_user_id
+	const chatId = type === "group" ? params.channel_id! : params.to_user_id!
 
 	if (data.user) {
 		this.cache.cacheUsers([data.user]).catch(logger.error)
@@ -18,7 +18,30 @@ export default function (this: EventsActions, data: any): void {
 		.updateSyncState({ chat_id: chatId, last_message_id: data._id })
 		.catch(logger.error)
 
-	if (!this.state.pausedUpdates) {
-		this.getState().actions.pushToTimeline([data], "bottom")
+	if (this.state.pausedUpdates) {
+		this.setState((state) => {
+			const index = state.pendingMessages.findIndex(
+				(message) =>
+					message._id === data._id ||
+					(data.nonce && message.nonce === data.nonce),
+			)
+
+			if (index === -1) {
+				return { pendingMessages: [...state.pendingMessages, data] }
+			}
+
+			const pendingMessages = [...state.pendingMessages]
+
+			pendingMessages[index] = {
+				...pendingMessages[index],
+				...data,
+			}
+
+			return { pendingMessages }
+		})
+
+		return
 	}
+
+	this.getState().actions.pushToTimeline([data], "bottom")
 }

@@ -5,5 +5,8 @@ export default function (this: EventsActions, data: any): void {
 		timeline: state.timeline.map((msg) =>
 			msg._id === data._id ? { ...msg, ...data } : msg,
 		),
+		pendingMessages: state.pendingMessages.map((msg) =>
+			msg._id === data._id ? { ...msg, ...data } : msg,
+		),
 	}))
 }

@@ -24,7 +24,7 @@ export default async function (
 	const optimisticMessage: ExtendedMessage = {
 		_id: `temp-${nonce}`,
 		nonce: nonce,
-		channel_id: type === "group" ? params.channel_id : "",
+		channel_id: type === "group" ? params.channel_id! : "",
 		user_id: session.user_id,
 		message: message,
 		attachments: attachments,
@@ -52,9 +52,13 @@ export default async function (
 	})
 
 	try {
-		if (this.socket) {
-			await this.socket.call(config.methods.send, data)
+		if (!this.socket) {
+			throw new Error("socket not available")
 		}
+
+		await this.socket.call(config.methods.send, data)
+
+		return true
 	} catch (err) {
 		logger.error("failed to send message", err)
 
@@ -63,7 +67,7 @@ export default async function (
 				msg.nonce === nonce ? { ...msg, status: "error" } : msg,
 			),
 		}))
-	}
 
-	return true
+		return false
+	}
 }

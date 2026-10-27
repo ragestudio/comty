@@ -1,16 +1,16 @@
 import type LifecycleActions from "./index"
+import type { ChatParams, ChatType } from "@/chat/types"
 
 import { CHAT_CONFIGS } from "@/chat/constants"
+import { getChatSessionKey } from "@/chat/types"
 import sortMessages from "@/utils/sortMessages"
 import logger from "@/utils/logger"
 
 export default async function (
 	this: LifecycleActions,
-	type: "group" | "dm",
-	params: any,
+	type: ChatType,
+	params: ChatParams,
 ): Promise<void> {
-	if (!this.adapter) return
-
 	this.state.actions.reset()
 	const generation = this.getState().initGeneration + 1
 
@@ -19,9 +19,17 @@ export default async function (
 	const config = CHAT_CONFIGS[type]
 	if (!config) throw new Error(`invalid chat type: ${type}`)
 
-	this.setState({ type, params, initialLoading: true })
+	this.setState({
+		type,
+		params,
+		sessionKey: getChatSessionKey(type, params),
+		initialLoading: true,
+	})
 
-	const cachedMessages = await this.adapter.getCachedMessages(params, 50)
+	const adapter = this.adapter
+	if (!adapter) return
+
+	const cachedMessages = await adapter.getCachedMessages(params, 50)
 
 	if (generation !== this.state.initGeneration) return
 
@@ -33,6 +41,9 @@ export default async function (
 
 	if (cachedMessages.length === 0) {
 		await this.state.actions.load()
+	} else if (type === "dm") {
+		// dm sync is not implemented server side, fill newer messages
+		await this.state.actions.loadAfter()
 	}
 
 	if (generation === this.state.initGeneration) {
