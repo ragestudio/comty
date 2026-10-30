@@ -13,9 +13,9 @@ const ShareCameraOptionsDialog = ({ close }) => {
 		(device) => {
 			console.log(device)
 
-			app.cores.mediartc.handlers().startCameraShare({
-				device: device,
-			})
+			// app.cores.mediartc.handlers().startCameraShare({
+			// 	device: device,
+			// })
 
 			close()
 		},
