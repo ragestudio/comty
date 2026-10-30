@@ -17,6 +17,8 @@ export interface ScreenStreamParams extends BaseHandlerParams {
 		framerate?: number
 		systemAudio?: boolean
 		contentHint?: ScreenContentHint
+		// android only: fraction of the display resolution used for the capture
+		resolutionScale?: number
 	}
 	close: { force?: boolean; reason?: string }
 }
@@ -31,7 +33,16 @@ export const ScreenStream = (self: Self) =>
 			const useSystemAudio =
 				!!systemAudio && (await systemAudio.isSupported())
 
-			const stream = await navigator.mediaDevices.getDisplayMedia({
+			const resolutionScale =
+				typeof params?.resolutionScale === "number"
+					? Math.min(1, Math.max(0.1, params.resolutionScale))
+					: undefined
+
+			// the android implementation uses resolutionScale instead of the video
+			// constraints, which it ignores for screen capture
+			const constraints: MediaStreamConstraints & {
+				android?: { resolutionScale?: number }
+			} = {
 				video: {
 					width: { max: params?.resolution?.width ?? 1920 },
 					height: { max: params?.resolution?.height ?? 1080 },
@@ -40,7 +51,15 @@ export const ScreenStream = (self: Self) =>
 				// when the platform exposes a dedicated loopback capture, request
 				// video only and add the system audio track below
 				audio: useSystemAudio ? false : !!params?.systemAudio,
-			})
+			}
+
+			if (resolutionScale !== undefined) {
+				constraints.android = { resolutionScale }
+			}
+
+			const stream = await navigator.mediaDevices.getDisplayMedia(
+				constraints as any,
+			)
 
 			if (useSystemAudio) {
 				try {

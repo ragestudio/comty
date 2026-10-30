@@ -20,6 +20,30 @@ export type ProduceOptions = {
 let speakerIdSequence = 0
 const nextSpeakerId = () => `self-producer-${++speakerIdSequence}`
 
+// screen content degrades better by lowering the resolution than by dropping
+// frames, so ask the encoder to keep the framerate under congestion
+async function applyDegradationPreference(
+	producer: Producer,
+	preference: "maintain-framerate" | "maintain-resolution" | "balanced",
+) {
+	const sender = producer.rtpSender as any
+
+	if (!sender?.getParameters || !sender?.setParameters) return
+
+	try {
+		const params = sender.getParameters()
+
+		if (!params || params.degradationPreference === preference) return
+
+		await sender.setParameters({
+			...params,
+			degradationPreference: preference,
+		})
+	} catch (error) {
+		logger.warn("failed to set degradation preference", error)
+	}
+}
+
 export class Producers extends Map<string, Producer> {
 	constructor(core: RTC, data?: Iterable<readonly [string, Producer]>) {
 		super(data)
@@ -108,6 +132,11 @@ export class Producers extends Map<string, Producer> {
 
 		if (detachSpeaking) {
 			this.speakingDetectors.set(producer.id, detachSpeaking)
+		}
+
+		// screen shares keep a stable framerate when the network is the limit
+		if (payload.appData?.mediaTag === "screen-video") {
+			void applyDegradationPreference(producer, "maintain-framerate")
 		}
 
 		this.core.eventBus.emit("rtc:producer:joined", producer)

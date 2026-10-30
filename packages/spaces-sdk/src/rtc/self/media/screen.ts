@@ -18,6 +18,8 @@ export interface ScreenParams {
 		framerate?: number
 		contentHint?: ScreenContentHint
 		systemAudio?: boolean
+		// android only: fraction of the display resolution used for the capture
+		resolutionScale?: number
 	}
 }
 
@@ -33,6 +35,7 @@ export const Screen = (self: Self) =>
 				framerate: params?.framerate,
 				contentHint: params?.contentHint,
 				systemAudio: params?.systemAudio,
+				resolutionScale: params?.resolutionScale,
 			})
 
 			if (!screen.stream) {
