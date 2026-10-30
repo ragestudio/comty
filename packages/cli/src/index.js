@@ -4,7 +4,7 @@ import fs from "node:fs"
 import path from "node:path"
 import { Command } from "commander"
 import { createClient } from "comty.js"
-import SessionModel from "comty.js/dist/models/session/index.js"
+import SessionModel from "comty.js/dist/endpoints/session/index.js"
 import Storage from "comty.js/dist/helpers/withStorage.js"
 
 import Cache from "./classes/cache.js"

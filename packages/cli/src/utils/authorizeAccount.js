@@ -1,5 +1,5 @@
 import * as prompts from "@inquirer/prompts"
-import AuthModel from "comty.js/dist/models/auth/index.js"
+import AuthModel from "comty.js/dist/endpoints/auth/index.js"
 
 export default function authorizeAccount() {
 	return new Promise(async (resolve, reject) => {
