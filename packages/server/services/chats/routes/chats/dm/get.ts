@@ -1,8 +1,8 @@
-import type API from "@services/chats/chats.service"
+import API from "@services/chats/chats.service"
 
-export default defineRoute<API>()({
+export default defineRoute(API)({
 	useMiddlewares: ["botAuthentication", "withAuthentication"],
-	useContexts: ["dmChannels"] as const,
+	useContexts: ["dmChannels"],
 	fn: async (req, res, ctx) => {
 		const user_id = req.auth.session.user_id
 

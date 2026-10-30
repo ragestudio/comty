@@ -8,7 +8,7 @@ interface SendPayload extends Partial<Message> {
 	channel_id: string
 }
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["groupChannels"] as const,
 	fn: async (client: RTEClient, payload: SendPayload, ctx) => {
 		if (!client.userId) {
@@ -29,6 +29,9 @@ export default defineRoute<API, "ws">()({
 			client.userId,
 		)
 
-		await channel.write((client as any).user ?? client.socket.context.user, payload)
+		await channel.write(
+			(client as any).user ?? client.socket.context.user,
+			payload,
+		)
 	},
 })

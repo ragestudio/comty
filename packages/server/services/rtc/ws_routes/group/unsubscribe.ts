@@ -1,7 +1,7 @@
 import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, group_id: string, ctx) => {
 		if (typeof group_id !== "string") {

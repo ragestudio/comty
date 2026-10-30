@@ -1,12 +1,12 @@
-import type API from "@services/chats/chats.service"
+import API from "@services/chats/chats.service"
 
 import User from "@db_models/user"
 import ChannelLogModel, { type ChannelLog } from "@db/channel_log"
 import MessageModel from "@db/channel_messages"
 
-export default defineRoute<API>()({
+export default defineRoute(API)({
 	useMiddlewares: ["botAuthentication", "withAuthentication"],
-	useContexts: ["groupChannels"] as const,
+	useContexts: ["groupChannels"],
 	fn: async (req, res, ctx) => {
 		const { group_id, channel_id } = req.params
 		let { last_synced_at, last_message_id } = req.query

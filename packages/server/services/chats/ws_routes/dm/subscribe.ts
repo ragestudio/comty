@@ -5,7 +5,7 @@ interface DMSubscribePayload {
 	to_user_id: string
 }
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["dmChannels"] as const,
 	fn: async (client: RTEClient, payload: DMSubscribePayload, ctx) => {
 		if (!client.userId) {

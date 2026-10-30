@@ -6,7 +6,7 @@ interface SubscribePayload {
 	channel_id: string
 }
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	fn: async (client: RTEClient, payload: SubscribePayload) => {
 		if (!payload.group_id) {
 			throw new OperationError(400, "Missing group_id")

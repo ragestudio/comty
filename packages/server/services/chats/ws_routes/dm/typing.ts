@@ -6,7 +6,7 @@ interface DMTypingPayload {
 	isTyping: boolean
 }
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["dmChannels"] as const,
 	fn: async (client: RTEClient, payload: DMTypingPayload, ctx) => {
 		if (!client.userId) {

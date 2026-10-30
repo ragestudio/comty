@@ -2,7 +2,7 @@ import type API from "@services/chats/chats.service"
 import ChannelAcksModel from "@db/channel_acks"
 import NotificationsModel from "@db/notifications"
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["server", "scylla"] as const,
 	fn: async (client, payload, ctx) => {
 		if (!client.userId) {

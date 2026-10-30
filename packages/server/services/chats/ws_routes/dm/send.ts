@@ -1,6 +1,6 @@
 import type API from "@services/chats/chats.service"
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["dmChannels"] as const,
 	fn: async (client, payload, ctx) => {
 		if (!client.userId) {

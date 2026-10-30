@@ -5,7 +5,7 @@ interface UnsubscribePayload {
 	channel_id: string
 }
 
-export default defineRoute<API, "ws">()({
+export default defineRoute<API, HandlerKind["ws"]>()({
 	fn: async (client: RTEClient, payload: UnsubscribePayload) => {
 		if (!payload.channel_id) {
 			throw new OperationError(400, "Missing channel_id")
