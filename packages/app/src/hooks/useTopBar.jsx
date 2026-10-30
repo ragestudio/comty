@@ -1,18 +1,18 @@
 import React from "react"
 
-export default (props) => {
-	if (!app.layout?.top_bar) {
-		return null
-	}
+import { setTopBarRender, useTopBarStore } from "@/stores/topbar"
 
-	app.layout.top_bar.render(
-		<React.Fragment>{props.children}</React.Fragment>,
-		props.options,
-	)
+export default (props) => {
+	React.useEffect(() => {
+		setTopBarRender(
+			<React.Fragment>{props.children}</React.Fragment>,
+			props.options,
+		)
+	}, [props.children, props.options])
 
 	React.useEffect(() => {
 		return () => {
-			app.layout.top_bar.renderDefault()
+			useTopBarStore.getState().clearRender()
 		}
 	}, [])
 

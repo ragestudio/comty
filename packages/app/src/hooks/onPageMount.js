@@ -75,6 +75,19 @@ export const handleSidebarVisibility = (option) => {
 	return app.layout.sidebar.toggleVisibility(option)
 }
 
+export const handleToolbarVisibility = (option) => {
+	// check if sidebar is available
+	if (!app.layout?.tools_bar || !app.layout?.tools_bar?.toggleVisibility) {
+		return null
+	}
+
+	if (typeof option !== "boolean") {
+		return app.layout.tools_bar.toggleVisibility(true)
+	}
+
+	return app.layout.tools_bar.toggleVisibility(option)
+}
+
 export const handleTitle = (targetTitle) => {
 	if (targetTitle) {
 		document.title = `${targetTitle} - ${config.app.siteName}`
@@ -98,7 +111,7 @@ export default ({ element, declaration }) => {
 
 	// handle visibilities
 	handleSidebarVisibility(options.layout?.sidebar ?? declaration?.sidebar)
-	// TODO: handleToolbarVisibility(options.layout?.toolbar ?? declaration?.toolbar)
+	handleToolbarVisibility(options.layout?.toolsbar ?? declaration?.toolsbar)
 	// TODO: handleHeaderVisibility(options.layout?.header ?? declaration?.header)
 
 	// handle mobile components visibilities

@@ -10,6 +10,8 @@ import MarkdownReader from "@components/MarkdownReader"
 import config from "@config"
 import deleteInternalStorage from "@utils/deleteInternalStorage"
 
+import { useTopBarStore } from "@/stores/topbar"
+
 export default {
 	"👀": async () => {
 		const component = await import("@components/SkeletonRun")
@@ -26,9 +28,7 @@ export default {
 				app.layout.tools_bar.toggleVisibility(to)
 			}
 
-			if (app.layout.top_bar) {
-				app.layout.top_bar.toggleVisibility(to)
-			}
+			useTopBarStore.getState().toggleVisibility(to)
 
 			if (app.layout.floatingStack) {
 				app.layout.floatingStack.toggleGlobalVisibility(to)

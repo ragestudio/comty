@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useIsPresent } from "motion/react"
 import PropTypes from "prop-types"
 
 import useLayoutInterface from "@hooks/useLayoutInterface"
-import useToolsBarRenders from "@hooks/useToolsBarRenders"
+import useToolsBarStore from "@/stores/toolsbar"
 
 import WidgetsWrapper from "@components/WidgetsWrapper"
 
@@ -79,59 +79,14 @@ ToolsBar.propTypes = {
 }
 
 const ToolsBarWrapper = (props) => {
-	const { topRenders, bottomRenders, setTopRenders, setBottomRenders } =
-		useToolsBarRenders()
-	const [visible, setVisible] = React.useState(false)
+	const store = useToolsBarStore()
+	const enabled = store.hasAnyRenders() && store.visible
 
-	const hasAnyRenders = topRenders.length > 0 || bottomRenders.length > 0
-	const isVisible = hasAnyRenders && visible
-
-	useLayoutInterface("tools_bar", {
-		toggleVisibility: (to) => {
-			setVisible((prev) => {
-				return to ?? !prev
-			})
-		},
-		attachRender: (id, component, props, { position = "bottom" } = {}) => {
-			let stateUpdater = setBottomRenders
-
-			if (position === "top") {
-				stateUpdater = setTopRenders
-			}
-
-			if (position === "bottom") {
-				stateUpdater = setBottomRenders
-			}
-
-			stateUpdater((prev) => {
-				return [
-					...prev,
-					{
-						id: id,
-						component: component,
-						props: props,
-					},
-				]
-			})
-
-			return component
-		},
-		detachRender: (id) => {
-			setTopRenders((prev) => {
-				return prev.filter((render) => render.id !== id)
-			})
-
-			setBottomRenders((prev) => {
-				return prev.filter((render) => render.id !== id)
-			})
-
-			return true
-		},
-	})
+	useLayoutInterface("tools_bar", store)
 
 	React.useEffect(() => {
 		setTimeout(() => {
-			setVisible(true)
+			store.toggleVisibility(true)
 		}, 10)
 	}, [])
 
@@ -141,14 +96,7 @@ const ToolsBarWrapper = (props) => {
 
 	return (
 		<AnimatePresence>
-			{isVisible && (
-				<ToolsBar
-					renders={{
-						top: topRenders,
-						bottom: bottomRenders,
-					}}
-				/>
-			)}
+			{enabled && <ToolsBar renders={store.renders} />}
 		</AnimatePresence>
 	)
 }

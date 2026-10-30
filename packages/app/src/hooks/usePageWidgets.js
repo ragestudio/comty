@@ -1,34 +1,26 @@
 import React from "react"
+import useToolsBarStore from "@/stores/toolsbar"
 
 const usePageWidgets = (widgets = []) => {
+	const store = useToolsBarStore()
+
 	React.useEffect(() => {
-		if (
-			!app.layout.tools_bar ||
-			!app.layout.tools_bar.attachRender ||
-			!app.layout.tools_bar.detachRender
-		) {
+		if (!store || !store.attachRender || !store.detachRender) {
 			return
 		}
 
 		for (const widget of widgets) {
-			app.layout.tools_bar.attachRender(
-				widget.id,
-				widget.component,
-				widget.props,
-				{
-					position: "top",
-				},
-			)
+			store.attachRender(widget.id, widget.component, widget.props, {
+				position: "top",
+			})
 		}
 
 		return () => {
-			if (app.layout?.tools_bar) {
-				for (const widget of widgets) {
-					app.layout.tools_bar.detachRender(widget.id)
-				}
+			for (const widget of widgets) {
+				store.detachRender(widget.id)
 			}
 		}
-	})
+	}, [])
 }
 
 export default usePageWidgets

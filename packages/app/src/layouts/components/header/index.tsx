@@ -1,32 +1,15 @@
 import React from "react"
 import { motion, AnimatePresence } from "motion/react"
 
-import useLayoutInterface from "@hooks/useLayoutInterface"
+import { useHeaderStore } from "@/stores/header"
 
 import "./index.less"
 
-const HeaderBar = (props) => {
-	const [render, setRender] = React.useState(null)
-
-	useLayoutInterface("header", {
-		render: (component, options) => {
-			if (component === null) {
-				return setRender(null)
-			}
-
-			return setRender({
-				component,
-				options,
-			})
-		},
-	})
+export const HeaderBar = () => {
+	const render = useHeaderStore((state) => state.render)
 
 	React.useEffect(() => {
-		if (render) {
-			app.layout.toggleDisableTopLayoutPadding(true)
-		} else {
-			app.layout.toggleDisableTopLayoutPadding(false)
-		}
+		app.layout.toggleDisableTopLayoutPadding(Boolean(render))
 	}, [render])
 
 	return (
@@ -58,11 +41,7 @@ const HeaderBar = (props) => {
 					}}
 				>
 					<div className="page_header bg-accent">
-						{render?.component &&
-							React.cloneElement(
-								render?.component,
-								render?.options?.props ?? {},
-							)}
+						{React.cloneElement(render.component, render.options.props ?? {})}
 					</div>
 				</motion.div>
 			)}

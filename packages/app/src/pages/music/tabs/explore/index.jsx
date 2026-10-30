@@ -8,6 +8,8 @@ import SearchModel from "@endpoints/search"
 import MusicModel from "@endpoints/music"
 import RadioModel from "@endpoints/radio"
 
+import { usePagePanelsStore } from "@/stores/pagePanels"
+
 import Navbar from "./components/Navbar"
 import RecentlyPlayedList from "./components/RecentlyPlayedList"
 import SearchResults from "./components/SearchResults"
@@ -19,16 +21,14 @@ const MusicExploreTab = () => {
 	const [searchResults, setSearchResults] = React.useState(false)
 
 	React.useEffect(() => {
-		app.layout.page_panels.attachComponent("music_navbar", Navbar, {
+		usePagePanelsStore.getState().attachComponent("music_navbar", Navbar, {
 			props: {
 				setSearchResults: setSearchResults,
 			},
 		})
 
 		return () => {
-			if (app.layout.page_panels) {
-				app.layout.page_panels.detachComponent("music_navbar")
-			}
+			usePagePanelsStore.getState().detachComponent("music_navbar")
 		}
 	}, [])
 

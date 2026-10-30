@@ -1,56 +1,14 @@
 import React from "react"
 
-import useToolsBarRenders from "@hooks/useToolsBarRenders"
 import useLayoutInterface from "@hooks/useLayoutInterface"
+import useToolsBarStore from "@/stores/toolsbar"
 
 const ToolsBar = (props) => {
-	const { topRenders, bottomRenders, setTopRenders, setBottomRenders } =
-		useToolsBarRenders()
+	const store = useToolsBarStore()
 
-	useLayoutInterface("tools_bar", {
-		toggleVisibility: (to) => {
-			// setVisible((prev) => {
-			// 	return to ?? !prev
-			// })
-		},
-		attachRender: (id, component, props, { position = "bottom" } = {}) => {
-			let stateUpdater = setBottomRenders
+	useLayoutInterface("tools_bar", store)
 
-			if (position === "top") {
-				stateUpdater = setTopRenders
-			}
-
-			if (position === "bottom") {
-				stateUpdater = setBottomRenders
-			}
-
-			stateUpdater((prev) => {
-				return [
-					...prev,
-					{
-						id: id,
-						component: component,
-						props: props,
-					},
-				]
-			})
-
-			return component
-		},
-		detachRender: (id) => {
-			setTopRenders((prev) => {
-				return prev.filter((render) => render.id !== id)
-			})
-
-			setBottomRenders((prev) => {
-				return prev.filter((render) => render.id !== id)
-			})
-
-			return true
-		},
-	})
-
-	return [...bottomRenders, ...topRenders]
+	return [...store.renders.bottom, ...store.renders.top]
 		.filter((item) => {
 			if (
 				Array.isArray(props.filters) &&

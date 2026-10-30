@@ -103,6 +103,7 @@ const EnhancedLyricsPage = () => {
 EnhancedLyricsPage.options = {
 	layout: {
 		sidebar: false,
+		toolsbar: false,
 	},
 }
 

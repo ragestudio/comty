@@ -120,9 +120,10 @@ class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 						declarations={routesDeclarations}
 						staticRenders={ComtyApp.staticRenders}
 						onPageMount={onPageMount}
+						renderEnabled={this.state.firstInitialized}
 					>
 						<Layout staticRenders={ComtyApp.staticRenders}>
-							{this.state.firstInitialized && <Router.Render />}
+							<Router.Render />
 						</Layout>
 					</Router.Router>
 				</AppCrash>

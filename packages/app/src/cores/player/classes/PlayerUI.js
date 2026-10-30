@@ -1,3 +1,4 @@
+import { toolsBarStore } from "@/stores/toolsbar"
 import Player from "@components/Player"
 
 export default class PlayerUI {
@@ -7,39 +8,25 @@ export default class PlayerUI {
 		return this
 	}
 
-	currentDomWindow = null
+	toolbarRenderId = null
 
 	//
 	// UI Methods
 	//
 	attachPlayerComponent() {
-		if (this.currentDomWindow) {
-			this.player.console.warn("EmbbededMediaPlayer already attached")
-			return false
-		}
+		if (this.toolbarRenderId) return
 
-		if (app.layout.tools_bar) {
-			this.currentDomWindow = app.layout.tools_bar.attachRender(
-				"mediaPlayer",
-				Player,
-				undefined,
-				{
-					position: "bottom",
-				},
-			)
-		}
+		const render = toolsBarStore
+			.getState()
+			.attachRender("mediaPlayer", Player, undefined, {
+				position: "bottom",
+			})
+
+		this.toolbarRenderId = render.id
 	}
 
 	detachPlayerComponent() {
-		if (!this.currentDomWindow) {
-			this.player.console.warn("EmbbededMediaPlayer not attached")
-			return false
-		}
-
-		if (app.layout.tools_bar) {
-			app.layout.tools_bar.detachRender("mediaPlayer")
-		}
-
-		this.currentDomWindow = null
+		toolsBarStore.getState().detachRender("mediaPlayer")
+		this.toolbarRenderId = null
 	}
 }
