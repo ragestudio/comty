@@ -59,7 +59,7 @@ importers:
         version: 7.0.2
       vitest:
         specifier: ^4.1.11
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
   modules/linebridge:
     devDependencies:
@@ -140,7 +140,7 @@ importers:
         version: 4.0.3(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
       vitepress:
         specifier: 2.0.0-alpha.20
-        version: 2.0.0-alpha.20(@types/node@26.6.5)(axios@1.21.0(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0))(esbuild@0.28.2)(fuse.js@7.4.2)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@11.0.0))(postcss@8.5.29)(qrcode@1.5.4)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1)
+        version: 2.0.0-alpha.20(@types/node@26.6.5)(axios@1.21.0(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0))(esbuild@0.28.2)(fuse.js@7.4.2)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@11.0.0))(postcss@8.5.29)(qrcode@1.5.4)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1)
       vitepress-plugin-lightbox:
         specifier: ^1.0.3
         version: 1.0.3
@@ -171,7 +171,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^8.3.0
-        version: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+        version: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
   modules/linebridge/engines/neo:
     dependencies:
@@ -220,7 +220,7 @@ importers:
         version: 7.0.2
       vitest:
         specifier: ^4.1.11
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
   modules/linebridge/gateway: {}
 
@@ -284,7 +284,7 @@ importers:
         version: 7.0.2
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
   modules/vessel:
     dependencies:
@@ -330,7 +330,7 @@ importers:
         version: 7.0.2
       vite:
         specifier: ^8.3.5
-        version: 8.3.5(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+        version: 8.3.5(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
   packages/app:
     dependencies:
@@ -412,6 +412,9 @@ importers:
       classnames:
         specifier: 2.5.1
         version: 2.5.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       comlink:
         specifier: ^4.4.2
         version: 4.4.2
@@ -463,9 +466,6 @@ importers:
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
-      less:
-        specifier: ^4.9.0
-        version: 4.9.1(supports-color@11.0.0)
       less-vars-to-js:
         specifier: ^1.3.0
         version: 1.3.0
@@ -598,7 +598,7 @@ importers:
         version: 8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.13.0(jiti@2.7.0)(supports-color@11.0.0))(supports-color@11.0.0)(typescript@7.0.2))(eslint@10.13.0(jiti@2.7.0)(supports-color@11.0.0))(supports-color@11.0.0)(typescript@7.0.2)
       '@vitejs/plugin-react-swc':
         specifier: ^4.3.3
-        version: 4.3.3(vite@7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+        version: 4.3.3(vite@7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
       eslint:
         specifier: ^10.9.1
         version: 10.13.0(jiti@2.7.0)(supports-color@11.0.0)
@@ -608,6 +608,9 @@ importers:
       globals:
         specifier: ^17.11.0
         version: 17.13.0
+      less:
+        specifier: ^4.9.0
+        version: 4.9.1(supports-color@11.0.0)
       strip-json-comments:
         specifier: ^5.0.3
         version: 5.0.3
@@ -616,7 +619,7 @@ importers:
         version: 7.0.2
       vite:
         specifier: ^7.3.6
-        version: 7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+        version: 7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
   packages/cli:
     dependencies:
@@ -682,8 +685,8 @@ importers:
         specifier: ~57.0.26
         version: 57.0.26(@babel/core@7.29.7(supports-color@11.0.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(expo@57.0.31)(react-dom@19.3.0(react@19.3.0))(react-native-worklets@0.10.1(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(react@19.3.0)(supports-color@11.0.0))(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(react@19.3.0)
       '@ragestudio/react-native-webrtc':
-        specifier: https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-4/react-native-webrtc-124.0.8-4.tgz
-        version: https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-4/react-native-webrtc-124.0.8-4.tgz(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(supports-color@11.0.0)
+        specifier: https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-5/react-native-webrtc-124.0.8-5.tgz
+        version: https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-5/react-native-webrtc-124.0.8-5.tgz(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(supports-color@11.0.0)
       '@react-native-masked-view/masked-view':
         specifier: ^0.3.2
         version: 0.3.2(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(react@19.3.0)
@@ -723,6 +726,9 @@ importers:
       expo-haptics:
         specifier: ~57.0.3
         version: 57.0.3(expo@57.0.31)
+      expo-keep-awake:
+        specifier: ~57.0.2
+        version: 57.0.2(expo@57.0.31)(react@19.3.0)
       expo-linear-gradient:
         specifier: ^57.0.2
         version: 57.0.2(expo@57.0.31)(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(react@19.3.0)
@@ -967,7 +973,7 @@ importers:
         version: 22.1.0
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@25.9.9)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@25.9.9)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
     optionalDependencies:
       bufferutil:
         specifier: ^4.1.0
@@ -1721,6 +1727,9 @@ packages:
 
   '@borewit/text-codec@0.2.2':
     resolution: {integrity: sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ==}
+
+  '@bufbuild/protobuf@2.16.0':
+    resolution: {integrity: sha512-FWa0sPlqYGJgpTs6OxBRcL/AW4JT0OIO+W1ajerluoTVh8CV0B7XM1qsNCRgnkSCkRCgOICKHRQlY17jrsm0+Q==}
 
   '@cacheable/memory@2.2.0':
     resolution: {integrity: sha512-CTLKqLItRCEixEAewD3/j9DB3/o96gpTPD4eJ1v+DGOlxZRZncRQkGYqqnAGCscYd6RNeXfGeiuCphsPtqyIfQ==}
@@ -3024,6 +3033,88 @@ packages:
   '@oxc-project/types@0.155.0':
     resolution: {integrity: sha512-SeE8JPwW1xs1tHeNycjUtUBdhorRa8o4jlvjwk49R7/Z291i+4DQa7JJIgOm/TaYQZx+QrPQbVJ/9c8dMIZN8Q==}
 
+  '@parcel/watcher-android-arm64@2.6.0':
+    resolution: {integrity: sha512-trgpLSCKRC/huFjXX/Smh+0sWe4+YtKfktIToiMl59ghz7z+qkH6kMvNnUbLyRs9N11t8l4svSCs1+5B3rOAhA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [android]
+
+  '@parcel/watcher-darwin-arm64@2.6.0':
+    resolution: {integrity: sha512-Y3QV0gl7Q1zbfueunkWIERICbEojQFCgpyG7YqOGNFLsckXyI1xu9mAIUpKY9QBYzBtSkN8dBPwd3yiAO9ovMw==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@parcel/watcher-darwin-x64@2.6.0':
+    resolution: {integrity: sha512-Ohv6OpzhUfKYD7Beb8kDvG0jbIxORCYY1JRdZnaBtnjjkJxgD7ZVL0nw2sCYd0yTMKTvz3nnTnOF3cDifK+kvw==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@parcel/watcher-freebsd-x64@2.6.0':
+    resolution: {integrity: sha512-5HmXvDgs8VK+74jF9y9/2FE3/OnlcKmc56tjmSrEuZjpSZOGL+fvAu+HKJBdPs9uwoP2hE6TlSUpXZ/C5jUFmQ==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@parcel/watcher-linux-arm-glibc@2.6.0':
+    resolution: {integrity: sha512-Ps/hui3A+vMbjdqlqAowK2ZL8+BO8dBjxeWXj6npTBs3jx4wWmbPpaLuqwrQrSqIVMCnpWo238bJ1U37GhQOYg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm]
+    os: [linux]
+    libc: [glibc]
+
+  '@parcel/watcher-linux-arm-musl@2.6.0':
+    resolution: {integrity: sha512-9c6AUHgHoG+IY88MRIHupztQiQnrbqHYQjkM2btA+Bf/wQnQMuiD0Wfk1EVv3TlNT3x41uU71rn6E4xh/+zvkw==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm]
+    os: [linux]
+    libc: [musl]
+
+  '@parcel/watcher-linux-arm64-glibc@2.6.0':
+    resolution: {integrity: sha512-yHRqS2owEXe6Hic9z6Mh1ECsCd+ODVOGvZDyciqRd21+v+o+DnXMOrw50DSpIG2sb8GPEaPPmfeCAWKPJdq46g==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@parcel/watcher-linux-arm64-musl@2.6.0':
+    resolution: {integrity: sha512-WhB2e/V7rqdHHWZusBSPuy5Ei8S6lSz6FE5TKKQz5h3a0O+C+mhY7vxU9b/stqvMb8beLnPY82ZrFTLKs+SrKA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@parcel/watcher-linux-x64-glibc@2.6.0':
+    resolution: {integrity: sha512-ulGE6x6Oz6iAwg75T8YQSoguBWasniIbX+QWpaYPcCnDOpdWX3k+4xbEYPZVLxOuoJI+svJJPD3sEj8G7lrQ3A==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@parcel/watcher-linux-x64-musl@2.6.0':
+    resolution: {integrity: sha512-tkBYKt7YQrjIJWYDnto2YgO8MRkjlMTSNoRHzsXinBqbLdeOM3L32wPZJvIZxqaLMfSlS/4sUjH/6STVP/XDLw==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@parcel/watcher-win32-arm64@2.6.0':
+    resolution: {integrity: sha512-gIZAP23jaHjGWasY/TY6yL7NHFClf0Ga7FN+iINvk+KN94rhm94lYZhFsbYFNcA04/onvGD9kKmiJLJB2HbNwQ==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@parcel/watcher-win32-x64@2.6.0':
+    resolution: {integrity: sha512-cA+/pXV2YkfxlIcXOQ5fSWqAzzPyD78/x5qbK/I0vUkrlYHA8TIz+MXjAbGouguKVSI4bOmkTSJ1/poVSsgt+A==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [win32]
+
+  '@parcel/watcher@2.6.0':
+    resolution: {integrity: sha512-7FNeNl8NCE7aINx7WXiKQrPYZWC/hvrTsmk6zmxbI7LTXE7hVek/n8AfVgpe2y82zl3w0HvCHN0bVKMBoJcC0w==}
+    engines: {node: '>= 10.0.0'}
+
   '@peculiar/asn1-schema@2.10.0':
     resolution: {integrity: sha512-GhokD41lV4gQrrLYm3wCkHfBOnJrnhDMgt4XeMW8gzfE1UdJqIuSwsE+ggf82XBjUXRJylcm+KIGQFa4utIVLw==}
     engines: {node: '>=14'}
@@ -3266,9 +3357,9 @@ packages:
       '@types/react':
         optional: true
 
-  '@ragestudio/react-native-webrtc@https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-4/react-native-webrtc-124.0.8-4.tgz':
-    resolution: {integrity: sha512-yddoy4HZdOdOK0CU4XmWfa4MkKWbttGDvrUQWxgT7JKCNwAHV35a/FiQyyl/9I2mRKaPYWMaws9VahKvFbtJjg==, tarball: https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-4/react-native-webrtc-124.0.8-4.tgz}
-    version: 124.0.8-4
+  '@ragestudio/react-native-webrtc@https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-5/react-native-webrtc-124.0.8-5.tgz':
+    resolution: {integrity: sha512-LftOCGsRxMMh31EbXZymPFoH09zfqo5DGHbm+WKjpbChcQXo6W6KHZebn07P5tmxjGLvia7i70v1P7b8qJIovg==, tarball: https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-5/react-native-webrtc-124.0.8-5.tgz}
+    version: 124.0.8-5
     peerDependencies:
       react-native: '>=0.60.0'
 
@@ -6141,6 +6232,9 @@ packages:
     resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
     engines: {node: '>=12.5.0'}
 
+  colorjs.io@0.7.1:
+    resolution: {integrity: sha512-LY7OHnJZxHwT5UlzNa9bbhHHDbzB6yE5+3MIPwJEQKRvSCt/T4G7epsj+9j2BExUIIfXFIJGsIXUKdfrK9Q5tA==}
+
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
@@ -7642,6 +7736,9 @@ packages:
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
 
+  immutable@5.1.9:
+    resolution: {integrity: sha512-m8nVez3rwrgmWxtLMt1ZYXB2Lv7OKYn/disyxAlSDYAlKSlFoPPfIAmAM/M5xqL4m4C/wAPw7S2/CNaUii1Hxg==}
+
   import-in-the-middle@3.5.2:
     resolution: {integrity: sha512-WseIA/4o56+GYO3RmlOPvejYi771OFeJEeK/ejROsr9bdjW+E5NXTOD1Di8TL40Qgg3JJX9aa97Hf8iiSVIKZw==}
     engines: {node: '>=18'}
@@ -9082,6 +9179,9 @@ packages:
   node-abort-controller@3.1.1:
     resolution: {integrity: sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==}
 
+  node-addon-api@7.1.1:
+    resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
+
   node-addon-api@8.9.2:
     resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
     engines: {node: ^18 || ^20 || >= 21}
@@ -10123,6 +10223,128 @@ packages:
   sanitize-filename@1.6.4:
     resolution: {integrity: sha512-9ZyI08PsvdQl2r/bBIGubpVdR3RR9sY6RDiWFPreA21C/EFlQhmgo20UZlNjZMMZNubusLhAQozkA0Od5J21Eg==}
 
+  sass-embedded-all-unknown@1.106.1:
+    resolution: {integrity: sha512-5jUnX+WVeovsbORYHBfPMiAtb5/qTnWpuLrlg0ZEjo4AKLjkM3gXkRCReYBEi/bLC3JhBcWWwG/yPqJwd8/lLw==}
+    cpu: ['!arm', '!arm64', '!riscv64', '!x64']
+
+  sass-embedded-android-arm64@1.106.1:
+    resolution: {integrity: sha512-USQo5LkotweQnofhTCZYBtI35HkbIRUx+YfI6AvNN/Wr45ewCbUnTOYvQc+DLFFcm+g9cp64kLrySPdLbkuPzQ==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm64]
+    os: [android]
+
+  sass-embedded-android-arm@1.106.1:
+    resolution: {integrity: sha512-xtLTJzkh2/oGI0kZ787ef55zKzmk6UO6nsIMV8CE9n2qMG3JvyU91EU+BxjvknRR9BTVvbQOCLqW5j0psFOeAQ==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm]
+    os: [android]
+
+  sass-embedded-android-riscv64@1.106.1:
+    resolution: {integrity: sha512-OyEAsl8q6xpZgsK4zupwfhVUYvjJaMPgILyXtx326DSPc5lKOwWpXa8rhI2H3eAB76xU61C/5RavIkH1iaqQeQ==}
+    engines: {node: '>=14.0.0'}
+    cpu: [riscv64]
+    os: [android]
+
+  sass-embedded-android-x64@1.106.1:
+    resolution: {integrity: sha512-cczQbbtwex6mtaXS/8UwCSx6613EHiVLQNpkeVmk5oN08HpzPsWMoyzuGa2hdfh0by9mHXismdLk8fh9wdEQ+w==}
+    engines: {node: '>=14.0.0'}
+    cpu: [x64]
+    os: [android]
+
+  sass-embedded-darwin-arm64@1.106.1:
+    resolution: {integrity: sha512-j8p5iM8v0lGFwfO6sagHkrokD7/zlEkCpfRiBDzvW+FdD/JqOW1nemVz/CexHeeR28ULrUNnE1fKJ/FN9TjTEw==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  sass-embedded-darwin-x64@1.106.1:
+    resolution: {integrity: sha512-WMszbY07IZ/GOaRlrMI3o+h7eiiOKBppLT+GSunSQsVcr2N4rlmM2rXlLsfub1praplLB4FWqMY1St8kLSjmZg==}
+    engines: {node: '>=14.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
+  sass-embedded-linux-arm64@1.106.1:
+    resolution: {integrity: sha512-CBUcLDCBUiB6vlMO5VwtTywpapeE8cmr/UJ//xwNwByNGxc6JvoBru5XA1bhPquRjgNNMs90u89ybgap8gN31Q==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: glibc
+
+  sass-embedded-linux-arm@1.106.1:
+    resolution: {integrity: sha512-EfhuxqURaMpP/eG4bg3fk4XZvRzMJBIw2iSVNRRbpwMOZLhDce8Eys95rTuOuU2R9/pHMwcVwpj/ZU3mZyLHog==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm]
+    os: [linux]
+    libc: glibc
+
+  sass-embedded-linux-musl-arm64@1.106.1:
+    resolution: {integrity: sha512-yDUGDnNbPOoVaeEapLomFnwQkLQF4pveitqjq3J9Oi7qmg8mM/PXJYWOqCOq1ifXSbnnWppfuylUSkGTwnO1Hg==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm64]
+    os: [linux]
+    libc: musl
+
+  sass-embedded-linux-musl-arm@1.106.1:
+    resolution: {integrity: sha512-ToaDrOiunMuD64XLelRqjC0LWuEKt8q6vpqPsHdSN8T5paJWrAXP8EXMcuR/iIBigsssifAPym/MHEWLkLSTlg==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm]
+    os: [linux]
+    libc: musl
+
+  sass-embedded-linux-musl-riscv64@1.106.1:
+    resolution: {integrity: sha512-mQwiwXzfYlT/3Tb7TAvly9eoJc6Q6z+PC2e8mtuajr77DWAGa+8Ibte1umkG/F6o9jFNG8k752A4EAlSRTXfNg==}
+    engines: {node: '>=14.0.0'}
+    cpu: [riscv64]
+    os: [linux]
+    libc: musl
+
+  sass-embedded-linux-musl-x64@1.106.1:
+    resolution: {integrity: sha512-GwVa+GJGeu8ACw06aGXz8uuc9rFXRJsceMHHi02fpuv3qsy2asMgy9xgN4GPVJLac4yjCBmf09sUUqWpOCrkzw==}
+    engines: {node: '>=14.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: musl
+
+  sass-embedded-linux-riscv64@1.106.1:
+    resolution: {integrity: sha512-biV7fnrlTBAfl+bzIMTgGUHaW803NJti4XcKpX70ukOOKOgxsEwwvk21tI0w8VLKIyXFuLKM3TJxe3Ze1DR0tQ==}
+    engines: {node: '>=14.0.0'}
+    cpu: [riscv64]
+    os: [linux]
+    libc: glibc
+
+  sass-embedded-linux-x64@1.106.1:
+    resolution: {integrity: sha512-Ev2UktLmdFVvCFeSNyow0HNdxmNHqcXLRgEeesKpw4mtcuLN5HHocOJw9LrHiTbcpMPsfxgymS4jJBg43AptaA==}
+    engines: {node: '>=14.0.0'}
+    cpu: [x64]
+    os: [linux]
+    libc: glibc
+
+  sass-embedded-unknown-all@1.106.1:
+    resolution: {integrity: sha512-uaeOeGCaHnhqpfZnjy5wGMcuyYbnDyXhzWCniGctqCj/Inlst4eDZaweowo+sJLExRvmToBhQ8seZyEvfGMQ4g==}
+    os: ['!android', '!darwin', '!linux', '!win32']
+
+  sass-embedded-win32-arm64@1.106.1:
+    resolution: {integrity: sha512-EiDwpthGDIX25B4d5lVEYgxzqRSdSFoi8czHHesXFYinroDHmgTpqgv7MhYmGogTCvei3o8AahX2Wl1BanWJQg==}
+    engines: {node: '>=14.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  sass-embedded-win32-x64@1.106.1:
+    resolution: {integrity: sha512-j3OIOIXrNqbggtWlht7M/mkYybmGeGtvP7FRUx0NTDC6yeRhc16QTOoHb+z8S6NO9x0frg8eQS+F5qF7+DCKBQ==}
+    engines: {node: '>=14.0.0'}
+    cpu: [x64]
+    os: [win32]
+
+  sass-embedded@1.106.1:
+    resolution: {integrity: sha512-OoaTjMm7PcQnCo/AZNSKM/KdAeaX57edhmOp2bH8hcGNph2VDIg404gOSMZxGKNL+lbc7Ng0S/IYLAbs0YmgfA==}
+    engines: {node: '>=20.19.0'}
+    hasBin: true
+
+  sass@1.106.1:
+    resolution: {integrity: sha512-kD+Gi66vycZcbJt+42NC4z4PXNMcCajVrJPhqoKKXy5cOBMmJQt052CxIBcRjwYXeImHYOpu/ydWWGZQIenl7A==}
+    engines: {node: '>=20.19.0'}
+    hasBin: true
+
   sax@1.2.1:
     resolution: {integrity: sha512-8I2a3LovHTOpm7NV5yOyO8IHqgVsfK4+UuySrXU8YXkSRX7k6hCV9b3HrkKCr3nMpgj+0bmocaJJWpvp1oc7ZA==}
 
@@ -10512,6 +10734,14 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  sync-child-process@1.1.1:
+    resolution: {integrity: sha512-54zMOnH5qgjdKW8SGpCx3daSP+v+TtTfOxgPdhUE3P0hytMMpknZfP67S4JeRcx5IQRWJERz6890yO4dkTywww==}
+    engines: {node: '>=16.0.0'}
+
+  sync-message-port@1.2.0:
+    resolution: {integrity: sha512-gAQ9qrUN/UCypHtGFbbe7Rc/f9bzO88IwrG8TDo/aMKAApKyD6E3W4Cm0EfhfBb6Z6SKt59tTCTfD+n1xmAvMg==}
+    engines: {node: '>=16.0.0'}
 
   tabbable@6.5.0:
     resolution: {integrity: sha512-wieBHXygIm7OyQOu5hQlkk62/WyCFYGlWg7L6/ZCUZwx0o398Zkn4pVmMyfYhfMG8kGrj/Krt8eIk6UKC6VzwA==}
@@ -11046,6 +11276,9 @@ packages:
   validate-npm-package-name@5.0.1:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+
+  varint@6.0.0:
+    resolution: {integrity: sha512-cXEIW6cfr15lFv563k4GuVuW/fiwjknytD37jIOLSdSWuOI6WnO/oKwmP2FQTU2l01LP8/M5TSAJpzUaGe3uWg==}
 
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
@@ -12355,6 +12588,9 @@ snapshots:
   '@bcoe/v8-coverage@1.0.2': {}
 
   '@borewit/text-codec@0.2.2': {}
+
+  '@bufbuild/protobuf@2.16.0':
+    optional: true
 
   '@cacheable/memory@2.2.0':
     dependencies:
@@ -13836,6 +14072,63 @@ snapshots:
 
   '@oxc-project/types@0.155.0': {}
 
+  '@parcel/watcher-android-arm64@2.6.0':
+    optional: true
+
+  '@parcel/watcher-darwin-arm64@2.6.0':
+    optional: true
+
+  '@parcel/watcher-darwin-x64@2.6.0':
+    optional: true
+
+  '@parcel/watcher-freebsd-x64@2.6.0':
+    optional: true
+
+  '@parcel/watcher-linux-arm-glibc@2.6.0':
+    optional: true
+
+  '@parcel/watcher-linux-arm-musl@2.6.0':
+    optional: true
+
+  '@parcel/watcher-linux-arm64-glibc@2.6.0':
+    optional: true
+
+  '@parcel/watcher-linux-arm64-musl@2.6.0':
+    optional: true
+
+  '@parcel/watcher-linux-x64-glibc@2.6.0':
+    optional: true
+
+  '@parcel/watcher-linux-x64-musl@2.6.0':
+    optional: true
+
+  '@parcel/watcher-win32-arm64@2.6.0':
+    optional: true
+
+  '@parcel/watcher-win32-x64@2.6.0':
+    optional: true
+
+  '@parcel/watcher@2.6.0':
+    dependencies:
+      detect-libc: 2.1.2
+      is-glob: 4.0.3
+      node-addon-api: 7.1.1
+      picomatch: 4.0.7
+    optionalDependencies:
+      '@parcel/watcher-android-arm64': 2.6.0
+      '@parcel/watcher-darwin-arm64': 2.6.0
+      '@parcel/watcher-darwin-x64': 2.6.0
+      '@parcel/watcher-freebsd-x64': 2.6.0
+      '@parcel/watcher-linux-arm-glibc': 2.6.0
+      '@parcel/watcher-linux-arm-musl': 2.6.0
+      '@parcel/watcher-linux-arm64-glibc': 2.6.0
+      '@parcel/watcher-linux-arm64-musl': 2.6.0
+      '@parcel/watcher-linux-x64-glibc': 2.6.0
+      '@parcel/watcher-linux-x64-musl': 2.6.0
+      '@parcel/watcher-win32-arm64': 2.6.0
+      '@parcel/watcher-win32-x64': 2.6.0
+    optional: true
+
   '@peculiar/asn1-schema@2.10.0':
     dependencies:
       '@peculiar/utils': 2.0.3
@@ -14062,7 +14355,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
-  '@ragestudio/react-native-webrtc@https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-4/react-native-webrtc-124.0.8-4.tgz(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(supports-color@11.0.0)':
+  '@ragestudio/react-native-webrtc@https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-5/react-native-webrtc-124.0.8-5.tgz(react-native@0.86.3(@babel/core@7.29.7(supports-color@11.0.0))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@11.0.0))(bufferutil@4.1.0)(supports-color@11.0.0))(@types/react@19.3.0)(bufferutil@4.1.0)(react@19.3.0)(supports-color@11.0.0))(supports-color@11.0.0)':
     dependencies:
       base64-js: 1.5.1
       debug: 4.3.4(supports-color@11.0.0)
@@ -16820,18 +17113,18 @@ snapshots:
       native-promise-only: 0.8.1
       weakmap-polyfill: 2.0.4
 
-  '@vitejs/plugin-react-swc@4.3.3(vite@7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))':
+  '@vitejs/plugin-react-swc@4.3.3(vite@7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       '@swc/core': 1.16.13
-      vite: 7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vite: 7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  '@vitejs/plugin-vue@6.0.9(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.43(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.9(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.43(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vue: 3.5.43(typescript@5.9.3)
 
   '@vitest/coverage-v8@4.1.12(vitest@4.1.12)':
@@ -16846,7 +17139,7 @@ snapshots:
       obug: 2.2.1
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
   '@vitest/expect@4.1.12':
     dependencies:
@@ -16857,21 +17150,21 @@ snapshots:
       chai: 6.3.0
       tinyrainbow: 3.2.0
 
-  '@vitest/mocker@4.1.12(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))':
+  '@vitest/mocker@4.1.12(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
       '@vitest/spy': 4.1.12
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vite: 8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
-  '@vitest/mocker@4.1.12(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))':
+  '@vitest/mocker@4.1.12(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
       '@vitest/spy': 4.1.12
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
   '@vitest/pretty-format@4.1.12':
     dependencies:
@@ -17802,6 +18095,9 @@ snapshots:
     dependencies:
       color-convert: 2.0.1
       color-string: 1.9.1
+
+  colorjs.io@0.7.1:
+    optional: true
 
   combined-stream@1.0.8:
     dependencies:
@@ -19632,6 +19928,9 @@ snapshots:
   ignore@7.0.12: {}
 
   immediate@3.0.6: {}
+
+  immutable@5.1.9:
+    optional: true
 
   import-in-the-middle@3.5.2:
     dependencies:
@@ -21566,6 +21865,9 @@ snapshots:
 
   node-abort-controller@3.1.1: {}
 
+  node-addon-api@7.1.1:
+    optional: true
+
   node-addon-api@8.9.2: {}
 
   node-api-headers@1.9.0: {}
@@ -22758,6 +23060,103 @@ snapshots:
     dependencies:
       truncate-utf8-bytes: 1.0.2
 
+  sass-embedded-all-unknown@1.106.1:
+    dependencies:
+      sass: 1.106.1
+    optional: true
+
+  sass-embedded-android-arm64@1.106.1:
+    optional: true
+
+  sass-embedded-android-arm@1.106.1:
+    optional: true
+
+  sass-embedded-android-riscv64@1.106.1:
+    optional: true
+
+  sass-embedded-android-x64@1.106.1:
+    optional: true
+
+  sass-embedded-darwin-arm64@1.106.1:
+    optional: true
+
+  sass-embedded-darwin-x64@1.106.1:
+    optional: true
+
+  sass-embedded-linux-arm64@1.106.1:
+    optional: true
+
+  sass-embedded-linux-arm@1.106.1:
+    optional: true
+
+  sass-embedded-linux-musl-arm64@1.106.1:
+    optional: true
+
+  sass-embedded-linux-musl-arm@1.106.1:
+    optional: true
+
+  sass-embedded-linux-musl-riscv64@1.106.1:
+    optional: true
+
+  sass-embedded-linux-musl-x64@1.106.1:
+    optional: true
+
+  sass-embedded-linux-riscv64@1.106.1:
+    optional: true
+
+  sass-embedded-linux-x64@1.106.1:
+    optional: true
+
+  sass-embedded-unknown-all@1.106.1:
+    dependencies:
+      sass: 1.106.1
+    optional: true
+
+  sass-embedded-win32-arm64@1.106.1:
+    optional: true
+
+  sass-embedded-win32-x64@1.106.1:
+    optional: true
+
+  sass-embedded@1.106.1:
+    dependencies:
+      '@bufbuild/protobuf': 2.16.0
+      colorjs.io: 0.7.1
+      immutable: 5.1.9
+      rxjs: 7.8.2
+      supports-color: 8.1.1
+      sync-child-process: 1.1.1
+      varint: 6.0.0
+    optionalDependencies:
+      sass-embedded-all-unknown: 1.106.1
+      sass-embedded-android-arm: 1.106.1
+      sass-embedded-android-arm64: 1.106.1
+      sass-embedded-android-riscv64: 1.106.1
+      sass-embedded-android-x64: 1.106.1
+      sass-embedded-darwin-arm64: 1.106.1
+      sass-embedded-darwin-x64: 1.106.1
+      sass-embedded-linux-arm: 1.106.1
+      sass-embedded-linux-arm64: 1.106.1
+      sass-embedded-linux-musl-arm: 1.106.1
+      sass-embedded-linux-musl-arm64: 1.106.1
+      sass-embedded-linux-musl-riscv64: 1.106.1
+      sass-embedded-linux-musl-x64: 1.106.1
+      sass-embedded-linux-riscv64: 1.106.1
+      sass-embedded-linux-x64: 1.106.1
+      sass-embedded-unknown-all: 1.106.1
+      sass-embedded-win32-arm64: 1.106.1
+      sass-embedded-win32-x64: 1.106.1
+    optional: true
+
+  sass@1.106.1:
+    dependencies:
+      chokidar: 5.0.0
+      immutable: 5.1.9
+      source-map-js: 1.2.2
+    optionalDependencies:
+      '@parcel/watcher': 2.6.0
+    optional: true
+
   sax@1.2.1: {}
 
   sax@1.6.1: {}
@@ -23229,6 +23628,14 @@ snapshots:
       supports-color: 7.2.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  sync-child-process@1.1.1:
+    dependencies:
+      sync-message-port: 1.2.0
+    optional: true
+
+  sync-message-port@1.2.0:
+    optional: true
 
   tabbable@6.5.0: {}
 
@@ -23731,6 +24138,9 @@ snapshots:
 
   validate-npm-package-name@5.0.1: {}
 
+  varint@6.0.0:
+    optional: true
+
   vary@1.1.2: {}
 
   vaul@1.1.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
@@ -23757,12 +24167,12 @@ snapshots:
       '@vimeo/player': 2.29.0
       media-played-ranges-mixin: 0.1.0
 
-  vite@7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
+  vite@7.3.7(@types/node@26.6.5)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(lightningcss@1.33.0)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
     dependencies:
       esbuild: 0.28.2
       fdir: 6.5.0(picomatch@4.0.7)
       picomatch: 4.0.7
-      postcss: 8.5.29
+      postcss: 8.5.32
       rollup: 4.64.1
       tinyglobby: 0.2.17
     optionalDependencies:
@@ -23771,11 +24181,13 @@ snapshots:
       jiti: 2.7.0
       less: 4.9.1(supports-color@11.0.0)
       lightningcss: 1.33.0
+      sass: 1.106.1
+      sass-embedded: 1.106.1
       terser: 5.51.2
       tsx: 4.23.15
       yaml: 2.9.1
 
-  vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
+  vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -23788,11 +24200,13 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
       less: 4.9.1(supports-color@11.0.0)
+      sass: 1.106.1
+      sass-embedded: 1.106.1
       terser: 5.51.2
       tsx: 4.23.15
       yaml: 2.9.1
 
-  vite@8.3.5(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
+  vite@8.3.5(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -23805,11 +24219,13 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
       less: 4.9.1(supports-color@11.0.0)
+      sass: 1.106.1
+      sass-embedded: 1.106.1
       terser: 5.51.2
       tsx: 4.23.15
       yaml: 2.9.1
 
-  vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
+  vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -23822,6 +24238,8 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
       less: 4.9.1(supports-color@11.0.0)
+      sass: 1.106.1
+      sass-embedded: 1.106.1
       terser: 5.51.2
       tsx: 4.23.15
       yaml: 2.9.1
@@ -23831,7 +24249,7 @@ snapshots:
       medium-zoom: 1.1.0
       photoswipe: 5.4.4
 
-  vitepress@2.0.0-alpha.20(@types/node@26.6.5)(axios@1.21.0(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0))(esbuild@0.28.2)(fuse.js@7.4.2)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@11.0.0))(postcss@8.5.29)(qrcode@1.5.4)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1):
+  vitepress@2.0.0-alpha.20(@types/node@26.6.5)(axios@1.21.0(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0))(esbuild@0.28.2)(fuse.js@7.4.2)(jiti@2.7.0)(jwt-decode@4.0.0)(less@4.9.1(supports-color@11.0.0))(postcss@8.5.29)(qrcode@1.5.4)(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.9.1):
     dependencies:
       '@docsearch/css': 4.7.1
       '@docsearch/js': 4.7.1
@@ -23839,7 +24257,7 @@ snapshots:
       '@iconify-json/simple-icons': 1.2.99
       '@shikijs/transformers': 4.5.0
       '@types/markdown-it': 14.2.0
-      '@vitejs/plugin-vue': 6.0.9(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.43(typescript@5.9.3))
+      '@vitejs/plugin-vue': 6.0.9(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.43(typescript@5.9.3))
       '@vue/devtools-api': 8.2.1
       '@vue/shared': 3.5.43
       '@vueuse/core': 14.4.0(vue@3.5.43(typescript@5.9.3))
@@ -23848,7 +24266,7 @@ snapshots:
       mark.js: 8.11.1
       minisearch: 7.2.0
       shiki: 4.5.0
-      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       vue: 3.5.43(typescript@5.9.3)
     optionalDependencies:
       postcss: 8.5.29
@@ -23878,10 +24296,10 @@ snapshots:
       - universal-cookie
       - yaml
 
-  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@25.9.9)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)):
+  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@25.9.9)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.12
-      '@vitest/mocker': 4.1.12(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+      '@vitest/mocker': 4.1.12(vite@8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
       '@vitest/pretty-format': 4.1.12
       '@vitest/runner': 4.1.12
       '@vitest/snapshot': 4.1.12
@@ -23898,7 +24316,7 @@ snapshots:
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tinyrainbow: 3.2.0
-      vite: 8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vite: 8.3.5(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
@@ -23907,10 +24325,10 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)):
+  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.12
-      '@vitest/mocker': 4.1.12(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+      '@vitest/mocker': 4.1.12(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
       '@vitest/pretty-format': 4.1.12
       '@vitest/runner': 4.1.12
       '@vitest/snapshot': 4.1.12
@@ -23927,7 +24345,7 @@ snapshots:
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tinyrainbow: 3.2.0
-      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vite: 8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@11.0.0))(sass-embedded@1.106.1)(sass@1.106.1)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
