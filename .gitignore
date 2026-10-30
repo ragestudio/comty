@@ -45,3 +45,13 @@
 
 # idea folder
 .idea/
+
+# Generated OpenAPI artifacts (regenerate with `bun run build:openapi`
+
+# in packages/server, then `docusaurus gen-api-docs all` in docusaurus/)
+/packages/server/docs/openapi/
+/docs/en/api/
+
+# Local OpenAPI dev harness & test artifacts
+/packages/server/.openapi-harness/
+/packages/server/openapi.json
