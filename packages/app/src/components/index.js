@@ -20,9 +20,6 @@ export { default as FeaturedEventsAnnouncements } from "./FeaturedEventsAnnounce
 
 export { default as NotificationsCenter } from "./NotificationsCenter"
 
-// LiveChat
-export { default as LiveChat } from "./LiveChat"
-
 // BUTTONS
 export { default as FollowButton } from "./FollowButton"
 
