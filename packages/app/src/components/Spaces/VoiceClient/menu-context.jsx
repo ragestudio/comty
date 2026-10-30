@@ -9,12 +9,13 @@ import copyToClipboard from "@utils/copyToClipboard"
 
 import GroupsModel from "@endpoints/groups"
 
-import useMediaRTCState from "@hooks/useMediaRTCState"
+import useRTCStore from "@comty/spaces-sdk/rtc"
 
 import "./index.less"
 
 const ClientContextMenu = ({ target, client, close }) => {
-	const state = useMediaRTCState()
+	const state = useRTCStore()
+
 	const group_id =
 		target.parentElement.closest("[data-group-id]")?.dataset.groupId
 	const channel_id =

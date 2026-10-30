@@ -1,6 +1,7 @@
 import React from "react"
 import humanReadable from "@tsmx/human-readable"
-import parseTransportStats from "@cores/mediartc/utils/parseTransportStats"
+import parseTransportStats from "./parseTransportStats"
+import { rtcService } from "@comty/spaces-sdk/rtc"
 
 import { Icons } from "@components/Icons"
 
@@ -29,10 +30,10 @@ const VoiceChannelStats = ({ state }) => {
 	const processInterval = React.useRef(null)
 
 	const sendTransport = React.useMemo(() => {
-		return app.cores.mediartc.instance().sendTransport
+		return rtcService.transports.send
 	}, [state.channelId])
 	const recvTransport = React.useMemo(() => {
-		return app.cores.mediartc.instance().recvTransport
+		return rtcService.transports.recv
 	}, [state.channelId])
 
 	const remoteCandidate = React.useMemo(() => {

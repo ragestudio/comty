@@ -1,5 +1,5 @@
 import React from "react"
-import useMediaRTCState from "@hooks/useMediaRTCState"
+import useRTCStore from "@comty/spaces-sdk/rtc"
 import { createIconRender } from "@components/Icons"
 
 import CallView from "@pages/@mobile-views/call"
@@ -9,10 +9,10 @@ const openCallView = () => {
 }
 
 const CallButton = () => {
-	const state = useMediaRTCState()
+	const state = useRTCStore()
 
 	React.useEffect(() => {
-		if (state.channelId) {
+		if (state.channel?._id) {
 			if (!app.layout.draggable.exists("call")) {
 				openCallView()
 			}
@@ -21,9 +21,9 @@ const CallButton = () => {
 				app.layout.draggable.destroy("call")
 			}
 		}
-	}, [state.channelId])
+	}, [state.channel])
 
-	if (!state.channelId) {
+	if (!state.channel?._id) {
 		return null
 	}
 
