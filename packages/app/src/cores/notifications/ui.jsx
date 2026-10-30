@@ -33,12 +33,12 @@ class NotificationUI {
 		if (notification.title) {
 			switch (typeof notification.title) {
 				case "function": {
-					notfObj.message = React.createElement(notification.title)
+					notfObj.title = React.createElement(notification.title)
 
 					break
 				}
 				case "object": {
-					notfObj.message = notification.title
+					notfObj.title = notification.title
 
 					break
 				}
