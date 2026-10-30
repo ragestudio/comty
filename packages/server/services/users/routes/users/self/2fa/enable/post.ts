@@ -14,7 +14,7 @@ export default defineRoute<API>()({
 		const { code } = req.body
 
 		if (!code) {
-			throw new OperationError(400, "MFA code is required")
+			throw new OperationError(400, "2FA code is required")
 		}
 
 		const userTotp = await UserTotp.findOne({ user_id })
@@ -22,7 +22,7 @@ export default defineRoute<API>()({
 		if (!userTotp) {
 			throw new OperationError(
 				404,
-				"MFA setup not found. Generate first.",
+				"2FA setup not found. Generate first.",
 			)
 		}
 
@@ -38,7 +38,7 @@ export default defineRoute<API>()({
 		})
 
 		if (!isValid) {
-			throw new OperationError(401, "Invalid MFA code")
+			throw new OperationError(401, "Invalid 2FA code")
 		}
 
 		userTotp.enabled = true
