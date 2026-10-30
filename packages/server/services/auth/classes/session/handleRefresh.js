@@ -1,4 +1,4 @@
-import AuthToken from "@shared-classes/AuthToken"
+import AuthToken, { SIGN_OPTIONS } from "@shared-classes/AuthToken"
 import SessionModel from "@db/auth_session"
 
 export default async function (req) {
@@ -55,6 +55,6 @@ export default async function (req) {
 	return {
 		token: newAuthToken,
 		refreshToken: newRefreshToken,
-		expiresIn: AuthToken.authStrategy.expiresIn,
+		expiresIn: SIGN_OPTIONS.auth.expiresIn,
 	}
 }
