@@ -1,6 +1,6 @@
 {
 	"name": "@comty/native-app",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"main": "expo-router/entry",
 	"private": true,
 	"dependencies": {
@@ -8,7 +8,7 @@
 		"@comty/spaces-sdk": "workspace:*",
 		"@config-plugins/react-native-webrtc": "^15.0.2",
 		"@expo/ui": "~57.0.26",
-		"@ragestudio/react-native-webrtc": "https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-4/react-native-webrtc-124.0.8-4.tgz",
+		"@ragestudio/react-native-webrtc": "https://git.ragestudio.net/api/packages/RageStudio/npm/%40ragestudio%2Freact-native-webrtc/-/124.0.8-5/react-native-webrtc-124.0.8-5.tgz",
 		"@react-native-masked-view/masked-view": "^0.3.2",
 		"@react-navigation/bottom-tabs": "^7.21.0",
 		"@shopify/react-native-skia": "^2.13.1",
@@ -22,6 +22,7 @@
 		"expo-font": "~57.0.4",
 		"expo-glass-effect": "~57.0.4",
 		"expo-haptics": "~57.0.3",
+		"expo-keep-awake": "~57.0.2",
 		"expo-linear-gradient": "^57.0.2",
 		"expo-linking": "~57.0.13",
 		"expo-router": "~57.0.29",
