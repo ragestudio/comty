@@ -1,12 +1,9 @@
 import React from "react"
-import { Button, Badge, Dropdown } from "antd"
-import classnames from "classnames"
+import { Button, Dropdown } from "antd"
 
 import { Icons } from "@components/Icons"
-import LiveChat from "@components/LiveChat"
 
 import "./index.less"
-import client from "comty.js/core/client"
 
 const eventsToDispatch = {
 	kick: (user) => {
@@ -53,74 +50,20 @@ export default class SyncRoomCard extends React.Component {
 		},
 	}
 
-	checkLatency = () => {
-		const instance = client.ws.sockets.music
-
-		if (instance) {
-			this.setState({
-				socketLatency: instance.latency,
-			})
-		}
-	}
-
 	componentDidMount = () => {
 		Object.keys(this.roomEvents).forEach((event) => {
 			app.cores.sync.music.eventBus.on(event, this.roomEvents[event])
 		})
-
-		// chat instance
-		const chatInstance = client.ws.sockets.chat
-
-		if (chatInstance) {
-			Object.keys(this.chatEvents).forEach((event) => {
-				chatInstance.on(event, this.chatEvents[event])
-			})
-		}
-
-		this.checkLatency()
-
-		this.latencyInterval = setInterval(() => {
-			this.checkLatency()
-		}, 1000)
 	}
 
 	componentWillUnmount = () => {
 		Object.keys(this.roomEvents).forEach((event) => {
 			app.cores.sync.music.eventBus.off(event, this.roomEvents[event])
 		})
-
-		if (this.latencyInterval) {
-			clearInterval(this.latencyInterval)
-		}
-
-		// chat instance
-		const chatInstance = client.ws.sockets.chat
-
-		if (chatInstance) {
-			Object.keys(this.chatEvents).forEach((event) => {
-				chatInstance.off(event, this.chatEvents[event])
-			})
-		}
 	}
 
 	leaveRoom = () => {
 		app.cores.sync.music.leaveRoom()
-	}
-
-	toggleChatVisibility = (to) => {
-		if (typeof to !== "boolean") {
-			to = !this.state.chatVisible
-		}
-
-		this.setState({
-			chatVisible: to,
-		})
-
-		if (this.state.notReadedMessages && to) {
-			this.setState({
-				notReadedMessages: false,
-			})
-		}
 	}
 
 	generateUserMenu = (user) => {
@@ -134,7 +77,7 @@ export default class SyncRoomCard extends React.Component {
 				key: "kick",
 				label: (
 					<>
-						<Icons.Logout /> Kick
+						<Icons.LogOut /> Kick
 					</>
 				),
 			})
@@ -184,14 +127,6 @@ export default class SyncRoomCard extends React.Component {
 							icon={<Icons.Share />}
 							onClick={app.cores.sync.music.createInviteUserModal}
 						/>
-
-						<Badge dot={this.state.notReadedMessages}>
-							<Button
-								size="small"
-								icon={<Icons.MessageSquare />}
-								onClick={this.toggleChatVisibility}
-							/>
-						</Badge>
 					</div>
 				</div>
 
@@ -246,29 +181,10 @@ export default class SyncRoomCard extends React.Component {
 							type="primary"
 							onClick={this.leaveRoom}
 							size="small"
-							icon={<Icons.Logout />}
+							icon={<Icons.LogOut />}
 							danger
 						/>
 					</div>
-
-					<div className="latency_display">
-						<span>
-							{client.ws.sockets.music.latency ??
-								"..."}
-							ms
-						</span>
-					</div>
-				</div>
-
-				<div
-					className={classnames("sync-room_subcard bottom", {
-						hidden: !this.state.chatVisible,
-					})}
-				>
-					<LiveChat
-						room={this.state.roomData?.roomId}
-						compact
-					/>
 				</div>
 			</>
 		)
