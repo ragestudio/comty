@@ -1,0 +1,10 @@
+services:
+  web:
+    container_name: comty-docs-web
+    image: ragestudio/comty-docs-web
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.docs
+    restart: "unless-stopped"
+    ports:
+      - 5000:5000

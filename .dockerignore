@@ -38,7 +38,6 @@ packages/server/nats-data
 packages/server/docs
 
 # Other packages (not needed for server build)
-docusaurus
 scripts
 docker/data
 docker/.env
