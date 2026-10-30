@@ -14,9 +14,9 @@ const DMChat = ({ to_user_id }) => {
 	const nav = useSpacesNavigation()
 
 	const onClickCall = React.useCallback(() => {
-		app.cores.mediartc.handlers().callUser(to_user_id, {
-			alternativeSfx: true,
-		})
+		// app.cores.mediartc.handlers().callUser(to_user_id, {
+		// 	alternativeSfx: true,
+		// })
 	}, [to_user_id])
 
 	const onClickBack = React.useCallback(() => {
