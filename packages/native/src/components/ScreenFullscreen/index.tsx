@@ -1,6 +1,7 @@
 import React from "react"
-import { Pressable, StatusBar, StyleSheet, View } from "react-native"
+import { Platform, Pressable, StatusBar, StyleSheet, View } from "react-native"
 import { RTCView } from "@ragestudio/react-native-webrtc"
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake"
 import * as ScreenOrientation from "expo-screen-orientation"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useTheme, XStack, YStack } from "tamagui"
@@ -16,6 +17,27 @@ import AppText from "@/ui/Text"
 
 import { useScreenFullscreen } from "./store"
 import { CONTROLS_HIDE_DELAY } from "./constants"
+
+// android only allows rotation while the system auto rotate is enabled
+// fullUser (13) keeps the user rotation lock instead of forcing fullSensor
+const FULL_USER_ANDROID = 13
+const KEEP_AWAKE_TAG = "screen-fullscreen"
+
+const setRotationPolicy = (active: boolean) => {
+	if (!active) {
+		return ScreenOrientation.lockAsync(
+			ScreenOrientation.OrientationLock.PORTRAIT_UP,
+		)
+	}
+
+	if (Platform.OS === "android") {
+		return ScreenOrientation.lockPlatformAsync({
+			screenOrientationConstantAndroid: FULL_USER_ANDROID,
+		})
+	}
+
+	return ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL)
+}
 
 export const ScreenFullscreen = () => {
 	const fullscreen = useScreenFullscreen()
@@ -48,20 +70,25 @@ export const ScreenFullscreen = () => {
 
 	// rotation is enabled and the status bar hidden only while fullscreen is up
 	React.useEffect(() => {
-		const lock = active
-			? ScreenOrientation.OrientationLock.ALL
-			: ScreenOrientation.OrientationLock.PORTRAIT_UP
-
-		ScreenOrientation.lockAsync(lock).catch(console.error)
+		setRotationPolicy(active).catch(console.error)
 		StatusBar.setHidden(active, "fade")
+	}, [active])
+
+	// the screen must not sleep while a screen is being watched
+	React.useEffect(() => {
+		if (!active) return
+
+		activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(console.error)
+
+		return () => {
+			deactivateKeepAwake(KEEP_AWAKE_TAG).catch(console.error)
+		}
 	}, [active])
 
 	// restore portrait and the status bar when the app tears down this view
 	React.useEffect(() => {
 		return () => {
-			ScreenOrientation.lockAsync(
-				ScreenOrientation.OrientationLock.PORTRAIT_UP,
-			).catch(console.error)
+			setRotationPolicy(false).catch(console.error)
 			StatusBar.setHidden(false, "fade")
 		}
 	}, [])
