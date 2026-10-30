@@ -1,4 +1,5 @@
 import { Server } from "linebridge"
+import { OpenAPIPlugin } from "@linebridge/plugin-openapi"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -14,6 +15,8 @@ export class API extends Server {
 
 	static bypassCors = true
 	static useMiddlewares = ["logs"]
+
+	static usePlugins = [OpenAPIPlugin]
 
 	static websockets = {
 		enabled: true,

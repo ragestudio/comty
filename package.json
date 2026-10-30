@@ -14,6 +14,8 @@
 		"packages/*",
 		"packages/server/services/*",
 		"modules/*",
+		"modules/linebridge/engines/*",
+		"modules/linebridge/plugins/*",
 		"modules/linebridge/*"
 	],
 	"devDependencies": {

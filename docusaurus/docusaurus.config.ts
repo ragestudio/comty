@@ -2,6 +2,37 @@ import type { Config } from "@docusaurus/types"
 import type { ThemeConfig } from "@docusaurus/preset-classic"
 // @ts-check
 import { themes as prismThemes } from "prism-react-renderer"
+import fs from "node:fs"
+import path from "node:path"
+
+// Build one docusaurus-plugin-openapi-docs entry per service spec generated
+// by `bun run build:openapi` in packages/server (docs/openapi/<svc>.json)
+const openApiSpecsDir = path.resolve(
+	__dirname,
+	"../packages/server/docs/openapi",
+)
+
+const openApiPluginConfig = Object.fromEntries(
+	fs.existsSync(openApiSpecsDir)
+		? fs
+				.readdirSync(openApiSpecsDir)
+				.filter((file) => file.endsWith(".json"))
+				.map((file) => {
+					const service = path.basename(file, ".json")
+
+					return [
+						service,
+						{
+							specPath: path.join(openApiSpecsDir, file),
+							outputDir: `../docs/en/api/${service}`,
+							sidebarOptions: {
+								groupPathsBy: "tag",
+							},
+						},
+					]
+				})
+		: [],
+)
 
 const config: Config = {
 	title: "Comty Documentation",
@@ -30,6 +61,7 @@ const config: Config = {
 					path: "../docs/en",
 					routeBasePath: "/",
 					sidebarPath: "./sidebars.js",
+					docItemComponent: "@theme/ApiItem", // from docusaurus-theme-openapi-docs
 				},
 				theme: {
 					customCss: "./src/css/custom.css",
@@ -53,18 +85,12 @@ const config: Config = {
 			{
 				id: "api",
 				docsPluginId: "classic",
-				config: {
-					petstore: {
-						specPath: "examples/petstore.yaml",
-						outputDir: "petstore",
-						sidebarOptions: {
-							groupPathsBy: "tag",
-						},
-					},
-				},
+				config: openApiPluginConfig,
 			},
 		],
 	],
+
+	themes: ["docusaurus-theme-openapi-docs"],
 
 	themeConfig: {
 		image: "img/docusaurus-social-card.jpg",
