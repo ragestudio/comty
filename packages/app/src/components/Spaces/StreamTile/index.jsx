@@ -19,15 +19,15 @@ const StreamTile = ({
 	// sdk streams carry the media directly, the legacy core resolves it by user
 	const isSdkStream = stream?.mediaStream !== undefined
 
-	const rtc = React.useMemo(() => {
-		if (isSdkStream) return null
+	// const rtc = React.useMemo(() => {
+	// 	if (isSdkStream) return null
 
-		try {
-			return app.cores.mediartc?.instance?.() ?? null
-		} catch {
-			return null
-		}
-	}, [isSdkStream])
+	// 	try {
+	// 		return app.cores.mediartc?.instance?.() ?? null
+	// 	} catch {
+	// 		return null
+	// 	}
+	// }, [isSdkStream])
 
 	const videoRef = React.useRef(null)
 	const containerRef = React.useRef(null)
