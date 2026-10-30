@@ -100,6 +100,12 @@ const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
 				}
 			})
 
+			if (result.activation_required) {
+				setActivation({
+					user_id: result.user_id,
+				})
+			}
+
 			if (result && result.token) {
 				await onDone(result)
 			} else {
