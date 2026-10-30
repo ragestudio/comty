@@ -7,6 +7,7 @@ import * as Sentry from "@sentry/browser"
 
 import { ThemeProvider } from "@cores/style/style.core"
 import NotificationsRenderer from "./cores/notifications/render"
+import { registerAll as registerAllKeyboardShortcuts } from "./shortcuts"
 
 import { rtcService } from "@comty/spaces-sdk/rtc"
 import { startWebPersistence } from "@comty/spaces-sdk/db/persister-web"
@@ -58,6 +59,9 @@ class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 	static async initialize() {
 		window.app.version = config.package.version
 		window.app.isCapacitor = window["IS_MOBILE_HOST"]
+
+		// register all keyboard shortcuts
+		registerAllKeyboardShortcuts()
 
 		// restore the spaces cache before any store starts querying it
 		await startWebPersistence()
