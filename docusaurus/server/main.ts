@@ -1,13 +1,13 @@
 import path from "node:path"
+import Stream from "node:stream"
 
 import { Server } from "linebridge"
 import LiveDirectory from "live-directory"
-import Stream from "node:stream"
 
 export class DocsWeb extends Server {
 	static baseRoutes = false
 	static listenPort = process.env.HTTP_LISTEN_PORT || 5000
-	static publicPath = path.resolve(process.cwd(), "build")
+	static publicPath = path.resolve(process.cwd(), "public")
 
 	contexts = {
 		public: new LiveDirectory(DocsWeb.publicPath, {

@@ -1,10 +1,10 @@
-FROM node:24-trixie-slim AS build
+FROM node:26-trixie-slim AS build
 
 RUN mkdir -p /building
 WORKDIR /building
 
-COPY ./docs .
-COPY ./docusaurus .
+COPY ./docs /building/docs
+COPY ./docusaurus /building/docusaurus
 
 RUN npm install --global corepack@latest
 RUN corepack use pnpm@latest-12
@@ -14,21 +14,19 @@ WORKDIR /building/docusaurus
 RUN pnpm install
 RUN pnpm build
 
-FROM ragestudio/ultragateway:latest AS runtime
+FROM node:26-trixie-slim AS runtime
 
 # Create workdir
 RUN mkdir -p /app
 WORKDIR /app
 
-COPY --from=build /building/docusaurus/build ./build
-COPY --from=build /building/docusaurus/server.ts .
-COPY --from=build /building/docusaurus/package.json .
-COPY --from=build /building/docusaurus/pnpm-lock.yaml .
-COPY --from=build /building/docusaurus/pnpm-workspace.yaml .
+COPY --from=build /building/docusaurus/server .
+COPY --from=build /building/docusaurus/build ./public
 
 RUN npm install --global corepack@latest
-RUN CI=true corepack use pnpm@latest-12
-RUN CI=true pnpm install --frozen-lockfile
+RUN corepack use pnpm@latest-12
+
+RUN pnpm install --frozen-lockfile
 
 ENV NODE_ENV=production
-CMD ["node", "--run", "serve"]
+CMD ["pnpm", "serve"]

@@ -1,5 +1,4 @@
 allowBuilds:
-  '@linebridge/engine-neo': true
   core-js: true
   core-js-pure: true
   esbuild: true

@@ -1,0 +1,3 @@
+allowBuilds:
+  '@linebridge/engine-neo': true
+  esbuild: true

@@ -1,0 +1,16 @@
+{
+	"name": "@comty/docs-web",
+	"type": "module",
+	"scripts": {
+		"serve": "linebridge boot ./main.ts"
+	},
+	"dependencies": {
+		"@linebridge/cli": "^3.0.0",
+		"@linebridge/engine-neo": "1.1.0",
+		"linebridge": "2.3.2",
+		"live-directory": "^3.0.3"
+	},
+	"devDependencies": {
+		"@types/node": "^26.6.6"
+	}
+}
