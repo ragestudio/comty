@@ -1,34 +1,22 @@
 // @ts-check
-// `@type` JSDoc annotations allow editor autocompletion and type checking
-// (when paired with `@ts-check`).
-// There are various equivalent ways to declare your Docusaurus config.
-// See: https://docusaurus.io/docs/api/docusaurus-config
-
 import { themes as prismThemes } from "prism-react-renderer"
 import type { Config } from "@docusaurus/types"
 import type { ThemeConfig } from "@docusaurus/preset-classic"
+
 const config: Config = {
 	title: "Comty Documentation",
-	tagline: "The place for developers",
+	tagline: "A place for developers",
 	favicon: "https://comty.app/favicon.ico",
 
-	// Set the production url of your site here
-	url: "https://comty.app",
-	// Set the /<baseUrl>/ pathname under which your site is served
-	// For GitHub pages deployment, it is often "/<projectName>/"
+	url: "https://docs.comty.app",
 	baseUrl: "/",
 
-	// GitHub pages deployment config.
-	// If you aren"t using GitHub pages, you don"t need these.
-	organizationName: "ragestudio", // Usually your GitHub org/user name.
-	projectName: "comty", // Usually your repo name.
+	organizationName: "ragestudio",
+	projectName: "comty",
 
 	onBrokenLinks: "throw",
 	onBrokenMarkdownLinks: "warn",
 
-	// Even if you don"t use internationalization, you can use this field to set
-	// useful metadata like html lang. For example, if your site is Chinese, you
-	// may want to replace "en" with "zh-Hans".
 	i18n: {
 		defaultLocale: "en",
 		locales: ["en"],
@@ -40,7 +28,7 @@ const config: Config = {
 			{
 				docs: {
 					path: "../docs/en",
-					routeBasePath: "docs",
+					routeBasePath: "/",
 					sidebarPath: "./sidebars.js",
 				},
 				theme: {
@@ -56,19 +44,19 @@ const config: Config = {
 			{
 				id: "es",
 				path: "../docs/es",
-				routeBasePath: "es/docs",
+				routeBasePath: "es",
 				sidebarPath: "./sidebars.js",
 			},
 		],
 		[
 			"docusaurus-plugin-openapi-docs",
 			{
-				id: "api", // plugin id
-				docsPluginId: "classic", // configured for preset-classic
+				id: "api",
+				docsPluginId: "classic",
 				config: {
 					petstore: {
 						specPath: "examples/petstore.yaml",
-						outputDir: "docs/petstore",
+						outputDir: "petstore",
 						sidebarOptions: {
 							groupPathsBy: "tag",
 						},
@@ -79,7 +67,6 @@ const config: Config = {
 	],
 
 	themeConfig: {
-		// Replace with your project"s social card
 		image: "img/docusaurus-social-card.jpg",
 		navbar: {
 			title: "Comty Developers",
@@ -88,17 +75,11 @@ const config: Config = {
 				src: "https://comty.app/basic_alt.svg",
 			},
 			items: [
-				{
-					type: "docSidebar",
-					sidebarId: "docs",
-					position: "left",
-					label: "Docs",
-				},
 				// {
 				// 	type: "docSidebar",
-				// 	sidebarId: "legal",
+				// 	sidebarId: "docs",
 				// 	position: "left",
-				// 	label: "Legal",
+				// 	label: "Docs",
 				// },
 				{
 					href: "https://github.com/ragestudio/comty",
@@ -112,11 +93,11 @@ const config: Config = {
 					items: [
 						{
 							label: "English",
-							to: "/docs/development/getting-started",
+							to: "/development/getting-started",
 						},
 						{
 							label: "Español",
-							to: "/es/docs/development/getting-started",
+							to: "/es/development/getting-started",
 						},
 					],
 				},
