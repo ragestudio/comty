@@ -11,6 +11,7 @@ import config from "@config"
 import deleteInternalStorage from "@utils/deleteInternalStorage"
 
 import { useTopBarStore } from "@/stores/topbar"
+import { openModal as openSettingsModal } from "@/pages/settings"
 
 export default {
 	"👀": async () => {
@@ -112,6 +113,7 @@ export default {
 				},
 			)
 		},
+		openSettings: openSettingsModal,
 	},
 	navigation: {
 		reload: () => {
@@ -165,46 +167,6 @@ export default {
 		goToGroupChannel: (group_id, channel_id) => {
 			return app.location.push(`/spaces/group/${group_id}/${channel_id}`)
 		},
-	},
-	capacitor: {
-		isAppCapacitor: () => window.navigator.userAgent === "capacitor",
-		// setStatusBarStyleDark: async () => {
-		// 	if (!window.app.capacitor.isAppCapacitor()) {
-		// 		console.warn(
-		// 			"[App] setStatusBarStyleDark is only available on capacitor",
-		// 		)
-		// 		return false
-		// 	}
-		// 	return await StatusBar.setStyle({ style: Style.Dark })
-		// },
-		// setStatusBarStyleLight: async () => {
-		// 	if (!window.app.capacitor.isAppCapacitor()) {
-		// 		console.warn(
-		// 			"[App] setStatusBarStyleLight is not supported on this platform",
-		// 		)
-		// 		return false
-		// 	}
-		// 	return await StatusBar.setStyle({ style: Style.Light })
-		// },
-		// hideStatusBar: async () => {
-		// 	if (!window.app.capacitor.isAppCapacitor()) {
-		// 		console.warn(
-		// 			"[App] hideStatusBar is not supported on this platform",
-		// 		)
-		// 		return false
-		// 	}
-
-		// 	return await StatusBar.hide()
-		// },
-		// showStatusBar: async () => {
-		// 	if (!window.app.capacitor.isAppCapacitor()) {
-		// 		console.warn(
-		// 			"[App] showStatusBar is not supported on this platform",
-		// 		)
-		// 		return false
-		// 	}
-		// 	return await StatusBar.show()
-		// },
 	},
 	maintenance: {
 		clearInternalStorage: async () => {

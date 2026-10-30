@@ -1,4 +1,4 @@
-import { ReactNode, ComponentType } from "react"
+import type { ReactNode, ComponentType } from "react"
 
 export type SettingComponentType =
 	| "button"
@@ -49,6 +49,7 @@ export interface Setting {
 	switchDefault?: boolean | (() => boolean)
 	desktop?: boolean
 	mobile?: boolean
+	render?: ComponentType<any>
 }
 
 export interface SettingTabModule {

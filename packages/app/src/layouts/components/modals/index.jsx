@@ -89,7 +89,6 @@ export default () => {
 	 * @param {any} [options.confirmOnClickTitle]
 	 * @param {any} [options.confirmOnClickContent]
 	 * @param {any} [options.onClose]
-	 * @param {string} [options.className]
 	 * @param {any} [options.props]
 	 */
 	function open(
@@ -104,15 +103,17 @@ export default () => {
 
 			onClose = null,
 
-			className,
 			props,
 		} = {},
 	) {
 		app.cores.window_mng.render(
 			id,
 			<Modal
-				className={className}
 				framed={framed}
+				wrapperClassname={props?.wrapperClassname}
+				wrapperStyle={props?.wrapperStyle}
+				contentStyle={props?.contentStyle}
+				contentClassname={props?.contentClassname}
 				confirmOnOutsideClick={confirmOnOutsideClick}
 				confirmOnClickTitle={confirmOnClickTitle}
 				confirmOnClickContent={confirmOnClickContent}
@@ -128,6 +129,7 @@ export default () => {
 				useFrame: false,
 				closeOnClickOutside: false,
 				onClose: onClose,
+				createOrUpdate: true,
 			},
 		)
 	}
@@ -136,10 +138,15 @@ export default () => {
 		app.cores.window_mng.close(id)
 	}
 
+	function has(id) {
+		app.cores.window_mng.has(id)
+	}
+
 	useLayoutInterface("modal", {
 		open: open,
 		close: close,
 		confirm: confirm,
+		has: has,
 	})
 
 	return null

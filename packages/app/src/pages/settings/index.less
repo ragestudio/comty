@@ -1,5 +1,33 @@
 @import "@styles/vars.less";
 
+.app_modal_settings {
+	width: 90% !important;
+	max-width: unset !important;
+
+	height: 90% !important;
+	overflow: hidden !important;
+
+	padding: 10px !important;
+	border-radius: 24px !important;
+
+	.settings_wrapper {
+		overflow-x: visible;
+		overflow-y: scroll;
+
+		height: 100%;
+
+		.settings_menu {
+			width: fit-content;
+			height: 100%;
+		}
+
+		.settings_content {
+			overflow: unset;
+			width: 100%;
+		}
+	}
+}
+
 .settings_wrapper {
 	display: flex;
 	flex-direction: row;
@@ -7,10 +35,10 @@
 	justify-content: center;
 
 	width: 100%;
-	max-width: 90%;
-
+	//max-width: 90%;
 	height: 100%;
 
+	gap: 10px;
 	overflow-y: scroll;
 
 	.settings_menu {
@@ -26,10 +54,11 @@
 
 		align-items: center;
 
-		width: 250px;
-		min-width: 250px;
+		width: fit-content;
+		min-width: 160px;
 
-		padding: 0 30px;
+		border-radius: 18px;
+		border: 1px solid var(--border-color);
 
 		gap: 3px;
 
@@ -90,7 +119,6 @@
 		flex-direction: column;
 
 		width: 700px;
-
 		gap: 10px;
 
 		.settings_content_group {
@@ -100,12 +128,11 @@
 			flex-direction: column;
 
 			color: var(--background-color-contrast);
-			background-color: var(--background-color-accent);
 
+			border: 1px solid var(--border-color);
 			border-radius: 12px;
 
 			padding: 15px;
-
 			gap: 15px;
 
 			.settings_content_group_header {

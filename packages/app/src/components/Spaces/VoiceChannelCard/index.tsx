@@ -11,7 +11,6 @@ import { openDialog as openScreenShareDialog } from "@components/ScreenShareDial
 import { openDialog as openScreenShareOptionsDialog } from "@components/ScreenShareOptionsDialog"
 import { openDialog as openSoundpadDialog } from "@components/SoundpadDialog"
 import { openDialog as openShareCameraDialog } from "@components/ShareCameraDialog"
-import { openModal as openQuickVoiceSettingsModal } from "@/components/Spaces/QuickVoiceSettings"
 
 import { type RTCReactiveState, useRTCStore, rtcService } from "@/rtc"
 
@@ -157,7 +156,7 @@ const VoiceChannelCard = () => {
 
 				<Button
 					icon={<Icons.Settings />}
-					onClick={openQuickVoiceSettingsModal}
+					onClick={() => app.controls.openSettings("voice")}
 				/>
 			</div>
 		</div>

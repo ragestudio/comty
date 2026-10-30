@@ -33,7 +33,7 @@ export default {
 		const [capInfo, setCapInfo] = React.useState(null)
 
 		const checkServerVersion = async () => {
-			const serverManifest = await client.instance()
+			const serverManifest = await client.instance("/")
 
 			setServerManifest(serverManifest.data)
 		}
@@ -57,7 +57,7 @@ export default {
 
 		return (
 			<div className="about_app">
-				<div className="header">
+				<div className="header bg-accent">
 					<div className="branding">
 						<div className="logo">
 							<img
@@ -95,7 +95,7 @@ export default {
 					</div>
 				</div>
 
-				<div className="group">
+				<div className="group bg-accent">
 					<div className="group_header">
 						<h3>
 							<Icons.Info />
@@ -182,7 +182,7 @@ export default {
 
 				<SponsorsList />
 
-				<div className="group">
+				<div className="group bg-accent">
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">

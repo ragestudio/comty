@@ -1,3 +1,5 @@
+import type { Setting } from "@/pages/settings/types"
+
 import React from "react"
 import Slider from "@ui/Slider"
 
@@ -11,6 +13,7 @@ import {
 import { getActiveMicTrack, getAudioContext } from "@comty/spaces-sdk/rtc/web"
 
 import "./volume-gate.less"
+import { Switch } from "antd"
 
 const clampDb = (db: number) => {
 	return Math.max(GATE_THRESHOLD_MIN_DB, Math.min(GATE_THRESHOLD_MAX_DB, db))
@@ -223,25 +226,18 @@ const VolumeGateSettings = () => {
 	)
 }
 
-export const GateEnabledSetting = {
-	id: "voice:gateEnabled",
-	group: "audio",
-	title: "Noise Gate",
-	description:
-		"Mute the microphone when the input level is below the threshold.",
-	component: "Switch",
-	defaultValue: () => audioProcessing.getState().input.gateEnabled,
-	onUpdate: async (value) => {
-		await audioProcessing.setGateEnabled(value)
-
-		return value
-	},
-}
-
 export default {
 	id: "voice:gateThresholdDb",
 	group: "audio",
 	title: "Sensitivity",
 	description: "Adjust how much sound transmits the mic to the audio call.",
 	component: VolumeGateSettings,
-}
+	extraActions: [
+		() => (
+			<Switch
+				defaultChecked={audioProcessing.getState().input.gateEnabled}
+				onChange={(value) => audioProcessing.setGateEnabled(value)}
+			/>
+		),
+	],
+} as Setting

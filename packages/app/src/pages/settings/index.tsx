@@ -116,14 +116,14 @@ const generateMenuItems = () => {
 	return items
 }
 
-const SettingsPage = () => {
+const SettingsPage = ({ defaultTabId }: { defaultTabId?: string }) => {
 	const [config, setConfig, loading] = useUserRemoteConfig() as [
 		any,
 		(config: any) => void,
 		boolean,
 	]
 	const [activeKey, setActiveKey] = useUrlQueryActiveKey({
-		defaultKey: "general",
+		defaultKey: defaultTabId ?? "general",
 		queryKey: "tab",
 	}) as [string, (key: string) => void]
 
@@ -170,7 +170,7 @@ const SettingsPage = () => {
 
 	return (
 		<div className="settings_wrapper">
-			<div className="settings_menu">
+			<div className="settings_menu bg-accent">
 				<antd.Menu
 					mode="vertical"
 					items={menuItems as any}
@@ -198,10 +198,20 @@ const SettingsPage = () => {
 	)
 }
 
-;(SettingsPage as any).options = {
+SettingsPage.options = {
 	layout: {
 		maxHeight: true,
 	},
+}
+
+export const openModal = (tabId?: string) => {
+	app.layout.modal.open("settings", SettingsPage, {
+		props: {
+			wrapperClassname: "app_modal_settings_wrapper",
+			contentClassname: "app_modal_settings",
+			defaultTabId: tabId,
+		},
+	})
 }
 
 export default SettingsPage

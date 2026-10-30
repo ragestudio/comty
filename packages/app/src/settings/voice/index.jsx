@@ -1,6 +1,6 @@
 import DevicesSetting from "./devices"
 import NoiseSuppresionSetting from "./noise-suppresion"
-import VolumeGateSetting, { GateEnabledSetting } from "./volume-gate"
+import VolumeGateSetting from "./volume-gate"
 import { EchoCancelation, AutoGain } from "./enchacements"
 
 export default {
@@ -10,7 +10,6 @@ export default {
 	group: "app",
 	settings: [
 		DevicesSetting,
-		GateEnabledSetting,
 		VolumeGateSetting,
 		NoiseSuppresionSetting,
 		EchoCancelation,

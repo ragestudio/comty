@@ -1,3 +1,5 @@
+import { openModal as openSettingsModal } from "@/pages/settings"
+
 export default {
 	apps: () => {
 		app.controls.openAppsMenu()
@@ -9,7 +11,8 @@ export default {
 		window.app.location.push("/studio")
 	},
 	settings: () => {
-		window.app.navigation.goToSettings()
+		openSettingsModal()
+		//window.app.navigation.goToSettings()
 	},
 	notifications: () => {
 		window.app.controls.openNotifications()

@@ -1,11 +1,10 @@
 import React from "react"
 import { AnimatePresence, motion } from "motion/react"
-import classnames from "classnames"
+import clsx from "clsx"
 
 import { Icons } from "@components/Icons"
 
 import "./index.less"
-import classNames from "classnames"
 
 class Modal extends React.Component {
 	state = {
@@ -86,10 +85,15 @@ class Modal extends React.Component {
 	render() {
 		return (
 			<div
-				className={classnames("app_modal_wrapper", {
-					["active"]: this.state.visible,
-					["framed"]: this.props.framed,
-				})}
+				className={clsx(
+					"app_modal_wrapper",
+					{
+						["active"]: this.state.visible,
+						["framed"]: this.props.framed,
+					},
+					this.props.wrapperClassname,
+				)}
+				style={this.props.wrapperStyle}
 			>
 				<div
 					id="mask_trigger"
@@ -110,15 +114,15 @@ class Modal extends React.Component {
 								mass: 1,
 								visualDuration: 0.15,
 							}}
-							className={classNames(
-								this.props.className,
+							className={clsx(
 								"app_modal_content",
 								{
 									"bg-accent": this.props.framed,
 								},
+								this.props.contentClassname,
 							)}
 							ref={this.contentRef}
-							style={this.props.frameContentStyle}
+							style={this.props.contentStyle}
 						>
 							{this.props.includeCloseButton && (
 								<div

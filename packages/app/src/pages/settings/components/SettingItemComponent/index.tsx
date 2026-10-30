@@ -1,38 +1,40 @@
-import React from "react";
-import * as antd from "antd";
-import Button from "@ui/Button";
-import classnames from "classnames";
-import { Translation } from "react-i18next";
+import React from "react"
+import * as antd from "antd"
+import Button from "@ui/Button"
+import classnames from "classnames"
+import { Translation } from "react-i18next"
 
-import { Icons, createIconRender } from "@components/Icons";
-import SettingsComponents from "./components";
-import { useSetting } from "../../hooks/useSetting";
-import { Setting, SettingAction } from "../../types";
+import { Icons, createIconRender } from "@components/Icons"
+import SettingsComponents from "./components"
+import { useSetting } from "../../hooks/useSetting"
+import { Setting, SettingAction } from "../../types"
 
-import "./index.less";
+import "./index.less"
 
-declare const app: any;
+interface ExtraActionsProps {
+	setting: Setting
+	ctx: any
+	actions?: (SettingAction | React.ComponentType<any> | React.ReactNode)[]
+}
 
 function shouldUseHorizontalLayout(type: string) {
 	switch (type) {
 		case "switch":
-			return true;
+			return true
 		case "button":
-			return true;
+			return true
 		default:
-			return false;
+			return false
 	}
 }
 
-interface ExtraActionsProps {
-	setting: Setting;
-	ctx: any;
-	actions?: (SettingAction | React.ComponentType<any> | React.ReactNode)[];
-}
-
-const SettingItemExtraActions: React.FC<ExtraActionsProps> = ({ setting, ctx, actions }) => {
+const SettingItemExtraActions: React.FC<ExtraActionsProps> = ({
+	setting,
+	ctx,
+	actions,
+}) => {
 	if (!actions) {
-		return null;
+		return null
 	}
 
 	return (
@@ -43,18 +45,20 @@ const SettingItemExtraActions: React.FC<ExtraActionsProps> = ({ setting, ctx, ac
 						key: index,
 						ctx: ctx,
 						setting: setting,
-					});
+					})
 				}
 
 				if (React.isValidElement(action)) {
-					return React.cloneElement(action as React.ReactElement, { key: index });
+					return React.cloneElement(action as React.ReactElement, {
+						key: index,
+					})
 				}
 
 				const handleOnClick = () => {
 					if (action.onClick) {
-						action.onClick(ctx);
+						action.onClick(ctx)
 					}
-				};
+				}
 
 				return (
 					<Button
@@ -67,48 +71,58 @@ const SettingItemExtraActions: React.FC<ExtraActionsProps> = ({ setting, ctx, ac
 					>
 						{action.title}
 					</Button>
-				);
+				)
 			})}
 		</>
-	);
-};
-
-interface SettingItemComponentProps {
-	setting: Setting;
-	ctx: any;
-	onUpdate?: (value: any) => void;
+	)
 }
 
-const SettingItemComponent: React.FC<SettingItemComponentProps> = ({ setting, ctx, onUpdate }) => {
-	const { value, debouncedValue, loading, disabled, componentProps, itemCtx, componentRef, dispatchUpdate } = useSetting(
-		setting,
-		ctx,
-		onUpdate,
-	);
+interface SettingItemComponentProps {
+	setting: Setting
+	ctx: any
+	onUpdate?: (value: any) => void
+}
+
+const SettingItemComponent: React.FC<SettingItemComponentProps> = ({
+	setting,
+	ctx,
+	onUpdate,
+}) => {
+	const {
+		value,
+		debouncedValue,
+		loading,
+		disabled,
+		componentProps,
+		itemCtx,
+		componentRef,
+		dispatchUpdate,
+	} = useSetting(setting, ctx, onUpdate)
 
 	if (!setting) {
-		console.error(`Item has no an setting!`);
-		return null;
+		console.error(`Item has no an setting!`)
+		return null
 	}
 
-	if (!setting.component) {
-		console.error(`Item [${setting.id}] has no an setting component!`);
-		return null;
+	if (!setting.component && !setting.render) {
+		console.error(`Item [${setting.id}] has no an setting component or render!`)
+		return null
 	}
 
-	const componentType = typeof setting.component === "string" ? setting.component.toLowerCase() : "";
+	const componentType =
+		typeof setting.component === "string" ? setting.component.toLowerCase() : ""
 
 	const generateInhertedProps = () => {
 		if (!SettingsComponents[componentType]) {
-			return {};
+			return {}
 		}
 
 		if (typeof SettingsComponents[componentType].props === "function") {
-			return SettingsComponents[componentType].props!(itemCtx);
+			return SettingsComponents[componentType].props!(itemCtx)
 		}
 
-		return {};
-	};
+		return {}
+	}
 
 	const finalProps = {
 		...componentProps,
@@ -120,23 +134,27 @@ const SettingItemComponent: React.FC<SettingItemComponentProps> = ({ setting, ct
 		value: value,
 		disabled: disabled || setting.disabled,
 		size: app.isMobile ? "large" : "default",
-	};
+	}
 
 	if (setting.children) {
-		finalProps.children = setting.children;
+		finalProps.children = setting.children
 	}
 
 	const Component =
 		typeof setting.component === "string"
-			? SettingsComponents[componentType]?.component ?? setting.component
-			: setting.component;
+			? (SettingsComponents[componentType]?.component ?? setting.component)
+			: setting.component
 
 	const computeSwitchEnablerDefault = () => {
 		if (typeof setting.switchDefault === "function") {
-			return setting.switchDefault();
+			return setting.switchDefault()
 		}
-		return setting.switchDefault;
-	};
+		return setting.switchDefault
+	}
+
+	if (setting.render) {
+		return React.createElement(setting.render, finalProps)
+	}
 
 	return (
 		<div
@@ -144,7 +162,8 @@ const SettingItemComponent: React.FC<SettingItemComponentProps> = ({ setting, ct
 			id={setting.id}
 			className={classnames("setting_item", {
 				["usePadding"]: setting.usePadding ?? true,
-				["useHorizontal"]: setting.layout ?? shouldUseHorizontalLayout(componentType),
+				["useHorizontal"]:
+					setting.layout ?? shouldUseHorizontalLayout(componentType),
 			})}
 		>
 			<div className="setting_item_header">
@@ -152,7 +171,11 @@ const SettingItemComponent: React.FC<SettingItemComponentProps> = ({ setting, ct
 					<div className="setting_item_header_title">
 						<h1>
 							{createIconRender(setting.icon)}
-							<Translation>{(t) => t(setting.title ?? setting.id)}</Translation>
+							{setting.title && (
+								<Translation>
+									{(t) => t(setting.title ?? setting.id)}
+								</Translation>
+							)}
 						</h1>
 
 						{setting.experimental && <antd.Tag>Experimental</antd.Tag>}
@@ -198,7 +221,7 @@ const SettingItemComponent: React.FC<SettingItemComponentProps> = ({ setting, ct
 				</>
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export default React.memo(SettingItemComponent);
+export default React.memo(SettingItemComponent)

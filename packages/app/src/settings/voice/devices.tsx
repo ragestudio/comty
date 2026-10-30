@@ -121,6 +121,7 @@ const Devices = () => {
 
 			<div className="mediartc-voice-devices__actions">
 				<Button
+					type="small"
 					icon={<Icons.RefreshCw size={16} />}
 					onClick={() => audioManager.refresh()}
 				>
@@ -135,5 +136,5 @@ export default {
 	id: "voice:devices",
 	group: "audio",
 	title: null,
-	component: Devices,
+	render: Devices,
 }
