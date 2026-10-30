@@ -5,7 +5,7 @@ export default class SyncRoom {
 	}
 
 	static pushInterval = 1000
-	static maxTimeOffset = parseFloat(0.15)
+	static maxTimeOffset = 0.15
 
 	state = {
 		joined_room: null,
@@ -54,7 +54,7 @@ export default class SyncRoom {
 		}
 
 		if (this.socket) {
-			await this.socket.destroy()
+			this.socket = null
 		}
 	}
 
@@ -178,7 +178,7 @@ export default class SyncRoom {
 		this.state.joined_room = null
 
 		if (this.socket) {
-			await this.socket.destroy()
+			this.socket = null
 		}
 	}
 
