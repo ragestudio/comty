@@ -18,7 +18,9 @@ async function filterPackages(packages, ignore = []) {
         // remove comments
         if (line.startsWith("#")) return
 
-        return line.replace(/(\/)/g, "\\/").replace(/(\*)/g, "(.*)")
+        return line
+            .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+            .replace(/\\\*/g, "(.*)")
     }).filter((line) => line)
 
     // filter packages that are in the gitignore file
