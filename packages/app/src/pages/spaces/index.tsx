@@ -1,60 +1,49 @@
 import React from "react"
+import classNames from "clsx"
+import { Splitter } from "antd"
+
 import DMRoomsList from "@components/Spaces/DMRoomsList"
 import DMRoom from "@components/Spaces/DMRoom"
-import ToolsBar from "@components/Spaces/ToolsBar"
-import { Result, Splitter } from "antd"
-import classNames, { type ClassValue } from "clsx"
 
 import useNavigation from "@/stores/spaces/navigation"
 
-import styles from "./index.module.less"
+import { BaseLeftPanel } from "@pages/spaces/layout"
+import styles from "@pages/spaces/index.module.less"
 
 const MIN_PANELS_WIDTH = {
-	left: 70,
+	left: 300,
 	main: 500,
 	right: 300,
 }
 
-const Panel = ({
-	children,
-	className,
-}: {
-	children: any
-	className?: ClassValue
-}) => {
-	return (
-		<div className={classNames("bg-accent", styles.panel, className)}>
-			{children}
-		</div>
-	)
+const MAX_PANELS_WIDTH = {
+	left: 460,
 }
 
 const LeftPanel = () => {
 	const nav = useNavigation()
 
-	return (
-		<Panel className={classNames(styles.left_panel)}>
-			<DMRoomsList
-				compact={false}
-				selectedRoom={nav.room}
-				onClickItem={(room) => {
-					nav.actions.navigate({
-						type: "dm",
-						room: room.to_user_id,
-					})
-				}}
-			/>
-		</Panel>
-	)
-}
-
-const RightPanel = () => {
-	const nav = useNavigation()
+	const onClickDMListItem = (item) => {
+		nav.actions.navigate({
+			type: "dm",
+			room: item.to_user_id,
+		})
+	}
 
 	return (
-		<Panel className={classNames(styles.right_panel)}>
-			<ToolsBar />
-		</Panel>
+		<BaseLeftPanel>
+			<div className={classNames(styles.panel_section)}>
+				<div className={styles.panel_section__header}>
+					<span>Direct Messages</span>
+				</div>
+
+				<DMRoomsList
+					compact={false}
+					selectedRoom={nav.room}
+					onClickItem={onClickDMListItem}
+				/>
+			</div>
+		</BaseLeftPanel>
 	)
 }
 
@@ -70,6 +59,8 @@ const SpacesMainPage = () => {
 			<Splitter.Panel
 				collapsible={false}
 				min={MIN_PANELS_WIDTH.left}
+				max={MAX_PANELS_WIDTH.left}
+				defaultSize={350}
 			>
 				<LeftPanel />
 			</Splitter.Panel>
@@ -81,12 +72,12 @@ const SpacesMainPage = () => {
 				<MainPanel />
 			</Splitter.Panel>
 
-			<Splitter.Panel
+			{/*<Splitter.Panel
 				collapsible
 				min={MIN_PANELS_WIDTH.right}
 			>
 				<RightPanel />
-			</Splitter.Panel>
+			</Splitter.Panel>*/}
 		</Splitter>
 	)
 }

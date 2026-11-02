@@ -3,13 +3,15 @@
 	flex-direction: row;
 
 	height: 100%;
-	gap: 10px;
+	gap: 5px;
 
 	:global {
 		.rtc-vc-card {
 			margin-top: auto;
 			width: 100%;
-			background-color: var(--backgroundColorAccent);
+
+			border-radius: 0;
+			background-color: transparent;
 		}
 
 		.ant-splitter-bar-dragger::before {
@@ -32,6 +34,37 @@
 
 	border-radius: 12px;
 	border: 1px solid var(--border-color);
+
+	&__attached {
+		position: absolute;
+
+		bottom: 0;
+		left: 0;
+
+		display: flex;
+		flex-direction: column;
+
+		align-items: center;
+		justify-content: center;
+
+		width: 100%;
+
+		border-top: 1px solid var(--border-color);
+		background-color: rgba(var(--bg_color_2), 0.8);
+	}
+}
+
+.panel_section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+
+	&__header {
+		span {
+			font-weight: 900;
+			color: rgba(var(--bg_color_6), 1);
+		}
+	}
 }
 
 .left_panel {
