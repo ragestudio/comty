@@ -166,7 +166,7 @@ const VoiceChannel = () => {
 					}}
 				>
 					{items.map((item) => {
-						let tileMode = "grid"
+						let tileMode: "grid" | "single" | "hero" | "preview" = "grid"
 
 						if (isSingleStream) {
 							tileMode = "single"

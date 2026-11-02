@@ -20,7 +20,6 @@ import "./index.less"
 const ChannelsPanel = () => {
 	const loading = useGroupLoading()
 	const channels = useGroupChannels()
-	const statedChannels = useGroupRTC()
 	const data = useGroupData()
 
 	const nav = useSpacesNavigation()
@@ -33,18 +32,21 @@ const ChannelsPanel = () => {
 			}
 
 			if (channel.kind === "voice") {
-				if (state.channel?._id === channel._id) {
-					nav.actions.navigate({
-						channel: state.channel?._id,
-						subview: "voice",
-					})
-					return
+				if (state.channel) {
+					if (channel._id == state.channel._id) {
+						nav.actions.navigate({
+							channel: state.channel?._id,
+							subview: "voice",
+						})
+						return
+					}
 				}
 
-				return rtcService.handlers.joinChannel({
+				rtcService.handlers.joinChannel({
 					groupId: data._id,
 					channelId: channel._id,
 				})
+				return
 			}
 
 			if (channel.kind === "chat") {
@@ -52,9 +54,10 @@ const ChannelsPanel = () => {
 					channel: channel._id,
 					subview: null,
 				})
+				return
 			}
 		},
-		[data],
+		[data, state],
 	)
 
 	return (

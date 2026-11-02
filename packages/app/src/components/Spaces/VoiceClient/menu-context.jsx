@@ -9,7 +9,7 @@ import copyToClipboard from "@utils/copyToClipboard"
 
 import GroupsModel from "@endpoints/groups"
 
-import useRTCStore from "@comty/spaces-sdk/rtc"
+import useRTCStore, { rtcService } from "@comty/spaces-sdk/rtc"
 
 import "./index.less"
 
@@ -27,7 +27,7 @@ const ClientContextMenu = ({ target, client, close }) => {
 	}
 
 	const clientInstance = React.useMemo(() => {
-		return app.cores.mediartc.instance().clients.get(client.userId)
+		return rtcService.clients.get(client.userId)
 	}, [client])
 
 	const onClickCopyUserId = React.useCallback(() => {
@@ -57,7 +57,7 @@ const ClientContextMenu = ({ target, client, close }) => {
 	const onClickToggleMute = React.useCallback(() => {
 		console.debug("Toggle mute", client.userId)
 
-		clientInstance.toggleMute()
+		clientInstance?.toggleMute()
 	}, [client])
 
 	const onChangeVolume = React.useCallback(
