@@ -1,6 +1,16 @@
-import Redis from "ioredis"
+import Redis, { RedisOptions } from "ioredis"
 
-export function composeURL({ host, port, username, password } = {}) {
+export function composeURL({
+	host,
+	port,
+	username,
+	password,
+}: {
+	host?: string
+	port?: string
+	username?: string
+	password?: string
+} = {}) {
 	let url = "redis://"
 
 	if (username && password) {
@@ -16,7 +26,7 @@ export function composeURL({ host, port, username, password } = {}) {
 	return url
 }
 
-export default (params = {}) => {
+export default (params: RedisOptions = {}) => {
 	let { REDIS_HOST, REDIS_PORT, REDIS_NO_AUTH, REDIS_AUTH, REDIS_DB } =
 		process.env
 
@@ -40,9 +50,10 @@ export default (params = {}) => {
 
 	// if redis db is provided, set db
 	if (REDIS_DB) {
-		clientOptions.db = REDIS_DB
+		clientOptions.db = parseInt(REDIS_DB)
 	}
 
+	// @ts-ignore
 	let client = new Redis(clientOptions)
 
 	client.on("error", (error) => {
