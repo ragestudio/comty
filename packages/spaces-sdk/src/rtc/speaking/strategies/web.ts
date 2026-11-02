@@ -5,6 +5,9 @@ import type {
 } from "../types"
 
 import workerSource from "../../workers/rtp-spkdt"
+import loggerBase from "@/utils/logger"
+
+const logger = loggerBase.child("voice-detection")
 
 const handlers = new Map<string, SpeakingChangeHandler>()
 
@@ -64,7 +67,17 @@ const webStrategy: SpeakingStrategy = {
 
 		if (!transport || !instance) return null
 
-		const streams = transport.createEncodedStreams()
+		let streams: { readable: ReadableStream; writable: WritableStream }
+
+		try {
+			streams = transport.createEncodedStreams()
+		} catch (error) {
+			// chromium only allows this right after the receiver is created, so
+			// let the next strategy take over instead of breaking the setup
+			logger.debug(`cannot create encoded streams [${target.id}]`, error)
+
+			return null
+		}
 
 		handlers.set(keyOf(target), onChange)
 
