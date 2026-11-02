@@ -13,6 +13,9 @@ import rnnoiseWorkletUrl from "@timephy/rnnoise-wasm/NoiseSuppressorWorklet?work
 import { dbToGain, getAudioContext, resumeAudioContext } from "./audio-context"
 import { getSelectedInputDeviceId } from "./audio-devices"
 import { setOutputGainDb } from "./track-volume"
+import loggerBase from "@/utils/logger"
+
+const logger = loggerBase.child("audio-processing")
 
 // a processing chain for one captured mic stream. the returned stream is the
 // destination node output, the raw track is kept to switch input devices later
@@ -22,7 +25,9 @@ interface MicChain {
 	rnnoise: AudioWorkletNode
 	gate: AudioWorkletNode
 	destination: MediaStreamAudioDestinationNode
+	rawStream: MediaStream
 	rawTrack: MediaStreamTrack
+	onTrackEnded: () => void
 }
 
 const chains = new Map<MediaStream, MicChain>()
@@ -122,19 +127,83 @@ export async function processMicStream(
 		rnnoise,
 		gate,
 		destination,
+		rawStream: stream,
 		rawTrack,
+		onTrackEnded: () => {},
 	}
+
+	chain.onTrackEnded = () => disposeChain(chain)
 
 	const processedStream = destination.stream
 
 	chains.set(processedStream, chain)
 	connectChain(chain)
 
-	rawTrack.addEventListener("ended", () => disposeChain(chain), {
-		once: true,
-	})
+	rawTrack.addEventListener("ended", chain.onTrackEnded, { once: true })
 
 	return processedStream
+}
+
+function microphoneConstraints(deviceId?: string): MediaTrackConstraints {
+	const base = webAudioProcessing.getMicrophoneConstraints?.() ?? {}
+
+	return {
+		...base,
+		...(deviceId ? { deviceId: { exact: deviceId } } : {}),
+	}
+}
+
+// browsers cannot change the device of a live track, so the raw capture is
+// re-acquired and the existing graph is fed from the new source. the published
+// stream (the destination node) is kept untouched, so no renegotiation needed
+export async function switchMicInput(deviceId: string): Promise<boolean> {
+	if (chains.size === 0) {
+		// nothing capturing yet, the next capture will use the stored device
+		return true
+	}
+
+	let captured: MediaStream
+
+	try {
+		captured = await navigator.mediaDevices.getUserMedia({
+			video: false,
+			audio: microphoneConstraints(deviceId),
+		})
+	} catch (error) {
+		logger.error("failed to switch microphone device", error)
+		return false
+	}
+
+	const track = captured.getAudioTracks()[0]
+
+	if (!track) {
+		for (const capturedTrack of captured.getTracks()) capturedTrack.stop()
+		return false
+	}
+
+	const ctx = getAudioContext()
+
+	for (const chain of chains.values()) {
+		const previousTrack = chain.rawTrack
+
+		previousTrack.removeEventListener("ended", chain.onTrackEnded)
+
+		disconnectNode(chain.source)
+
+		chain.source = ctx.createMediaStreamSource(captured)
+		chain.rawStream = captured
+		chain.rawTrack = track
+		chain.onTrackEnded = () => disposeChain(chain)
+
+		track.addEventListener("ended", chain.onTrackEnded, { once: true })
+
+		connectChain(chain)
+
+		// only now is safe to release the previous capture
+		previousTrack.stop()
+	}
+
+	return true
 }
 
 function disposeChain(chain: MicChain) {
@@ -144,6 +213,8 @@ function disposeChain(chain: MicChain) {
 	if (chains.get(processedStream) !== chain) return
 
 	chains.delete(processedStream)
+
+	chain.rawTrack.removeEventListener("ended", chain.onTrackEnded)
 
 	disconnectNode(chain.source)
 	disconnectNode(chain.inputGain)
@@ -211,7 +282,7 @@ export const webAudioProcessing: AudioProcessingAdapter = {
 			noiseSuppression: config.input.noiseSuppression === "system",
 			autoGainControl: config.input.gainMode === "auto",
 			echoCancellation: config.input.echoCancellation,
-			...(inputDeviceId ? { deviceId: { ideal: inputDeviceId } } : {}),
+			...(inputDeviceId ? { deviceId: { exact: inputDeviceId } } : {}),
 		}
 	},
 }

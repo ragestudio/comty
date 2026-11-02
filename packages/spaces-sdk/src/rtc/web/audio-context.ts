@@ -23,10 +23,51 @@ export async function resumeAudioContext(): Promise<AudioContext> {
 	const ctx = getAudioContext()
 
 	if (ctx.state === "suspended") {
-		await ctx.resume().catch(() => {})
+		// do not wait for the promise, chromium keeps it pending until the page
+		// receives a user gesture
+		ctx.resume().catch(() => {})
 	}
 
 	return ctx
+}
+
+let unlockInstalled = false
+
+// a resume can be ignored when it happens outside a gesture, so keep retrying on
+// every interaction until the context is actually running
+export function installAudioUnlock(): void {
+	if (unlockInstalled || typeof window === "undefined") return
+
+	unlockInstalled = true
+
+	const unlock = () => {
+		const ctx = getAudioContext()
+
+		if (ctx.state === "running") return
+
+		ctx.resume().catch(() => {})
+	}
+
+	window.addEventListener("pointerdown", unlock, { capture: true })
+	window.addEventListener("keydown", unlock, { capture: true })
+}
+
+// same as above for a context created elsewhere (e.g. the sysaudio output bus)
+const keptContexts = new WeakSet<AudioContext>()
+
+export function keepContextRunning(ctx: AudioContext): void {
+	if (typeof window === "undefined" || keptContexts.has(ctx)) return
+
+	keptContexts.add(ctx)
+
+	const resume = () => {
+		if (ctx.state === "running") return
+
+		ctx.resume().catch(() => {})
+	}
+
+	window.addEventListener("pointerdown", resume, { capture: true })
+	window.addEventListener("keydown", resume, { capture: true })
 }
 
 export function dbToGain(db: number): number {
@@ -47,6 +88,12 @@ export async function setAudioSink(deviceId: string): Promise<boolean> {
 	}
 
 	try {
+		// a suspended context may reject or ignore the sink change, the resume
+		// promise stays pending until a gesture so it is not awaited
+		if (ctx.state !== "running") {
+			ctx.resume().catch(() => {})
+		}
+
 		await ctx.setSinkId(deviceId)
 		return true
 	} catch (error) {

@@ -1,3 +1,5 @@
+import { keepContextRunning } from "./audio-context"
+
 const pcmInputWorkletUrl = new URL("./worklets/pcm-input.js", import.meta.url)
 	.href
 const pcmOutputWorkletUrl = new URL("./worklets/pcm-output.js", import.meta.url)
@@ -176,6 +178,9 @@ class SysAudioCapture {
 
 		this.outputBus = this.outputCtx.createGain()
 		this.outputBus.gain.value = 1
+
+		// the output context is created before any gesture, so keep it unlocked
+		keepContextRunning(this.outputCtx)
 
 		this.pcmOutputWorklet = new AudioWorkletNode(
 			this.outputCtx,

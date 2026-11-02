@@ -1,14 +1,34 @@
 import type { AudioRouting } from "@/adapter"
 import type { AudioDevice } from "@/rtc/audio"
 
+import { AUDIO_SETTINGS_KEYS, readAudioSetting } from "@/rtc/audio/settings"
+
 import { setAudioSink } from "./audio-context"
 import {
 	getSelectedInputDeviceId,
 	setSelectedInputDeviceId,
 } from "./audio-devices"
-import { getActiveMicTrack } from "./audio-processing"
+import { switchMicInput } from "./audio-processing"
 
 let outputDeviceId: string | null = null
+let outputLoaded = false
+
+// same as the input device, the stored output is read lazily so it is used on
+// the first session even though the device list is empty before permissions
+function getSelectedOutputDeviceId(): string | null {
+	if (!outputLoaded) {
+		outputLoaded = true
+
+		const stored = readAudioSetting<string | null>(
+			AUDIO_SETTINGS_KEYS.outputDeviceId,
+			null,
+		)
+
+		outputDeviceId = stored && stored !== "" ? stored : null
+	}
+
+	return outputDeviceId
+}
 
 async function enumerateDevices(): Promise<MediaDeviceInfo[]> {
 	if (!navigator.mediaDevices?.enumerateDevices) return []
@@ -33,7 +53,7 @@ export const webAudioRouting: AudioRouting = {
 				const isInput = device.kind === "audioinput"
 				const selected = isInput
 					? getSelectedInputDeviceId()
-					: outputDeviceId
+					: getSelectedOutputDeviceId()
 
 				return {
 					id: device.deviceId,
@@ -63,31 +83,21 @@ export const webAudioRouting: AudioRouting = {
 
 		if (applied) {
 			outputDeviceId = deviceId
+			outputLoaded = true
 		}
 
 		return applied
 	},
 
 	async setAudioInputDevice(deviceId: string) {
-		const track = getActiveMicTrack()
+		// a live capture cannot change its device, so the adapter re-acquires it
+		const applied = await switchMicInput(deviceId)
 
-		// no active capture yet, the selection is applied when the mic starts
-		if (!track) {
-			setSelectedInputDeviceId(deviceId)
-			return true
-		}
+		if (!applied) return false
 
-		try {
-			await track.applyConstraints({ deviceId: { exact: deviceId } })
-			setSelectedInputDeviceId(deviceId)
-			return true
-		} catch (error) {
-			console.error(
-				"[spaces-adapter] failed to switch input device",
-				error,
-			)
-			return false
-		}
+		setSelectedInputDeviceId(deviceId)
+
+		return true
 	},
 
 	async isBluetoothAvailable() {
@@ -97,6 +107,7 @@ export const webAudioRouting: AudioRouting = {
 	async resetAudioRouting() {
 		setSelectedInputDeviceId(null)
 		outputDeviceId = null
+		outputLoaded = true
 
 		await setAudioSink("")
 

@@ -3,6 +3,7 @@ import { audioManager } from "@/rtc/audio"
 import { audioProcessing } from "@/rtc/audio/processing"
 
 import { webAudioDevicesEvents } from "./audio-devices"
+import { installAudioUnlock } from "./audio-context"
 import {
 	processMicStream,
 	releaseMicStream,
@@ -24,6 +25,9 @@ export function initializeRtcAdapter(): Promise<void> {
 	adapter.registerAudioProcessing(webAudioProcessing)
 	adapter.registerAudioRouting(webAudioRouting)
 	adapter.registerAudioDevicesEvents(webAudioDevicesEvents)
+
+	// playback only sessions need a gesture to start the audio output
+	installAudioUnlock()
 
 	// publish the available capabilities so the ui can hide unsupported options
 	audioProcessing.sync()

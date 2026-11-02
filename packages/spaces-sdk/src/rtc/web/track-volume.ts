@@ -1,5 +1,8 @@
-import { dbToGain, getAudioContext } from "./audio-context"
+import { dbToGain, getAudioContext, keepContextRunning } from "./audio-context"
 import { sysAudio } from "./sys-audio"
+import loggerBase from "@/utils/logger"
+
+const logger = loggerBase.child("track-volume")
 
 // a gain node per remote track. connecting the node to an output destination is
 // what actually plays the track. on electron the destination is the sysaudio
@@ -11,6 +14,8 @@ interface PlaybackGraph {
 	context: AudioContext
 	destination: AudioNode
 	baseGain: number
+	// muted element used to keep the remote track inside the media pipeline
+	anchor: HTMLAudioElement | null
 }
 
 const graphs = new Map<MediaStreamTrack, PlaybackGraph>()
@@ -30,14 +35,29 @@ function resolveTarget(): {
 	return { context, destination: context.destination }
 }
 
-function resumeContext(context: AudioContext) {
-	if (context.state === "suspended") {
-		context.resume().catch(() => {})
-	}
-}
-
 function applyGain(graph: PlaybackGraph) {
 	graph.gain.gain.value = graph.baseGain * dbToGain(outputGainDb)
+}
+
+// some browsers do not decode a remote track until it is attached to a media
+// element, so keep a muted element pointing at the same stream. the audible
+// output still comes from the audio graph
+function anchorStream(stream: MediaStream): HTMLAudioElement | null {
+	if (typeof Audio === "undefined") return null
+
+	try {
+		const element = new Audio()
+
+		element.muted = true
+		element.autoplay = true
+		element.srcObject = stream
+
+		element.play().catch(() => {})
+
+		return element
+	} catch {
+		return null
+	}
 }
 
 export function setTrackVolume(track: MediaStreamTrack, gain: number): void {
@@ -59,6 +79,7 @@ export function setTrackVolume(track: MediaStreamTrack, gain: number): void {
 			context: target.context,
 			destination: target.destination,
 			baseGain: gain,
+			anchor: anchorStream(stream),
 		}
 
 		graphs.set(track, graph)
@@ -67,7 +88,19 @@ export function setTrackVolume(track: MediaStreamTrack, gain: number): void {
 			once: true,
 		})
 
-		resumeContext(target.context)
+		logger.debug("playback graph ready", {
+			trackId: track.id,
+			muted: track.muted,
+			readyState: track.readyState,
+			contextState: target.context.state,
+		})
+
+		// do not allow a suspended context to leave the remote audio silent
+		keepContextRunning(target.context)
+
+		if (target.context.state === "suspended") {
+			target.context.resume().catch(() => {})
+		}
 	}
 
 	graph.baseGain = gain
@@ -109,6 +142,11 @@ function disposeTrack(track: MediaStreamTrack) {
 		graph.gain.disconnect()
 	} catch {
 		// already disconnected
+	}
+
+	if (graph.anchor) {
+		graph.anchor.pause()
+		graph.anchor.srcObject = null
 	}
 
 	graphs.delete(track)
