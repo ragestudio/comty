@@ -2,7 +2,7 @@ import type EvaluateActions from "./index"
 import type { Member } from "@comty/shared/types/spaces/member"
 
 import GroupsModel from "comty.js/endpoints/groups"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (
 	this: EvaluateActions,

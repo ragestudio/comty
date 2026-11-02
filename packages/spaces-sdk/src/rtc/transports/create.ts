@@ -9,7 +9,7 @@ import type {
 	TransportOptions as _TransportOptions,
 } from "mediasoup-client/types"
 
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 const logger = loggerBase.child("transport")
 

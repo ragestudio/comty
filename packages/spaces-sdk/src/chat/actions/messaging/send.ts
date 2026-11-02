@@ -4,7 +4,7 @@ import { CHAT_CONFIGS } from "@/chat/constants"
 import { ExtendedMessage } from "@/chat/types"
 
 import { adapter } from "@/adapter"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (
 	this: MessagingActions,

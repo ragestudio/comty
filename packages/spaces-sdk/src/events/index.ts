@@ -8,7 +8,7 @@ import { GroupsListStore } from "../groupsList"
 
 import GROUP_CONFIG from "../chat/configs/group"
 import DM_CONFIG from "../chat/configs/dm"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 const CHAT_CONFIGS: Record<string, any> = {
 	group: GROUP_CONFIG,

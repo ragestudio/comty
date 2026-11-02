@@ -1,7 +1,7 @@
 import type TypingActions from "./index"
 
 import { CHAT_CONFIGS } from "@/chat/constants"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default function (this: TypingActions, isTypingNow = true): void {
 	const { type, params, typingTimeout, isTypingNetworkState } =

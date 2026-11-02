@@ -1,7 +1,7 @@
 import type SyncActions from "./index"
 
 import ChatsService from "comty.js/endpoints/chats"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (this: SyncActions): Promise<void> {
 	if (!this.adapter) return

@@ -5,7 +5,7 @@ import { getChatSessionKey } from "./types"
 
 import { useChatActions } from "./index"
 import { subscribeChatSocket } from "@/events"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export function useChatSession(type: ChatType, params: ChatParams) {
 	const actions = useChatActions()

@@ -1,9 +1,9 @@
 import type { AudioDevice, AudioRouteMode } from "./rtc/audio/types"
 import type { AudioProcessingAdapter } from "./rtc/audio/processing/types"
-import type { LogLevel, LoggerSink } from "./utils/logger"
+import type { LogLevel, LoggerSink } from "@comty/shared/utils/logger"
 
 import session from "comty.js/core/session"
-import logger from "./utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export interface WebRtcObjects {
 	RTCIceCandidate: RTCIceCandidate
@@ -172,6 +172,6 @@ export class Adapter {
 
 export const adapter = new Adapter()
 
-export type { LogLevel, LoggerSink } from "./utils/logger"
+export type { LogLevel, LoggerSink } from "@comty/shared/utils/logger"
 
 export default adapter

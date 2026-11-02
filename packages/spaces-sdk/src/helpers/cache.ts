@@ -4,7 +4,7 @@ import type { Group } from "@comty/shared/types/spaces/group"
 import type { Member, Members } from "@comty/shared/types/spaces/member"
 
 import db from "../db"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 const CACHED_MEMBERS_PER_GROUP_LIMIT = 2000
 

@@ -1,7 +1,7 @@
 import type { RTC } from ".."
 import type { Transport } from "mediasoup-client/types"
 
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 import createTransport from "./create"
 
 export const logger = loggerBase.child("transports")

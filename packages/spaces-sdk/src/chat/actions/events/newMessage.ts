@@ -1,5 +1,5 @@
 import type EventsActions from "./index"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default function (this: EventsActions, data: any): void {
 	if (!this.adapter) return

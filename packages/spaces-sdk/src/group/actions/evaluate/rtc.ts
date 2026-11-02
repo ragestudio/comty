@@ -1,7 +1,7 @@
 import type EvaluateActions from "./index"
 
 import GroupsModel from "comty.js/endpoints/groups"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (this: EvaluateActions): Promise<void> {
 	if (!this.state.groupId) return

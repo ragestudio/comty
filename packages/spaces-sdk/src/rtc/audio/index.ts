@@ -10,7 +10,7 @@ import {
 	readAudioSetting,
 	writeAudioSetting,
 } from "./settings"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 export const logger = loggerBase.child("audio-manager")
 

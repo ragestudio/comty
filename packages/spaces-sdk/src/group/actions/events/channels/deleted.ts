@@ -3,7 +3,7 @@ import type { Channel, Channels } from "@comty/shared/types/spaces/channel"
 
 import { persistChannelsCache } from "./utils"
 import db from "@/db"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default function (this: EventsActions, payload: Channel): void {
 	this.setState((state) => {

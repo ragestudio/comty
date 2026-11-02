@@ -7,7 +7,7 @@ import type {
 import nativeStrategy from "./strategies/native"
 import webStrategy from "./strategies/web"
 import analyserStrategy from "./strategies/analyser"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 export const logger = loggerBase.child("voice-detection")
 

@@ -5,7 +5,7 @@ import GroupsModel from "comty.js/endpoints/groups"
 import { createDefaultChannels, createDefaultMembers } from "@/group/constants"
 import { resolveCachedMembersUsers } from "@/helpers/cache"
 import db from "@/db"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 async function deferredCacheCheck(
 	groupId: string,

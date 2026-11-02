@@ -5,7 +5,7 @@ import type { Consumer } from "../consumers/consumer"
 import type { SoundpadDispatch } from "@comty/shared/types/rtc/clientEvent"
 import type { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
 
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 import adapter from "@/adapter"
 
 export const logger = loggerBase.child("clients")

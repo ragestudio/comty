@@ -3,7 +3,7 @@ import type { Group } from "@comty/shared/types/spaces/group"
 
 import GroupsModel from "comty.js/endpoints/groups"
 import { cacheGroup } from "@/helpers/cache"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (this: FetchingActions): Promise<Group | null> {
 	if (!this.state.groupId) return null

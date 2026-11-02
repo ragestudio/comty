@@ -4,7 +4,7 @@ import type { ProducerAppData } from "@comty/shared/types/rtc/producer"
 import type { Producer } from "./producer"
 
 import { attachSpeakingDetection } from "../speaking"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 export const logger = loggerBase.child("producers")
 

@@ -10,7 +10,7 @@ import { EventEmitter } from "tseep"
 import BaseStore from "@/classes/BaseStore"
 import client from "comty.js/core/client"
 import session from "comty.js/core/session"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 import Self from "./self"
 import Producers from "./producers"

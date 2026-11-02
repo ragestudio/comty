@@ -4,7 +4,7 @@ import type { ChatParams, ChatType } from "@/chat/types"
 import { CHAT_CONFIGS } from "@/chat/constants"
 import { getChatSessionKey } from "@/chat/types"
 import sortMessages from "@/utils/sortMessages"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (
 	this: LifecycleActions,

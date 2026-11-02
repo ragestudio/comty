@@ -1,7 +1,7 @@
 import type { Channels } from "@comty/shared/types/spaces/channel"
 
 import { cacheChannels } from "../../../../helpers/cache"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export function persistChannelsCache(
 	groupId: string | null,

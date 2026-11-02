@@ -2,7 +2,7 @@ import type EventsActions from "../index"
 import type { GroupUpdatePayload } from "@/group/types"
 
 import db from "@/db"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default function (
 	this: EventsActions,

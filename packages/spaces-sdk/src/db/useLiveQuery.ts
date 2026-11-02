@@ -2,7 +2,7 @@ import type { DexieCompat } from "./wrapper/compat"
 
 import { useEffect, useRef, useState } from "react"
 import db from "./instance"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 // compare query results so unrelated transactions do not trigger renders
 function isEqual(a: unknown, b: unknown) {

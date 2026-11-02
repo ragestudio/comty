@@ -4,7 +4,7 @@ import type { Consumer } from "./consumer"
 import type { ConsumerOptions } from "mediasoup-client/types"
 
 import { attachSpeakingDetection } from "../speaking"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 export const logger = loggerBase.child("consumers")
 

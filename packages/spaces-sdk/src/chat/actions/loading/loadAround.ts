@@ -1,7 +1,7 @@
 import type LoadActions from "./index"
 
 import { CHAT_CONFIGS } from "@/chat/constants"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (
 	this: LoadActions,

@@ -3,7 +3,7 @@ import type { RTC } from ".."
 import { JoinChannelResult } from "@comty/shared/types/rtc/handlers/joinChannel"
 
 import Client from "./client"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export class Clients extends Map<string, Client> {
 	constructor(core: RTC, data?: Iterable<readonly [string, Client]>) {

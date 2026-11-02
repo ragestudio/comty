@@ -4,7 +4,7 @@ import GroupsModel from "comty.js/endpoints/groups"
 
 import { INITIAL_CACHE_PAGE_SIZE } from "@/group/constants"
 import { cacheMembers, cacheTotalMembers } from "@/helpers/cache"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (this: FetchingActions): Promise<void> {
 	if (!this.state.groupId) return

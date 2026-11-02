@@ -1,6 +1,6 @@
 import type LifecycleActions from "./index"
 
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default function (this: LifecycleActions, paused: boolean): void {
 	if (this.state.pausedUpdates === paused) return

@@ -13,7 +13,7 @@ import rnnoiseWorkletUrl from "@timephy/rnnoise-wasm/NoiseSuppressorWorklet?work
 import { dbToGain, getAudioContext, resumeAudioContext } from "./audio-context"
 import { getSelectedInputDeviceId } from "./audio-devices"
 import { setOutputGainDb } from "./track-volume"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 const logger = loggerBase.child("audio-processing")
 

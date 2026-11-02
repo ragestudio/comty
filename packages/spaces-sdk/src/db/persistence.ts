@@ -1,6 +1,6 @@
 import type { Persister, Persists } from "tinybase/persisters"
 
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export type SpacesPersister = Persister<Persists.StoreOrMergeableStore>
 

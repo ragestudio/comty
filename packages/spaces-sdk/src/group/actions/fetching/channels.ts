@@ -5,7 +5,7 @@ import GroupsModel from "comty.js/endpoints/groups"
 
 import { VALID_CHANNEL_KINDS } from "@/group/constants"
 import { cacheChannels } from "@/helpers/cache"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (
 	this: FetchingActions,

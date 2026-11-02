@@ -9,7 +9,7 @@ import CameraStream from "./streams/camera"
 import Microphone from "./media/mic"
 import Screen from "./media/screen"
 import Camera from "./media/camera"
-import Logger from "@/utils/logger"
+import Logger from "@comty/shared/utils/logger"
 import { releaseMediaStreamURL } from "@/utils/mediaStreamURL"
 
 export const StreamsKinds = {

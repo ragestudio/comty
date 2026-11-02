@@ -1,6 +1,6 @@
 import { dbToGain, getAudioContext, keepContextRunning } from "./audio-context"
 import { sysAudio } from "./sys-audio"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 const logger = loggerBase.child("track-volume")
 

@@ -4,7 +4,7 @@ import type { Member } from "@comty/shared/types/spaces/member"
 
 import UserModel from "comty.js/endpoints/user"
 import db from "@/db"
-import logger from "@/utils/logger"
+import logger from "@comty/shared/utils/logger"
 
 export default async function (
 	this: EventsActions,

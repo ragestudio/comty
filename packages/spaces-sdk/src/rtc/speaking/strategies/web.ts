@@ -5,7 +5,7 @@ import type {
 } from "../types"
 
 import workerSource from "../../workers/rtp-spkdt"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 const logger = loggerBase.child("voice-detection")
 

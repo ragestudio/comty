@@ -8,7 +8,7 @@ import {
 	getMediaStreamURL,
 	releaseMediaStreamURL,
 } from "@/utils/mediaStreamURL"
-import loggerBase from "@/utils/logger"
+import loggerBase from "@comty/shared/utils/logger"
 
 import { MIN_VOLUME_DB } from "./constants"
 
