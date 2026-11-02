@@ -47,10 +47,7 @@ export class Worker {
 		this.#datacenterId = BigInt(datacenterId)
 		this.#datacenterIdBits = BigInt(options?.datacenterIdBits ?? 5)
 		this.#maxDatacenterId = -1n ^ (-1n << this.#datacenterIdBits)
-		if (
-			this.#datacenterId < 0 ||
-			this.#datacenterId > this.#maxDatacenterId
-		) {
+		if (this.#datacenterId < 0 || this.#datacenterId > this.#maxDatacenterId) {
 			throw new Error(
 				`With ${this.#datacenterIdBits} bits, datacenter id can't be greater than ${this.#maxDatacenterId} or less than 0`,
 			)

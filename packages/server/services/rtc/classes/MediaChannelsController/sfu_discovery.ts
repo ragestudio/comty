@@ -1,7 +1,7 @@
 import type {
-	IPC_RegisterNodePayload,
-	IPC_UnregisterNodePayload,
-} from "@comty/shared/types/rtc/events/index"
+	SfuNodeRegisterPayload,
+	SfuNodeUnregisterPayload,
+} from "@comty/shared/types/sfu/index"
 import type MediaChannelsController from "."
 
 import { EventEmitter } from "tseep/lib/ee-safe"
@@ -35,9 +35,7 @@ export class SfuNodeDiscovery extends EventEmitter {
 
 		for await (const key of keys) {
 			try {
-				const reg = (await this.kv_bucket.get(
-					key,
-				)) as IPC_RegisterNodePayload
+				const reg = (await this.kv_bucket.get(key)) as SfuNodeRegisterPayload
 
 				if (!reg) continue
 				if (!key.startsWith("node.")) continue
@@ -46,10 +44,7 @@ export class SfuNodeDiscovery extends EventEmitter {
 
 				await this.handleRegNode(reg)
 			} catch (err) {
-				console.error(
-					`[SfuDiscovery] Failed to load entry "${key}":`,
-					err,
-				)
+				console.error(`[SfuDiscovery] Failed to load entry "${key}":`, err)
 			}
 		}
 	}
@@ -58,14 +53,21 @@ export class SfuNodeDiscovery extends EventEmitter {
 		return this.nodes.find((n) => n.node_id === nodeId)
 	}
 
-	handleRegNode = async (payload: IPC_RegisterNodePayload) => {
+	handleRegNode = async (payload: SfuNodeRegisterPayload) => {
 		if (!payload) return
-		if (this.getNodeById(BigInt(payload.node_id))) return
 
-		const node = new SFUNode(
-			payload,
-			this.controller.server.nats.connection,
-		)
+		const existing = this.getNodeById(BigInt(payload.node_id))
+
+		if (existing) {
+			// a node can re-register after a restart with the same id
+			existing.refName = payload.refName ?? existing.refName
+			existing.hostname = payload.hostname ?? existing.hostname
+			existing.announced_ip = payload.announced_ip ?? existing.announced_ip
+			existing.listens = payload.listens ?? existing.listens
+			return
+		}
+
+		const node = new SFUNode(payload, this.controller.server.nats.connection)
 
 		if (!(await node.alive())) {
 			console.debug(
@@ -87,30 +89,26 @@ export class SfuNodeDiscovery extends EventEmitter {
 		this.emit("register", payload)
 	}
 
-	handleUnregNode = async (payload: IPC_UnregisterNodePayload) => {
+	handleUnregNode = async (payload: SfuNodeUnregisterPayload) => {
 		if (!payload) return
 
 		const node = this.getNodeById(BigInt(payload.node_id))
 		if (!node) return
 
-		console.debug(
-			`[SfuDiscovery] Unregistering SFU node[${payload.node_id}]`,
-		)
-		this.nodes = this.nodes.filter(
-			(n) => n.node_id !== BigInt(payload.node_id),
-		)
+		console.debug(`[SfuDiscovery] Unregistering SFU node[${payload.node_id}]`)
+		this.nodes = this.nodes.filter((n) => n.node_id !== BigInt(payload.node_id))
 
 		this.emit("unregister", payload)
 	}
 
-	async addNodeToBucket(payload: IPC_RegisterNodePayload) {
+	async addNodeToBucket(payload: SfuNodeRegisterPayload) {
 		if (!this.kv_bucket) return
 
 		const nodeKey = `node.${payload.node_id}`
 		await this.kv_bucket.put(nodeKey, payload)
 	}
 
-	async deleteNodeToBucket(payload: IPC_UnregisterNodePayload) {
+	async deleteNodeToBucket(payload: SfuNodeUnregisterPayload) {
 		if (!this.kv_bucket) return
 
 		const nodeKey = `node.${payload.node_id}`

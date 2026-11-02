@@ -1,15 +1,13 @@
-import type API from "@services/rtc/rtc.service"
-import type {
-	MediaChannel,
-	SerializedStateMediaChannel,
-} from "@classes/MediaChannel"
+import API from "@services/rtc/rtc.service"
+import type { MediaChannel } from "@classes/MediaChannel"
+import type { StatedChannel } from "@comty/shared/types/rtc/statedChannel"
 
 import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import GroupsModel from "@db/groups"
 
-export default defineRoute<API>()({
+export default defineRoute(API)({
 	useMiddlewares: ["withAuthentication"],
-	useContexts: ["mediaChannels"] as const,
+	useContexts: ["mediaChannels"],
 	fn: async (req, res, ctx) => {
 		const { group_id } = req.params
 		const user_id = req.auth.session.user_id
@@ -31,7 +29,7 @@ export default defineRoute<API>()({
 			group_id,
 		)) as MediaChannel[]
 
-		let result: SerializedStateMediaChannel[] = []
+		let result: StatedChannel[] = []
 
 		if (Array.isArray(state)) {
 			// map channel clients

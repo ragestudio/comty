@@ -1,13 +1,13 @@
 import type { MediaChannel } from ".."
 import type { RTCClient } from "@services/rtc/types"
-import type { IPC_ConsumerControlPayload } from "@comty/shared/types/rtc/events/index"
+import type { SfuConsumerControlPayload } from "@comty/shared/types/sfu/index"
 
 import setFind from "@shared-utils/setFind"
 
 export default async function (
 	this: MediaChannel,
 	client: RTCClient,
-	payload: IPC_ConsumerControlPayload,
+	payload: SfuConsumerControlPayload,
 ) {
 	try {
 		const clientInst = setFind(this.clients, (c: RTCClient) => {

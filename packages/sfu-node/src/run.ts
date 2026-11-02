@@ -1,8 +1,5 @@
-import SFU from "./index"
+import "@linebridge/engine-nats/register"
+import SfuNode from "./index"
 
-try {
-	const sfu = new SFU()
-	sfu.initialize()
-} catch (error) {
-	console.error(error)
-}
+export default SfuNode
+export { SfuNode }

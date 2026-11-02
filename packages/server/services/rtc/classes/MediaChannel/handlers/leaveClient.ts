@@ -97,7 +97,7 @@ async function leaveClientHandler(
 
 		// if no users left, close it self
 		if (this.clients.size === 0) {
-			this.close()
+			await this.close()
 		}
 
 		if (this.controller) {

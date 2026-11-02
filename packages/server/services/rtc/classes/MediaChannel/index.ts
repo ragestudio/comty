@@ -1,9 +1,15 @@
 import type { RemoteRouter } from "../MediaChannelsController/sfu/router"
 import type { MediaChannelParams, RTCClient } from "../../types"
 import type { Consumer } from "mediasoup/types"
+
+import type { Client as SerializedClient } from "@comty/shared/types/rtc/client"
+import type { SerializedProducer } from "@comty/shared/types/rtc/producer"
+import type { StatedChannel as SerializedStateMediaChannel } from "@comty/shared/types/rtc/statedChannel"
+
 import type Producer from "./producer"
 import type MediaChannelsController from "@classes/MediaChannelsController"
 
+import Bind from "@comty/shared/utils/bind"
 import { SFUNode } from "@classes/MediaChannelsController/sfu/node"
 import { EventEmitter } from "tseep/lib/ee-safe"
 
@@ -37,10 +43,6 @@ export type SerializedMediaChannel = {
 	started_at: string
 	mediaCodecs: any[]
 }
-
-import type { Client as SerializedClient } from "@comty/shared/types/rtc/client"
-import type { SerializedProducer } from "@comty/shared/types/rtc/producer"
-import type { StatedChannel as SerializedStateMediaChannel } from "@comty/shared/types/rtc/statedChannel"
 
 export interface SerializedConsumer extends Partial<Consumer> {
 	user_id: string
@@ -124,35 +126,19 @@ export class MediaChannel {
 		}
 	}
 
-	joinClient = joinClientHandler.bind(this) as OmitThisParameter<
-		typeof joinClientHandler
-	>
-	leaveClient = leaveClientHandler.bind(this) as OmitThisParameter<
-		typeof leaveClientHandler
-	>
+	joinClient = Bind(this, joinClientHandler)
+	leaveClient = Bind(this, leaveClientHandler)
+	handleClientEvent = Bind(this, handleClientEventHandler)
 
-	createTransport = createTransportHandler.bind(this) as OmitThisParameter<
-		typeof createTransportHandler
-	>
-	connectTransport = connectTransportHandler.bind(this) as OmitThisParameter<
-		typeof connectTransportHandler
-	>
+	createTransport = Bind(this, createTransportHandler)
+	connectTransport = Bind(this, connectTransportHandler)
 
-	produce = produceHandler.bind(this) as OmitThisParameter<
-		typeof produceHandler
-	>
-	stopProduce = stopProduceHandler.bind(this) as OmitThisParameter<
-		typeof stopProduceHandler
-	>
-	consume = consumeHandler.bind(this) as OmitThisParameter<
-		typeof consumeHandler
-	>
-	stopConsume = stopConsumeHandler.bind(this) as OmitThisParameter<
-		typeof stopConsumeHandler
-	>
-	consumerControl = consumerControlHandler.bind(this) as OmitThisParameter<
-		typeof consumerControlHandler
-	>
+	produce = Bind(this, produceHandler)
+	stopProduce = Bind(this, stopProduceHandler)
+	consume = Bind(this, consumeHandler)
+	stopConsume = Bind(this, stopConsumeHandler)
+	consumerControl = Bind(this, consumerControlHandler)
+	close = Bind(this, closeHandler)
 
 	static deserializeMaps(state: SerializedMediaChannel) {
 		const producersMap = new Map<string, Map<string, any>>()
@@ -182,12 +168,6 @@ export class MediaChannel {
 
 		return { producers: producersMap, consumers: consumersMap }
 	}
-
-	close = closeHandler.bind(this) as OmitThisParameter<typeof closeHandler>
-
-	handleClientEvent = handleClientEventHandler.bind(
-		this,
-	) as OmitThisParameter<typeof handleClientEventHandler>
 
 	async handleSoundpadDispatch(client: RTCClient, payload: any) {
 		this.broadcastToClients(`media:channel:soundpad:dispatch`, {

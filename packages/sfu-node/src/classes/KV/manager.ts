@@ -20,9 +20,7 @@ export class KvManager {
 
 	async bucket(name: string, options?: Partial<KvOptions>): Promise<Bucket> {
 		if (!this.kvm) {
-			throw new Error(
-				"[KV] Manager is not initialized. Call init() first.",
-			)
+			throw new Error("[KV] Manager is not initialized. Call init() first.")
 		}
 
 		if (this.buckets.has(name)) {
@@ -44,8 +42,7 @@ export class KvManager {
 			await conn.get("_probe_")
 		} catch (err: any) {
 			const isMissingKey =
-				err?.code === "KV_KEY_NOT_FOUND" ||
-				err?.message?.includes("not found")
+				err?.code === "KV_KEY_NOT_FOUND" || err?.message?.includes("not found")
 
 			if (!isMissingKey) {
 				console.error(`[KV] Failed to probe "${name}":`, err)

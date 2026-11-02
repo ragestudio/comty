@@ -1,10 +1,10 @@
 import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
-import type { IPC_ConsumerControlPayload } from "@comty/shared/types/rtc/events/index"
+import type { SfuConsumerControlPayload } from "@comty/shared/types/sfu/index"
 
 export default defineRoute<API, HandlerKind["ws"]>()({
-	useContexts: ["mediaChannels"] as const,
-	fn: async (client: RTCClient, payload: IPC_ConsumerControlPayload, ctx) => {
+	useContexts: ["mediaChannels"],
+	fn: async (client: RTCClient, payload: SfuConsumerControlPayload, ctx) => {
 		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
 
 		if (!channelInstance) {

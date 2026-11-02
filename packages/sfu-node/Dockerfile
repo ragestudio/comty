@@ -1,6 +1,13 @@
 FROM node:24-trixie-slim AS builder
 
-RUN apt update && apt install -y git build-essential
+RUN apt update && apt install -y \
+    git \
+    build-essential \
+    python3 \
+    make \
+    g++ \
+    jq \
+    ca-certificates
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME/bin:$PATH"
@@ -8,25 +15,26 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 RUN corepack enable
 
-COPY packages/sfu-node /packages/sfu-node
-COPY packages/shared /packages/shared
+WORKDIR /app
 
-WORKDIR /packages/shared
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages/sfu-node ./packages/sfu-node
+COPY packages/shared ./packages/shared
+COPY modules/linebridge ./modules/linebridge
 
-WORKDIR /packages/sfu-node
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --no-frozen-lockfile --filter sfu-node...
 
-RUN pnpm run build
-RUN pnpm clean
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+RUN pnpm --filter sfu-node build
 
 FROM node:24-trixie-slim AS runner
 
 USER node
 
-COPY --from=builder --chown=node:node /packages/sfu-node /packages/sfu-node
-COPY --from=builder --chown=node:node /packages/shared /packages/shared
+WORKDIR /app/packages/sfu-node
 
-WORKDIR /packages/sfu-node
-CMD ["node", "build/run.js"]
+COPY --from=builder --chown=node:node /app /app
+
+ENV NODE_ENV=production
+
+CMD ["./node_modules/.bin/linebridge-boot", "./build/run.js"]

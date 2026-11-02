@@ -1,69 +1,21 @@
-import type { MediaKind, RtpCapabilities } from "mediasoup/types"
-
-export type IPC_RegisterNodePayload = {
-	pid: string
-	node_id: string
-	hostname: string
-	announced_ip: string
-	listens: Record<string, any>[]
-}
-
-export type IPC_UnregisterNodePayload = {
-	node_id: string
-	pid?: string
-	hostname?: string
-}
-
-export type IPC_CloseRouterPayload = {
-	id: string
-}
-
-export type IPC_CreateRouterRTCTransportPayload = {
-	router_id: string
-}
-
-export type IPC_RouterCanConsumePayload = {
-	router_id: string
-	producerId: string
-	rtpCapabilities: RtpCapabilities
-}
-
-export type IPC_ConnectTransportPayload = {
-	transport_id: string
-	dtlsParameters: any
-}
-
-export type IPC_ProducePayload = {
-	transport_id: string
-	kind: MediaKind
-	rtpParameters: any
-	appData?: any
-}
-
-export type IPC_ConsumePayload = {
-	transport_id: string
-	producerId: string
-	rtpCapabilities: RtpCapabilities
-	paused?: boolean
-}
-
-export type IPC_ConsumerControlPayload = {
-	consumer_id: string
-	paused: boolean
-}
-
-export type IPC_CloseTransportPayload = {
-	transport_id: string
-}
-
-export type IPC_CloseProducerPayload = {
-	producer_id: string
-}
-
-export type IPC_CloseConsumerPayload = {
-	consumer_id: string
-}
-
-export type IPC_RequestKeyframePayload = {
-	consumer_id: string
-}
+/**
+ * Legacy IPC aliases. The canonical contract lives in types/sfu.
+ */
+export type {
+	SfuCloseConsumerPayload as IPC_CloseConsumerPayload,
+	SfuCloseProducerPayload as IPC_CloseProducerPayload,
+	SfuCloseRouterPayload as IPC_CloseRouterPayload,
+	SfuCloseTransportPayload as IPC_CloseTransportPayload,
+	SfuConnectTransportPayload as IPC_ConnectTransportPayload,
+	SfuConsumePayload as IPC_ConsumePayload,
+	SfuConsumerControlPayload as IPC_ConsumerControlPayload,
+	SfuCreateRouterPayload as IPC_CreateRouterPayload,
+	SfuCreateTransportPayload as IPC_CreateRouterRTCTransportPayload,
+	SfuGetRouterPayload as IPC_GetRouterPayload,
+	SfuListRoutersPayload as IPC_ListRoutersPayload,
+	SfuNodeRegisterPayload as IPC_RegisterNodePayload,
+	SfuNodeUnregisterPayload as IPC_UnregisterNodePayload,
+	SfuProducePayload as IPC_ProducePayload,
+	SfuRequestKeyframePayload as IPC_RequestKeyframePayload,
+	SfuCanConsumePayload as IPC_RouterCanConsumePayload,
+} from "../../sfu/index"

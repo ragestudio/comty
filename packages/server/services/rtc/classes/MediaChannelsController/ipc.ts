@@ -1,6 +1,12 @@
 import type { NatsConnection, Subscription } from "@nats-io/transport-node"
+import type {
+	SfuRouteName,
+	SfuRoutePayload,
+	SfuRouteResult,
+} from "@comty/shared/types/sfu/index"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
+import { OperationError } from "linebridge/classes/OperationError/index"
 import {
 	EventDataEncode,
 	EventDataDecode,
@@ -68,23 +74,64 @@ export class IPC extends EventEmitter {
 		}
 	}
 
-	sendToNode(node_id: string, event: string, data?: any) {
+	sendToNode<K extends SfuRouteName>(
+		node_id: string,
+		event: K,
+		data?: SfuRoutePayload<K>,
+	) {
 		this.nats.publish(
 			`${this.sfuIpcPrefixSubject}${node_id}`,
 			JSON.stringify({ event, data }),
 		)
 	}
 
-	async requestToNode(node_id: string, event: string, data?: any) {
+	async requestToNode<K extends SfuRouteName>(
+		node_id: string,
+		event: K,
+		data?: SfuRoutePayload<K>,
+	): Promise<SfuRouteResult<K>> {
 		const response = await this.nats.request(
 			`${this.sfuIpcPrefixSubject}${node_id}`,
 			EventDataEncode(event, data),
+			{ timeout: 10000 },
 		)
 
 		const payload = EventDataDecode(response.data)
 
 		if (payload.error) {
 			throw new Error(payload.error)
+		}
+
+		return payload.data
+	}
+
+	sendToService<K extends SfuRouteName>(
+		refName: string,
+		event: K,
+		data?: SfuRoutePayload<K>,
+	) {
+		this.nats.publish(`sfu.${refName}.${event}`, JSON.stringify(data ?? {}))
+	}
+
+	async requestToService<K extends SfuRouteName>(
+		refName: string,
+		event: K,
+		data?: SfuRoutePayload<K>,
+	): Promise<SfuRouteResult<K>> {
+		const response = await this.nats.request(
+			`sfu.${refName}.${event}`,
+			JSON.stringify(data ?? {}),
+			{ timeout: 10000 },
+		)
+
+		const payload = JSON.parse(Buffer.from(response.data).toString()) as {
+			data?: any
+			error?: string
+			code?: number
+		}
+
+		if (payload.error) {
+			throw new OperationError(payload.code ?? 500, payload.error)
 		}
 
 		return payload.data

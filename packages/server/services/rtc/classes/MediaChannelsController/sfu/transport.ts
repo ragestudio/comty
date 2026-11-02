@@ -1,4 +1,11 @@
-import type { RtpCapabilities, WebRtcTransportDump } from "mediasoup/types"
+import type {
+	AppData,
+	DtlsParameters,
+	MediaKind,
+	RtpCapabilities,
+	RtpParameters,
+} from "mediasoup/types"
+import type { SfuTransportDump } from "@comty/shared/types/sfu/index"
 import type { SFUNode } from "./node"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
@@ -9,12 +16,11 @@ export class RemoteRouterTransport extends EventEmitter {
 	node: SFUNode
 	id: string
 	closed: boolean
-	iceParameters: WebRtcTransportDump["iceParameters"]
-	iceCandidates: WebRtcTransportDump["iceCandidates"]
-	dtlsParameters: WebRtcTransportDump["dtlsParameters"]
-	appData: any
+	iceParameters: SfuTransportDump["iceParameters"]
+	iceCandidates: SfuTransportDump["iceCandidates"]
+	dtlsParameters: SfuTransportDump["dtlsParameters"]
 
-	constructor(node: SFUNode, data: any) {
+	constructor(node: SFUNode, data: SfuTransportDump) {
 		super()
 
 		this.node = node
@@ -23,20 +29,15 @@ export class RemoteRouterTransport extends EventEmitter {
 		this.iceParameters = data.iceParameters
 		this.iceCandidates = data.iceCandidates
 		this.dtlsParameters = data.dtlsParameters
-		this.appData = data.appData ?? {}
 
 		this.node.registerRemoteTransport(this)
 	}
 
-	async connect({ dtlsParameters }: { dtlsParameters: any }) {
-		await this.node.ipc.requestToNode(
-			this.node.node_id.toString(),
-			"connectTransport",
-			{
-				transport_id: this.id,
-				dtlsParameters,
-			},
-		)
+	async connect({ dtlsParameters }: { dtlsParameters: DtlsParameters }) {
+		await this.node.request("connectTransport", {
+			transport_id: this.id,
+			dtlsParameters,
+		})
 	}
 
 	async produce({
@@ -44,20 +45,16 @@ export class RemoteRouterTransport extends EventEmitter {
 		rtpParameters,
 		appData,
 	}: {
-		kind: string
-		rtpParameters: any
-		appData?: any
+		kind: MediaKind
+		rtpParameters: RtpParameters
+		appData?: AppData
 	}) {
-		const response = await this.node.ipc.requestToNode(
-			this.node.node_id.toString(),
-			"produce",
-			{
-				transport_id: this.id,
-				kind,
-				rtpParameters,
-				appData,
-			},
-		)
+		const response = await this.node.request("produce", {
+			transport_id: this.id,
+			kind,
+			rtpParameters,
+			appData,
+		})
 
 		return new RemoteRouterProducer(this.node, response)
 	}
@@ -71,16 +68,12 @@ export class RemoteRouterTransport extends EventEmitter {
 		rtpCapabilities: RtpCapabilities
 		paused?: boolean
 	}) {
-		const response = await this.node.ipc.requestToNode(
-			this.node.node_id.toString(),
-			"consume",
-			{
-				transport_id: this.id,
-				producerId,
-				rtpCapabilities,
-				paused,
-			},
-		)
+		const response = await this.node.request("consume", {
+			transport_id: this.id,
+			producerId,
+			rtpCapabilities,
+			paused,
+		})
 
 		return new RemoteRouterConsumer(this.node, response)
 	}
@@ -90,11 +83,7 @@ export class RemoteRouterTransport extends EventEmitter {
 
 		this.closed = true
 
-		this.node.ipc.sendToNode(
-			this.node.node_id.toString(),
-			"closeTransport",
-			{ transport_id: this.id },
-		)
+		this.node.send("closeTransport", { transport_id: this.id })
 
 		this.node.unregisterRemoteTransport(this.id)
 		this.emit("@close")

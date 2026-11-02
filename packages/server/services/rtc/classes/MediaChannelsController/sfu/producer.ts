@@ -1,4 +1,5 @@
-import type { MediaKind } from "mediasoup/types"
+import type { AppData, MediaKind, RtpParameters } from "mediasoup/types"
+import type { SfuProducerResult } from "@comty/shared/types/sfu/index"
 import type { SFUNode } from "./node"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
@@ -8,12 +9,12 @@ export class RemoteRouterProducer extends EventEmitter {
 	id: string
 	closed: boolean
 	kind: MediaKind
-	rtpParameters: any
-	appData: any
+	rtpParameters: RtpParameters
+	appData: AppData
 
 	observer = new EventEmitter()
 
-	constructor(node: SFUNode, data: any) {
+	constructor(node: SFUNode, data: SfuProducerResult) {
 		super()
 
 		this.node = node
@@ -30,11 +31,7 @@ export class RemoteRouterProducer extends EventEmitter {
 		if (this.closed) return
 		this.closed = true
 
-		this.node.ipc.sendToNode(
-			this.node.node_id.toString(),
-			"closeProducer",
-			{ producer_id: this.id },
-		)
+		this.node.send("closeProducer", { producer_id: this.id })
 
 		this._handleClosed()
 	}

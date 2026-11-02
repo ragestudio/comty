@@ -25,6 +25,8 @@ import getUserJoinedGroupsIds from "./handlers/getUserJoinedGroupsIds"
 import flushDirtyInstancesState from "./handlers/flushDirtyInstancesState"
 import getInstance from "./handlers/getInstance"
 
+import Bind from "@comty/shared/utils/bind"
+
 type PendingDisconnectEntry = {
 	timeout: NodeJS.Timeout
 	channelId: string
@@ -68,9 +70,7 @@ export default class MediaChannelsController {
 		throw new Error("No SFU nodes available")
 	}
 
-	getInstance = getInstance.bind(this) as OmitThisParameter<
-		typeof getInstance
-	>
+	getInstance = Bind(this, getInstance)
 
 	async initialize() {
 		// initialize KV engine
@@ -140,36 +140,19 @@ export default class MediaChannelsController {
 		this.dirtyInstances.delete(channelId)
 	}
 
-	flushDirtyInstancesState = flushDirtyInstancesState.bind(
-		this,
-	) as OmitThisParameter<typeof flushDirtyInstancesState>
+	flushDirtyInstancesState = Bind(this, flushDirtyInstancesState)
+	createChannelInstance = Bind(this, createChannelInstanceHandler)
 
-	createChannelInstance = createChannelInstanceHandler.bind(
-		this,
-	) as OmitThisParameter<typeof createChannelInstanceHandler>
+	joinClient = Bind(this, joinClient)
+	leaveClient = Bind(this, leaveClient)
 
-	joinClient = joinClient.bind(this) as OmitThisParameter<typeof joinClient>
-	leaveClient = leaveClient.bind(this) as OmitThisParameter<
-		typeof leaveClient
-	>
+	getUserJoinedGroupsIds = Bind(this, getUserJoinedGroupsIds)
+	findChannelsByGroupId = Bind(this, findChannelsByGroupId)
 
-	getUserJoinedGroupsIds = getUserJoinedGroupsIds.bind(
-		this,
-	) as OmitThisParameter<typeof getUserJoinedGroupsIds>
-	findChannelsByGroupId = findChannelsByGroupId.bind(
-		this,
-	) as OmitThisParameter<typeof findChannelsByGroupId>
+	handleUserConnectedToSocket = Bind(this, handleUserConnectedToSocket)
+	handleUserDisconnectedToSocket = Bind(this, handleUserDisconnectedToSocket)
 
-	handleUserConnectedToSocket = handleUserConnectedToSocket.bind(
-		this,
-	) as OmitThisParameter<typeof handleUserConnectedToSocket>
-	handleUserDisconnectedToSocket = handleUserDisconnectedToSocket.bind(
-		this,
-	) as OmitThisParameter<typeof handleUserDisconnectedToSocket>
-
-	validateGroupAccess = validateGroupAccess.bind(this) as OmitThisParameter<
-		typeof validateGroupAccess
-	>
+	validateGroupAccess = Bind(this, validateGroupAccess)
 
 	cleanupOrphanedResources(client: RTCClient): void {
 		if (client.transports) {

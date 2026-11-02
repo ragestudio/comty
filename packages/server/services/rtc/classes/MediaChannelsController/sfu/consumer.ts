@@ -1,4 +1,5 @@
-import type { MediaKind } from "mediasoup/types"
+import type { MediaKind, RtpParameters } from "mediasoup/types"
+import type { SfuConsumerResult } from "@comty/shared/types/sfu/index"
 import type { SFUNode } from "./node"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
@@ -10,9 +11,9 @@ export class RemoteRouterConsumer extends EventEmitter {
 	closed: boolean
 	producerId: string
 	kind: MediaKind
-	rtpParameters: any
+	rtpParameters: RtpParameters
 
-	constructor(node: SFUNode, data: any) {
+	constructor(node: SFUNode, data: SfuConsumerResult) {
 		super()
 
 		this.node = node
@@ -26,22 +27,16 @@ export class RemoteRouterConsumer extends EventEmitter {
 	}
 
 	async requestKeyFrame() {
-		await this.node.ipc.requestToNode(
-			this.node.node_id.toString(),
-			"requestKeyFrame",
-			{ producer_id: this.producerId },
-		)
+		await this.node.request("requestKeyframe", {
+			consumer_id: this.id,
+		})
 	}
 
 	close() {
 		if (this.closed) return
 		this.closed = true
 
-		this.node.ipc.sendToNode(
-			this.node.node_id.toString(),
-			"closeConsumer",
-			{ consumer_id: this.id },
-		)
+		this.node.send("closeConsumer", { consumer_id: this.id })
 
 		this.node.unregisterRemoteConsumer(this.id)
 
