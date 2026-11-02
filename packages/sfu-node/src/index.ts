@@ -27,8 +27,6 @@ export const SFU_NODES_KV_BUCKET = "sfu_nodes"
 
 export class SfuNode extends Server<"nats"> {
 	static useEngine = "nats"
-	static baseRoutes = false
-	static websockets = false
 	static useMiddlewares = ["logs"]
 
 	config: SfuConfig
