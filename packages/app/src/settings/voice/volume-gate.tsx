@@ -62,15 +62,20 @@ function useMicLevel(deviceId?: string | null) {
 						...(adapter.audioProcessing?.getMicrophoneConstraints?.() ?? {}),
 					}
 
-					const inputDeviceId = audioManager.getState().inputDeviceId
+					try {
+						temporaryStream = await navigator.mediaDevices.getUserMedia({
+							audio: constraints,
+						})
+					} catch (error) {
+						if (!constraints.deviceId) throw error
 
-					if (inputDeviceId) {
-						constraints.deviceId = { ideal: inputDeviceId }
+						// the selected device may be gone, meter the system default
+						const { deviceId, ...fallback } = constraints
+
+						temporaryStream = await navigator.mediaDevices.getUserMedia({
+							audio: fallback,
+						})
 					}
-
-					temporaryStream = await navigator.mediaDevices.getUserMedia({
-						audio: constraints,
-					})
 
 					track = temporaryStream.getAudioTracks()[0] ?? null
 				} catch (err: any) {
