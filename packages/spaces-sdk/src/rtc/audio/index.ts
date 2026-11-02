@@ -239,18 +239,15 @@ export class AudioManager extends BaseStore<AudioReactiveState> {
 			null,
 		)
 
-		if (
-			inputDeviceId &&
-			this.inputs.some((device) => device.id === inputDeviceId)
-		) {
-			await this.setInputDevice(inputDeviceId)
+		// device ids are not visible until permissions are granted, so the
+		// selection cannot depend on the enumerated list. the strategy reports
+		// when the device is not available
+		if (outputDeviceId) {
+			await this.setOutputDevice(outputDeviceId)
 		}
 
-		if (
-			outputDeviceId &&
-			this.outputs.some((device) => device.id === outputDeviceId)
-		) {
-			await this.setOutputDevice(outputDeviceId)
+		if (inputDeviceId) {
+			await this.setInputDevice(inputDeviceId)
 		}
 	}
 

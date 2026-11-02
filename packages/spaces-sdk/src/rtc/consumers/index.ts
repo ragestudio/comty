@@ -119,8 +119,34 @@ export class Consumers extends Map<string, Consumer> {
 			appData: appData,
 		}
 
+		const detectSpeaking =
+			consumerInfo.kind === "audio" && appData?.mediaTag === "user-mic"
+
+		let consumer: Consumer | null = null
+		let detachSpeaking: (() => void) | null = null
+
+		if (detectSpeaking) {
+			// the encoded streams must be created synchronously right after the
+			// rtp receiver exists, otherwise chromium rejects them as too late
+			consumeParams.onRtpReceiver = (rtpReceiver) => {
+				detachSpeaking = attachSpeakingDetection(
+					{
+						id: consumerInfo.id,
+						role: "receiver",
+						rtpReceiver,
+						track: rtpReceiver.track,
+					},
+					(isSpeaking) => {
+						if (consumer) {
+							this.onSpeakingChange(consumer, isSpeaking)
+						}
+					},
+				)
+			}
+		}
+
 		// create the local consumer
-		const consumer = (await this.core.transports.recv.consume(
+		consumer = (await this.core.transports.recv.consume(
 			consumeParams,
 		)) as Consumer
 
@@ -130,8 +156,12 @@ export class Consumers extends Map<string, Consumer> {
 		// track the consumer so it can be paused, resumed or stopped later
 		this.set(consumer.id, consumer)
 
-		// attach detection after creation so it never depends on callback timing
-		this.ensureSpeakingDetection(consumer)
+		if (detachSpeaking) {
+			this.speakingDetectors.set(consumer.id, detachSpeaking)
+		} else {
+			// heal consumers whose detection never got attached
+			this.ensureSpeakingDetection(consumer)
+		}
 
 		// Consumer event handlers
 		consumer.on("transportclose", () => {

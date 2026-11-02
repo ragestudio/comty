@@ -3,6 +3,7 @@ import type { BaseHandlerParams } from "./base"
 
 import BaseStream from "./base"
 import adapter from "@/adapter"
+import { audioManager } from "@/rtc/audio"
 import { logger } from "@/rtc/self"
 
 export interface MicStreamParams extends BaseHandlerParams {
@@ -10,19 +11,45 @@ export interface MicStreamParams extends BaseHandlerParams {
 	close: { force?: boolean; reason?: string }
 }
 
+function captureMic(constraints: MediaTrackConstraints) {
+	return navigator.mediaDevices.getUserMedia({
+		video: false,
+		audio: {
+			echoCancellation: true,
+			noiseSuppression: true,
+			autoGainControl: true,
+			...constraints,
+		},
+	})
+}
+
 export const MicStream = (self: Self) =>
 	new BaseStream<MicStreamParams>(self, "mic", {
 		async onStart() {
-			const captured = await navigator.mediaDevices.getUserMedia({
-				video: false,
-				audio: {
-					echoCancellation: true,
-					noiseSuppression: true,
-					autoGainControl: true,
-					...(adapter.audioProcessing?.getMicrophoneConstraints?.() ??
-						{}),
-				},
-			})
+			const constraints =
+				adapter.audioProcessing?.getMicrophoneConstraints?.() ?? {}
+
+			let captured: MediaStream
+
+			try {
+				captured = await captureMic(constraints)
+			} catch (error) {
+				if (!constraints.deviceId) throw error
+
+				// the selected device may be gone, fall back to the system default
+				const { deviceId, ...fallback } = constraints
+
+				logger.warn(
+					"selected microphone is not available, using the default",
+					error,
+				)
+
+				captured = await captureMic(fallback)
+			}
+
+			// the device list exposes real ids only after the permission is granted,
+			// so refresh it to resolve the selected devices
+			audioManager.refresh().catch(logger.error)
 
 			// let the host post-process the captured stream (gain, gate, rnnoise)
 			this.stream = adapter.mediaStreamProcessor

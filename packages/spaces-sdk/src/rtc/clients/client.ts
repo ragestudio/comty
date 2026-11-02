@@ -61,6 +61,29 @@ export class Client {
 		volume: 1,
 	}
 
+	// per-client playback volume, 0 to 150 like the rest of the voice ui
+	setVolume(volume: number): void {
+		this.localState.volume = Math.max(0, volume) / 100
+
+		this.applyVolume()
+	}
+
+	toggleMute(to?: boolean): void {
+		this.localState.muted = to === undefined ? !this.localState.muted : to
+
+		this.applyVolume()
+	}
+
+	private applyVolume(): void {
+		const track = this.micConsumer?.track
+
+		if (!track) return
+
+		const gain = this.localState.muted ? 0 : this.localState.volume
+
+		adapter.trackVolume?.setVolume(track, gain)
+	}
+
 	async attachMic(producer: Producer) {
 		// already attached to this producer
 		if (this.micConsumer?.producerId === producer.producerId) {
@@ -88,12 +111,7 @@ export class Client {
 
 		// route the remote track through the host audio output. on web this is
 		// what actually plays the track, on native it just applies the volume
-		if (consumer.track) {
-			adapter.trackVolume?.setVolume(
-				consumer.track,
-				this.localState.volume,
-			)
-		}
+		this.applyVolume()
 
 		this.setState({ micConsumerId: this.micConsumer.id })
 
