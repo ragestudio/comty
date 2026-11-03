@@ -12,15 +12,13 @@ export function pickVideoCodec(
 ): RtpCodecCapability | undefined {
 	const videoCodecs = (capabilities.codecs ?? []).filter(
 		(codec) =>
-			codec.kind === "video" &&
-			!codec.mimeType?.toLowerCase().includes("rtx"),
+			codec.kind === "video" && !codec.mimeType?.toLowerCase().includes("rtx"),
 	)
 
 	if (preferred?.mimeType) {
 		const match = videoCodecs.find(
 			(codec) =>
-				codec.mimeType?.toLowerCase() ===
-				preferred.mimeType.toLowerCase(),
+				codec.mimeType?.toLowerCase() === preferred.mimeType.toLowerCase(),
 		)
 
 		if (match) return match
@@ -41,22 +39,26 @@ export function pickVideoCodec(
 // bitrate matches what is actually being shared
 export function computeScreenEncoding(
 	track: MediaStreamTrack,
-	fallbackFramerate = 30,
+	requestedFramerate?: number,
 ) {
 	const settings = track.getSettings()
 
-	const width = settings.width ?? 1920
-	const height = settings.height ?? 1080
-	const framerate = settings.frameRate ?? fallbackFramerate
+	const width = settings.width || 1920
+	const height = settings.height || 1080
+
+	// the capture rate is the ceiling, a lower requested rate limits the encoder
+	const captureFramerate = settings.frameRate || 30
+	const framerate =
+		requestedFramerate && requestedFramerate > 0
+			? Math.min(captureFramerate, requestedFramerate)
+			: captureFramerate
 
 	const pixelRatio = (width * height) / (1920 * 1080)
 	const fpsRatio = framerate / 30
 
 	const maxBitrate = Math.min(
 		Math.round(
-			defaults.screenVideoEncodingParams.maxBitrate *
-				pixelRatio *
-				fpsRatio,
+			defaults.screenVideoEncodingParams.maxBitrate * pixelRatio * fpsRatio,
 		),
 		defaults.maxScreenBitrate,
 	)

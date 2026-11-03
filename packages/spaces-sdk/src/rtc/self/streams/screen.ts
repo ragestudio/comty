@@ -65,12 +65,23 @@ export const ScreenStream = (self: Self) =>
 				try {
 					const track = await systemAudio!.start()
 
-					if (track) stream.addTrack(track)
+					if (track) {
+						stream.addTrack(track)
+					} else {
+						logger.warn("system audio capture returned no track")
+					}
 
 					systemAudioStreams.add(this)
 				} catch (error) {
 					logger.error("failed to capture system audio", error)
 				}
+			} else if (
+				params?.systemAudio &&
+				stream.getAudioTracks().length === 0
+			) {
+				logger.warn(
+					"system audio was requested but the platform provided no audio track",
+				)
 			}
 
 			this.stream = stream

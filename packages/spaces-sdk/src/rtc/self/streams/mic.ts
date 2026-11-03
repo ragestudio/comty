@@ -56,12 +56,9 @@ export const MicStream = (self: Self) =>
 				? await adapter.mediaStreamProcessor(captured, "mic")
 				: captured
 
-			// if is muted, disable audio tracks
-			if (this.self.isMuted) {
-				for (const track of this.stream.getAudioTracks()) {
-					track.enabled = false
-				}
-			}
+			// the stream is not registered in self.streams yet, so restore the
+			// stored preference
+			this.self.applyMutePreference(this.stream)
 
 			logger.log(`created stream:`, this.stream)
 

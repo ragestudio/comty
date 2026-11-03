@@ -57,6 +57,9 @@ export const Microphone = (self: Self) =>
 			// set the mic producer id
 			this.self.core.setState({ micProducerId: producer.id })
 
+			// the producer creation must not re-enable a muted microphone
+			this.self.applyMutePreference(mic.stream)
+
 			// when the mic producer is closed
 			producer.observer.on("close", () => {
 				this.self.core.setState({ micProducerId: null })

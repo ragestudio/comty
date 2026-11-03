@@ -108,9 +108,7 @@ export const Screen = (self: Self) =>
 					childrens: [],
 				},
 				codec: videoCodec,
-				encodings: [
-					computeScreenEncoding(videoTrack, params?.framerate),
-				],
+				encodings: [computeScreenEncoding(videoTrack, params?.framerate)],
 				track: videoTrack,
 			}
 
