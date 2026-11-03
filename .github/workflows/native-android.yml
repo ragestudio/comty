@@ -62,9 +62,9 @@ jobs:
           cache: gradle
 
       - name: Setup Android SDK
-        run: |
-          yes | sdkmanager --licenses > /dev/null
-          sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null
+        uses: android-actions/setup-android@v4
+        with:
+          packages: "platforms;android-36 build-tools;36.0.0"
 
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon -x lint -x lintVitalRelease -x lintVitalAnalyzeRelease
