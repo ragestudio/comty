@@ -2,8 +2,10 @@ import type { User } from "@comty/shared/types/user"
 import type { Channels } from "@comty/shared/types/spaces/channel"
 import type { Group } from "@comty/shared/types/spaces/group"
 import type { Member, Members } from "@comty/shared/types/spaces/member"
+import type { SpacesUser } from "@/users/types"
 
 import db from "../db"
+import { usersActions } from "@/users"
 import logger from "@comty/shared/utils/logger"
 
 const CACHED_MEMBERS_PER_GROUP_LIMIT = 2000
@@ -47,10 +49,7 @@ export const cacheMembers = async (
 		await db.members.bulkPut(stripped)
 
 		// enforce per-group member limit (keep most recent)
-		const total = await db.members
-			.where("group_id")
-			.equals(group_id)
-			.count()
+		const total = await db.members.where("group_id").equals(group_id).count()
 
 		if (total > CACHED_MEMBERS_PER_GROUP_LIMIT) {
 			const oldest = await db.members
@@ -102,14 +101,8 @@ export const cacheUsers = async (users: User[]) => {
 			throw new Error(`"users" must be a array`)
 		}
 
-		const now = Date.now()
-
-		users = users.map((user) => ({
-			...user,
-			cached_at: now,
-		}))
-
-		await db.users.bulkPut(users)
+		// the users store owns the memory cache and the persistence layer
+		usersActions.setUsers(users as SpacesUser[])
 	} catch (error) {
 		logger.error("Error caching users", error)
 	}
@@ -128,7 +121,14 @@ export const resolveCachedMembersUsers = async (
 	if (userIds.length === 0) return memberships
 
 	const users = await db.users.bulkGet(userIds)
-	const userMap = new Map(users.filter(Boolean).map((u) => [u?._id, u]))
+	const found = users.filter(Boolean) as SpacesUser[]
+
+	// keep the store in sync with what was read from the cache
+	if (found.length > 0) {
+		usersActions.hydrateFromCache(found)
+	}
+
+	const userMap = new Map(found.map((u) => [u._id, u]))
 
 	return memberships.map((m) => ({
 		...m,

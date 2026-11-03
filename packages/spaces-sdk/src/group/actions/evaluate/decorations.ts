@@ -1,80 +1,40 @@
 import type EvaluateActions from "./index"
 import type { Member } from "@comty/shared/types/spaces/member"
 
-import UsersModel from "comty.js/endpoints/user"
+import { UsersStore, usersActions } from "@/users"
 import logger from "@comty/shared/utils/logger"
 
 export default async function (
 	this: EvaluateActions,
 	items: (Member | string)[],
 ): Promise<void> {
-	const cache = this.state.decorationsCache
+	const ids = items
+		.map((item) => (typeof item === "string" ? item : item.user_id))
+		.filter((id): id is string => Boolean(id))
 
-	const missingIds = new Set<string>()
-	const knownDecorations: Record<string, any> = {}
-	let hasKnown = false
+	if (ids.length === 0) return
 
-	items.forEach((item) => {
-		const id = typeof item === "string" ? item : item.user_id
+	try {
+		await usersActions.ensureDecorations(ids)
 
-		// if its a Member object and has decorations, update the cache
-		if (
-			typeof item !== "string" &&
-			item.user?.decorations &&
-			!cache.has(id)
-		) {
-			cache.set(id, item.user.decorations)
+		const { users } = UsersStore.getState()
+		const decorations: Record<string, any> = {}
+
+		for (const id of ids) {
+			const hydrated = users[id]?.decorations
+
+			if (hydrated) decorations[id] = hydrated
 		}
 
-		const cachedDecs = cache.get(id)
+		if (Object.keys(decorations).length === 0) return
 
-		if (cachedDecs) {
-			knownDecorations[id] = cachedDecs
-			hasKnown = true
-		} else {
-			missingIds.add(id)
-		}
-	})
-
-	// apply known from cache immediately
-	if (hasKnown) {
 		this.setState((state) => ({
 			membersDecorations: {
 				...state.membersDecorations,
-				...knownDecorations,
+				...decorations,
 			},
 		}))
-	}
-
-	if (missingIds.size === 0) return
-
-	const missingIdsArr = Array.from(missingIds)
-	missingIdsArr.forEach((id) => cache.set(id, {}))
-
-	try {
-		const users_ids = missingIdsArr.join(",")
-		const fetchedData = await UsersModel.decorations.get(users_ids)
-
-		if (Array.isArray(fetchedData)) {
-			const newDecorationsDict = fetchedData.reduce(
-				(acc: Record<string, any>, curr: any) => {
-					const decs = curr.decorations || {}
-					cache.set(curr.user_id, decs)
-					acc[curr.user_id] = decs
-					return acc
-				},
-				{},
-			)
-
-			this.setState((state) => ({
-				membersDecorations: {
-					...state.membersDecorations,
-					...newDecorationsDict,
-				},
-			}))
-		}
-	} catch (err) {
-		logger.error("Failed to fetch decorations", err)
-		missingIds.forEach((id) => cache.delete(id)) // rollback
+	} catch (error) {
+		logger.error("Failed to fetch decorations", error)
 	}
 }

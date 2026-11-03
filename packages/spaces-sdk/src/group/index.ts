@@ -29,7 +29,6 @@ export const GroupStore = create<GroupStoreType>()((set, get) => {
 		error: null,
 		initGeneration: 0,
 		userConnections: new Map(),
-		decorationsCache: new Map(),
 
 		actions: {
 			fetchGroup: fetchingActions.fetchGroup,

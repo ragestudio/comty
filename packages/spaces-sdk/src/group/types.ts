@@ -75,7 +75,6 @@ export interface GroupStoreState {
 
 	initGeneration: number
 	userConnections: Map<string, UserConnectionReference>
-	decorationsCache: Map<string, any>
 }
 
 export interface GroupStoreActions {
@@ -99,9 +98,7 @@ export interface GroupStoreActions {
 	handleChannelUpdated: (payload: Channel) => void
 	handleChannelsOrdered: (payload: string[]) => void
 	handleChannelNewMessage: (payload: Message) => void
-	handleMembershipCreated: (
-		payload: MembershipCreatedPayload,
-	) => Promise<void>
+	handleMembershipCreated: (payload: MembershipCreatedPayload) => Promise<void>
 	handleMembershipDeleted: (payload: MembershipDeletedPayload) => void
 	handleUserOnline: (payload: { userId: string }) => void
 	handleUserOffline: (payload: { userId: string }) => void

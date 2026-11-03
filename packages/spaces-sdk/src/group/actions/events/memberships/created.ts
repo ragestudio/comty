@@ -4,6 +4,7 @@ import type { Member } from "@comty/shared/types/spaces/member"
 
 import UserModel from "comty.js/endpoints/user"
 import db from "@/db"
+import { usersActions } from "@/users"
 import logger from "@comty/shared/utils/logger"
 
 export default async function (
@@ -17,6 +18,10 @@ export default async function (
 			user_id: payload.user_id,
 			basic: true,
 		})
+	}
+
+	if (user) {
+		usersActions.setUsers([user])
 	}
 
 	const newMember: Member = {

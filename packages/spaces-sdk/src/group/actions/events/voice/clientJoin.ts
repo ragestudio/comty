@@ -3,6 +3,7 @@ import type { ClientVoiceJoinPayload } from "@/group/types"
 import type { Client } from "@comty/shared/types/rtc/client"
 
 import { adapter } from "@/adapter"
+import { usersActions } from "@/users"
 
 export default async function (
 	this: EventsActions,
@@ -45,4 +46,11 @@ export default async function (
 	})
 
 	this.state.actions.evaluateDecorations([payload.userId])
+
+	if (payload.user) {
+		usersActions.setUsers([payload.user])
+	}
+
+	// the gateway payload may not include the full profile
+	void usersActions.ensure(payload.userId)
 }

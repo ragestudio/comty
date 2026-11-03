@@ -48,6 +48,8 @@
 		"./chat/*": "./src/chat/*",
 		"./groupsList": "./src/groupsList/index.ts",
 		"./groupsList/*": "./src/groupsList/*",
+		"./users": "./src/users/index.ts",
+		"./users/*": "./src/users/*",
 		"./events": "./src/events/index.ts",
 		"./events/*": "./src/events/*",
 		"./db": "./src/db/index.ts",
