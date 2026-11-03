@@ -1,0 +1,296 @@
+---
+id: adapter
+title: Adapter
+sidebar_label: Adapter
+---
+
+The adapter is the only contract between the SDK and its host runtime. The SDK never touches platform APIs directly for anything that is not standard WebRTC: audio routing, device enumeration, audio processing, system audio capture, soundpad playback, persisted preferences and logging are all provided by the host.
+
+Everything is optional. When a capability is not registered the SDK disables the related feature and keeps working (for example, without `soundpad` the remote soundpad event is still emitted on the event bus, it just does not play).
+
+```ts
+import { adapter } from "@comty/spaces-sdk"
+```
+
+## Registration methods
+
+| Method | Registered type | Used by |
+| --- | --- | --- |
+| `registerWebRtcGlobals(objects)` | `WebRtcObjects` | Host access to the runtime constructors and `mediaDevices` |
+| `registerSessionDataGetter(getter)` | `() => Promise<{ user_id?, token? }>` | Chat sends and RTC event filtering (defaults to `comty.js` session) |
+| `registerFrameTransformEvents(events)` | `FrameTransformEvents` | Native speaking detection |
+| `registerAudioRouting(routing)` | `AudioRouting` | `audioManager` routing, devices and bluetooth |
+| `registerAudioDevicesEvents(events)` | `AudioDevicesEvents` | Audio hotplug detection |
+| `registerAudioProcessing(processing)` | `AudioProcessingAdapter` | `audioProcessing` preferences and mic constraints |
+| `registerTrackVolume(trackVolume)` | `TrackVolume` | Per-client and per-media volume |
+| `registerMediaStreamProcessor(processor)` | `MediaStreamProcessor` | Post-process the captured microphone stream |
+| `registerMediaStreamReleaser(releaser)` | `MediaStreamReleaser` | Release the raw capture / audio graph behind a processed stream |
+| `registerSystemAudio(capture)` | `SystemAudioCapture` | Loopback system audio for screen share (electron) |
+| `registerSoundpad(player)` | `SoundpadPlayer` | Play remote soundpad clips |
+| `registerAudioSettingsStorage(storage)` | `AudioSettingsStorage` | Persist audio preferences |
+| `registerLogger(sink)` | `LoggerSink` | Redirect SDK logs |
+| `registerLogLevel(level)` | `LogLevel` | `silent`, `error`, `warn`, `info` or `debug` |
+
+## Types
+
+### WebRtcObjects
+
+```ts
+interface WebRtcObjects {
+	RTCIceCandidate: RTCIceCandidate
+	RTCCertificate: Partial<RTCCertificate>
+	RTCPeerConnection: RTCPeerConnection
+	RTCSessionDescription: RTCSessionDescription
+
+	MediaStream: MediaStream
+	MediaStreamTrack: MediaStreamTrack
+	MediaStreamTrackEvent: MediaStreamTrackEvent
+
+	RTCRtpTransceiver: RTCRtpTransceiver
+	RTCRtpReceiver: RTCRtpReceiver
+	RTCRtpSender: RTCRtpSender
+	RTCErrorEvent: RTCErrorEvent
+
+	mediaDevices: {
+		getUserMedia: MediaDevices["getDisplayMedia"]
+		getDisplayMedia: MediaDevices["getDisplayMedia"]
+		enumerateDevices: MediaDevices["enumerateDevices"]
+	}
+}
+```
+
+On React Native these objects come from the WebRTC package and must also be installed as globals (`navigator.mediaDevices`, `MediaStream`, ...), because `mediasoup-client` reads the global scope. The `registerWebRtcGlobals` call keeps a reference for hosts that need to construct streams themselves.
+
+### Session getter
+
+```ts
+registerSessionDataGetter(
+	getter: () => Promise<{ user_id?: string; token?: string }>,
+): void
+```
+
+Defaults to the `comty.js` session. Override it when the token or user id come from another source.
+
+### FrameTransformEvents
+
+```ts
+interface FrameTransformEvents {
+	addListener(
+		listener: unknown,
+		eventName: string,
+		handler: (event: any) => void,
+	): void
+	removeListener(listener: unknown): void
+}
+```
+
+Used by the native speaking detector (`onFrame` transform). On the web the SDK falls back to an `AnalyserNode`/`RTCRtpReceiver` strategy, so this is optional.
+
+### AudioRouting
+
+```ts
+interface AudioRouting {
+	getAudioDevices(): Promise<AudioDevice[]>
+	setSpeakerphoneOn(enabled: boolean): void
+	isSpeakerphoneOn(): Promise<boolean>
+	setAudioOutputDevice(deviceId: string): Promise<boolean>
+	setAudioInputDevice?(deviceId: string): Promise<boolean>
+	setAudioRouteMode?(mode: AudioRouteMode): Promise<boolean>
+	isBluetoothAvailable?(): Promise<boolean>
+	resetAudioRouting?(): Promise<boolean>
+	// false on runtimes without an earpiece/speaker concept (web)
+	supportsSpeakerphone?: boolean
+}
+
+interface AudioDevice {
+	id: string
+	kind: "input" | "output"
+	type: string
+	label: string
+	isCurrent: boolean
+}
+
+type AudioRouteMode = "call" | "high-fidelity"
+```
+
+`call` uses the system voice path (bluetooth headset mic and output). `high-fidelity` keeps the bluetooth output on A2DP stereo and captures from the device builtin microphone.
+
+### AudioDevicesEvents
+
+```ts
+interface AudioDevicesEvents {
+	// returns an unsubscribe function
+	subscribe(handler: () => void): () => void
+}
+```
+
+### Audio processing
+
+```ts
+interface AudioProcessingAdapter {
+	capabilities: AudioProcessingCapabilities
+	apply(config: AudioProcessingConfig): Promise<void>
+	getMicrophoneConstraints?(): MediaTrackConstraints
+}
+```
+
+See [Audio](audio) for the configuration shape.
+
+### Track volume
+
+```ts
+type TrackVolume = {
+	setVolume(track: MediaStreamTrack, gain: number): void
+}
+```
+
+`gain` is linear (`0` is muted, `1` is the original level, values can exceed `1` for the per-client boost).
+
+### Media stream processing
+
+```ts
+type MediaStreamKind = "mic" | "camera" | "screen"
+
+type MediaStreamProcessor = (
+	stream: MediaStream,
+	kind: MediaStreamKind,
+) => Promise<MediaStream> | MediaStream
+
+type MediaStreamReleaser = (stream: MediaStream) => void
+```
+
+The processor runs right after the device is captured. The returned stream is what gets published, so it is the place to attach an audio graph (gain, noise gate, rnnoise). The releaser must dispose whatever the processor created.
+
+### System audio capture
+
+```ts
+interface SystemAudioCapture {
+	isSupported(): boolean | Promise<boolean>
+	start(): Promise<MediaStreamTrack | null>
+	stop(): Promise<void>
+}
+```
+
+Used for screen share when the platform does not expose system audio through `getDisplayMedia` (electron loopback). When registered and supported, the SDK requests the screen without audio and adds the captured track.
+
+### Soundpad
+
+```ts
+interface SoundpadPlayback {
+	stop(): void
+}
+
+interface SoundpadPlayer {
+	play(params: {
+		src: string
+		volume?: number
+		onEnded?: () => void
+	}): SoundpadPlayback | Promise<SoundpadPlayback>
+}
+```
+
+### Audio settings storage
+
+```ts
+interface AudioSettingsStorage {
+	get<T = unknown>(key: string): T | undefined
+	set(key: string, value: unknown): void
+}
+```
+
+Synchronous key/value storage (localStorage on the web, preferences on React Native). It stores the device selection and the processing preferences, see [Audio](audio).
+
+## Web and electron
+
+For browser/electron hosts the package ships a ready-made adapter:
+
+```ts
+import { initializeRtcAdapter } from "@comty/spaces-sdk/rtc/web"
+
+await initializeRtcAdapter()
+```
+
+It registers the audio settings storage, audio processing (rnnoise + gain + gate), audio routing and device events, the audio unlock for autoplay policies, track volume, soundpad, the microphone processor/releaser and - when running inside electron - the system audio loopback. It is idempotent, calling it twice returns the same promise.
+
+The same entry point re-exports the individual implementations (`audio-context`, `audio-processing`, `audio-routing`, `audio-settings`, `sys-audio`, `track-volume`) for hosts that want to compose them manually.
+
+## React Native
+
+React Native registers each capability explicitly because they come from different native modules:
+
+```ts
+import {
+	registerGlobals,
+	addListener,
+	removeListener,
+	getAudioDevices,
+	setSpeakerphoneOn,
+	isSpeakerphoneOn,
+	setAudioOutputDevice,
+	setAudioInputDevice,
+	setAudioRouteMode,
+	isBluetoothAvailable,
+	resetAudioRoute,
+} from "@ragestudio/react-native-webrtc"
+
+import { adapter } from "@comty/spaces-sdk"
+import { audioManager, audioProcessing } from "@comty/spaces-sdk/rtc/audio"
+import session from "comty.js/session"
+
+// install navigator.mediaDevices and the WebRTC constructors as globals
+registerGlobals()
+
+adapter.registerFrameTransformEvents({ addListener, removeListener })
+
+adapter.registerAudioRouting({
+	getAudioDevices,
+	setSpeakerphoneOn,
+	isSpeakerphoneOn,
+	setAudioOutputDevice,
+	setAudioInputDevice,
+	setAudioRouteMode,
+	isBluetoothAvailable,
+	resetAudioRouting: resetAudioRoute,
+})
+
+adapter.registerAudioDevicesEvents({
+	subscribe(handler) {
+		const listener = {}
+
+		addListener(listener, "onAudioDevicesChanged", handler)
+
+		return () => removeListener(listener)
+	},
+})
+
+adapter.registerAudioProcessing(nativeAudioProcessing)
+
+adapter.registerTrackVolume({
+	setVolume: (track, gain) => {
+		const audioTrack = track as unknown as {
+			_setVolume?: (gain: number) => void
+		}
+
+		audioTrack._setVolume?.(gain)
+	},
+})
+
+adapter.registerSoundpad(nativeSoundpad)
+
+adapter.registerSessionDataGetter(async () => ({
+	user_id: session.user?._id,
+	token: session.token,
+}))
+
+// start listening to hotplug and restore the stored preferences
+audioManager.observe()
+audioProcessing.sync()
+```
+
+Platform implementations for native audio processing and the soundpad player live in the host app (`packages/native/src/adapter`).
+
+## Notes
+
+- `registerAudioSettingsStorage` is required to persist device/processing preferences; without it the SDK keeps them in memory for the session.
+- `registerTrackVolume` is required for per-user volume and deafening on platforms where muting the track is not enough.
+- `registerLogger` receives an object with `log`, `debug`, `info`, `warn` and `error`, matching the console interface.

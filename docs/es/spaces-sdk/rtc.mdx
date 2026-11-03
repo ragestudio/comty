@@ -1,0 +1,386 @@
+---
+id: rtc
+title: RTC
+sidebar_label: RTC
+---
+
+El módulo RTC implementa la sesión de voz y vídeo sobre un SFU mediasoup. Gestiona el `Device` de mediasoup, los transports de envío y recepción, los medios locales, los producers y consumers remotos, la detección de voz y un bus de eventos para la aplicación host.
+
+```ts
+import { rtcService, useRTCStore } from "@comty/spaces-sdk/rtc"
+```
+
+`rtcService` es una instancia singleton de `RTC`; extiende `BaseStore`, así que expone `getState()`, `setState()`, `useStore(selector?)` y también el `subscribe()` vanilla.
+
+## Inicialización
+
+```ts
+await rtcService.initialize()
+```
+
+`initialize()` requiere el websocket `"main"` de `comty.js` y enlaza los eventos `media:*` del socket con el servicio. Es idempotente por socket: llamarlo más de una vez (hot reload, arranques repetidos) no registra los manejadores dos veces.
+
+| Propiedad | Tipo | Descripción |
+| --- | --- | --- |
+| `socket` | `Websocket \| undefined` | El socket `"main"` de `comty.js` |
+| `userId` | `string \| undefined` | Id de usuario de la sesión |
+| `device` | `Device \| null` | Dispositivo mediasoup, se crea al entrar |
+| `rtpCapabilities` | `RtpCapabilities` | Capacidades del router recibidas del servidor |
+| `channel` | `Channel \| null` | Canal activo |
+| `isConnected` | `boolean` | Hay canal y al menos un transport |
+
+## Handlers de sesión
+
+```ts
+const { handlers } = rtcService
+```
+
+| Handler | Firma | Descripción |
+| --- | --- | --- |
+| `joinChannel` | `(params: { groupId?: string; channelId: string; dmPair?: string }) => Promise<void>` | Obtiene el canal, se une al SFU, crea el dispositivo y los transports, restaura los clientes conectados y crea el micrófono local |
+| `leaveChannel` | `() => Promise<void>` | Resetea todos los recursos locales y llama a `channel:leave` |
+| `emitClientEvent` | `(event: RTC_ClientEvents, payload: unknown) => Promise<void>` | Emite `channel:client_event` |
+| `syncVoiceState` | `() => void` | Publica `{ muted, deafen }` en el servidor |
+| `reset` | `() => Promise<unknown[]>` | Detiene medios, transports, consumers y clientes, limpia el estado y devuelve los errores ocurridos |
+
+`joinChannel` nunca lanza: resetea lo que se hubiera capturado, pone `state: "failed"` y emite `rtc:channel:join_failed` con el error.
+
+`leaveChannel` emite `rtc:channel:left`, o `rtc:channel:leave_failed` y relanza el error cuando fallan el reset o la llamada al servidor.
+
+Los canales DM todavía no están implementados; pasar `dmPair` hace fallar la unión.
+
+## Estado reactivo
+
+```ts
+const state = rtcService.getState()
+
+const channel = useRTCStore((s) => s.channel)
+const idle = useRTCStore((s) => s.state === "disconnected")
+```
+
+```ts
+type ConnState =
+	"disconnected" | "loading" | "connecting" | "connected" | "failed"
+
+interface RTCReactiveState {
+	initialized: boolean
+	state: ConnState
+	connectedAt: Date | null
+	channel: Channel | null
+	voiceState: { muted: boolean; deafened: boolean }
+	isSpeaking: boolean
+
+	statedClients: Partial<SerializedClient>[]
+	remoteProducersIds: string[]
+	speakingClients: string[]
+	statedScreens: SerializedRemoteMedia[]
+	statedCameras: SerializedRemoteMedia[]
+
+	localScreenStreamURL: string | null
+	localCameraStreamURL: string | null
+	localScreenStream: MediaStream | null
+	localCameraStream: MediaStream | null
+
+	micProducerId: string | null
+	cameraProducerId: string | null
+	screenVideoProducerId: string | null
+	screenAudioProducerId: string | null
+
+	sendTransportState: ConnectionState
+	recvTransportState: ConnectionState
+}
+```
+
+`SerializedClient` es `{ userId, voiceState, micConsumerId, self }`. `SerializedRemoteMedia` es `{ userId, streamURL, stream, hasAudio, enabled, volume }`.
+
+`useRTCStore` acepta un selector opcional:
+
+```ts
+function useRTCStore(): RTCReactiveState
+function useRTCStore<U>(selector: (state: RTCReactiveState) => U): U
+```
+
+## Bus de eventos
+
+```ts
+const bus = rtcService.eventBus
+
+bus.on("rtc:channel:joined", (channel) => {
+	console.log("joined", channel?.name)
+})
+
+bus.off("rtc:channel:joined", handler)
+```
+
+| Evento | Payload | Se emite cuando |
+| --- | --- | --- |
+| `rtc:channel:joined` | `Channel \| null` | La sesión SFU está completamente enganchada |
+| `rtc:channel:join_failed` | el valor del error | Falló la unión |
+| `rtc:channel:left` | - | La salida se completó |
+| `rtc:channel:leave_failed` | `{ error }` | Falló la salida |
+| `rtc:channel:disconnected` | payload del servidor o `{ reason: "transport_failed" }` | El servidor nos sacó del canal o murió el transport |
+| `channel:attached` | `Channel` | El dispositivo y los transports están listos |
+| `rtc:mute` / `rtc:unmute` | - | Cambió el estado del micrófono local |
+| `rtc:deafen` / `rtc:undeafen` | - | Cambió el estado de ensordecimiento local |
+| `rtc:client:joined` / `rtc:client:left` | `Client` | Un cliente remoto entró o salió del canal |
+| `rtc:producer:joined` / `rtc:producer:left` | `Producer` | Se creó o cerró un producer (local o remoto) |
+| `rtc:producer:error` | `{ error }` | Falló la producción o el manejo de un producer |
+| `rtc:vc:soundpad` | `{ userId, src, icon? }` | Empezó un clip de soundpad remoto |
+| `rtc:vc:soundpad:ended` | `{ userId, src, icon? }` | El clip terminó o lo paró el timeout de seguridad |
+| `rtc:vc:soundpad:<userId>` | mismo payload | Inicio de soundpad por usuario |
+| `rtc:vc:soundpad:<userId>:ended` | mismo payload | Fin de soundpad por usuario |
+
+El mapa es abierto (`[key: string]: (...args: any[]) => void`), así que los hosts pueden emitir sus propios eventos en el mismo bus.
+
+## Medios locales
+
+`rtcService.self` gestiona el micrófono, la cámara y la captura de pantalla.
+
+### Estado de voz
+
+| Miembro | Firma | Descripción |
+| --- | --- | --- |
+| `isMuted` | `boolean` (getter) | Derivado del flag `enabled` del track del micrófono |
+| `isDeafened` | `boolean` (getter) | Preferencia local de ensordecimiento |
+| `toggleMute` | `(to?: boolean) => void` | Habilita/deshabilita los tracks del micrófono y sincroniza el estado de voz |
+| `toggleDeafened` | `(to?: boolean) => void` | Pausa/reanuda los micrófonos remotos y silencia el micrófono local |
+| `applyMutePreference` | `(stream?: MediaStream \| null) => void` | Restaura la preferencia guardada en un stream recién capturado |
+
+La preferencia del micrófono es una decisión persistida del usuario: si está muteado antes de entrar en un canal, el SDK mantiene el micrófono deshabilitado durante toda la unión. Ensordecer conserva la preferencia de mute, así que al desensordecer se restaura el estado anterior del micrófono, y el audio del compartir pantalla sigue sonando.
+
+```ts
+rtcService.self.toggleMute()
+rtcService.self.toggleDeafened(true)
+```
+
+### Streams
+
+```ts
+createStream<Kind>(kind: "mic" | "cam" | "screen", params?): Promise<BaseStream>
+deleteStream(kind, stream, params?): Promise<BaseStream>
+deleteStreamByKind(kind): Promise<void>
+```
+
+Los streams son la capa de captura cruda. `createStream` detiene primero un stream del mismo tipo. Prefiere la API de medios de abajo, que además publica los tracks.
+
+### Medios
+
+```ts
+createMedia<Kind>(kind: "mic" | "cam" | "screen", params?): Promise<SelfMedia>
+destroyMedia(kind): Promise<void>
+deleteAll(): Promise<void>
+```
+
+`createMedia` captura el dispositivo, lo publica en el SFU y actualiza el estado reactivo (`micProducerId`, `cameraProducerId`, `screenVideoProducerId`, `screenAudioProducerId`, urls de los streams locales). Las llamadas concurrentes para el mismo tipo comparten la misma promesa de creación, así que un doble tap no abre dos diálogos de permiso.
+
+`destroyMedia` cierra los producers y detiene la captura.
+
+```ts
+function toggleMic() {
+	rtcService.self.toggleMute()
+}
+
+async function toggleCamera() {
+	const { cameraProducerId } = rtcService.getState()
+
+	if (cameraProducerId) {
+		await rtcService.self.destroyMedia("cam")
+	} else {
+		await rtcService.self.createMedia("cam", {
+			facingMode: "user",
+			resolution: { width: 1280, height: 720 },
+		})
+	}
+}
+```
+
+#### Parámetros de cámara
+
+```ts
+interface CameraParams {
+	create?: {
+		codec?: RtpCodecCapability
+		deviceId?: string
+		facingMode?: "user" | "environment"
+		resolution?: { width?: number; height?: number }
+	}
+}
+```
+
+#### Compartir pantalla
+
+```ts
+interface ScreenParams {
+	create?: {
+		codec?: RtpCodecCapability
+		resolution?: { width?: number; height?: number }
+		framerate?: number
+		contentHint?: "motion" | "detail" | "text"
+		systemAudio?: boolean
+		// solo android: fracción de la resolución de pantalla usada en la captura
+		resolutionScale?: number
+	}
+}
+```
+
+```ts
+await rtcService.self.createMedia("screen", {
+	resolution: { width: 1920, height: 1080 },
+	framerate: 30,
+	contentHint: "detail",
+	systemAudio: true,
+})
+
+await rtcService.self.destroyMedia("screen")
+```
+
+Qué hace `createMedia("screen")`:
+
+1. Captura con `getDisplayMedia`. Cuando se pide `systemAudio` y el host registró un adaptador `SystemAudioCapture`, la captura es solo vídeo y el track de loopback se añade después; si no, el audio se pide a la plataforma.
+2. Elige el códec de vídeo (el preferido, luego H.264, VP9, VP8, AV1) y el de audio de las capacidades del router.
+3. Publica el audio como `screen-audio` y el vídeo como `screen-video` (el producer de vídeo referencia al de audio en `appData.childrens`).
+4. Calcula la codificación de vídeo a partir del tamaño y framerate reales de la captura y fija la preferencia de degradación en `maintain-framerate`.
+5. Marca la captura como destruida cuando termina el track de vídeo (botón "dejar de compartir" del navegador).
+
+Los presets se exportan para la UI:
+
+```ts
+import {
+	SCREEN_RESOLUTIONS,
+	SCREEN_FRAMERATES,
+	SCREEN_CONTENT_HINTS,
+	SCREEN_VIDEO_CODECS,
+} from "@comty/spaces-sdk/rtc/self/constants.js"
+```
+
+Cambios en caliente, sin reiniciar la captura:
+
+```ts
+// redimensiona la captura (requiere soporte del host para applyConstraints en tracks de pantalla)
+await rtcService.self.updateScreenConstraints({ width: 1280, height: 720 })
+
+// cambia los límites del encoder
+await rtcService.self.updateScreenEncoding({ framerate: 15 })
+```
+
+Ambos devuelven `false` cuando el runtime o el producer no lo soportan.
+
+### Codificaciones por defecto
+
+| Medio | Bitrate | Framerate | Notas |
+| --- | --- | --- | --- |
+| Micrófono | 32 kbps | - | DTX activo, mono |
+| Cámara | 3 Mbps | 30 | - |
+| Vídeo de pantalla | 5 Mbps base | hasta 90 | escalado por píxeles y fps capturados, máximo 12 Mbps |
+| Audio de pantalla | 128 kbps | - | Estéreo, FEC, sin DTX |
+
+## Producers, consumers y clientes
+
+```ts
+rtcService.producers // Map<producerId, Producer>
+rtcService.consumers // Map<consumerId, Consumer>
+rtcService.clients // Map<userId, Client>
+rtcService.screens // Map<userId, RemoteMedia>
+rtcService.cameras // Map<userId, RemoteMedia>
+rtcService.transports // { send, recv }
+```
+
+### Producers
+
+| Método | Firma | Descripción |
+| --- | --- | --- |
+| `produce` | `(payload: ProducerOptions<ProducerAppData>, options?: { onSpeaking?: (speaking: boolean) => void }) => Promise<Producer>` | Produce un track; `onSpeaking` engancha la detección de voz local antes de negociar |
+| `setRemote` | `(producer) => Producer \| null` | Registra un producer remoto desde un evento del socket |
+| `delRemote` | `(producer) => null` | Elimina un producer remoto |
+| `getSelfProducers` | `() => Producer[]` | Producers locales |
+| `clear` | `() => void` | Desengancha detectores y vacía el mapa |
+
+### Consumers
+
+| Método | Firma | Descripción |
+| --- | --- | --- |
+| `start` | `({ producerId, userId, kind, appData }) => Promise<Consumer \| void>` | Pide un consumer al SFU, lo reanuda y engancha la detección de voz para micrófonos |
+| `stop` | `(consumerId: string) => Promise<void>` | Cierra y avisa con `channel:consumer_stop` |
+| `stopByProducerId` | `(producerId: string) => Promise<void>` | Detiene todos los consumers de un producer |
+| `stopAll` | `() => Promise<void>` | Detiene todo |
+| `findByProducerId` | `(producerId) => Consumer \| undefined` | - |
+| `findByUserId` | `(userId) => Consumer[]` | - |
+| `onSpeakingChange` | `(consumer, isSpeaking) => void` | Actualiza `speakingClients` |
+
+### Clientes
+
+`Client` representa a un participante del canal:
+
+| Miembro | Firma | Descripción |
+| --- | --- | --- |
+| `userId` | `string` | Id del participante |
+| `self` | `boolean` | Si es el usuario local |
+| `voiceState` | `{ muted, deafen }` | Estado de voz publicado |
+| `micConsumer` | `Consumer \| undefined` | Consumer actual del micrófono |
+| `setVolume` | `(volume: number) => void` | Volumen de reproducción por cliente, `0` a `150` |
+| `toggleMute` | `(to?: boolean) => void` | Silencia solo la reproducción local de este cliente |
+| `attachMic` / `dettachMic` | `(producer) / (producerId?)` | Consumir/liberar el micrófono de este cliente |
+| `getAvailableProducers` | `() => Producer[]` | Producers del cliente |
+| `dispatchSoundpad` | `(payload) => Promise<void>` | Reproduce un clip de soundpad remoto con el adaptador |
+| `serialize` | `() => SerializedClient` | La entrada guardada en `statedClients` |
+
+Helpers de la colección: `clients.join(data)`, `clients.leave(userIdOrClient)`, `clients.restore(joinResult)`, `clients.destroyAll()`.
+
+### Pantallas y cámaras
+
+Ambas colecciones usan la misma entidad `RemoteMedia`, una por usuario:
+
+| Método | Descripción |
+| --- | --- |
+| `add(producer)` | Registra un producer disponible para el usuario |
+| `removeProducer(userId, role, producerId?)` | Libera el producer/consumer de ese rol |
+| `enable(userId)` | Empieza a consumir los producers disponibles |
+| `disable(userId)` | Deja de consumir pero mantiene los producers registrados |
+| `stop(userId)` | Destruye la entidad |
+| `setVolume(userId, volume)` | `0` a `100` |
+| `stopAll()` | Destruye todas las entidades |
+
+Un `RemoteMedia` solo se consume después de `enable(userId)`, así que el host decide cuándo empezar a descargar vídeo (por ejemplo cuando el tile es visible). Los tracks de vídeo alimentan un `MediaStream` expuesto como `stream` (y `streamURL` en React Native); los de audio se enrutan por el volumen del adaptador y no se añaden al stream. Se piden keyframes al SFU hasta que se decodifican frames.
+
+## Detección de voz
+
+El SDK engancha la detección por producer/consumer y publica:
+
+- `isSpeaking` en el producer local (`state.isSpeaking` para el usuario local).
+- `speakingClients` con los ids de los usuarios remotos que hablan ahora.
+
+Se prueban tres estrategias en orden: frame transforms nativos (React Native), `RTCRtpReceiver`/`AnalyserNode` (web) y un fallback de analizador puro. Una estrategia que falla nunca rompe el montaje del medio, se usa la siguiente.
+
+```ts
+import { registerSpeakingStrategy } from "@comty/spaces-sdk/rtc/speaking/index.js"
+
+registerSpeakingStrategy({
+	name: "custom",
+	supports: (target) => target.role === "receiver",
+	attach: (target, onChange) => {
+		// devuelve una función de detach, o null para probar la siguiente estrategia
+		return () => {}
+	},
+})
+```
+
+## Estadísticas del transport
+
+```ts
+import { parseTransportStats } from "@comty/spaces-sdk/rtc"
+
+const sendStats = await rtcService.transports.send?.getStats()
+const recvStats = await rtcService.transports.recv?.getStats()
+
+const parsed = parseTransportStats(sendStats)
+// { bytesSent, bytesReceived, packetsSent, packetsReceived, packetsLost,
+//   rttRaw, rttMs, iceState, dtlsState, availableOutgoingBitrate,
+//   availableIncomingBitrate, localCandidates, remoteCandidates,
+//   selectedPair, dtlsCipher }
+```
+
+## Reconexión
+
+Cuando un transport falla el servicio sale del canal, libera todos los recursos locales y emite `rtc:channel:disconnected` con `{ reason: "transport_failed" }`. Si el socket ya no está, solo resetea en local. El host es responsable de pedir al usuario que vuelva a entrar.
+
+Por lo demás, producers y consumers remotos toleran las carreras: los eventos que llegan antes de que los transports estén listos esperan hasta 10 segundos al dispositivo y al transport de recepción, y los eventos duplicados actualizan la instancia existente en lugar de crear una segunda.

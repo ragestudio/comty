@@ -1,0 +1,128 @@
+---
+id: database
+title: Base de datos
+sidebar_label: Base de datos
+---
+
+El SDK mantiene una caché offline de todo lo que carga: grupos, canales, miembros, usuarios, mensajes de canal, mensajes directos y los cursores de sincronización del chat. Es un store de tinybase envuelto con una pequeña API tipo Dexie, persistido en web mediante IndexedDB y mantenido en memoria en React Native (los hosts pueden enganchar su propio persister).
+
+```ts
+import db, { SpacesDatabase } from "@comty/spaces-sdk/db"
+```
+
+## Esquema
+
+Nombre de la base de datos: `spaces_store` (versión `5`).
+
+| Tabla | Clave / índices | Contenido |
+| --- | --- | --- |
+| `groups` | `_id` | Metadatos del grupo (sin canales ni miembros anidados) |
+| `channels` | `group_id` | Lista de canales de un grupo (`items`, `total_items`, `has_more`) |
+| `members` | `_id`, `group_id`, `[group_id+_id]` | Membresías del grupo, sin el usuario anidado |
+| `members_counter` | `group_id` | `{ group_id, counter }` total de miembros |
+| `channel_messages` | `_id`, `channel_id`, `[channel_id+_id]` | Mensajes de canales de grupo |
+| `last_channels_message` | `channel_id` | Referencia al último mensaje por canal |
+| `direct_messages` | `_id`, `to_user_id`, `[to_user_id+_id]` | Mensajes directos |
+| `users` | `_id` | Usuarios cacheados, referenciados por miembros y mensajes |
+| `chats_sync` | `chat_id` | Cursor de sincronización: `last_message_id`, `last_synced_at`, `has_more_before`, `has_more_after` |
+
+Los registros cacheados llevan también un timestamp `cached_at` usado para la limpieza.
+
+## Consultas
+
+Las tablas exponen los helpers tipo Dexie (`get`, `put`, `delete`, `bulkPut`, `bulkGet`, `bulkDelete`, `where`, `sortBy`, `count`, `toArray`, ...) y el constructor `where` soporta `equals`, `between`, `anyOf`, `limit`, `reverse` y `toArray`:
+
+```ts
+// los 30 mensajes más recientes de un canal. el índice compuesto se ordena por
+// _id, así que -Infinity y [[]] son los centinelas para los límites inferior y
+// superior
+const messages = await db.channel_messages
+	.where("[channel_id+_id]")
+	.between([channelId, -Infinity], [channelId, [[]]])
+	.reverse()
+	.limit(30)
+	.toArray()
+
+// un grupo
+const group = await db.groups.get(groupId)
+
+// todas las membresías de un grupo
+const members = await db.members.where("group_id").equals(groupId).toArray()
+```
+
+## Consultas en vivo
+
+`useLiveQuery` vuelve a ejecutar la consulta cada vez que cambia la base de datos (cualquier tabla) y solo vuelve a renderizar cuando el resultado cambia de verdad:
+
+```ts
+import db from "@comty/spaces-sdk/db"
+import useLiveQuery from "@comty/spaces-sdk/db/react"
+
+function useUser(userId: string) {
+	return useLiveQuery(() => db.users.get(userId), [userId])
+}
+
+function useChannelMessages(channelId: string) {
+	return useLiveQuery(
+		() => db.channel_messages.where("channel_id").equals(channelId).toArray(),
+		[channelId],
+	)
+}
+```
+
+```ts
+function useLiveQuery<T>(
+	querier: () => Promise<T> | T,
+	deps?: unknown[],
+	dbInstance?: SpacesDatabase,
+): T | undefined
+```
+
+El resultado es `undefined` hasta que resuelve la primera consulta. Las transacciones que ocurren mientras una consulta está en vuelo se agrupan en una sola re-ejecución.
+
+## Persistencia
+
+```ts
+import {
+	attachPersister,
+	detachPersister,
+	getPersister,
+	type SpacesPersister,
+} from "@comty/spaces-sdk/db"
+```
+
+| Función | Descripción |
+| --- | --- |
+| `attachPersister(persister)` | Arranca el autoguardado. Desengancha y destruye el anterior |
+| `detachPersister()` | Detiene y destruye el persister actual |
+| `getPersister()` | Devuelve el persister actual o `null` |
+
+Para hosts web/electron hay un persister de IndexedDB listo:
+
+```ts
+import {
+	startWebPersistence,
+	stopWebPersistence,
+} from "@comty/spaces-sdk/db/persister-web"
+
+// antes de que los stores empiecen a consultar la caché
+await startWebPersistence()
+
+// por ejemplo al cerrar sesión
+await stopWebPersistence()
+```
+
+`startWebPersistence` no hace nada cuando `indexedDB` no está disponible y resuelve a `null`.
+
+## Qué se cachea y cuándo
+
+| Área | Comportamiento |
+| --- | --- |
+| Init del grupo | Carga grupo, canales y las primeras 50 membresías de la caché, los pinta al instante y sincroniza con el servidor si falta algo |
+| Comprobación diferida | Cuando el grupo completo está cacheado, `GroupsModel.meta(groupId)` compara `__v`, `total_members` y `total_channels` y solo refresca lo que cambió |
+| Miembros | Los usuarios se separan en la tabla `users`; se guardan como máximo 2000 membresías por grupo, podando primero las más antiguas |
+| Canales | Las listas se filtran a los tipos `chat` y `voice` antes de guardarse |
+| Chat | Los mensajes se guardan con `status: "sent"` y marca `cached_at`; el estado de sincronización se guarda por chat |
+| Usuarios | Se piden en bloque y se guardan aparte para que miembros y mensajes no los dupliquen |
+
+Las escrituras en caché son best-effort: un error de persistencia se registra y el SDK sigue funcionando con el estado en memoria.

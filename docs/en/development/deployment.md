@@ -44,10 +44,14 @@ The active slot is tracked in `docker/.bluegreen_state`. The script waits on `ht
 
 The release workflow builds `packages/app` and publishes `dist.zip` as a release asset. Serve the static `dist/` behind your web server or CDN and point it at the gateway API.
 
+## Native app
+
+`.github/workflows/native-android.yml` generates the Android project with `expo prebuild`, builds the release APK and publishes it as `spaces-android.apk`. It also runs on every push to `master` that touches the native app or its workspace dependencies.
+
 ## Releases
 
 Pushing a `rel-*` tag triggers `.github/workflows/release.yml`, which:
 
-1. Compares the current `packages/app` and `packages/server` versions with the latest release.
-2. Builds the web app and/or the backend image only when their version changed.
-3. Creates a GitHub Release with `versions.json` and the app bundle.
+1. Compares the current `packages/app`, `packages/server` and `packages/native` versions with the latest release.
+2. Calls `app.yml`, `server.yml` and `native-android.yml` only when each component version changed.
+3. Creates a GitHub Release with `versions.json`, the web bundle and the Android APK.

@@ -1,0 +1,227 @@
+---
+id: chat
+title: Chat
+sidebar_label: Chat
+---
+
+El módulo de chat gestiona una única conversación activa: un canal de grupo (`type: "group"`) o un hilo de mensajes directos (`type: "dm"`). Se encarga de la paginación, los envíos optimistas, el indicador de escritura, los acuses de lectura y la caché offline, y se mantiene sincronizado a través del websocket principal.
+
+```ts
+import { ChatStore, useChatTimeline } from "@comty/spaces-sdk/chat"
+import { useChatSession } from "@comty/spaces-sdk/chat/session"
+```
+
+## Iniciar una sesión
+
+`useChatSession` inicializa el store, se suscribe a los eventos del socket y lo resetea todo al desmontar. El `sessionKey` se deriva de los parámetros, así que cambiar de chat reemplaza la sesión anterior.
+
+```tsx
+import { useChatSession } from "@comty/spaces-sdk/chat/session"
+import { useChatTimeline, useChatPagination } from "@comty/spaces-sdk/chat"
+
+function GroupChat({
+	groupId,
+	channelId,
+}: {
+	groupId: string
+	channelId: string
+}) {
+	useChatSession("group", { group_id: groupId, channel_id: channelId })
+
+	const timeline = useChatTimeline()
+	const { hasMoreBefore, loading } = useChatPagination()
+
+	return (
+		<MessageList
+			messages={timeline}
+			loading={loading && hasMoreBefore}
+		/>
+	)
+}
+```
+
+Sin React:
+
+```ts
+await ChatStore.getState().actions.init("dm", { to_user_id: userId })
+
+const unsubscribe = subscribeChatSocket("dm", { to_user_id: userId })
+
+// más tarde
+unsubscribe()
+ChatStore.getState().actions.reset()
+```
+
+### Parámetros
+
+```ts
+type ChatType = "group" | "dm"
+
+interface GroupChatParams {
+	group_id: string
+	channel_id: string
+	to_user_id?: never
+}
+
+interface DmChatParams {
+	to_user_id: string
+	group_id?: never
+	channel_id?: never
+}
+
+type ChatParams = GroupChatParams | DmChatParams
+
+// "group:<group_id>:<channel_id>" o "dm:<to_user_id>"
+getChatSessionKey(type: ChatType, params: ChatParams): string
+```
+
+## Estado
+
+| Campo | Tipo | Descripción |
+| --- | --- | --- |
+| `type` | `ChatType \| null` | Tipo de conversación activa |
+| `params` | `ChatParams \| null` | Parámetros activos |
+| `sessionKey` | `string \| null` | Clave derivada |
+| `timeline` | `ExtendedMessage[]` | Mensajes, del más nuevo al más antiguo |
+| `pendingMessages` | `ExtendedMessage[]` | Mensajes entrantes en buffer mientras `pausedUpdates` está activo |
+| `initialLoading` | `boolean` | Carga inicial en curso |
+| `loading` | `boolean` | Hay una petición de paginación en curso |
+| `loadingAfter` | `boolean` | La petición en curso es una página "after" |
+| `afterLoadVersion` | `number` | Se incrementa tras cada página "after", útil para hacer scroll una vez |
+| `hasMoreBefore` | `boolean` | Hay páginas más antiguas |
+| `hasMoreAfter` | `boolean` | Hay páginas más nuevas |
+| `error` | `any` | Último error de carga |
+| `usersTyping` | `any[]` | Usuarios escribiendo ahora mismo |
+| `isTyping` | `boolean` | Estado de escritura local |
+| `pausedUpdates` | `boolean` | Si es true los mensajes entrantes se almacenan en vez de fusionarse |
+
+`ExtendedMessage` es un `Message` con dos campos extra:
+
+```ts
+type MessageStatus = "sending" | "sent" | "error"
+
+interface ExtendedMessage extends Message {
+	status?: MessageStatus
+	nonce?: string
+}
+```
+
+Los mensajes se ordenan por `_id` descendente (el más nuevo primero).
+
+## Hooks
+
+| Hook | Devuelve |
+| --- | --- |
+| `useChatState()` | La porción principal del estado (shallow) |
+| `useChatActions()` | El objeto `actions` |
+| `useChatTimeline()` | `timeline` |
+| `useChatTypingUsers()` | `usersTyping` |
+| `useChatStatus()` | `error`, `type`, `sessionKey`, `initialLoading` |
+| `useChatPagination()` | `loading`, `loadingAfter`, `afterLoadVersion`, `initialLoading`, `hasMoreBefore`, `hasMoreAfter` |
+
+## Acciones
+
+| Acción | Firma | Descripción |
+| --- | --- | --- |
+| `init` | `(type: ChatType, params: ChatParams) => Promise<void>` | Resetea, carga la página cacheada y sincroniza con el servidor |
+| `reset` | `() => void` | Limpia la sesión |
+| `setPausedUpdates` | `(paused: boolean) => void` | Congela/reanuda la fusión de mensajes entrantes; al reanudar vuelca el buffer y ejecuta `loadAfter` |
+| `load` | `(options?: { beforeId?, afterId?, limit? }) => Promise<void>` | Carga una página, por defecto `limit: 30` |
+| `loadBefore` | `(id?: string) => Promise<void>` | Carga mensajes más antiguos |
+| `loadAfter` | `(id?: string) => Promise<void>` | Carga mensajes más nuevos |
+| `loadAround` | `(messageId: string) => Promise<void>` | Carga 15 mensajes antes y después de uno dado, más el propio mensaje |
+| `sync` | `() => Promise<void>` | Solo canales de grupo: aplica el log de sincronización del servidor (borrados, ediciones, mensajes nuevos) |
+| `send` | `(payload: { message?, attachments?, sticker?, reply_to_id? }) => Promise<boolean \| null>` | Envío optimista |
+| `sendReadAck` | `(messageId: string) => void` | Emite `channel:ack` / `dm:ack` |
+| `typing` | `(isTypingNow?: boolean) => void` | Emite el evento de escritura, se limpia solo a los 5 segundos |
+| `pushToTimeline` | `(messages: ExtendedMessage[], position?: "top" \| "bottom") => void` | Fusiona y deduplica mensajes (por `_id` o `nonce`) |
+
+### Enviar
+
+```ts
+const ok = await ChatStore.getState().actions.send({
+	message: "hola",
+	attachments: [{ url: "https://...", hash: "..." }],
+	reply_to_id: "message_id",
+	sticker: undefined,
+})
+```
+
+`send` devuelve:
+
+- `null` cuando no hay nada que enviar.
+- `false` cuando la sesión no está inicializada.
+- `true` cuando el socket aceptó el mensaje.
+
+El mensaje se inserta de inmediato con `status: "sending"` y un `nonce` aleatorio. El servidor lo devuelve con el `_id` real; `pushToTimeline` lo fusiona por `nonce`, así que la entrada optimista se reemplaza en su sitio. Si falla, la entrada queda con `status: "error"`.
+
+### Paginación
+
+```ts
+const { loadBefore, loadAfter, loadAround } = ChatStore.getState().actions
+
+await loadBefore() // página más antigua del timeline actual
+await loadAfter() // página más nueva (se usa tras reconectar)
+await loadAround(messageId) // saltar a un mensaje concreto
+```
+
+`load` lee primero de la caché local y luego pide al servidor; mantiene `hasMoreBefore` / `hasMoreAfter` y se detiene cuando una página no extiende el timeline (lo que también evita bucles infinitos de autocarga).
+
+## Contrato de socket
+
+`subscribeChatSocket(type, params)` suscribe el store y devuelve una función de limpieza. También fuerza una pasada de recuperación al reconectar (`loadAfter`).
+
+| Tipo    | Suscripción         | Envío          | Typing           |
+| ------- | ------------------- | -------------- | ---------------- |
+| `group` | `channel:subscribe` | `channel:send` | `channel:typing` |
+| `dm`    | `dm:subscribe`      | `dm:send`      | `dm:typing`      |
+
+Eventos consumidos por ambos tipos:
+
+| Evento                    | Manejador              |
+| ------------------------- | ---------------------- |
+| `channel:message`         | `handleNewMessage`     |
+| `channel:message:updated` | `handleMessageUpdated` |
+| `channel:message:deleted` | `handleMessageDeleted` |
+| `channel:typing`          | `handleTypingEvent`    |
+
+Los acuses de lectura se emiten directamente (`channel:ack` o `dm:ack`) con `{ reference_id, message_id }`.
+
+## Caché y sincronización
+
+El store de chat usa un `ChatAdapter` por tipo (`chat/adapters`):
+
+```ts
+interface ChatAdapter {
+	storeMessage(message: ExtendedMessage): Promise<void>
+	deleteMessage(id: string): Promise<void>
+	checkMessageExists(id: string): Promise<boolean>
+	getCachedMessages(
+		params: ChatParams,
+		limit: number,
+		beforeId?: string,
+		afterId?: string,
+	): Promise<ExtendedMessage[]>
+	cacheMessages(messages: ExtendedMessage[]): Promise<void>
+	getSyncState(chatId: string): Promise<ChatSyncState | undefined>
+	updateSyncState(
+		state: Partial<ChatSyncState> & { chat_id: string },
+	): Promise<void>
+}
+
+interface ChatSyncState {
+	chat_id: string
+	last_synced_at: number
+	last_message_id: string
+	has_more_before: boolean
+	has_more_after: boolean
+}
+```
+
+Los adaptadores por defecto escriben en la [base de datos](database) (`channel_messages`, `direct_messages`, `users` y `chats_sync`). Al inicializar, el store pinta la página cacheada antes de la respuesta de red, así que abrir una conversación es instantáneo.
+
+Para canales de grupo `sync()` llama a `ChatsService.channels.sync` con el cursor guardado y aplica borrados, ediciones y mensajes nuevos. Los DMs no tienen endpoint de sincronización, así que el store rellena el hueco más nuevo con `loadAfter()`.
+
+## Actualizar el estado de la UI
+
+`setPausedUpdates(true)` es útil mientras el usuario lee mensajes antiguos o tiene el timeline desplazado: los mensajes entrantes se siguen cacheando, pero se guardan en `pendingMessages` en lugar de fusionarse en el timeline visible. Al reanudar (`setPausedUpdates(false)`) se limpia el buffer, se empujan los mensajes al timeline y se ejecuta `loadAfter()` para rellenar cualquier hueco provocado por una desconexión.

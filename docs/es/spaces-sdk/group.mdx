@@ -1,0 +1,226 @@
+---
+id: group
+title: Grupos
+sidebar_label: Grupos
+---
+
+El módulo de grupo contiene todo lo relativo a un único grupo activo: metadatos, canales, miembros, presencia, decoraciones y el estado RTC en vivo de sus canales de voz. Es un store de zustand (`GroupStore`) con un objeto `actions`.
+
+```ts
+import { GroupStore } from "@comty/spaces-sdk/group"
+```
+
+## Ciclo de vida
+
+```ts
+await GroupStore.getState().actions.init(groupId)
+GroupStore.getState().actions.reset()
+```
+
+`init(groupId)`:
+
+1. Incrementa `initGeneration`, limpia el grupo anterior y pone `loading: true`.
+2. Carga de la [base de datos](database) el grupo, los canales y las primeras 50 membresías cacheadas, y las publica de inmediato.
+3. Llama a `syncRTCChannels()` en segundo plano para rellenar `statedChannels`.
+4. Pide al servidor solo lo que faltaba en la caché.
+5. Cuando todo el grupo estaba cacheado, ejecuta una comprobación diferida con `GroupsModel.meta(groupId)` y refresca el grupo, los miembros o los canales que hayan cambiado.
+6. Pone `loading: false`.
+
+Cada paso comprueba el contador de generación, así que las respuestas de un grupo anterior (o de un doble `init`) se descartan. Llama siempre a `reset()` al salir de la pantalla.
+
+`reset()` incrementa la generación y restaura el estado inicial.
+
+## Estado
+
+| Campo | Tipo | Descripción |
+| --- | --- | --- |
+| `groupId` | `string \| null` | Grupo activo |
+| `data` | `Group \| null` | Metadatos del grupo |
+| `channels` | `Channels` | Lista de canales (`items`, `total_items`, `has_more`) |
+| `members` | `Members` | Lista de miembros |
+| `statedChannels` | `Record<string, StatedChannel>` | Estado de voz por canal, incluidos los clientes conectados |
+| `connectedMembers` | `string[]` | Ids de usuarios conectados en el grupo |
+| `membersDecorations` | `Record<string, any>` | Decoraciones por id de usuario |
+| `loading` | `boolean` | Carga inicial en curso |
+| `error` | `Error \| null` | Último error fatal |
+
+Los campos internos (`initGeneration`, `userConnections`, `decorationsCache`) se usan para caché y cancelación, no están pensados para que la UI los lea.
+
+## Hooks
+
+| Hook | Devuelve |
+| --- | --- |
+| `useGroupStore()` | Todo el estado (shallow) |
+| `useGroupData()` | `data` |
+| `useGroupChannels()` | `channels` |
+| `useGroupMembers()` | `members` |
+| `useGroupRTC()` | `statedChannels` (alias de `useGroupStatedChannels`) |
+| `useGroupStatedChannels()` | `statedChannels` |
+| `useGroupStatedChannel(channelId?)` | Un `StatedChannel` o `undefined` |
+| `useGroupConnections()` | `connectedMembers` |
+| `useGroupDecorations()` | `membersDecorations` |
+| `useGroupLoading()` | `loading` |
+| `useGroupError()` | `error` |
+| `useGroupActions()` | El objeto `actions` |
+
+```tsx
+import {
+	useGroupChannels,
+	useGroupData,
+	useGroupStatedChannel,
+} from "@comty/spaces-sdk/group"
+
+function ChannelHeader({ channelId }: { channelId: string }) {
+	const group = useGroupData()
+	const channels = useGroupChannels()
+	const voice = useGroupStatedChannel(channelId)
+
+	return (
+		<header>
+			{group?.name} - {channels.total_items} canales -{" "}
+			{voice?.clients?.length ?? 0} conectados
+		</header>
+	)
+}
+```
+
+## Acciones
+
+### Obtención
+
+| Acción | Firma | Descripción |
+| --- | --- | --- |
+| `fetchGroup` | `() => Promise<Group \| null>` | Carga `GroupsModel.get(groupId)` en `data` y lo cachea |
+| `fetchChannels` | `() => Promise<Channels \| null>` | Carga los canales, filtrados a `chat` y `voice` |
+| `fetchMembers` | `() => Promise<void>` | Carga los primeros 50 miembros y evalúa presencia/decoraciones |
+
+Las acciones de obtención nunca lanzan: registran el error y devuelven `null`.
+
+### Evaluación
+
+| Acción | Firma | Descripción |
+| --- | --- | --- |
+| `syncRTCChannels` | `() => Promise<void>` | Vuelca `GroupsModel.rtc.getGroupState(groupId)` en `statedChannels` |
+| `evaluateConnections` | `(members: Member[]) => Promise<void>` | Resuelve qué miembros están online y los fusiona en `connectedMembers` |
+| `evaluateDecorations` | `(items: (Member \| string)[]) => Promise<void>` | Resuelve decoraciones, primero caché y luego `UsersModel.decorations.get` |
+
+Ambos evaluadores mantienen una caché interna, así que pasar los mismos miembros otra vez solo pide los ids que faltan.
+
+### Setters
+
+| Acción | Firma |
+| --- | --- |
+| `setData` | `(data: Group \| null) => void` |
+| `setChannels` | `(updater: Channels \| ((prev: Channels) => Channels)) => void` |
+| `setMembers` | `(updater: Members \| ((prev: Members) => Members)) => void` |
+| `setConnectedMembers` | `(updater: string[] \| ((prev: string[]) => string[])) => void` |
+
+Los usan sobre todo los manejadores de eventos. Para datos que vienen del servidor, prefiere las acciones de obtención.
+
+### Manejadores de eventos
+
+El store expone un manejador por evento de websocket (ver abajo). Los registra `subscribeGroupSocket`; llamarlos a mano solo tiene sentido si reproduces eventos desde otro transporte.
+
+| Manejador | Payload |
+| --- | --- |
+| `handleGroupUpdate` | `{ _id, ...fields }` |
+| `handleChannelCreated` / `handleChannelDeleted` / `handleChannelUpdated` | `Channel` |
+| `handleChannelsOrdered` | `string[]` con ids de canal |
+| `handleChannelNewMessage` | `Message` |
+| `handleMembershipCreated` | `{ group_id, membership_id, user_id, user? }` |
+| `handleMembershipDeleted` | `{ group_id, membership_id, user_id }` |
+| `handleUserOnline` / `handleUserOffline` | `{ userId }` |
+| `handleVoiceChannelStarted` | `{ channelId, started_at? }` |
+| `handleVoiceChannelEnded` | `{ channelId }` |
+| `handleClientVoiceJoin` | `{ channelId, userId, user, voiceState }` |
+| `handleClientVoiceLeft` | `{ channelId, userId }` |
+| `handleClientEvent` | `{ event, channelId, userId, data }` |
+| `handleProducerOpen` / `handleProducerClose` | `{ channelId, producer }` |
+
+## Suscripciones de socket
+
+```ts
+import {
+	subscribeGroupSocket,
+	subscribeUserSocket,
+} from "@comty/spaces-sdk/events"
+```
+
+`subscribeGroupSocket(groupId)` se suscribe al topic `group:<groupId>` y enlaza cada evento con el store. Devuelve una función de limpieza que desuscribe el topic y elimina los manejadores. Al reconectar vuelve a sincronizar los canales RTC, la presencia de miembros y las decoraciones, de modo que la UI se recupera tras un corte de red.
+
+| Evento de socket | Manejador del store |
+| --- | --- |
+| `group:<id>:update` | `handleGroupUpdate` |
+| `group:<id>:channel:created` / `deleted` / `updated` | `handleChannelCreated` / `handleChannelDeleted` / `handleChannelUpdated` |
+| `group:<id>:channels:ordered` | `handleChannelsOrdered` |
+| `group:<id>:channels:new:message` | `handleChannelNewMessage` |
+| `group:<id>:membership:created` / `deleted` | `handleMembershipCreated` / `handleMembershipDeleted` |
+| `group:<id>:vc:started` / `ended` | `handleVoiceChannelStarted` / `handleVoiceChannelEnded` |
+| `group:<id>:client:vc:join` / `left` | `handleClientVoiceJoin` / `handleClientVoiceLeft` |
+| `group:<id>:client:vc:event` | `handleClientEvent` |
+| `group:<id>:client:vc:producer:open` / `close` | `handleProducerOpen` / `handleProducerClose` |
+| `group:<id>:user:online` / `offline` | `handleUserOnline` / `handleUserOffline` |
+
+`subscribeUserSocket()` solo enlaza los dos eventos de membresía que usa la lista de grupos (`groups:membership:created` y `groups:membership:deleted`).
+
+```tsx
+useEffect(() => {
+	const actions = GroupStore.getState().actions
+	const unsubscribe = subscribeGroupSocket(groupId)
+
+	actions.init(groupId)
+
+	return () => {
+		unsubscribe()
+		actions.reset()
+	}
+}, [groupId])
+```
+
+## Lista de grupos
+
+Las membresías del usuario las expone un store aparte, más ligero.
+
+```ts
+import { useGroupsList, GroupsListStore } from "@comty/spaces-sdk/groupsList"
+```
+
+Estado: `groups: Group[]`, `loading: boolean`, `error: any`.
+
+| Acción | Firma | Descripción |
+| --- | --- | --- |
+| `fetchGroups` | `() => Promise<void>` | Carga `GroupsModel.getMy()` |
+| `setGroups` | `(groups: Group[]) => void` | Reemplaza la lista localmente |
+| `sortGroups` | `(newOrderIds: string[]) => Promise<void>` | Persiste el orden con `GroupsModel.sort` |
+| `handleMembershipCreated` | `(data) => void` | Vuelve a pedir la lista |
+| `handleMembershipDeleted` | `(data) => void` | Vuelve a pedir la lista |
+
+```tsx
+function GroupsSidebar() {
+	const { groups, loading, actions } = useGroupsList()
+
+	useEffect(() => {
+		actions.fetchGroups()
+	}, [])
+
+	if (loading) return <Spinner />
+
+	return (
+		<ul>
+			{groups.map((group) => (
+				<li key={group._id}>{group.name}</li>
+			))}
+		</ul>
+	)
+}
+```
+
+## Tipos de canal
+
+`fetchChannels` solo conserva los canales `chat` y `voice`:
+
+```ts
+import { VALID_CHANNEL_KINDS } from "@comty/spaces-sdk/group/constants"
+
+VALID_CHANNEL_KINDS // ["chat", "voice"]
+```

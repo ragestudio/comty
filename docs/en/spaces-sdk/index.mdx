@@ -1,0 +1,203 @@
+---
+id: index
+title: Spaces SDK
+sidebar_label: Introduction
+---
+
+`@comty/spaces-sdk` is the agnostic client SDK for **Comty Spaces**: groups, channels, chat, voice/video RTC (built on top of a mediasoup SFU) and the platform-specific plumbing (audio routing, audio processing, screen capture, persistence) that each host application provides through an adapter.
+
+The SDK does not depend on React or on any UI toolkit. State lives in plain zustand stores with vanilla subscriptions, and React hooks are exported as a thin convenience layer. That is why the same package powers both the web / electron app (`packages/app`) and the React Native app (`packages/native`).
+
+## Requirements
+
+- A running Comty server with the `rtc` service and a reachable SFU.
+- `comty.js` configured with an authenticated session and its websocket connection `"main"` opened. The SDK reads the token and user id from the session and reuses the main socket for every Spaces event.
+- `mediasoup-client` compatible WebRTC globals in the runtime. On React Native they are provided by `@ragestudio/react-native-webrtc`; on the web they are the browser globals.
+
+## Install
+
+```bash
+pnpm add @comty/spaces-sdk
+```
+
+The package ships TypeScript sources and exposes an `exports` map, so both the barrel and individual subpaths are available. Explicit subpaths (`chat/types`, `db/react`, `rtc/web`, ...) work as-is; deep imports resolved by the wildcard (`rtc/self/constants`, `chat/adapters`, ...) must include the `.js` extension:
+
+```ts
+import { SCREEN_RESOLUTIONS } from "@comty/spaces-sdk/rtc/self/constants.js"
+import { groupAdapter } from "@comty/spaces-sdk/chat/adapters.js"
+```
+
+## Entry points
+
+| Import | Contents |
+| --- | --- |
+| `@comty/spaces-sdk` | `adapter` singleton and `version` |
+| `@comty/spaces-sdk/classes` | `BaseStore` (also `classes/BaseActions.js`, `classes/IndexedArray.js`, `classes/MirrorMap.js`) |
+| `@comty/spaces-sdk/group` | `GroupStore` and its hooks |
+| `@comty/spaces-sdk/group/types` | Group store types |
+| `@comty/spaces-sdk/group/constants` | `VALID_CHANNEL_KINDS`, `INITIAL_CACHE_PAGE_SIZE` |
+| `@comty/spaces-sdk/groupsList` | `GroupsListStore` / `useGroupsList` |
+| `@comty/spaces-sdk/chat` | `ChatStore`, chat hooks and `getChatSessionKey` |
+| `@comty/spaces-sdk/chat/session` | `useChatSession` |
+| `@comty/spaces-sdk/chat/types` | Chat params, message and store types |
+| `@comty/spaces-sdk/events` | Socket subscriptions (`subscribeGroupSocket`, `subscribeUserSocket`, `subscribeChatSocket`) |
+| `@comty/spaces-sdk/db` | `db` instance, `SpacesDatabase` and persister helpers |
+| `@comty/spaces-sdk/db/react` | `useLiveQuery` |
+| `@comty/spaces-sdk/db/persister-web` | `startWebPersistence` / `stopWebPersistence` |
+| `@comty/spaces-sdk/rtc` | `rtcService`, `useRTCStore`, `parseTransportStats` |
+| `@comty/spaces-sdk/rtc/audio` | `audioManager`, `useAudioStore`, audio types |
+| `@comty/spaces-sdk/rtc/audio/processing` | `audioProcessing`, `useAudioProcessing`, processing types |
+| `@comty/spaces-sdk/rtc/self/constants.js` | Screen share presets (`SCREEN_RESOLUTIONS`, `SCREEN_FRAMERATES`, ...) |
+| `@comty/spaces-sdk/rtc/web` | `initializeRtcAdapter` and the web/electron implementations |
+| `@comty/spaces-sdk/rtc/speaking/index.js` | Speaking detection strategies |
+
+## Architecture
+
+| Layer | Responsibility |
+| --- | --- |
+| `adapter` | Platform primitives registered by the host: WebRTC globals, session getter, audio routing/devices, audio processing, track volume, media processors, system audio, soundpad, audio settings and logging |
+| `db` | Offline cache on tinybase (groups, channels, members, messages, users) with an IndexedDB persister for web |
+| `group` | Single active group store: metadata, channels, members, presence, decorations and the voice state of every channel |
+| `groupsList` | The user's memberships list |
+| `chat` | Single active chat session (group channel or DM) with pagination, optimistic sends, typing and sync |
+| `rtc` | Voice/video session: mediasoup device, send/recv transports, local media, remote producers and consumers, speaking detection and an event bus |
+| `rtc/audio` | Audio device routing (`audioManager`) and microphone processing preferences (`audioProcessing`) |
+
+Only one group and one chat session are active at a time. Both stores are singletons and expose an `actions` object; `init()` replaces the previous session and `reset()` clears it. Every async action carries a generation counter, so a response from a previous session can never overwrite the current state.
+
+## Bootstrap
+
+The order matters: the adapter must be registered before any media is captured or played, and the socket must be connected before the RTC service initializes.
+
+```ts
+import client from "comty.js/client"
+import { authManager } from "comty.js"
+
+import { rtcService } from "@comty/spaces-sdk/rtc"
+import { initializeRtcAdapter } from "@comty/spaces-sdk/rtc/web"
+import { startWebPersistence } from "@comty/spaces-sdk/db/persister-web"
+
+// 1. session + auth
+await authManager.start()
+
+// 2. offline cache
+await startWebPersistence()
+
+// 3. platform adapter (web / electron)
+await initializeRtcAdapter()
+
+// 4. realtime socket
+await client.ws.connect("main")
+
+// 5. rtc service, binds the "media:*" socket events
+await rtcService.initialize()
+```
+
+On React Native the adapter is registered manually instead of calling `initializeRtcAdapter()`. See [Adapter](adapter).
+
+## Minimal usage
+
+```tsx
+import { useEffect } from "react"
+import {
+	GroupStore,
+	useGroupChannels,
+	useGroupData,
+} from "@comty/spaces-sdk/group"
+import { subscribeGroupSocket } from "@comty/spaces-sdk/events"
+import { rtcService, useRTCStore } from "@comty/spaces-sdk/rtc"
+
+function GroupScreen({ groupId }: { groupId: string }) {
+	const group = useGroupData()
+	const channels = useGroupChannels()
+	const channel = useRTCStore((state) => state.channel)
+
+	useEffect(() => {
+		const actions = GroupStore.getState().actions
+		const unsubscribe = subscribeGroupSocket(groupId)
+
+		actions.init(groupId)
+
+		return () => {
+			unsubscribe()
+			actions.reset()
+		}
+	}, [groupId])
+
+	const join = (channelId: string) =>
+		rtcService.handlers.joinChannel({ groupId, channelId })
+
+	return (
+		<div>
+			<h1>{group?.name}</h1>
+			<p>Connected to: {channel?.name ?? "none"}</p>
+			{channels.items.map((item) => (
+				<button
+					key={item._id}
+					onClick={() => join(item._id)}
+				>
+					{item.name}
+				</button>
+			))}
+		</div>
+	)
+}
+```
+
+## Stores and actions
+
+Every store is a zustand store with a plain-vanilla API, which means it can be used outside React too:
+
+```ts
+import { GroupStore } from "@comty/spaces-sdk/group"
+import { ChatStore } from "@comty/spaces-sdk/chat"
+import { rtcService } from "@comty/spaces-sdk/rtc"
+
+await GroupStore.getState().actions.init(groupId)
+await ChatStore.getState().actions.send({ message: "hello" })
+
+rtcService.self.toggleMute()
+```
+
+- `store.getState()` returns the current state plus the `actions` object.
+- `store.setState(...)` mutates the store (avoid it outside the SDK).
+- `store.subscribe(listener)` is the vanilla zustand subscription.
+- React hooks are exported per slice (`useGroupData`, `useChatTimeline`, `useRTCStore`, ...).
+
+## Helpers and classes
+
+| Export | Description |
+| --- | --- |
+| `BaseStore<State>` | Zustand vanilla store wrapper used by the SDK, exposes `getState`, `setState` and `useStore(selector?)` (`@comty/spaces-sdk/classes`) |
+| `BaseActions` | Base class for action groups, exposes `state`, `store`, `setState` and `getState` (`@comty/spaces-sdk/classes/BaseActions.js`) |
+| `IndexedArray<T>` | Array with `insert`, `delete` and `clear` helpers (`@comty/spaces-sdk/classes/IndexedArray.js`) |
+| `MirrorMap<K, V>` | Read-only view over an external `Map` (`@comty/spaces-sdk/classes/MirrorMap.js`) |
+| `version` | SDK version taken from `package.json` |
+
+## Logging
+
+All modules use `@comty/shared/utils/logger` and derive child loggers (`rtc-core`, `self`, `clients`, `consumers`, `transports`, `voice-detection`, `audio-manager`, ...). The host can redirect them:
+
+```ts
+import { adapter } from "@comty/spaces-sdk"
+
+adapter.registerLogLevel("info")
+
+// any object implementing the console-like methods works
+adapter.registerLogger({
+	log: (...args) => myReporter.debug(...args),
+	debug: (...args) => myReporter.debug(...args),
+	info: (...args) => myReporter.info(...args),
+	warn: (...args) => myReporter.warn(...args),
+	error: (...args) => myReporter.error(...args),
+})
+```
+
+## Next steps
+
+- [Adapter](adapter) - register the platform primitives.
+- [Database](database) - offline cache and live queries.
+- [Groups](group) - group, channels, members and presence.
+- [Chat](chat) - channels and DMs.
+- [RTC](rtc) - voice, video, screen share and events.
+- [Audio](audio) - devices, routing and microphone processing.

@@ -1,0 +1,258 @@
+---
+id: audio
+title: Audio
+sidebar_label: Audio
+---
+
+The audio module has two independent managers:
+
+- `audioManager` routes playback and capture between the available devices (speaker, earpiece, bluetooth, headsets) and exposes the device list.
+- `audioProcessing` owns the microphone processing preferences (noise suppression, gain, gate, echo cancellation) and persists them through the adapter.
+
+```ts
+import { audioManager, useAudioStore } from "@comty/spaces-sdk/rtc/audio"
+import {
+	audioProcessing,
+	useAudioProcessing,
+} from "@comty/spaces-sdk/rtc/audio/processing"
+```
+
+Both managers rely on the adapter. Without `registerAudioRouting` / `registerAudioDevicesEvents` the device list stays empty and the methods return `false`; without `registerAudioProcessing` the SDK reports it as unavailable.
+
+## Audio devices
+
+### State
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `devices` | `AudioDevice[]` | Input and output devices |
+| `outputDeviceId` | `string \| null` | Selected output |
+| `inputDeviceId` | `string \| null` | Selected input |
+| `speakerEnabled` | `boolean` | Speakerphone state (native) |
+| `speakerAvailable` | `boolean` | Whether the runtime has a speakerphone |
+| `routeMode` | `AudioRouteMode` | `"call"` or `"high-fidelity"` |
+| `routeModeSupported` | `boolean` | Whether the runtime supports route modes |
+
+```ts
+interface AudioDevice {
+	id: string
+	kind: "input" | "output"
+	type: string
+	label: string
+	isCurrent: boolean
+}
+```
+
+### Getters
+
+| Getter | Type | Description |
+| --- | --- | --- |
+| `strategy` | `AudioStrategy \| null` | First supported strategy |
+| `outputs` | `AudioDevice[]` | Output devices |
+| `inputs` | `AudioDevice[]` | Input devices |
+| `selectedOutput` | `AudioDevice \| null` | Current output device |
+| `selectedOutputIsBluetooth` | `boolean` | - |
+| `hasBluetoothHeadset` | `boolean` | - |
+
+The helper `isBluetoothDevice(device)` is exported for UIs that need to show the bluetooth specific controls.
+
+### Methods
+
+| Method | Signature | Description |
+| --- | --- | --- |
+| `observe` | `() => () => void` | Listens to hotplug events, returns the unsubscribe function. Call once at startup |
+| `setActive` | `(active: boolean) => Promise<void>` | Tells the manager that a call started/ended. While idle no route is held; when a call starts bluetooth is preferred automatically |
+| `refresh` | `() => Promise<AudioDevice[]>` | Re-enumerates devices and refreshes the state |
+| `restore` | `() => Promise<void>` | Restores the persisted input/output selection |
+| `setSpeakerEnabled` | `(enabled: boolean) => Promise<void>` | Speakerphone on/off |
+| `toggleSpeaker` | `() => Promise<void>` | Toggles the speakerphone |
+| `setOutputDevice` | `(deviceId: string) => Promise<boolean>` | Routes playback, persists the selection |
+| `setInputDevice` | `(deviceId: string) => Promise<boolean>` | Selects the capture device, persists the selection |
+| `setRouteMode` | `(mode: AudioRouteMode) => Promise<boolean>` | Only meaningful for bluetooth output |
+| `handleDevicesChanged` | `() => Promise<void>` | Handles a hotplug burst, called by `observe` |
+
+```tsx
+function DevicePicker() {
+	const { inputs, outputs, outputDeviceId } = useAudioStore()
+	const { setOutputDevice } = audioManager
+
+	return (
+		<select
+			value={outputDeviceId ?? ""}
+			onChange={(event) => setOutputDevice(event.target.value)}
+		>
+			{outputs.map((device) => (
+				<option
+					key={device.id}
+					value={device.id}
+				>
+					{device.label}
+				</option>
+			))}
+		</select>
+	)
+}
+```
+
+### Route modes
+
+| Mode | Behaviour |
+| --- | --- |
+| `call` | System voice path: bluetooth headset microphone and output |
+| `high-fidelity` | Bluetooth output stays on A2DP stereo, capture uses the device builtin microphone |
+
+Selecting a bluetooth output switches to `call`. Selecting a non-bluetooth output forces `call` as well. Changing to `high-fidelity` moves the input to the builtin microphone.
+
+### Strategies
+
+An `AudioStrategy` describes how a runtime enumerates and routes audio. The manager picks the first strategy whose `supports()` returns `true`:
+
+1. `native-audio-routing` - wraps the adapter `AudioRouting` (React Native, and also web/electron, which register the browser implementation).
+2. `web-media-devices` - fallback that only enumerates devices with `navigator.mediaDevices`, used when no routing adapter is registered.
+
+```ts
+interface AudioStrategy {
+	name: string
+	speakerAvailable: boolean
+	supports(): boolean
+	getDevices(): Promise<AudioDevice[]>
+	setSpeakerEnabled?(enabled: boolean): Promise<void>
+	isSpeakerEnabled?(): Promise<boolean>
+	setOutputDevice?(deviceId: string): Promise<boolean>
+	setInputDevice?(deviceId: string): Promise<boolean>
+	setRouteMode?(mode: AudioRouteMode): Promise<boolean>
+	isBluetoothAvailable?(): Promise<boolean>
+	resetRouting?(): Promise<boolean>
+}
+```
+
+## Microphone processing
+
+### State
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `available` | `boolean` | An adapter is registered |
+| `capabilities` | `AudioProcessingCapabilities \| null` | What the host supports |
+| `input` | `AudioInputProcessingConfig` | Current input configuration |
+| `output` | `AudioOutputProcessingConfig` | Current output configuration |
+
+### Configuration
+
+```ts
+type NoiseSuppressionMode = "off" | "system" | "rnnoise"
+type InputGainMode = "manual" | "auto"
+
+interface AudioInputProcessingConfig {
+	noiseSuppression: NoiseSuppressionMode
+	gateEnabled: boolean
+	gateThresholdDb: number
+	gainMode: InputGainMode
+	gainDb: number
+	echoCancellation: boolean
+}
+
+interface AudioOutputProcessingConfig {
+	gainDb: number
+}
+
+interface AudioProcessingCapabilities {
+	noiseSuppression: NoiseSuppressionMode[]
+	gate: boolean
+	manualGain: boolean
+	autoGain: boolean
+	echoCancellation: boolean
+	outputGain: boolean
+}
+```
+
+Ranges: gain `-10` to `20` dB, gate threshold `-80` to `0` dB. Defaults:
+
+```ts
+{
+	input: {
+		noiseSuppression: "system",
+		gateEnabled: false,
+		gateThresholdDb: -50,
+		gainMode: "manual",
+		gainDb: 0,
+		echoCancellation: true,
+	},
+	output: { gainDb: 0 },
+}
+```
+
+### Methods
+
+| Method | Signature | Description |
+| --- | --- | --- |
+| `sync` | `() => void` | Publishes availability/capabilities and loads the persisted config once. Call after registering the adapter |
+| `apply` | `() => Promise<void>` | Re-applies the current config |
+| `update` | `(input?, output?) => Promise<void>` | Merges a partial config, clamps, persists and applies |
+| `setNoiseSuppression` | `(mode) => Promise<void>` | - |
+| `setGateEnabled` | `(enabled: boolean) => Promise<void>` | - |
+| `setGateThresholdDb` | `(db: number) => Promise<void>` | - |
+| `setGainMode` | `(mode: InputGainMode) => Promise<void>` | - |
+| `setInputGainDb` | `(db: number) => Promise<void>` | - |
+| `setEchoCancellation` | `(enabled: boolean) => Promise<void>` | - |
+| `setOutputGainDb` | `(db: number) => Promise<void>` | - |
+
+```ts
+await audioProcessing.setNoiseSuppression("rnnoise")
+await audioProcessing.update({ gateEnabled: true, gateThresholdDb: -45 })
+```
+
+Every change is written to the adapter storage and applied immediately, also while a call is running.
+
+### Adapter requirements
+
+```ts
+interface AudioProcessingAdapter {
+	capabilities: AudioProcessingCapabilities
+	apply(config: AudioProcessingConfig): Promise<void>
+	// optional constraints merged into getUserMedia for the microphone
+	getMicrophoneConstraints?(): MediaTrackConstraints
+}
+```
+
+The web implementation (registered by `initializeRtcAdapter`) applies the configuration to the audio graph created by the `registerMediaStreamProcessor` hook (rnnoise, gain and gate). On React Native the host applies it with its own native module.
+
+## Persisted keys
+
+Settings are stored through `adapter.audioSettings`:
+
+```ts
+import {
+	AUDIO_SETTINGS_KEYS,
+	readAudioSetting,
+	writeAudioSetting,
+} from "@comty/spaces-sdk/rtc/audio/settings.js"
+
+AUDIO_SETTINGS_KEYS
+// audio:noiseSuppression
+// audio:echoCancellation
+// audio:gainMode
+// audio:gateEnabled
+// audio:gateThresholdDb
+// audio:inputGainDb
+// audio:outputGainDb
+// audio:inputDeviceId
+// audio:outputDeviceId
+```
+
+## Lifecycle example
+
+```ts
+// startup: register adapter, then
+audioManager.observe()
+audioProcessing.sync()
+
+// when joining a voice channel
+await audioManager.setActive(true)
+await audioManager.restore()
+
+// when leaving
+await audioManager.setActive(false)
+```
+
+The web helper `initializeRtcAdapter()` already calls `audioManager.observe()` and `audioProcessing.sync()`; on React Native the host calls them explicitly.
