@@ -4,19 +4,8 @@ on:
   workflow_call:
   workflow_dispatch:
   push:
-    branches:
-      - master
-    paths:
-      - "packages/native/**"
-      - "packages/spaces-sdk/**"
-      - "packages/shared/**"
-      - "modules/comty.js"
-      - "modules/comty.js/**"
-      - "modules/linebridge"
-      - "modules/linebridge/**"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - ".github/workflows/native-android.yml"
+    tags:
+      - "android-*"
 
 permissions:
   contents: read
