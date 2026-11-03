@@ -5,6 +5,7 @@ import { Flex, Listy, Tag } from "antd"
 
 import { Icons } from "@components/Icons"
 import { useGroupMembers } from "@comty/spaces-sdk/group"
+import { useUsers } from "@comty/spaces-sdk/users"
 import Image from "@components/Image"
 
 import "./index.less"
@@ -32,6 +33,26 @@ const MembersSettings = () => {
 	const [loading, setLoading] = React.useState(false)
 	const loadingRef = React.useRef(false)
 
+	const userIds = React.useMemo(
+		() => members.items.map((member) => member.user_id),
+		[members.items],
+	)
+
+	const users = useUsers(userIds)
+
+	// always render the latest profile from the users store, the member
+	// list can hold a stale copy of the user data
+	const items = React.useMemo(
+		() =>
+			members.items.map((member) => ({
+				...member,
+				user: users[member.user_id]
+					? { ...member.user, ...users[member.user_id] }
+					: member.user,
+			})),
+		[members.items, users],
+	)
+
 	const onScroll: React.UIEventHandler<HTMLElement> = (event) => {
 		const { scrollTop, clientHeight, scrollHeight } = event.currentTarget
 
@@ -49,7 +70,7 @@ const MembersSettings = () => {
 				<Listy<Member>
 					virtual
 					rowKey="_id"
-					items={members.items}
+					items={items}
 					itemRender={MemberRender}
 					onScroll={onScroll}
 				/>

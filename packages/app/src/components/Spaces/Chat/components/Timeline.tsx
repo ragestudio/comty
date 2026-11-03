@@ -106,7 +106,11 @@ const Timeline = ({
 						key={item._id}
 						data={item}
 						headless={headless}
-						user={item.user_id ? (users[item.user_id] ?? item.user) : item.user}
+						user={
+							item.user_id && users[item.user_id]
+								? { ...item.user, ...users[item.user_id] }
+								: item.user
+						}
 						reply={item.reply_to_id ? replies[item.reply_to_id] : undefined}
 						onReplyPreviewClick={handleReplyPreviewClick}
 					/>
