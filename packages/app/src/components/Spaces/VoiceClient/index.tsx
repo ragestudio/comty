@@ -55,6 +55,12 @@ const VoiceClient = ({
 		)
 	}, [producers])
 
+	const isProducingCamera = React.useCallback(() => {
+		return producers.some(
+			(producer) => producer.appData.mediaTag === "user-cam",
+		)
+	}, [producers])
+
 	const handleSoundpadDispatched = React.useCallback(
 		(payload) => {
 			if (!payload) {
@@ -162,6 +168,7 @@ const VoiceClient = ({
 
 			<div className="group-page__channels-panel__list-item__clients__client__indicators">
 				{isProducingScreen() && <Icons.Monitor />}
+				{isProducingCamera() && <Icons.Video />}
 
 				{client?.voiceState?.muted && (
 					<Icons.MicOff style={{ color: "var(--danger-color)" }} />
