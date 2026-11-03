@@ -88,6 +88,21 @@ export interface SystemAudioCapture {
 	stop(): Promise<void>
 }
 
+// handle of a soundpad clip being played
+export interface SoundpadPlayback {
+	stop(): void
+}
+
+// plays a remote soundpad clip. hosts provide the platform player (html audio
+// on web, expo audio on react native)
+export interface SoundpadPlayer {
+	play(params: {
+		src: string
+		volume?: number
+		onEnded?: () => void
+	}): SoundpadPlayback | Promise<SoundpadPlayback>
+}
+
 // releases the resources behind a processed stream, e.g. the raw capture and
 // the audio graph when the host wraps the mic with a processing chain
 export type MediaStreamReleaser = (stream: MediaStream) => void
@@ -112,6 +127,7 @@ export class Adapter {
 	mediaStreamProcessor?: MediaStreamProcessor
 	mediaStreamReleaser?: MediaStreamReleaser
 	systemAudio?: SystemAudioCapture
+	soundpad?: SoundpadPlayer
 	audioSettings?: AudioSettingsStorage
 
 	registerWebRtcGlobals(objects: WebRtcObjects) {
@@ -152,6 +168,10 @@ export class Adapter {
 
 	registerSystemAudio(capture: SystemAudioCapture) {
 		this.systemAudio = capture
+	}
+
+	registerSoundpad(player: SoundpadPlayer) {
+		this.soundpad = player
 	}
 
 	registerAudioSettingsStorage(storage: AudioSettingsStorage) {
