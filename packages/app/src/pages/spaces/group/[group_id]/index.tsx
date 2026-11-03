@@ -68,18 +68,19 @@ const MainPanel = () => {
 	return (
 		<>
 			{loading && <Skeleton />}
-			{!loading && !error && nav.subview !== "settings" && (
-				<div className="group-page__content-panel">
-					<ContentPanelHeader />
-					<ContentPanelRender />
-				</div>
-			)}
 			{error && (
 				<Result
 					status="error"
 					title="Error"
 					subTitle={error.message}
 				/>
+			)}
+
+			{!loading && !error && nav.subview !== "settings" && (
+				<div className="group-page__content-panel">
+					<ContentPanelHeader />
+					<ContentPanelRender />
+				</div>
 			)}
 
 			{nav.subview === "settings" && (
