@@ -71,7 +71,7 @@ jobs:
         working-directory: ./packages/native/android
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: christopherhx/gitea-upload-artifact@v4
         with:
           name: native-android-apk
           path: ./packages/native/android/app/build/outputs/apk/release/*.apk
