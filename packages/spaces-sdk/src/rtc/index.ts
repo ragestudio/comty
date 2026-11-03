@@ -38,11 +38,7 @@ export type {
 } from "./utils/parseTransportStats"
 
 type ConnState =
-	| "disconnected"
-	| "loading"
-	| "connecting"
-	| "connected"
-	| "failed"
+	"disconnected" | "loading" | "connecting" | "connected" | "failed"
 
 type TransportConnState = ConnectionState & {}
 
@@ -136,6 +132,10 @@ export class RTC extends BaseStore<RTCReactiveState> {
 
 	private recoveringFromTransportFailure = false
 
+	// socket the events are bound to, so initializing the service more than
+	// once does not register the handlers multiple times
+	private eventsSocket: any = null
+
 	logger = logger.child("rtc-core")
 
 	constructor() {
@@ -205,9 +205,15 @@ export class RTC extends BaseStore<RTCReactiveState> {
 	}
 
 	async initialize() {
-		if (!this.socket) {
+		const socket = this.socket
+
+		if (!socket) {
 			throw new Error("Cannot initialize RTC without Websocket")
 		}
+
+		// the app may initialize the service more than once, binding the
+		// handlers again would dispatch every event multiple times
+		if (this.eventsSocket === socket) return
 
 		// set as initialized
 		this.setState({
@@ -215,8 +221,10 @@ export class RTC extends BaseStore<RTCReactiveState> {
 		})
 
 		for (const [event, handler] of Object.entries(Events)) {
-			this.socket.on(event, Bind(this, handler))
+			socket.on(event, Bind(this, handler))
 		}
+
+		this.eventsSocket = socket
 
 		this.logger.log("rtc loaded!")
 	}
@@ -241,10 +249,7 @@ export class RTC extends BaseStore<RTCReactiveState> {
 			await this.handlers
 				.reset()
 				.catch((resetError) =>
-					logger.error(
-						"Failed to reset the failed channel",
-						resetError,
-					),
+					logger.error("Failed to reset the failed channel", resetError),
 				)
 		} finally {
 			this.recoveringFromTransportFailure = false
