@@ -1,28 +1,27 @@
-import "@comty/shared/utils/index"
-import "@/app/adapter"
-import "../global.css"
-
-import { audioManager } from "@comty/spaces-sdk/rtc/audio"
+import "@/adapter" // load adapter
+import "@comty/shared/utils/index" // load global utils
+import "../global.css" // load styles
 
 import React from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { LucideProvider } from "lucide-react-native"
 import { DarkTheme, ThemeProvider, Slot, useRouter } from "expo-router"
+import UI from "./tamagui.config"
 import { BottomSheet } from "@expo/ui"
 import { TamaguiProvider, ZStack } from "tamagui"
 import { PanelUIProvider, useTheme } from "panelui-native"
 import TextureBg from "@/ui/TextureBg"
 import { BlurTargetArea, BlurTargetProvider } from "@/ui/BlurTarget"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import ScreenFullscreen from "@/components/ScreenFullscreen"
-import UI from "./tamagui.config"
 
 import { app, useStore as useApp } from "@/engine/app"
 import * as notifications from "@/engine/notifications"
 import useMainSheetStore from "@/stores/MainSheet"
-import { useRTCStore } from "@comty/spaces-sdk/rtc"
 import { useAppPermissions } from "@/hooks/useAppPermissions"
 
-import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { useRTCStore } from "@comty/spaces-sdk/rtc"
+import { audioManager } from "@comty/spaces-sdk/rtc/audio"
 
 const RouterTheme = {
 	...DarkTheme,
@@ -33,9 +32,9 @@ const RouterTheme = {
 }
 
 export const MainLayout = () => {
+	// TODO: check if needs to open a main sheet to request permissions
 	const { hasAllPermissions, isChecking, requestPermissions } =
 		useAppPermissions()
-	// TODO: check if needs to open a main sheet to request permissions
 
 	const appState = useApp()
 	const router = useRouter()
@@ -80,17 +79,6 @@ export const MainLayout = () => {
 				.catch(console.error)
 		}
 	}, [rtc.state])
-
-	// if (!isChecking && !hasAllPermissions) {
-	// 	return (
-	// 		<View>
-	// 			<Button
-	// 				title="Request needed permission"
-	// 				onPress={requestPermissions}
-	// 			/>
-	// 		</View>
-	// 	)
-	// }
 
 	if (!app.ready) return null
 

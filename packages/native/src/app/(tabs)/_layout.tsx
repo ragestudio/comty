@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { Tabs } from "expo-router"
 import { Image, View } from "react-native"
 import { useTheme, XStack, YStack } from "tamagui"
-import { Home, RadioIcon } from "lucide-react-native"
+import { Home, RadioIcon, SettingsIcon } from "lucide-react-native"
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -14,7 +14,7 @@ import Animated, {
 import AppTabBar from "@/components/TabBar"
 import RTCControls from "@/components/RTCControls"
 
-import useApp from "@/engine/app"
+import useAuth from "comty.js/auth/use"
 import useRTCStore from "@comty/spaces-sdk/rtc"
 
 import useRTCControls from "@/components/RTCControls/store"
@@ -79,7 +79,7 @@ function BottomBar(props: BottomTabBarProps) {
 }
 
 function TabsLayout() {
-	const app = useApp()
+	const auth = useAuth()
 	const theme = useTheme()
 	const rtc = useRTCStore()
 
@@ -129,7 +129,7 @@ function TabsLayout() {
 			<Tabs.Screen
 				name="profile"
 				options={{
-					href: app.userData ? "/profile" : null,
+					href: auth.user ? "/profile" : null,
 					tabBarIcon: ({ color }) => {
 						return (
 							<XStack
@@ -143,12 +143,24 @@ function TabsLayout() {
 								<Image
 									style={{ flex: 1 }}
 									source={{
-										uri: app.userData?.avatar,
+										uri: auth.user?.avatar,
 									}}
 								/>
 							</XStack>
 						)
 					},
+				}}
+			/>
+			<Tabs.Screen
+				name="settings"
+				options={{
+					title: "Settings",
+					tabBarIcon: ({ color }) => (
+						<SettingsIcon
+							color={color}
+							size={24}
+						/>
+					),
 				}}
 			/>
 			<Tabs.Screen
