@@ -23,10 +23,10 @@ Nombre de la base de datos: `spaces_store` (versión `5`).
 | `channel_messages` | `_id`, `channel_id`, `[channel_id+_id]` | Mensajes de canales de grupo |
 | `last_channels_message` | `channel_id` | Referencia al último mensaje por canal |
 | `direct_messages` | `_id`, `to_user_id`, `[to_user_id+_id]` | Mensajes directos |
-| `users` | `_id` | Usuarios cacheados, referenciados por miembros y mensajes |
+| `users` | `_id` | Perfiles cacheados que mantiene el store de [usuarios](users), referenciados por miembros y mensajes |
 | `chats_sync` | `chat_id` | Cursor de sincronización: `last_message_id`, `last_synced_at`, `has_more_before`, `has_more_after` |
 
-Los registros cacheados llevan también un timestamp `cached_at` usado para la limpieza.
+Los registros cacheados llevan también un timestamp `cached_at` usado para la limpieza y para las comprobaciones de frescura del store de usuarios.
 
 ## Consultas
 
@@ -58,7 +58,7 @@ const members = await db.members.where("group_id").equals(groupId).toArray()
 import db from "@comty/spaces-sdk/db"
 import useLiveQuery from "@comty/spaces-sdk/db/react"
 
-function useUser(userId: string) {
+function useCachedUser(userId: string) {
 	return useLiveQuery(() => db.users.get(userId), [userId])
 }
 
@@ -69,6 +69,8 @@ function useChannelMessages(channelId: string) {
 	)
 }
 ```
+
+Para perfiles de usuario prefiere el store de [usuarios](users) (`useUser`), que hidrata desde esta tabla y resuelve los perfiles que faltan desde la API.
 
 ```ts
 function useLiveQuery<T>(
@@ -123,6 +125,6 @@ await stopWebPersistence()
 | Miembros | Los usuarios se separan en la tabla `users`; se guardan como máximo 2000 membresías por grupo, podando primero las más antiguas |
 | Canales | Las listas se filtran a los tipos `chat` y `voice` antes de guardarse |
 | Chat | Los mensajes se guardan con `status: "sent"` y marca `cached_at`; el estado de sincronización se guarda por chat |
-| Usuarios | Se piden en bloque y se guardan aparte para que miembros y mensajes no los dupliquen |
+| Usuarios | Los gestiona el store de [usuarios](users): primero memoria, después esta tabla y después la API. Los perfiles se fusionan, se agrupan y se persisten con marca `cached_at` |
 
 Las escrituras en caché son best-effort: un error de persistencia se registra y el SDK sigue funcionando con el estado en memoria.

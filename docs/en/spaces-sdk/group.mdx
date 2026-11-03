@@ -40,11 +40,13 @@ Every step checks the generation counter, so responses from a previous group (or
 | `members` | `Members` | Member list |
 | `statedChannels` | `Record<string, StatedChannel>` | Voice state per channel, including connected clients |
 | `connectedMembers` | `string[]` | User ids currently online in the group |
-| `membersDecorations` | `Record<string, any>` | Decorations per user id |
+| `membersDecorations` | `Record<string, any>` | Hydrated decorations per user id, mirrored from the [users](users) store |
 | `loading` | `boolean` | Initial load in progress |
 | `error` | `Error \| null` | Last fatal error |
 
-Internal fields (`initGeneration`, `userConnections`, `decorationsCache`) are used for caching and cancellation, they are not meant to be read by the UI.
+Internal fields (`initGeneration`, `userConnections`) are used for caching and cancellation, they are not meant to be read by the UI.
+
+Member profiles are cached by the [users](users) store. `members[].user` is a snapshot taken when the list was fetched, so render `useUser(member.user_id)` when the UI must show an up-to-date avatar or name.
 
 ## Hooks
 
@@ -92,7 +94,7 @@ function ChannelHeader({ channelId }: { channelId: string }) {
 | --- | --- | --- |
 | `fetchGroup` | `() => Promise<Group \| null>` | Loads `GroupsModel.get(groupId)` into `data` and caches it |
 | `fetchChannels` | `() => Promise<Channels \| null>` | Loads the channels, filtered to `chat` and `voice` |
-| `fetchMembers` | `() => Promise<void>` | Loads the first 50 members and evaluates presence/decorations |
+| `fetchMembers` | `() => Promise<void>` | Loads the first 50 members, seeds the users store and evaluates presence/decorations |
 
 Fetching actions never throw: they log and return `null` on failure.
 
@@ -102,9 +104,9 @@ Fetching actions never throw: they log and return `null` on failure.
 | --- | --- | --- |
 | `syncRTCChannels` | `() => Promise<void>` | Pulls `GroupsModel.rtc.getGroupState(groupId)` into `statedChannels` |
 | `evaluateConnections` | `(members: Member[]) => Promise<void>` | Resolves which members are online and merges them into `connectedMembers` |
-| `evaluateDecorations` | `(items: (Member \| string)[]) => Promise<void>` | Resolves user decorations, cache first, then `UsersModel.decorations.get` |
+| `evaluateDecorations` | `(items: (Member \| string)[]) => Promise<void>` | Resolves hydrated decorations through the [users](users) store (`ensureDecorations`) and mirrors them into `membersDecorations` |
 
-Both evaluators keep an internal cache, so passing the same members again only requests the missing ids.
+`evaluateConnections` keeps an internal cache, so passing the same members again only requests the missing ids. Decorations are cached by the users store, with their own TTL.
 
 ### Setters
 

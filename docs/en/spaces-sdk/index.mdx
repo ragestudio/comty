@@ -38,6 +38,8 @@ import { groupAdapter } from "@comty/spaces-sdk/chat/adapters.js"
 | `@comty/spaces-sdk/group/types` | Group store types |
 | `@comty/spaces-sdk/group/constants` | `VALID_CHANNEL_KINDS`, `INITIAL_CACHE_PAGE_SIZE` |
 | `@comty/spaces-sdk/groupsList` | `GroupsListStore` / `useGroupsList` |
+| `@comty/spaces-sdk/users` | `UsersStore`, profile hooks and the shared user cache helpers |
+| `@comty/spaces-sdk/users/types` | User store and profile types |
 | `@comty/spaces-sdk/chat` | `ChatStore`, chat hooks and `getChatSessionKey` |
 | `@comty/spaces-sdk/chat/session` | `useChatSession` |
 | `@comty/spaces-sdk/chat/types` | Chat params, message and store types |
@@ -60,11 +62,12 @@ import { groupAdapter } from "@comty/spaces-sdk/chat/adapters.js"
 | `db` | Offline cache on tinybase (groups, channels, members, messages, users) with an IndexedDB persister for web |
 | `group` | Single active group store: metadata, channels, members, presence, decorations and the voice state of every channel |
 | `groupsList` | The user's memberships list |
+| `users` | Shared profile cache (memory + database + API) used by members, messages and voice tiles |
 | `chat` | Single active chat session (group channel or DM) with pagination, optimistic sends, typing and sync |
 | `rtc` | Voice/video session: mediasoup device, send/recv transports, local media, remote producers and consumers, speaking detection and an event bus |
 | `rtc/audio` | Audio device routing (`audioManager`) and microphone processing preferences (`audioProcessing`) |
 
-Only one group and one chat session are active at a time. Both stores are singletons and expose an `actions` object; `init()` replaces the previous session and `reset()` clears it. Every async action carries a generation counter, so a response from a previous session can never overwrite the current state.
+Only one group and one chat session are active at a time. Both stores are singletons and expose an `actions` object; `init()` replaces the previous session and `reset()` clears it. Every async action carries a generation counter, so a response from a previous session can never overwrite the current state. The `users` store is not tied to a session: it survives navigation and is cleared only with `resetUsers()`.
 
 ## Bootstrap
 
@@ -152,10 +155,12 @@ Every store is a zustand store with a plain-vanilla API, which means it can be u
 ```ts
 import { GroupStore } from "@comty/spaces-sdk/group"
 import { ChatStore } from "@comty/spaces-sdk/chat"
+import { ensureUsers } from "@comty/spaces-sdk/users"
 import { rtcService } from "@comty/spaces-sdk/rtc"
 
 await GroupStore.getState().actions.init(groupId)
 await ChatStore.getState().actions.send({ message: "hello" })
+await ensureUsers(["user_1", "user_2"])
 
 rtcService.self.toggleMute()
 ```
@@ -199,6 +204,7 @@ adapter.registerLogger({
 - [Adapter](adapter) - register the platform primitives.
 - [Database](database) - offline cache and live queries.
 - [Groups](group) - group, channels, members and presence.
+- [Users](users) - shared profile cache for members, messages and voice tiles.
 - [Chat](chat) - channels and DMs.
 - [RTC](rtc) - voice, video, screen share and events.
 - [Audio](audio) - devices, routing and microphone processing.

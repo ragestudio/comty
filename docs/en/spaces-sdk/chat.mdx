@@ -218,7 +218,7 @@ interface ChatSyncState {
 }
 ```
 
-The default adapters write to the [database](database) (`channel_messages`, `direct_messages`, `users` and `chats_sync`). On init the store renders the cached page before the network response, so opening a conversation is instant.
+The default adapters write to the [database](database) (`channel_messages`, `direct_messages` and `chats_sync`). The users returned with the messages are handed to the [users](users) store, which owns the `users` table and the in-memory profile cache. On init the store renders the cached page before the network response, so opening a conversation is instant.
 
 For group channels `sync()` calls `ChatsService.channels.sync` with the stored cursor and applies deletions, edits and new messages. DMs do not have a server sync endpoint, so the store fills the newest gap with `loadAfter()` instead.
 

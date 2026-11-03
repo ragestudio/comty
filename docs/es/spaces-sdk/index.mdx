@@ -38,6 +38,8 @@ import { groupAdapter } from "@comty/spaces-sdk/chat/adapters.js"
 | `@comty/spaces-sdk/group/types` | Tipos del store de grupo |
 | `@comty/spaces-sdk/group/constants` | `VALID_CHANNEL_KINDS`, `INITIAL_CACHE_PAGE_SIZE` |
 | `@comty/spaces-sdk/groupsList` | `GroupsListStore` / `useGroupsList` |
+| `@comty/spaces-sdk/users` | `UsersStore`, hooks de perfil y helpers de la caché compartida de usuarios |
+| `@comty/spaces-sdk/users/types` | Tipos del store de usuarios y de los perfiles |
 | `@comty/spaces-sdk/chat` | `ChatStore`, hooks de chat y `getChatSessionKey` |
 | `@comty/spaces-sdk/chat/session` | `useChatSession` |
 | `@comty/spaces-sdk/chat/types` | Parámetros, mensajes y tipos del store de chat |
@@ -60,11 +62,12 @@ import { groupAdapter } from "@comty/spaces-sdk/chat/adapters.js"
 | `db` | Caché offline sobre tinybase (grupos, canales, miembros, mensajes, usuarios) con persister de IndexedDB para web |
 | `group` | Store del grupo activo: metadatos, canales, miembros, presencia, decoraciones y el estado de voz de cada canal |
 | `groupsList` | Lista de membresías del usuario |
+| `users` | Caché compartida de perfiles (memoria + base de datos + API) usada por miembros, mensajes y tiles de voz |
 | `chat` | Sesión de chat activa (canal de grupo o DM) con paginación, envío optimista, typing y sincronización |
 | `rtc` | Sesión de voz/vídeo: dispositivo mediasoup, transports de envío/recepción, medios locales, producers y consumers remotos, detección de voz y bus de eventos |
 | `rtc/audio` | Rutas de dispositivos (`audioManager`) y preferencias de procesado del micrófono (`audioProcessing`) |
 
-Solo hay un grupo y una sesión de chat activos a la vez. Ambos stores son singletons y exponen un objeto `actions`; `init()` reemplaza la sesión anterior y `reset()` la limpia. Cada acción asíncrona lleva un contador de generación, de modo que la respuesta de una sesión anterior nunca puede sobrescribir el estado actual.
+Solo hay un grupo y una sesión de chat activos a la vez. Ambos stores son singletons y exponen un objeto `actions`; `init()` reemplaza la sesión anterior y `reset()` la limpia. Cada acción asíncrona lleva un contador de generación, de modo que la respuesta de una sesión anterior nunca puede sobrescribir el estado actual. El store de `users` no está ligado a una sesión: sobrevive a la navegación y solo se limpia con `resetUsers()`.
 
 ## Arranque
 
@@ -152,10 +155,12 @@ Cada store es un store de zustand con API vanilla, así que también se puede us
 ```ts
 import { GroupStore } from "@comty/spaces-sdk/group"
 import { ChatStore } from "@comty/spaces-sdk/chat"
+import { ensureUsers } from "@comty/spaces-sdk/users"
 import { rtcService } from "@comty/spaces-sdk/rtc"
 
 await GroupStore.getState().actions.init(groupId)
 await ChatStore.getState().actions.send({ message: "hola" })
+await ensureUsers(["user_1", "user_2"])
 
 rtcService.self.toggleMute()
 ```
@@ -199,6 +204,7 @@ adapter.registerLogger({
 - [Adapter](adapter) - registrar las primitivas de plataforma.
 - [Base de datos](database) - caché offline y consultas en vivo.
 - [Grupos](group) - grupo, canales, miembros y presencia.
+- [Usuarios](users) - caché compartida de perfiles para miembros, mensajes y tiles de voz.
 - [Chat](chat) - canales y DMs.
 - [RTC](rtc) - voz, vídeo, compartir pantalla y eventos.
 - [Audio](audio) - dispositivos, rutas y procesado del micrófono.

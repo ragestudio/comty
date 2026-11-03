@@ -326,6 +326,8 @@ rtcService.transports // { send, recv }
 
 Collection helpers: `clients.join(data)`, `clients.leave(userIdOrClient)`, `clients.restore(joinResult)`, `clients.destroyAll()`.
 
+`Client` and `SerializedClient` only carry identity and voice state. The public profile (`avatar`, `public_name`, `verified`, ...) is not part of the RTC state: resolve it with the [users](users) store (`useUser(userId)`), which is also seeded by `handleClientVoiceJoin` and `syncRTCChannels`.
+
 ### Screens and cameras
 
 Both collections use the same `RemoteMedia` entity, one per user:

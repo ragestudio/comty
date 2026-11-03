@@ -23,10 +23,10 @@ Database name: `spaces_store` (version `5`).
 | `channel_messages` | `_id`, `channel_id`, `[channel_id+_id]` | Group channel messages |
 | `last_channels_message` | `channel_id` | Last message reference per channel |
 | `direct_messages` | `_id`, `to_user_id`, `[to_user_id+_id]` | Direct messages |
-| `users` | `_id` | Cached users, referenced by members and messages |
+| `users` | `_id` | Cached profiles maintained by the [users](users) store and referenced by members and messages |
 | `chats_sync` | `chat_id` | Sync cursor: `last_message_id`, `last_synced_at`, `has_more_before`, `has_more_after` |
 
-Cached records also carry a `cached_at` timestamp used for pruning.
+Cached records also carry a `cached_at` timestamp used for pruning and for the users store freshness checks.
 
 ## Queries
 
@@ -57,7 +57,7 @@ const members = await db.members.where("group_id").equals(groupId).toArray()
 import db from "@comty/spaces-sdk/db"
 import useLiveQuery from "@comty/spaces-sdk/db/react"
 
-function useUser(userId: string) {
+function useCachedUser(userId: string) {
 	return useLiveQuery(() => db.users.get(userId), [userId])
 }
 
@@ -68,6 +68,8 @@ function useChannelMessages(channelId: string) {
 	)
 }
 ```
+
+For user profiles prefer the [users](users) store (`useUser`), which hydrates from this table and resolves the missing profiles from the API.
 
 ```ts
 function useLiveQuery<T>(
@@ -122,6 +124,6 @@ await stopWebPersistence()
 | Members | Users are split into the `users` table; at most 2000 memberships are kept per group, oldest pruned first |
 | Channels | Channel lists are filtered to `chat` and `voice` kinds before being stored |
 | Chat | Messages are stored with `status: "sent"` and a `cached_at` marker; sync state is stored per chat |
-| Users | Fetched in bulk and stored separately so members and messages do not duplicate them |
+| Users | Managed by the [users](users) store: memory first, then this table, then the API. Profiles are merged, batched and persisted with a `cached_at` marker |
 
 Cache writes are best-effort: a persistence error is logged and the SDK keeps working with the in-memory state.

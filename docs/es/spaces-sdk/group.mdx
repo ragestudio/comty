@@ -40,11 +40,13 @@ Cada paso comprueba el contador de generación, así que las respuestas de un gr
 | `members` | `Members` | Lista de miembros |
 | `statedChannels` | `Record<string, StatedChannel>` | Estado de voz por canal, incluidos los clientes conectados |
 | `connectedMembers` | `string[]` | Ids de usuarios conectados en el grupo |
-| `membersDecorations` | `Record<string, any>` | Decoraciones por id de usuario |
+| `membersDecorations` | `Record<string, any>` | Decoraciones hidratadas por id de usuario, espejo del store de [usuarios](users) |
 | `loading` | `boolean` | Carga inicial en curso |
 | `error` | `Error \| null` | Último error fatal |
 
-Los campos internos (`initGeneration`, `userConnections`, `decorationsCache`) se usan para caché y cancelación, no están pensados para que la UI los lea.
+Los campos internos (`initGeneration`, `userConnections`) se usan para caché y cancelación, no están pensados para que la UI los lea.
+
+Los perfiles de los miembros los cachea el store de [usuarios](users). `members[].user` es una instantánea tomada al cargar la lista, así que renderiza `useUser(member.user_id)` cuando la UI deba mostrar un avatar o un nombre actualizado.
 
 ## Hooks
 
@@ -92,7 +94,7 @@ function ChannelHeader({ channelId }: { channelId: string }) {
 | --- | --- | --- |
 | `fetchGroup` | `() => Promise<Group \| null>` | Carga `GroupsModel.get(groupId)` en `data` y lo cachea |
 | `fetchChannels` | `() => Promise<Channels \| null>` | Carga los canales, filtrados a `chat` y `voice` |
-| `fetchMembers` | `() => Promise<void>` | Carga los primeros 50 miembros y evalúa presencia/decoraciones |
+| `fetchMembers` | `() => Promise<void>` | Carga los primeros 50 miembros, siembra el store de usuarios y evalúa presencia/decoraciones |
 
 Las acciones de obtención nunca lanzan: registran el error y devuelven `null`.
 
@@ -102,9 +104,9 @@ Las acciones de obtención nunca lanzan: registran el error y devuelven `null`.
 | --- | --- | --- |
 | `syncRTCChannels` | `() => Promise<void>` | Vuelca `GroupsModel.rtc.getGroupState(groupId)` en `statedChannels` |
 | `evaluateConnections` | `(members: Member[]) => Promise<void>` | Resuelve qué miembros están online y los fusiona en `connectedMembers` |
-| `evaluateDecorations` | `(items: (Member \| string)[]) => Promise<void>` | Resuelve decoraciones, primero caché y luego `UsersModel.decorations.get` |
+| `evaluateDecorations` | `(items: (Member \| string)[]) => Promise<void>` | Resuelve las decoraciones hidratadas a través del store de [usuarios](users) (`ensureDecorations`) y las refleja en `membersDecorations` |
 
-Ambos evaluadores mantienen una caché interna, así que pasar los mismos miembros otra vez solo pide los ids que faltan.
+`evaluateConnections` mantiene una caché interna, así que pasar los mismos miembros otra vez solo pide los ids que faltan. Las decoraciones las cachea el store de usuarios, con su propio TTL.
 
 ### Setters
 

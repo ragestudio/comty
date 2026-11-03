@@ -1,0 +1,223 @@
+---
+id: users
+title: Usuarios
+sidebar_label: Usuarios
+---
+
+El módulo de usuarios es la caché compartida de perfiles del SDK. Asocia un `userId` con el perfil público (`avatar`, `public_name`, `cover`, `verified`, `decorations`, `badges`, ...) y resuelve los perfiles que faltan desde la API, agrupando y deduplicando las peticiones.
+
+Es un store de zustand (`UsersStore`) con un objeto `actions`, así que funciona tanto dentro como fuera de React.
+
+```ts
+import { useUser, useUsers } from "@comty/spaces-sdk/users"
+```
+
+A diferencia de los stores de grupo y chat, el store de usuarios no está ligado a una sesión: sobrevive a la navegación entre grupos y chats y solo se limpia manualmente con `resetUsers()`.
+
+## Por qué un store dedicado
+
+La lista de miembros, el timeline del chat, los clientes de voz y los tiles de stream necesitan los mismos perfiles. Mantener una copia cacheada por funcionalidad provocaria avatares y nombres desactualizados: un miembro conservaba el perfil de la primera vez que se cargó la lista mientras otra pantalla ya tenía uno más reciente.
+
+El store de usuarios es una única fuente de verdad:
+
+- un objeto por id de usuario, compartido por todos los consumidores;
+- primero memoria, después la caché de la [base de datos](database) y después la API;
+- un payload parcial nunca elimina campos que ya se conocen;
+- solo se vuelven a renderizar los componentes suscritos al usuario que cambia.
+
+## Estado
+
+| Campo | Tipo | Descripción |
+| --- | --- | --- |
+| `users` | `Record<string, SpacesUser>` | Perfiles indexados por `_id` |
+| `error` | `Error \| null` | Último error de petición, se limpia en la siguiente escritura correcta |
+
+`SpacesUser` es el usuario público más las decoraciones hidratadas:
+
+```ts
+import type { User } from "@comty/shared/types/user"
+
+type SpacesUser = Omit<User, "decorations" | "badges"> & {
+	cached_at?: number
+	// objetos de decoración hidratados por slot (member_bg, avatar, ...)
+	decorations?: Record<string, any>
+	badges?: any[]
+}
+```
+
+`cached_at` es el timestamp de la última escritura del perfil. Se usa para el TTL de la caché y para decidir cuándo hay que refrescar un perfil cacheado.
+
+## Hooks
+
+| Hook | Devuelve |
+| --- | --- |
+| `useUsers(userIds)` | `Record<string, SpacesUser>` con los perfiles solicitados que ya están disponibles |
+| `useUser(userId)` | Un `SpacesUser` o `undefined` |
+| `useUsersActions()` | El objeto `actions` |
+
+Tanto `useUsers` como `useUser` llaman a `ensure()` para los ids solicitados después del montaje, así que la UI no tiene que pedir nada manualmente. Cuando llega (o cambia) un perfil solo se vuelven a renderizar los hooks suscritos a ese id.
+
+`useUsers` acepta un array, un `Set` o una cadena separada por comas. Los ids se serializan internamente, así que pasar un array nuevo en cada render no provoca efectos extra.
+
+```tsx
+import { useUser, useUsers } from "@comty/spaces-sdk/users"
+
+function MemberRow({ userId }: { userId: string }) {
+	const user = useUser(userId)
+
+	return (
+		<div>
+			<img
+				src={user?.avatar}
+				alt={user?.username}
+			/>
+			<span>{user?.public_name ?? user?.username}</span>
+			{user?.verified && <VerifiedIcon />}
+		</div>
+	)
+}
+
+function VoiceClients({ userIds }: { userIds: string[] }) {
+	const users = useUsers(userIds)
+
+	return (
+		<ul>
+			{userIds.map((id) => (
+				<li key={id}>{users[id]?.username ?? id}</li>
+			))}
+		</ul>
+	)
+}
+```
+
+## API vanilla
+
+```ts
+import {
+	UsersStore,
+	usersActions,
+	getUser,
+	setUsers,
+	ensureUsers,
+	ensureUserDecorations,
+	invalidateUsers,
+	resetUsers,
+} from "@comty/spaces-sdk/users"
+```
+
+| Export | Descripción |
+| --- | --- |
+| `UsersStore` | El store de zustand (`getState`, `subscribe`, ...) |
+| `usersActions` | La instancia de acciones |
+| `getUser(userId)` | Perfil cacheado actual o `undefined` |
+| `setUsers(users)` | Inserta o fusiona perfiles y los persiste |
+| `ensureUsers(ids, options?)` | Resuelve los perfiles leyendo caché y API según haga falta |
+| `ensureUserDecorations(ids, options?)` | Resuelve solo las decoraciones hidratadas |
+| `invalidateUsers(ids?)` | Marca los ids (o todos los usuarios) como obsoletos |
+| `resetUsers()` | Limpia la caché en memoria |
+
+```ts
+// siembra el usuario actual cuando la sesión esté disponible
+setUsers([app.userData])
+
+// asegura que los participantes del canal estén disponibles
+await ensureUsers(["user_1", "user_2"])
+
+// fuerza un refresco después de editar el perfil
+invalidateUsers(app.userData._id)
+await ensureUsers(app.userData._id, { force: true })
+
+const user = getUser("user_1")
+```
+
+## Acciones
+
+| Acción | Firma | Descripción |
+| --- | --- | --- |
+| `ensure` | `(ids, options?) => Promise<void>` | Lee memoria, después la base de datos y después la API |
+| `ensureDecorations` | `(ids, options?) => Promise<void>` | Mismo flujo, solo para decoraciones hidratadas |
+| `setUsers` | `(users, { persist? }) => void` | Fusiona perfiles, actualiza `cached_at` y los persiste |
+| `patchUser` | `(userId, patch, { persist? }) => void` | Fusiona un perfil parcial |
+| `hydrateFromCache` | `(users) => void` | Añade registros leídos de la base de datos sin marcarlos como frescos |
+| `invalidate` | `(ids?) => void` | Elimina los timestamps de frescura |
+| `reset` | `() => void` | Limpia el estado y las cachés internas |
+
+### Opciones
+
+```ts
+interface EnsureUsersOptions {
+	force?: boolean
+	maxAge?: number
+	decorations?: boolean
+}
+```
+
+- `force` ignora el TTL y la caché negativa.
+- `maxAge` sobrescribe la ventana de frescura por defecto, en milisegundos.
+- `decorations` resuelve también las decoraciones hidratadas después del perfil.
+
+## Estrategia de caché
+
+Orden de resolución para cada id:
+
+1. Perfil en memoria, cuando está completo y fresco.
+2. La tabla `users` de la caché de la [base de datos](database).
+3. `UsersModel.data()` para los ids que siguen faltando u obsoletos.
+
+| Ajuste | Por defecto | Significado |
+| --- | --- | --- |
+| Frescura del perfil | 5 minutos | Pasado este tiempo, el siguiente `ensure()` lo refresca en segundo plano |
+| Id no encontrado | 1 minuto | La API no devolvió el id, evita preguntar de nuevo de inmediato |
+| Frescura de decoraciones | 10 minutos | Las decoraciones hidratadas cambian menos |
+| Tamaño de lote | 50 ids | Máximo de ids por petición |
+| Retardo de lote | 10 ms | Los ids pedidos en el mismo tick se agrupan |
+
+Las peticiones se deduplican: cuando varios componentes piden el mismo id a la vez solo se hace una petición y el resto espera a esa.
+
+### Reglas de fusión
+
+- Un payload parcial nunca elimina campos que ya se conocen.
+- Una escritura local más reciente gana a una respuesta que ya estaba en vuelo.
+- `setUsers()` evita actualizar el estado cuando el perfil recibido es idéntico, así las llamadas repetidas de `cacheUsers` no re-renderizan la UI.
+- Los ids de `decorations` del perfil base se ignoran; solo se guardan los objetos hidratados del endpoint de decoraciones. Si las decoraciones llegan antes que el perfil base se mantienen como pendientes y se aplican al hidratar el usuario.
+
+## Relación con los otros stores
+
+Los stores de grupo y chat alimentan el store de usuarios y después leen de él, de modo que todas las pantallas ven el mismo perfil:
+
+| Origen | Qué hace |
+| --- | --- |
+| `fetchMembers()` | Cachea los usuarios anidados de los miembros y siembra el store de usuarios |
+| `init()` (grupo cacheado) | Hidrata el store con los usuarios leídos de la base de datos |
+| `handleMembershipCreated` | Siembra el perfil del nuevo miembro |
+| `handleClientVoiceJoin` | Siembra el perfil del cliente de voz y lo resuelve si está incompleto |
+| `syncRTCChannels()` | Siembra los perfiles de los clientes de voz conectados |
+| `cacheUsers()` (chat) | Inserta los usuarios devueltos junto a los mensajes |
+| `evaluateDecorations()` | Llama a `ensureDecorations()` y lee el resultado del store de usuarios |
+
+Usa el store (o `useUser`) al renderizar listas de miembros, mensajes y tiles de voz en lugar del objeto `user` anidado que puede estar desactualizado:
+
+```tsx
+const user = useUser(member.user_id)
+
+return <span>{user?.public_name ?? member.user?.public_name}</span>
+```
+
+## Ejemplo de tiles de stream
+
+Cada tile resuelve su propio participante, así una actualización de perfil solo re-renderiza ese tile:
+
+```tsx
+function StreamTile({ userId }: { userId: string }) {
+	const user = useUser(userId)
+
+	return (
+		<div>
+			<video />
+			{user?.username && <UserBadge user={user} />}
+		</div>
+	)
+}
+```
+
+El componente de canal de voz usa el mismo patrón: cada `VoiceChannelTile` llama a `useUser(item.userId)` y pasa el resultado a `StreamTile.userData`, protegiéndose de los perfiles incompletos.

@@ -218,7 +218,7 @@ interface ChatSyncState {
 }
 ```
 
-Los adaptadores por defecto escriben en la [base de datos](database) (`channel_messages`, `direct_messages`, `users` y `chats_sync`). Al inicializar, el store pinta la página cacheada antes de la respuesta de red, así que abrir una conversación es instantáneo.
+Los adaptadores por defecto escriben en la [base de datos](database) (`channel_messages`, `direct_messages` y `chats_sync`). Los usuarios que vienen con los mensajes se entregan al store de [usuarios](users), que es dueño de la tabla `users` y de la caché de perfiles en memoria. Al inicializar, el store pinta la página cacheada antes de la respuesta de red, así que abrir una conversación es instantáneo.
 
 Para canales de grupo `sync()` llama a `ChatsService.channels.sync` con el cursor guardado y aplica borrados, ediciones y mensajes nuevos. Los DMs no tienen endpoint de sincronización, así que el store rellena el hueco más nuevo con `loadAfter()`.
 
