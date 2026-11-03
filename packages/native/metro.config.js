@@ -19,6 +19,11 @@ try {
 	}
 } catch {}
 
+config.watchFolders = [
+	...(config.watchFolders ?? []),
+	path.resolve(__dirname, "node_modules/comty.js", "src"),
+]
+
 config.serializer = {
 	...config.serializer,
 	getModulesRunBeforeMainModule: () => [
@@ -146,6 +151,17 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
 	if (aliased) return aliased
 
 	return context.resolveRequest(context, moduleName, platform)
+}
+
+config.transformer = {
+	...config.transformer,
+	babelTransformerPath: require.resolve("react-native-svg-transformer/expo"),
+}
+
+config.resolver = {
+	...config.resolver,
+	assetExts: config.resolver.assetExts.filter((ext) => ext !== "svg"),
+	sourceExts: [...config.resolver.sourceExts, "svg"],
 }
 
 module.exports = withUniwindConfig(config, {
