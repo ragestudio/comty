@@ -18,8 +18,9 @@ export async function attachChannel(this: RTC, join: JoinChannelResult) {
 			throw new Error("Server did not provide any codecs")
 		}
 
-		// store rtp capabilities for use in future producers
-		this.rtpCapabilities = join.rtpCapabilities
+		// the channel is already set by joinChannel, keep a reference since a
+		// reset clears the reactive state (including the channel)
+		const channel = this.channel
 
 		if (this.isConnected) {
 			// if already joined, do local cleanup only
@@ -28,7 +29,14 @@ export async function attachChannel(this: RTC, join: JoinChannelResult) {
 			if (errors && errors.length > 0) {
 				throw new Error(errors.join(", "))
 			}
+
+			// reset cleared the channel and the capabilities, restore them
+			this.setState({ channel })
 		}
+
+		// store rtp capabilities for use in future producers, after the reset
+		// so it is not wiped by it
+		this.rtpCapabilities = join.rtpCapabilities
 
 		// create and setup transports before restoring the channel, since
 		// restoring a remote mic needs the device and the recv transport

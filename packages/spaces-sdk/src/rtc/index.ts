@@ -31,6 +31,11 @@ import emitClientEvent from "./handlers/emitClientEvent"
 import reset from "./handlers/reset"
 
 export type { SerializedRemoteMedia } from "./remote/media"
+export { default as parseTransportStats } from "./utils/parseTransportStats"
+export type {
+	ParsedTransportStats,
+	TransportCandidate,
+} from "./utils/parseTransportStats"
 
 type ConnState =
 	| "disconnected"
@@ -129,6 +134,8 @@ export class RTC extends BaseStore<RTCReactiveState> {
 
 	rtpCapabilities: RtpCapabilities = {}
 
+	private recoveringFromTransportFailure = false
+
 	logger = logger.child("rtc-core")
 
 	constructor() {
@@ -215,7 +222,37 @@ export class RTC extends BaseStore<RTCReactiveState> {
 	}
 
 	async _handleTransportFailure() {
-		logger.error("Transport failure, triggering recovery")
+		if (this.recoveringFromTransportFailure) return
+
+		this.recoveringFromTransportFailure = true
+
+		logger.error("Transport failure, leaving the channel")
+
+		try {
+			if (this.socket) {
+				await this.handlers.leaveChannel()
+			} else {
+				// without a socket there is nothing to notify, just release the media
+				await this.handlers.reset()
+			}
+		} catch (error) {
+			logger.error("Failed to leave the failed channel", error)
+
+			await this.handlers
+				.reset()
+				.catch((resetError) =>
+					logger.error(
+						"Failed to reset the failed channel",
+						resetError,
+					),
+				)
+		} finally {
+			this.recoveringFromTransportFailure = false
+		}
+
+		this.eventBus.emit("rtc:channel:disconnected", {
+			reason: "transport_failed",
+		})
 	}
 }
 

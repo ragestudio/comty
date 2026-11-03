@@ -25,10 +25,11 @@ export const Microphone = (self: Self) =>
 			)
 
 			if (!audioCodec) {
-				throw new Error("audio codec not found")
+				// let mediasoup pick the codec instead of failing the whole media
+				logger.warn("audio codec not found, using the default one")
+			} else {
+				logger.debug("using audio codec", audioCodec)
 			}
-
-			logger.debug("using audio codec", audioCodec)
 
 			const producer = await this.self.core.producers.produce(
 				{
