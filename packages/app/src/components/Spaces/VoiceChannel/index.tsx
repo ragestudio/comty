@@ -1,16 +1,20 @@
 import React from "react"
-import classnames from "classnames"
 import { motion } from "motion/react"
 
 import StreamTile from "@components/Spaces/StreamTile"
 
 import { rtcService, useRTCStore } from "@comty/spaces-sdk/rtc"
-import UsersModel from "@endpoints/user"
+import { useUser, usersActions } from "@comty/spaces-sdk/users"
+import createBem from "@/utils/createBem"
 
-import "./index.less"
+import Grid, { type RenderGridItem, type TileModes } from "./grid"
 
-type VCItem = {
-	type: "screen" | "camera"
+import styles from "./index.module.less"
+
+const b = createBem("channel_view", styles)
+
+export type VoiceChannelItem = {
+	type: "screen" | "camera" | "user"
 	id: string
 	userId?: string
 	isSelf?: boolean
@@ -21,17 +25,51 @@ type VCItem = {
 	onVolume?: (value: number) => void
 }
 
+const VoiceChannelTile = ({
+	item,
+	tileMode,
+	toggleItemFocus,
+}: {
+	item: VoiceChannelItem
+	tileMode: TileModes
+	toggleItemFocus: () => void
+}) => {
+	const user = useUser(item.userId)
+
+	return (
+		<StreamTile
+			stream={item}
+			userData={user?.username ? user : undefined}
+			mode={tileMode}
+			onTileClick={toggleItemFocus}
+		/>
+	)
+}
+
+const VoiceChannelGridItemRender: RenderGridItem<VoiceChannelItem> = (
+	props,
+) => {
+	if (props.item.type === "screen" || props.item.type === "camera") {
+		return (
+			<VoiceChannelTile
+				key={props.item.id}
+				item={props.item}
+				tileMode={props.tileMode}
+				toggleItemFocus={props.toggleItemFocus}
+			/>
+		)
+	}
+
+	return null
+}
+
 const VoiceChannel = () => {
 	const rtc = useRTCStore()
 
-	const [selectedStreamId, setSelectedStreamId] = React.useState(null)
-	const [userData, setUserData] = React.useState({})
-	const fetchedUsersRef = React.useRef(new Set())
-
 	const selfId = app.userData?._id
 
-	const items = React.useMemo<VCItem[]>(() => {
-		const next: VCItem[] = []
+	const items = React.useMemo<VoiceChannelItem[]>(() => {
+		const next: VoiceChannelItem[] = []
 
 		if (rtc.localScreenStream) {
 			next.push({
@@ -88,108 +126,38 @@ const VoiceChannel = () => {
 		rtc.statedCameras,
 	])
 
-	const handleTileClick = React.useCallback((streamId) => {
-		setSelectedStreamId((current) => (current === streamId ? null : streamId))
-	}, [])
-
 	React.useEffect(() => {
-		const missingUserIds = items
-			.map((s) => s.userId)
-			.filter((id) => id && !userData[id] && !fetchedUsersRef.current.has(id))
-
-		if (missingUserIds.length === 0) return
-
-		missingUserIds.forEach((id) => fetchedUsersRef.current.add(id))
-
-		UsersModel.data({ user_id: missingUserIds.join(",") }).then((data) => {
-			const usersArray = Array.isArray(data) ? data : [data]
-
-			setUserData((prev) => {
-				const next = { ...prev }
-
-				usersArray.forEach((u) => {
-					if (u) {
-						next[u._id] = u
-					}
-				})
-
-				return next
-			})
-		})
-	}, [items, userData])
-
-	React.useEffect(() => {
-		if (selectedStreamId && !items.find((s) => s.id === selectedStreamId)) {
-			setSelectedStreamId(null)
+		if (app.userData?._id) {
+			usersActions.setUsers([app.userData])
 		}
-	}, [items, selectedStreamId])
-
-	if (!rtc.channel) {
-		return <div className="channel-video-page channel-video-page--empty"></div>
-	}
-
-	if (items.length === 0) {
-		return (
-			<div className="channel-video-page channel-video-page--empty">
-				<h2>no video streams available</h2>
-			</div>
-		)
-	}
-
-	const getGridLayout = (count) => {
-		if (count <= 1) return { cols: 1, rows: 1 }
-		if (count === 2) return { cols: 2, rows: 1 }
-		if (count <= 4) return { cols: 2, rows: 2 }
-		if (count <= 6) return { cols: 3, rows: 2 }
-		if (count <= 9) return { cols: 3, rows: 3 }
-		if (count <= 16) return { cols: 4, rows: 4 }
-		return { cols: 4, rows: Math.ceil(count / 4) }
-	}
-
-	const isSingleStream = items.length === 1
-	const hasSidebar = !isSingleStream && selectedStreamId !== null
-
-	const { cols, rows } = getGridLayout(items.length)
+	}, [app.userData?._id])
 
 	return (
-		<motion.div className="channel-video-page">
-			<div className="channel-video-page__content">
-				<div
-					className={classnames("video-grid", {
-						"video-grid--with-sidebar": hasSidebar,
-						"video-grid--single": isSingleStream,
-					})}
-					style={{
-						// @ts-ignore
-						"--grid-cols": cols,
-						"--grid-rows": rows,
-					}}
-				>
-					{items.map((item) => {
-						let tileMode: "grid" | "single" | "hero" | "preview" = "grid"
+		<motion.div
+			className={b({
+				empty: items.length === 0 || !rtc.channel,
+			})}
+		>
+			{!rtc.channel && <h2>Join the channel</h2>}
+			{rtc.channel && items.length === 0 && <h2>Nothing here</h2>}
 
-						if (isSingleStream) {
-							tileMode = "single"
-						} else if (hasSidebar) {
-							tileMode = item.id === selectedStreamId ? "hero" : "preview"
-						}
-
-						return (
-							<StreamTile
-								key={item.id}
-								stream={item}
-								mode={tileMode}
-								onTileClick={handleTileClick}
-								userData={userData[item.userId]}
-							/>
-						)
-					})}
+			{items.length > 0 && (
+				<div className={b.elem("content")}>
+					<Grid
+						items={items}
+						renderItem={VoiceChannelGridItemRender}
+					/>
 				</div>
-			</div>
+			)}
 		</motion.div>
 	)
 }
 
-VoiceChannel.options = { layout: { centeredContent: false, maxHeight: true } }
+VoiceChannel.options = {
+	layout: {
+		centeredContent: false,
+		maxHeight: true,
+	},
+}
 
 export default VoiceChannel
