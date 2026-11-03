@@ -9,8 +9,13 @@ const fontFiles = fs
 	.filter((file) => file.endsWith(".ttf"))
 	.map((file) => `./assets/fonts/${file}`)
 
-export default ({ config }: ConfigContext): ExpoConfig => ({
-	...config,
+const buildArchs = ["arm64-v8a"]
+
+if (process.env.BUILD_X64 === "true") {
+	buildArchs.push("x86_64")
+}
+
+export const AppConfig = {
 	name: "Spaces",
 	slug: "spaces",
 	version: pkg.version,
@@ -87,7 +92,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 					compileSdkVersion: 36,
 					targetSdkVersion: 36,
 					buildToolsVersion: "36.0.0",
-					buildArchs: ["arm64-v8a", "x86_64"],
+					buildArchs,
 				},
 			},
 		],
@@ -120,4 +125,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		typedRoutes: true,
 		reactCompiler: true,
 	},
+} satisfies ExpoConfig
+
+export default ({ config }: ConfigContext): ExpoConfig => ({
+	...config,
+	...AppConfig,
 })
