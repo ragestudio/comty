@@ -1,6 +1,8 @@
 import type { RTCClient } from "@services/rtc/types"
 import type { MediaChannel } from "../"
 
+import { getClientUser } from "@shared-utils/clientUser"
+
 export type JoinClientOptions = {
 	isReconnection?: boolean
 }
@@ -27,14 +29,12 @@ export default async function (
 
 		// only notify other clients if this is NOT a reconnection
 		if (!options.isReconnection) {
-			const otherClients = clients.filter(
-				(c) => c.userId !== client.userId,
-			)
+			const otherClients = clients.filter((c) => c.userId !== client.userId)
 
 			for (const otherClient of otherClients) {
 				await otherClient.emit(`media:channel:client:joined`, {
 					userId: client.userId,
-					user: client.context.user,
+					user: getClientUser(client) ?? { _id: client.userId },
 					voiceState: client.voiceState,
 				})
 			}

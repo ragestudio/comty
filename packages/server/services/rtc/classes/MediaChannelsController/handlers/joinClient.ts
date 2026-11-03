@@ -3,6 +3,7 @@ import GroupChannelsModel from "@db/group_channels"
 import type MediaChannelsController from "../index"
 import { RTCClient } from "@services/rtc/types"
 import setFind from "@shared-utils/setFind"
+import { hydrateClientUser } from "@shared-utils/clientUser"
 
 export default async function (
 	this: MediaChannelsController,
@@ -24,6 +25,10 @@ export default async function (
 		if (!channel) {
 			throw new Error("Channel not found")
 		}
+
+		// attach a stable profile resolved from the user id, the gateway
+		// provided user object is not always available
+		await hydrateClientUser(client, this.server.contexts.redis?.client)
 
 		// Validate channel access
 		const group = await this.validateGroupAccess(
@@ -49,10 +54,7 @@ export default async function (
 				await this.leaveClient(client)
 			} else {
 				// check if reconnection is possible
-				const channelInstance = await this.getInstance(
-					channelId,
-					client,
-				)
+				const channelInstance = await this.getInstance(channelId, client)
 
 				if (channelInstance && !channelInstance.closed) {
 					// replace old client reference
@@ -88,10 +90,7 @@ export default async function (
 		let channelInstance = await this.getInstance(channelId, client)
 
 		if (!channelInstance || channelInstance?.closed === true) {
-			channelInstance = await this.createChannelInstance(
-				group._id,
-				channelId,
-			)
+			channelInstance = await this.createChannelInstance(group._id, channelId)
 		}
 
 		await this.users.set(client.userId, channelId)

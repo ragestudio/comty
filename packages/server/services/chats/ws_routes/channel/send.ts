@@ -2,6 +2,8 @@ import type API from "@services/chats/chats.service"
 import type { RTEClient } from "linebridge"
 import type { Message } from "@comty/shared/types/spaces/message"
 
+import { getClientUser } from "@shared-utils/clientUser"
+
 // Placeholder payload since we haven't strictly defined InboundEvents yet
 interface SendPayload extends Partial<Message> {
 	group_id: string
@@ -30,7 +32,7 @@ export default defineRoute<API, HandlerKind["ws"]>()({
 		)
 
 		await channel.write(
-			(client as any).user ?? client.socket.context.user,
+			getClientUser(client) ?? { _id: client.userId },
 			payload,
 		)
 	},

@@ -1,3 +1,5 @@
+import { getClientUser } from "@shared-utils/clientUser"
+
 export default {
 	useContexts: ["groupChannels"],
 	fn: async (client, payload, ctx) => {
@@ -28,7 +30,7 @@ export default {
 		)
 
 		return await channel.update(
-			(client as any).user ?? client.socket.context.user,
+			getClientUser(client) ?? { _id: client.userId },
 			payload.message_id,
 			payload.update,
 		)

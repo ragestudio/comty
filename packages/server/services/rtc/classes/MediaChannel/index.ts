@@ -10,6 +10,7 @@ import type Producer from "./producer"
 import type MediaChannelsController from "@classes/MediaChannelsController"
 
 import Bind from "@comty/shared/utils/bind"
+import { getClientUser } from "@shared-utils/clientUser"
 import { SFUNode } from "@classes/MediaChannelsController/sfu/node"
 import { EventEmitter } from "tseep/lib/ee-safe"
 
@@ -118,10 +119,7 @@ export class MediaChannel {
 				this.controller.markInstanceDirty(this.channelId)
 			}
 		} catch (error) {
-			console.error(
-				`[CHANNEL:${this.channelId}] Error initializing `,
-				error,
-			)
+			console.error(`[CHANNEL:${this.channelId}] Error initializing `, error)
 			throw error
 		}
 	}
@@ -145,9 +143,7 @@ export class MediaChannel {
 		const consumersMap = new Map<string, any[]>()
 
 		if (state.producers) {
-			for (const [userId, userProducers] of Object.entries(
-				state.producers,
-			)) {
+			for (const [userId, userProducers] of Object.entries(state.producers)) {
 				const innerMap = new Map<string, any>()
 				for (const [producerId, producerData] of Object.entries(
 					userProducers,
@@ -159,9 +155,7 @@ export class MediaChannel {
 		}
 
 		if (state.consumers) {
-			for (const [consumerId, consumers] of Object.entries(
-				state.consumers,
-			)) {
+			for (const [consumerId, consumers] of Object.entries(state.consumers)) {
 				consumersMap.set(consumerId, consumers)
 			}
 		}
@@ -234,37 +228,36 @@ export class MediaChannel {
 				channel_id: this.channelId,
 				voiceState: c.voiceState,
 				voice_state: c.voiceState,
-				user: {
-					_id: c.context.user?._id,
-					username: c.context.user?.username,
-					avatar: c.context.user?.avatar,
-				},
+				user: getClientUser(c) ?? { _id: c.userId },
 			}
 		})
 	}
 
 	getProducersSerialized(): SerializedProducer[] {
-		const producers = new Set()
+		const producers: SerializedProducer[] = []
 
 		for (const [producerUserId, userProducers] of this.producers) {
 			for (const [producerId, producer] of userProducers) {
-				producers.add({
-					id: producerId,
-					producer_id: producerId,
-					user_id: producerUserId,
-					kind:
-						(producer as any).producer?.kind ??
-						(producer as any).kind ??
-						null,
-					appData:
-						(producer as any).producer?.appData ??
-						(producer as any).appData ??
-						null,
+				// live producers expose serialize(), restored ones are already
+				// serialized objects
+				const serialized =
+					typeof (producer as any).serialize === "function"
+						? (producer as any).serialize()
+						: (producer as any)
+
+				producers.push({
+					id: serialized.id ?? producerId,
+					producerId: serialized.producerId ?? producerId,
+					channelId: serialized.channelId ?? this.channelId,
+					groupId: serialized.groupId ?? this.data?.group_id,
+					userId: serialized.userId ?? producerUserId,
+					kind: serialized.kind ?? null,
+					appData: serialized.appData ?? null,
 				})
 			}
 		}
 
-		return Array.from(producers) as SerializedProducer[]
+		return producers
 	}
 
 	serialize = (): SerializedMediaChannel => {

@@ -1,6 +1,8 @@
 import type API from "@services/chats/chats.service"
 import type { RTEClient } from "linebridge"
 
+import { resolveClientUser } from "@shared-utils/clientUser"
+
 interface TypingPayload {
 	group_id: string
 	channel_id: string
@@ -8,7 +10,7 @@ interface TypingPayload {
 }
 
 export default defineRoute<API, HandlerKind["ws"]>()({
-	useContexts: ["groupChannels"] as const,
+	useContexts: ["groupChannels", "redis"] as const,
 	fn: async (client: RTEClient, payload: TypingPayload, ctx) => {
 		if (!client.userId) {
 			throw new OperationError(400, "Missing userId")
@@ -28,7 +30,11 @@ export default defineRoute<API, HandlerKind["ws"]>()({
 			client.userId,
 		)
 
-		const userData = (client as any).user ?? client.socket.context.user
+		const userData = await resolveClientUser(client, ctx.redis?.client)
+
+		if (!userData) {
+			throw new OperationError(400, "Missing user")
+		}
 
 		await channel.sendEventToChannelTopic("channel:typing", {
 			user_id: client.userId,

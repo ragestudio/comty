@@ -1,13 +1,15 @@
 import type API from "@services/chats/chats.service"
 import type { RTEClient } from "linebridge"
 
+import { resolveClientUser } from "@shared-utils/clientUser"
+
 interface DMTypingPayload {
 	to_user_id: string
 	isTyping: boolean
 }
 
 export default defineRoute<API, HandlerKind["ws"]>()({
-	useContexts: ["dmChannels"] as const,
+	useContexts: ["dmChannels", "redis"] as const,
 	fn: async (client: RTEClient, payload: DMTypingPayload, ctx) => {
 		if (!client.userId) {
 			throw new OperationError(400, "Missing userId")
@@ -22,7 +24,11 @@ export default defineRoute<API, HandlerKind["ws"]>()({
 
 		const room = await ctx.dmChannels.get(from_user_id, to_user_id)
 
-		const userData = (client as any).user ?? client.socket.context.user
+		const userData = await resolveClientUser(client, ctx.redis?.client)
+
+		if (!userData) {
+			throw new OperationError(400, "Missing user")
+		}
 
 		await room.sendEventToChannelTopic("channel:typing", {
 			user_id: client.userId,

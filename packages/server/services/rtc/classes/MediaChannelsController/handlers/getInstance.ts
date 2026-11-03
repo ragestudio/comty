@@ -2,6 +2,7 @@ import { RTCClient } from "@services/rtc/types"
 import type MediaChannelsController from ".."
 
 import { MediaChannel, SerializedMediaChannel } from "@classes/MediaChannel"
+import { normalizeClientUser } from "@shared-utils/clientUser"
 
 function DeserializeMaps(state: SerializedMediaChannel) {
 	const producersMap = new Map<string, Map<string, any>>()
@@ -10,9 +11,7 @@ function DeserializeMaps(state: SerializedMediaChannel) {
 	if (state.producers) {
 		for (const [userId, userProducers] of Object.entries(state.producers)) {
 			const innerMap = new Map<string, any>()
-			for (const [producerId, producerData] of Object.entries(
-				userProducers,
-			)) {
+			for (const [producerId, producerData] of Object.entries(userProducers)) {
 				innerMap.set(producerId, producerData)
 			}
 			producersMap.set(userId, innerMap)
@@ -55,9 +54,7 @@ export default async function (
 
 		// if state is available, but sfu_node is not found, is needed to throw an error
 		if (!sfu_node) {
-			throw new Error(
-				`Failed to find SFU node for channel [${channelId}]`,
-			)
+			throw new Error(`Failed to find SFU node for channel [${channelId}]`)
 		}
 
 		const router = await sfu_node.getRouter(state.router_id)
@@ -67,10 +64,7 @@ export default async function (
 			throw new Error(`Failed to get router for channel [${channelId}]`)
 		}
 
-		console.log(
-			`Restoring channel instance for channel [${channelId}]`,
-			state,
-		)
+		console.log(`Restoring channel instance for channel [${channelId}]`, state)
 
 		// TODO: Check the ownership controller of the channel.
 		// If the channel is not owned by this controller, try to ask to the controller owner.
@@ -90,47 +84,46 @@ export default async function (
 		restoredInstance.sfu_node = sfu_node
 		restoredInstance.router = router
 		restoredInstance.started_at = new Date(state.started_at)
+		const restoredClients = state.clients.map((client) => {
+			if (bindClient && client.userId === bindClient.userId) {
+				return bindClient
+			}
+
+			// restored clients only keep the persisted state, the profile is
+			// part of it so no memory reference is needed
+			const user = normalizeClientUser(client.user) ?? {
+				_id: client.userId,
+			}
+
+			const staleClient: Partial<RTCClient> = {
+				staled: true,
+				userId: client.userId,
+				channel_id: state.channel_id,
+				voiceState: client.voiceState,
+				//@ts-ignore
+				voice_state: client.voiceState,
+				//@ts-ignore
+				context: {
+					user,
+				},
+			}
+
+			//@ts-ignore
+			staleClient.socket = {
+				context: staleClient.context,
+			}
+
+			return staleClient
+		})
+
 		// @ts-ignore
-		restoredInstance.clients = new Set(
-			state.clients.map((client) => {
-				if (bindClient && client.userId === bindClient.userId) {
-					return bindClient
-				}
-
-				const staleClient: Partial<RTCClient> = {
-					staled: true,
-					userId: client.userId,
-					channel_id: state.channel_id,
-					voiceState: client.voiceState,
-					//@ts-ignore
-					voice_state: client.voiceState,
-				}
-
-				staleClient.socket = {
-					// @ts-ignore
-					context: {
-						// @ts-ignore
-						user: client.user,
-					},
-				}
-				// @ts-ignore
-				staleClient.context = {
-					// @ts-ignore
-					user: client.user,
-				}
-
-				return staleClient
-			}),
-		)
+		restoredInstance.clients = new Set(restoredClients)
 
 		const { producers, consumers } = DeserializeMaps(state)
 		restoredInstance.producers = producers
 		restoredInstance.consumers = consumers
 
-		console.log(
-			"Restored channel instance from state bucket",
-			restoredInstance,
-		)
+		console.log("Restored channel instance from state bucket", restoredInstance)
 
 		//await restoredInstance.initialize()
 
