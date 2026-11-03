@@ -68,12 +68,14 @@ export const GroupStore = create<GroupStoreType>()((set, get) => {
 	}
 })
 
-export const useGroupStore = () => GroupStore((s) => useShallow((s) => s))
+export const useGroupStore = () => GroupStore(useShallow((s) => s))
 export const useGroupData = () => GroupStore((s) => s.data)
 export const useGroupChannels = () => GroupStore((s) => s.channels)
 export const useGroupMembers = () => GroupStore((s) => s.members)
 export const useGroupRTC = () => GroupStore((s) => s.statedChannels)
 export const useGroupStatedChannels = () => GroupStore((s) => s.statedChannels)
+export const useGroupStatedChannel = (channelId?: string | null) =>
+	GroupStore((s) => (channelId ? s.statedChannels[channelId] : undefined))
 export const useGroupConnections = () => GroupStore((s) => s.connectedMembers)
 export const useGroupDecorations = () => GroupStore((s) => s.membersDecorations)
 export const useGroupLoading = () => GroupStore((s) => s.loading)
