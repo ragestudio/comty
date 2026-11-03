@@ -2,6 +2,8 @@ import type { LayoutChangeEvent } from "react-native"
 
 import React from "react"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import { ScrollView } from "react-native"
+
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Animated, {
 	runOnJS,
@@ -15,7 +17,10 @@ import TextureBg from "@/ui/TextureBg"
 import AppButton from "@/ui/Button"
 import InputAudioControls from "@/components/InputAudioControls"
 import CameraControls from "@/components/CameraControls"
+import ScreenShareControls from "@/components/ScreenShareControls"
 import SectionTitle from "./SectionTitle"
+import ConnectionStatus from "./ConnectionStatus"
+import ConnectionStats from "./ConnectionStats"
 
 import {
 	MicIcon,
@@ -36,6 +41,10 @@ import {
 	CAMERA_RESOLUTIONS,
 	useCameraControls,
 } from "@/components/CameraControls/store"
+import {
+	getScreenShareSize,
+	useScreenShareControls,
+} from "@/components/ScreenShareControls/store"
 
 import { CONTAINER_ANIM_SPRING, DRAG_THRESHOLD } from "./constants"
 
@@ -45,6 +54,7 @@ export const RTCControls = () => {
 	const insets = useSafeAreaInsets()
 	const controls = useRTCControls()
 	const cameraControls = useCameraControls()
+	const screenShareControls = useScreenShareControls()
 
 	const expanded = controls.expanded
 	const progress = useSharedValue(expanded ? 1 : 0)
@@ -62,20 +72,16 @@ export const RTCControls = () => {
 		}
 	}, [expanded])
 
-	const contentStyle = useAnimatedStyle(() => ({
-		height: Math.max(contentHeight.value * progress.value, 0),
-		opacity: Math.max(progress.value, 0),
-	}))
-
 	// the tab bar collapses while expanded, so the panel has to take over its
 	// bottom safe area padding
 	const containerStyle = useAnimatedStyle(() => ({
 		paddingBottom: insets.bottom * progress.value,
 	}))
 
-	const onContentLayout = (event: LayoutChangeEvent) => {
-		contentHeight.value = event.nativeEvent.layout.height
-	}
+	const contentStyle = useAnimatedStyle(() => ({
+		height: Math.max(400 * progress.value, 0),
+		opacity: Math.max(progress.value, 0),
+	}))
 
 	// a small drag past the threshold opens or closes the panel, animating with a
 	// spring so the reveal is smooth instead of following the finger
@@ -107,9 +113,18 @@ export const RTCControls = () => {
 
 	const handleToggleScreenshare = () => {
 		if (rtc.screenVideoProducerId) {
-			rtcService.self.destroyMedia("screen")
+			rtcService.self.destroyMedia("screen").catch(console.error)
 		} else {
-			rtcService.self.createMedia<"screen">("screen")
+			const size = getScreenShareSize(screenShareControls.quality)
+
+			// the web shares the system audio by default, keep both platforms aligned
+			rtcService.self
+				.createMedia<"screen">("screen", {
+					systemAudio: true,
+					framerate: screenShareControls.framerate,
+					resolutionScale: size.scale,
+				})
+				.catch(console.error)
 		}
 	}
 
@@ -143,24 +158,38 @@ export const RTCControls = () => {
 						blurBackground
 					/>
 
-					<GestureDetector gesture={panGesture}>
-						<Animated.View>
-							<XStack
-								alignItems="center"
-								justifyContent="center"
-								paddingHorizontal={16}
-								paddingVertical={8}
-							>
-								<YStack
-									width={36}
-									height={4}
-									borderRadius={2}
-									backgroundColor="$borderColorSolid"
-									opacity={0.5}
-								/>
-							</XStack>
-						</Animated.View>
-					</GestureDetector>
+					<YStack position="relative">
+						<GestureDetector gesture={panGesture}>
+							<Animated.View>
+								<XStack
+									alignItems="center"
+									justifyContent="center"
+									paddingHorizontal={16}
+									paddingVertical={8}
+								>
+									<YStack
+										width={36}
+										height={4}
+										borderRadius={2}
+										backgroundColor="$borderColorSolid"
+										opacity={0.5}
+									/>
+								</XStack>
+							</Animated.View>
+						</GestureDetector>
+
+						<XStack
+							position="absolute"
+							left={16}
+							top={0}
+							bottom={0}
+							alignItems="center"
+						>
+							<ConnectionStatus
+								onPress={() => controls.setExpanded(!expanded)}
+							/>
+						</XStack>
+					</YStack>
 
 					<XStack
 						width="100%"
@@ -230,24 +259,37 @@ export const RTCControls = () => {
 
 					<Animated.View style={[{ overflow: "hidden" }, contentStyle]}>
 						<YStack
-							position="absolute"
-							top={0}
-							left={0}
-							right={0}
-							onLayout={onContentLayout}
+							flex={1}
 							paddingHorizontal={16}
 							paddingVertical={16}
 							gap={20}
 						>
-							<YStack gap={6}>
-								<SectionTitle>Audio</SectionTitle>
-								<InputAudioControls />
-							</YStack>
+							<ScrollView
+								style={{ flex: 1 }}
+								contentContainerStyle={{ flexGrow: 1 }}
+							>
+								<YStack gap={6}>
+									<SectionTitle>Audio</SectionTitle>
+									<InputAudioControls />
+								</YStack>
 
-							<YStack gap={6}>
-								<SectionTitle>Camera</SectionTitle>
-								<CameraControls />
-							</YStack>
+								<YStack gap={6}>
+									<SectionTitle>Camera</SectionTitle>
+									<CameraControls />
+								</YStack>
+
+								<YStack gap={6}>
+									<SectionTitle>Screen share</SectionTitle>
+									<ScreenShareControls />
+								</YStack>
+
+								{expanded && (
+									<YStack gap={6}>
+										<SectionTitle>Connection</SectionTitle>
+										<ConnectionStats />
+									</YStack>
+								)}
+							</ScrollView>
 						</YStack>
 					</Animated.View>
 				</YStack>
