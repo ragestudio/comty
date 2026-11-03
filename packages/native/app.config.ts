@@ -1,5 +1,6 @@
 import fs from "node:fs"
 import path from "node:path"
+import pkg from "./package.json"
 
 import { ExpoConfig, ConfigContext } from "expo/config"
 
@@ -12,7 +13,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	name: "Spaces",
 	slug: "spaces",
-	version: "0.3.0",
+	version: pkg.version,
 	orientation: "portrait",
 	icon: "./assets/icon.png",
 	scheme: "app",
@@ -106,6 +107,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 						types: ["microphone", "camera"],
 					},
 				},
+			},
+		],
+		[
+			"expo-audio",
+			{
+				enableBackgroundPlayback: true,
 			},
 		],
 	],
