@@ -7,10 +7,10 @@ import fonts from "./load/fonts"
 
 import { reconnectionToastStore } from "./reconnectionToast"
 import ThemeController from "./theme"
-import AuthManager from "./auth"
 
-import session from "comty.js/session"
 import client from "comty.js/client"
+import { authManager } from "comty.js"
+
 import { BaseStore } from "@comty/spaces-sdk/classes"
 import { rtcService } from "@comty/spaces-sdk/rtc"
 
@@ -30,7 +30,6 @@ interface AppState {
 	ready: boolean
 	earlyDone: boolean
 	router: ImperativeRouter | null
-	userData: typeof session.user | null
 	connected: boolean
 }
 
@@ -40,18 +39,38 @@ export class App extends BaseStore<AppState> {
 	earlyDone: Boolean = false
 	eventBus: EventEmitter = new EventEmitter()
 
-	auth: AuthManager = new AuthManager(this)
 	theme: ThemeController = new ThemeController(this)
-	userData!: typeof session.user | null
 
 	constructor() {
 		super({
 			ready: false,
 			earlyDone: false,
 			router: null,
-			userData: null,
 			connected: false,
 		})
+	}
+
+	private async initializeAuthManager() {
+		authManager.on("auth:unauthenticated", () => {
+			console.log("unauthed")
+			this.router?.navigate("/auth")
+		})
+		authManager.on("session:invalid", () => {
+			this.router?.navigate("/auth")
+		})
+		authManager.on("auth:login_success", async () => {
+			console.log("login success")
+			await authManager.adopt()
+			this.router?.navigate("/")
+		})
+		authManager.on("auth:logout_success", async () => {
+			this.router?.navigate("/auth")
+		})
+
+		// run auth manager
+		await authManager.start()
+
+		console.log("authManagerStore:", authManager.store.getState())
 	}
 
 	async initialize(params: AppInitializeParam) {
@@ -74,8 +93,7 @@ export class App extends BaseStore<AppState> {
 		this.setState({ ready: true })
 		this.eventBus.emit(InternalEvents.INIT_FINISH)
 
-		// run auth manager
-		await this.auth.initialize()
+		await this.initializeAuthManager()
 
 		const socket = client.ws.get("main")
 

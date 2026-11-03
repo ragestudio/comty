@@ -8,9 +8,11 @@ import Input from "@/ui/Input"
 import { useForm, Controller } from "react-hook-form"
 
 import { CircleSlash } from "lucide-react-native"
-import { app } from "@/engine/app"
 import useMainSheetStore from "@/stores/MainSheet"
 import LoginCode from "@/components/LoginCode"
+
+import { app } from "@/engine/app"
+import { authManager } from "comty.js"
 
 type AuthValues = {
 	username: string
@@ -33,7 +35,11 @@ const AuthView = () => {
 		setLoading(true)
 
 		try {
-			await app.auth.login(data.username, data.password, code)
+			await authManager.login({
+				username: data.username,
+				password: data.password,
+				mfa_code: code,
+			})
 		} catch (errOrAction: any) {
 			if (!errOrAction.action_required) {
 				console.error(errOrAction, errOrAction.response?.data)
