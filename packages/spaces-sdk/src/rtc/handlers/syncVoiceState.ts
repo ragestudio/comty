@@ -12,8 +12,8 @@ export function syncVoiceState(this: RTC) {
 		},
 	})
 
-	// if socket is connected, emit voice state update
-	if (this.socket) {
+	// if socket is connected and inside a channel, emit voice state update
+	if (this.socket && this.channel) {
 		try {
 			this.socket.emit("channel:client_event", {
 				event: "updateVoiceState",
