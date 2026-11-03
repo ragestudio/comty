@@ -1,5 +1,6 @@
 import type { PressHandler } from "@/types"
 
+import React from "react"
 import { useTheme, YStack } from "tamagui"
 import { TvMinimalPlayIcon } from "lucide-react-native"
 import AppText from "@/ui/Text"
@@ -53,4 +54,4 @@ export const VideoPromptTile = ({
 	)
 }
 
-export default VideoPromptTile
+export default React.memo(VideoPromptTile)

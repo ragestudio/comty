@@ -1,10 +1,11 @@
 import type { PressHandler } from "@/types"
 import type { Client } from "@comty/shared/types/rtc/client"
 
+import React from "react"
 import { Image } from "react-native"
 import AppText from "@/ui/Text"
 import { MicOffIcon, HeadphoneOffIcon } from "lucide-react-native"
-import { useTheme, XStack } from "tamagui"
+import { useTheme, XStack, YStack } from "tamagui"
 import clientName from "@/utils/clientName"
 
 import TileFrame from "./TileFrame"
@@ -24,7 +25,14 @@ export const ClientTile = ({
 }) => {
 	const theme = useTheme()
 
+	const name = clientName(client)
+	const avatar = client.user?.avatar
 	const avatarSize = Math.round(Math.min(width, height) * 0.4)
+
+	const initials = React.useMemo(
+		() => name.trim().slice(0, 2).toUpperCase() || "?",
+		[name],
+	)
 
 	return (
 		<TileFrame
@@ -33,15 +41,28 @@ export const ClientTile = ({
 			active={speaking}
 			onPress={onPress}
 		>
-			<Image
-				source={{ uri: client.user?.avatar }}
-				style={{
-					width: avatarSize,
-					height: avatarSize,
-					borderRadius: avatarSize / 2,
-					backgroundColor: theme.bgAccentSolid?.val,
-				}}
-			/>
+			{avatar ? (
+				<Image
+					source={{ uri: avatar }}
+					style={{
+						width: avatarSize,
+						height: avatarSize,
+						borderRadius: avatarSize / 2,
+						backgroundColor: theme.bgAccentSolid?.val,
+					}}
+				/>
+			) : (
+				<YStack
+					width={avatarSize}
+					height={avatarSize}
+					borderRadius={avatarSize / 2}
+					alignItems="center"
+					justifyContent="center"
+					backgroundColor="$bgAccentSolid"
+				>
+					<AppText fontSize={Math.round(avatarSize * 0.32)}>{initials}</AppText>
+				</YStack>
+			)}
 
 			<XStack
 				alignItems="center"
@@ -64,11 +85,11 @@ export const ClientTile = ({
 					fontSize={12}
 					numberOfLines={1}
 				>
-					{clientName(client)}
+					{name}
 				</AppText>
 			</XStack>
 		</TileFrame>
 	)
 }
 
-export default ClientTile
+export default React.memo(ClientTile)

@@ -1,5 +1,6 @@
 import type { PressHandler } from "@/types"
 
+import React from "react"
 import { useTheme, View, XStack, YStack } from "tamagui"
 import { RTCView } from "@ragestudio/react-native-webrtc"
 import { Maximize2Icon, TvMinimalPlayIcon, XIcon } from "lucide-react-native"
@@ -34,6 +35,13 @@ export const VideoViewTile = ({
 	hidden?: boolean
 }) => {
 	const theme = useTheme()
+
+	const [localVolume, setLocalVolume] = React.useState(volume ?? 100)
+
+	// the sdk is the source of truth, keep the thumb in sync with the store
+	React.useEffect(() => {
+		if (volume !== undefined) setLocalVolume(volume)
+	}, [volume])
 
 	return (
 		<YStack
@@ -145,7 +153,8 @@ export const VideoViewTile = ({
 						min={0}
 						max={100}
 						step={1}
-						defaultValue={volume}
+						value={localVolume}
+						onValueChange={setLocalVolume}
 						onValueCommit={onVolume}
 						haptics
 					/>
@@ -155,4 +164,4 @@ export const VideoViewTile = ({
 	)
 }
 
-export default VideoViewTile
+export default React.memo(VideoViewTile)

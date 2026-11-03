@@ -1,11 +1,13 @@
 import type { SerializedRemoteMedia } from "@comty/spaces-sdk/rtc"
+import type { Client } from "@comty/shared/types/rtc/client"
 import type { GestureResponderEvent, LayoutChangeEvent } from "react-native"
 
 import React from "react"
 import { View } from "react-native"
 import { XStack, YStack } from "tamagui"
+import { useShallow } from "zustand/react/shallow"
 
-import { useGroupRTC } from "@comty/spaces-sdk/group"
+import { useGroupStatedChannel } from "@comty/spaces-sdk/group"
 import { rtcService, useRTCStore } from "@comty/spaces-sdk/rtc"
 import { useScreenFullscreen } from "@/components/ScreenFullscreen/store"
 
@@ -25,35 +27,65 @@ import {
 	GridItem,
 } from "./constants"
 
+const EMPTY_CLIENTS: Client[] = []
+
 const ChannelGrid = () => {
-	const rtc = useRTCStore()
-	const channelState = useGroupRTC()
+	const {
+		channel,
+		screens,
+		cameras,
+		speakingClients,
+		isSpeaking,
+		localScreenStreamURL,
+		localCameraStreamURL,
+	} = useRTCStore(
+		useShallow((state) => ({
+			channel: state.channel,
+			screens: state.statedScreens,
+			cameras: state.statedCameras,
+			speakingClients: state.speakingClients,
+			isSpeaking: state.isSpeaking,
+			localScreenStreamURL: state.localScreenStreamURL,
+			localCameraStreamURL: state.localCameraStreamURL,
+		})),
+	)
+
 	const fullscreen = useScreenFullscreen()
+
+	const channelId = channel?._id
+	const groupChannel = useGroupStatedChannel(channelId)
+	const clients = groupChannel?.clients ?? EMPTY_CLIENTS
+
+	const selfUserId = rtcService.userId
 
 	const [area, setArea] = React.useState({ width: 0, height: 0 })
 	const [focusedId, setFocusedId] = React.useState<string | null>(null)
 
-	const channelId = rtc.channel?._id
-	const clients =
-		(channelId ? channelState[channelId]?.clients : undefined) ?? []
-	const speaking = rtc.speakingClients ?? []
+	const items = React.useMemo<GridItem[]>(() => {
+		const next: GridItem[] = []
 
-	const screens = rtc.statedScreens ?? []
-	const cameras = rtc.statedCameras ?? []
-	const localScreenStreamURL = rtc.localScreenStreamURL
-	const localCameraStreamURL = rtc.localCameraStreamURL
+		if (localScreenStreamURL) {
+			next.push({ kind: "local", media: "screen" })
+		}
 
-	const items: GridItem[] = [
-		...(localScreenStreamURL
-			? [{ kind: "local" as const, media: "screen" as const }]
-			: []),
-		...screens.map((screen) => ({ kind: "screen" as const, screen })),
-		...(localCameraStreamURL
-			? [{ kind: "local" as const, media: "camera" as const }]
-			: []),
-		...cameras.map((camera) => ({ kind: "camera" as const, camera })),
-		...clients.map((client) => ({ kind: "client" as const, client })),
-	]
+		for (const screen of screens) {
+			next.push({ kind: "screen", screen })
+		}
+
+		if (localCameraStreamURL) {
+			next.push({ kind: "local", media: "camera" })
+		}
+
+		for (const camera of cameras) {
+			next.push({ kind: "camera", camera })
+		}
+
+		for (const client of clients) {
+			next.push({ kind: "client", client })
+		}
+
+		return next
+	}, [localScreenStreamURL, localCameraStreamURL, screens, cameras, clients])
 
 	const columns = columnsFor(items.length)
 	const maxCell = area.width > 0 ? (area.width - GAP) / 2 : 0
@@ -72,82 +104,120 @@ const ChannelGrid = () => {
 	const focusedIndex = items.findIndex((item) => idOf(item) === focusedId)
 	const focused = focusedIndex >= 0 ? items[focusedIndex] : null
 
-	const nameOf = (userId: string) => {
-		const client = clients.find((c) => c.userId === userId)
-		return client ? clientName(client) : userId
-	}
+	const nameOf = React.useCallback(
+		(userId: string) => {
+			const client = clients.find((item) => item.userId === userId)
 
-	const handleCardPress = (id: string) => (event: GestureResponderEvent) => {
-		event.stopPropagation()
-		setFocusedId((prev) => (prev === id ? null : id))
-	}
+			return client ? clientName(client) : userId
+		},
+		[clients],
+	)
 
-	const handleScreenPromptPress =
+	const handleCardPress = React.useCallback(
+		(id: string) => (event: GestureResponderEvent) => {
+			event.stopPropagation()
+			setFocusedId((prev) => (prev === id ? null : id))
+		},
+		[],
+	)
+
+	const handleScreenPromptPress = React.useCallback(
 		(screen: SerializedRemoteMedia) => (event: GestureResponderEvent) => {
 			event.stopPropagation()
-			rtcService.screens.enable(screen.userId)
-			setFocusedId(idOf({ kind: "screen", screen }))
-		}
 
-	const handleCameraPromptPress =
+			rtcService.screens.enable(screen.userId).catch(console.error)
+			setFocusedId(idOf({ kind: "screen", screen }))
+		},
+		[],
+	)
+
+	const handleCameraPromptPress = React.useCallback(
 		(camera: SerializedRemoteMedia) => (event: GestureResponderEvent) => {
 			event.stopPropagation()
-			rtcService.cameras.enable(camera.userId)
+
+			rtcService.cameras.enable(camera.userId).catch(console.error)
 			setFocusedId(idOf({ kind: "camera", camera }))
-		}
+		},
+		[],
+	)
 
-	const handleBackgroundPress = () => {
-		if (focusedId !== null) setFocusedId(null)
-	}
+	const handleBackgroundPress = React.useCallback(() => {
+		setFocusedId(null)
+	}, [])
 
-	const handleOnFullscreenItem = (item: GridItem) => {
-		if (item.kind === "local") {
-			const id = idOf(item)
-			const isScreen = item.media === "screen"
-			const streamURL = isScreen ? localScreenStreamURL : localCameraStreamURL
+	const handleOnFullscreenItem = React.useCallback(
+		(item: GridItem) => {
+			if (item.kind === "local") {
+				const isScreen = item.media === "screen"
+				const streamURL = isScreen ? localScreenStreamURL : localCameraStreamURL
 
-			if (!streamURL) return
+				if (!streamURL) return
 
-			fullscreen.open(id, {
-				streamURL,
-				label: isScreen ? "Your screen" : "Your camera",
-				hasAudio: false,
-				volume: 0,
-			})
+				fullscreen.open(idOf(item), {
+					streamURL,
+					label: isScreen ? "Your screen" : "Your camera",
+					hasAudio: false,
+					volume: 0,
+				})
 
-			return
-		}
+				return
+			}
 
-		if (item.kind === "screen") {
-			fullscreen.open(idOf(item), {
-				streamURL: item.screen.streamURL,
-				label: nameOf(item.screen.userId),
-				hasAudio: item.screen.hasAudio,
-				volume: item.screen.volume,
-				onVolume: (value) =>
-					rtcService.screens.setVolume(item.screen.userId, value),
-			})
+			if (item.kind === "screen") {
+				fullscreen.open(idOf(item), {
+					streamURL: item.screen.streamURL,
+					label: nameOf(item.screen.userId),
+					hasAudio: item.screen.hasAudio,
+					volume: item.screen.volume,
+					onVolume: (value) =>
+						rtcService.screens.setVolume(item.screen.userId, value),
+				})
 
-			return
-		}
+				return
+			}
 
-		if (item.kind === "camera") {
-			fullscreen.open(idOf(item), {
-				streamURL: item.camera.streamURL,
-				label: nameOf(item.camera.userId),
-				hasAudio: item.camera.hasAudio,
-				volume: item.camera.volume,
-			})
-		}
-	}
+			if (item.kind === "camera") {
+				fullscreen.open(idOf(item), {
+					streamURL: item.camera.streamURL,
+					label: nameOf(item.camera.userId),
+					hasAudio: false,
+					volume: 0,
+				})
+			}
+		},
+		[fullscreen, localScreenStreamURL, localCameraStreamURL, nameOf],
+	)
 
-	const onLayout = (event: LayoutChangeEvent) => {
+	const onLayout = React.useCallback((event: LayoutChangeEvent) => {
 		const { width, height } = event.nativeEvent.layout
 
-		if (width !== area.width || height !== area.height) {
-			setArea({ width, height })
-		}
-	}
+		setArea((prev) => {
+			if (prev.width === width && prev.height === height) return prev
+
+			return { width, height }
+		})
+	}, [])
+
+	const handleStopLocal = React.useCallback((media: "screen" | "camera") => {
+		rtcService.self
+			.destroyMedia(media === "screen" ? "screen" : "cam")
+			.catch(console.error)
+	}, [])
+
+	const handleStopScreen = React.useCallback((userId: string) => {
+		rtcService.screens.disable(userId).catch(console.error)
+	}, [])
+
+	const handleStopCamera = React.useCallback((userId: string) => {
+		rtcService.cameras.disable(userId).catch(console.error)
+	}, [])
+
+	const handleScreenVolume = React.useCallback(
+		(userId: string, value: number) => {
+			rtcService.screens.setVolume(userId, value)
+		},
+		[],
+	)
 
 	const buildTile = (item: GridItem, width: number, height: number) => {
 		const id = idOf(item)
@@ -162,9 +232,7 @@ const ChannelGrid = () => {
 					height={height}
 					streamURL={isScreen ? localScreenStreamURL : localCameraStreamURL}
 					label={isScreen ? "Your screen" : "Your camera"}
-					onStop={() =>
-						rtcService.self.destroyMedia(isScreen ? "screen" : "cam")
-					}
+					onStop={() => handleStopLocal(item.media)}
 					onExpand={() => handleOnFullscreenItem(item)}
 					hidden={fullscreen.id === id}
 					onPress={handleCardPress(id)}
@@ -173,6 +241,8 @@ const ChannelGrid = () => {
 		}
 
 		if (item.kind === "screen") {
+			const userId = item.screen.userId
+
 			if (item.screen.enabled) {
 				return (
 					<VideoViewTile
@@ -180,14 +250,12 @@ const ChannelGrid = () => {
 						width={width}
 						height={height}
 						streamURL={item.screen.streamURL}
-						label={nameOf(item.screen.userId)}
+						label={nameOf(userId)}
 						hasAudio={item.screen.hasAudio}
 						volume={item.screen.volume}
-						onVolume={(value) =>
-							rtcService.screens.setVolume(item.screen.userId, value)
-						}
+						onVolume={(value) => handleScreenVolume(userId, value)}
 						onStop={() => {
-							rtcService.screens.disable(item.screen.userId)
+							handleStopScreen(userId)
 							setFocusedId((prev) => (prev === id ? null : prev))
 						}}
 						onExpand={() => handleOnFullscreenItem(item)}
@@ -202,13 +270,15 @@ const ChannelGrid = () => {
 					key={id}
 					width={width}
 					height={height}
-					label={nameOf(item.screen.userId)}
+					label={nameOf(userId)}
 					onPress={handleScreenPromptPress(item.screen)}
 				/>
 			)
 		}
 
 		if (item.kind === "camera") {
+			const userId = item.camera.userId
+
 			if (item.camera.enabled) {
 				return (
 					<VideoViewTile
@@ -216,9 +286,9 @@ const ChannelGrid = () => {
 						width={width}
 						height={height}
 						streamURL={item.camera.streamURL}
-						label={nameOf(item.camera.userId)}
+						label={nameOf(userId)}
 						onStop={() => {
-							rtcService.cameras.disable(item.camera.userId)
+							handleStopCamera(userId)
 							setFocusedId((prev) => (prev === id ? null : prev))
 						}}
 						onExpand={() => handleOnFullscreenItem(item)}
@@ -233,7 +303,7 @@ const ChannelGrid = () => {
 					key={id}
 					width={width}
 					height={height}
-					label={nameOf(item.camera.userId)}
+					label={nameOf(userId)}
 					hint="tap to view"
 					onPress={handleCameraPromptPress(item.camera)}
 				/>
@@ -245,8 +315,8 @@ const ChannelGrid = () => {
 				key={id}
 				client={item.client}
 				speaking={
-					speaking.includes(item.client.userId) ||
-					(!!item.client.self && rtc.isSpeaking)
+					speakingClients.includes(item.client.userId) ||
+					(item.client.userId === selfUserId && isSpeaking)
 				}
 				width={width}
 				height={height}
@@ -266,11 +336,10 @@ const ChannelGrid = () => {
 			</XStack>
 		))
 
-	// Safe guardrail if there are a fullscreen payload but no id applied
+	// safe guardrail if there is a fullscreen payload but no id applied
 	React.useEffect(() => {
 		if (!fullscreen.id && fullscreen.payload) {
 			fullscreen.close()
-			return
 		}
 	}, [fullscreen])
 
