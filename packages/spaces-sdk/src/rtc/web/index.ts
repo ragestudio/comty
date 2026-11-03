@@ -11,6 +11,7 @@ import {
 } from "./audio-processing"
 import { webAudioRouting } from "./audio-routing"
 import { webAudioSettingsStorage } from "./audio-settings"
+import { webSoundpad } from "./soundpad"
 import { sysAudio } from "./sys-audio"
 import { rebuildAllTracks, setTrackVolume } from "./track-volume"
 
@@ -34,6 +35,8 @@ export function initializeRtcAdapter(): Promise<void> {
 
 	adapter.registerTrackVolume({ setVolume: setTrackVolume })
 
+	adapter.registerSoundpad(webSoundpad)
+
 	adapter.registerMediaStreamReleaser(releaseMicStream)
 
 	adapter.registerMediaStreamProcessor(async (stream, kind) => {
@@ -42,10 +45,7 @@ export function initializeRtcAdapter(): Promise<void> {
 		try {
 			return await processMicStream(stream)
 		} catch (error) {
-			console.error(
-				"[spaces-adapter] failed to process mic stream",
-				error,
-			)
+			console.error("[spaces-adapter] failed to process mic stream", error)
 			return stream
 		}
 	})
