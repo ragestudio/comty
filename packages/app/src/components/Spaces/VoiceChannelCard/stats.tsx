@@ -1,7 +1,6 @@
 import React from "react"
 import humanReadable from "@tsmx/human-readable"
-import parseTransportStats from "./parseTransportStats"
-import { rtcService } from "@comty/spaces-sdk/rtc"
+import { parseTransportStats, rtcService } from "@comty/spaces-sdk/rtc"
 
 import { Icons } from "@components/Icons"
 
