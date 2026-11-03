@@ -31,12 +31,8 @@ export interface ParsedTransportStats {
 	dtlsCipher: string | null
 }
 
-type StatsReport = {
-	values(): IterableIterator<any>
-}
-
 export default function parseTransportStats(
-	rawStats?: StatsReport | null,
+	rawStats?: RTCStatsReport | null | undefined,
 ): ParsedTransportStats {
 	const parsed: ParsedTransportStats = {
 		bytesSent: 0,
