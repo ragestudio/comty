@@ -143,6 +143,7 @@ export class SfuNode extends Server<"nats"> {
 
 		logger.info(
 			`[sfu] node ${this.config.nodeId} registered as ${this.config.refName}`,
+			payload,
 		)
 	}
 
