@@ -11,7 +11,7 @@ import VoiceClient from "@components/Spaces/VoiceClient"
 import { Icons } from "@components/Icons"
 
 import { useRTCStore } from "@/rtc"
-import { GroupStore } from "@/group"
+import { useGroupStatedChannel } from "@/group"
 
 import "./index.less"
 
@@ -28,14 +28,10 @@ const ChannelsListItem = ({
 	hasUnread?: boolean
 	handleOnClick?: MouseEventHandler
 }) => {
-	if (!channel) {
-		return null
-	}
-
-	const channelState = GroupStore((s) => s.statedChannels[channel._id])
+	const channelState = useGroupStatedChannel(channel?._id)
 	const rtcState = useRTCStore()
 
-	const isJoined = rtcState.channel?._id === channel._id
+	const isJoined = rtcState.channel?._id === channel?._id
 
 	// only return true if the client is speaking and is joined to the channel
 	const isClientSpeaking = React.useCallback(
@@ -60,6 +56,11 @@ const ChannelsListItem = ({
 		},
 		[channelState],
 	)
+
+	// hooks must run before any early return
+	if (!channel) {
+		return null
+	}
 
 	return (
 		<div
