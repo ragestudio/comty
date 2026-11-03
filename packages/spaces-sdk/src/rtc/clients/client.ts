@@ -4,6 +4,7 @@ import type { Producer } from "../producers/producer"
 import type { Consumer } from "../consumers/consumer"
 import type { SoundpadDispatch } from "@comty/shared/types/rtc/clientEvent"
 import type { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
+import type { SoundpadPlayback } from "@/adapter"
 
 import loggerBase from "@comty/shared/utils/logger"
 import adapter from "@/adapter"
@@ -21,10 +22,7 @@ export class Client {
 	core: RTC
 	logger: typeof logger
 
-	constructor(
-		core: RTC,
-		data: Partial<Pick<Client, "userId" | "voiceState">>,
-	) {
+	constructor(core: RTC, data: Partial<Pick<Client, "userId" | "voiceState">>) {
 		this.core = core
 
 		if (!data.userId) {
@@ -166,24 +164,18 @@ export class Client {
 	async dispatchSoundpad(payload: RTC_ClientEvent<SoundpadDispatch>) {
 		this.logger.debug("dispatched soundpad audio", payload)
 
-		const audio = new Audio()
+		const eventBusPayload = {
+			userId: payload.userId,
+			src: payload.data.src,
+			icon: payload.data.icon,
+		}
 
-		audio.onended = () => {
+		const notifyEnded = () => {
 			this.core.eventBus.emit("rtc:vc:soundpad:ended", eventBusPayload)
 			this.core.eventBus.emit(
 				`rtc:vc:soundpad:${payload.userId}:ended`,
 				eventBusPayload,
 			)
-		}
-
-		audio.src = payload.data.src
-		audio.loop = false
-		audio.volume = 0.5 // TODO: get value from a persistent store
-
-		const eventBusPayload = {
-			userId: payload.userId,
-			src: payload.data.src,
-			icon: payload.data.icon,
 		}
 
 		this.core.eventBus.emit("rtc:vc:soundpad", eventBusPayload)
@@ -192,13 +184,47 @@ export class Client {
 			eventBusPayload,
 		)
 
-		await audio.play()
+		const player = adapter.soundpad
 
-		setTimeout(() => {
-			if (!audio.ended) {
-				audio.pause()
-				audio.currentTime = 0
-			}
+		if (!player) {
+			logger.debug("soundpad player is not available")
+
+			return
+		}
+
+		let finished = false
+		let stopTimer: ReturnType<typeof setTimeout> | null = null
+
+		const finish = () => {
+			if (finished) return
+
+			finished = true
+
+			if (stopTimer) clearTimeout(stopTimer)
+
+			notifyEnded()
+		}
+
+		let playback: SoundpadPlayback | null = null
+
+		try {
+			playback = await player.play({
+				src: payload.data.src,
+				volume: 0.5, // TODO: get value from a persistent store
+				onEnded: finish,
+			})
+		} catch (error) {
+			logger.error("failed to play soundpad", error)
+
+			finish()
+		}
+
+		if (!playback) return
+
+		// safety stop, a clip must not play forever
+		stopTimer = setTimeout(() => {
+			playback.stop()
+			finish()
 		}, 10000)
 	}
 
