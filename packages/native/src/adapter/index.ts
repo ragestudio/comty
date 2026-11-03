@@ -1,3 +1,17 @@
+import session from "comty.js/session"
+import { adapter } from "@comty/spaces-sdk"
+import { nativeSoundpad } from "@/adapter/soundpad"
+import { audioManager, audioProcessing } from "@comty/spaces-sdk/rtc/audio"
+import { SecureStoreStorageDriver } from "comty.js/core/storage/secure"
+import { registerStorageDriver } from "comty.js/core/storage/storage"
+import * as SecureStore from "expo-secure-store"
+
+import { nativeAudioProcessing } from "@/adapter/audioProcessing"
+import { initRtcEvents } from "@/adapter/events"
+
+// register a global default driver before the client is used
+registerStorageDriver(new SecureStoreStorageDriver(SecureStore))
+
 import {
 	registerGlobals as registerRtcGlobals,
 	addListener as addRtcListener,
@@ -11,14 +25,6 @@ import {
 	isBluetoothAvailable,
 	resetAudioRoute,
 } from "@ragestudio/react-native-webrtc"
-registerRtcGlobals()
-
-import session from "comty.js/session"
-
-import { app } from "@/engine/app"
-import { adapter } from "@comty/spaces-sdk"
-import { audioManager, audioProcessing } from "@comty/spaces-sdk/rtc/audio"
-import nativeAudioProcessing from "@/engine/audioProcessing"
 
 adapter.registerFrameTransformEvents({
 	addListener: addRtcListener,
@@ -45,9 +51,6 @@ adapter.registerAudioDevicesEvents({
 	},
 })
 
-// keep the audio device list and routing in sync with hardware hotplug
-audioManager.observe()
-
 adapter.registerAudioProcessing(nativeAudioProcessing)
 
 adapter.registerTrackVolume({
@@ -64,10 +67,19 @@ adapter.registerTrackVolume({
 	},
 })
 
+adapter.registerSoundpad(nativeSoundpad)
+
 // important register the getter hook
 adapter.registerSessionDataGetter(async () => ({
-	user_id: app.userData?._id,
+	user_id: session.user?._id,
 	token: session.token,
 }))
 
+// register all rtc global objects
+registerRtcGlobals()
+// keep the audio device list and routing in sync with hardware hotplug
+audioManager.observe()
+// syncronize audio process
 audioProcessing.sync()
+
+initRtcEvents()

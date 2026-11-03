@@ -6,7 +6,7 @@ import {
 	setSystemAudioProcessingConfig,
 } from "@ragestudio/react-native-webrtc"
 
-const nativeAudioProcessing: AudioProcessing = {
+export const nativeAudioProcessing: AudioProcessing = {
 	capabilities: {
 		noiseSuppression: ["off", "system", "rnnoise"],
 		gate: true,
