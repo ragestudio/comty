@@ -32,6 +32,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # the package ships no dist in the repository and it is resolved at runtime
+      - name: Build linebridge client
+        run: pnpm --filter @linebridge/client build
+
       - name: Build App
         run: pnpm --filter @comty/app build
 
