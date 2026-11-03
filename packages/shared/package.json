@@ -1,11 +1,12 @@
 {
 	"name": "@comty/shared",
 	"type": "module",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"exports": {
 		"./types/*": "./types/*.ts",
 		"./db/*": "./db/*.ts",
-		"./utils/*": "./utils/*.ts"
+		"./utils/*": "./utils/*.ts",
+		"./assets/*": "./assets/*"
 	},
 	"devEngines": {
 		"packageManager": {
