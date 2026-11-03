@@ -6,6 +6,13 @@ import adapter from "@/adapter"
 export default async function (this: RTC, data: Producer) {
 	if (!adapter.sessionGetter) return null
 
+	// ignore events for a channel we are not in (stale events after leaving)
+	if (!this.channel) return null
+
+	const channelId = (data as any).channelId
+
+	if (channelId && channelId !== this.channel._id) return null
+
 	const session = await adapter.sessionGetter()
 
 	try {

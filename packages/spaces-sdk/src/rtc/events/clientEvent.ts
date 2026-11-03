@@ -2,6 +2,9 @@ import type { RTC } from "@/rtc"
 import type { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
 
 export default async function (this: RTC, data: RTC_ClientEvent) {
+	// ignore events for a channel we are not in (stale events after leaving)
+	if (!this.channel) return
+
 	this.logger.debug("received client event:", data)
 
 	const client =

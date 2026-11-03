@@ -4,11 +4,7 @@ export default async function (this: RTC, data: any) {
 	this.logger.debug("disconnected from channel:", data)
 
 	// ignore stale events from a channel that was already replaced
-	if (
-		this.channel &&
-		data?.channelId &&
-		this.channel._id !== data.channelId
-	) {
+	if (this.channel && data?.channelId && this.channel._id !== data.channelId) {
 		return
 	}
 

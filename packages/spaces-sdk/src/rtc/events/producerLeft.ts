@@ -5,6 +5,11 @@ import adapter from "@/adapter"
 export default async function (this: RTC, data: any) {
 	if (!adapter.sessionGetter) return null
 
+	// ignore events for a channel we are not in (stale events after leaving)
+	if (!this.channel) return null
+
+	if (data.channelId && data.channelId !== this.channel._id) return null
+
 	const session = await adapter.sessionGetter()
 
 	try {
@@ -32,29 +37,17 @@ export default async function (this: RTC, data: any) {
 
 			// if a camera stops, drop it
 			if (data.appData.mediaTag === "user-cam") {
-				await this.cameras.removeProducer(
-					data.userId,
-					"video",
-					data.producerId,
-				)
+				await this.cameras.removeProducer(data.userId, "video", data.producerId)
 			}
 
 			// if a screen share ends, stop consuming its tracks
 			if (data.appData.mediaTag === "screen-video") {
 				//app.cores.sfx.play("media_video_leave")
-				await this.screens.removeProducer(
-					data.userId,
-					"video",
-					data.producerId,
-				)
+				await this.screens.removeProducer(data.userId, "video", data.producerId)
 			}
 
 			if (data.appData.mediaTag === "screen-audio") {
-				await this.screens.removeProducer(
-					data.userId,
-					"audio",
-					data.producerId,
-				)
+				await this.screens.removeProducer(data.userId, "audio", data.producerId)
 			}
 		}
 
