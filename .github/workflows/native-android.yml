@@ -1,0 +1,83 @@
+name: Native Android
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "packages/native/**"
+      - "packages/spaces-sdk/**"
+      - "packages/shared/**"
+      - "modules/comty.js"
+      - "modules/comty.js/**"
+      - "modules/linebridge"
+      - "modules/linebridge/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/native-android.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+      GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --filter "@comty/native-app..."
+
+      - name: Setup Android SDK
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" > /dev/null
+
+      - name: Generate Android project
+        run: pnpm --filter @comty/native-app exec expo prebuild --platform android --clean --no-install
+
+      - name: Build release APK
+        run: ./gradlew assembleRelease --no-daemon -x lint -x lintVitalRelease -x lintVitalAnalyzeRelease
+        working-directory: ./packages/native/android
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-android-apk
+          path: ./packages/native/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+          retention-days: 30
