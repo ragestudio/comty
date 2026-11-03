@@ -35,10 +35,19 @@ async function applyDegradationPreference(
 
 		if (!params || params.degradationPreference === preference) return
 
-		await sender.setParameters({
-			...params,
-			degradationPreference: preference,
-		})
+		// mutate the parameters instance instead of cloning it, some hosts keep
+		// their own format and convert it when serializing the parameters
+		const previous = params.degradationPreference
+
+		params.degradationPreference = preference
+
+		try {
+			await sender.setParameters(params)
+		} catch (error) {
+			params.degradationPreference = previous
+
+			throw error
+		}
 	} catch (error) {
 		logger.warn("failed to set degradation preference", error)
 	}
@@ -91,10 +100,9 @@ export class Producers extends Map<string, Producer> {
 		}
 
 		try {
-			producer =
-				(await this.core.transports.send.produce<ProducerAppData>(
-					payload,
-				)) as Producer
+			producer = (await this.core.transports.send.produce<ProducerAppData>(
+				payload,
+			)) as Producer
 		} catch (error) {
 			this.core.eventBus.emit("rtc:producer:error", { error })
 			logger.error("Failed to produce error", error)
@@ -109,8 +117,10 @@ export class Producers extends Map<string, Producer> {
 		producer.observer.on("close", () => this.onSelfProducerClosed(producer))
 		producer.on("trackended", () => producer.close())
 
-		// auto start
-		if (producer.paused) {
+		// mediasoup starts the producer paused when the track is disabled, so a
+		// muted track must stay paused instead of being forced to resume (that
+		// would enable the track again)
+		if (producer.paused && producer.track?.enabled !== false) {
 			producer.resume()
 		}
 
