@@ -1,9 +1,14 @@
 import type { SetNavState, GetNavState } from "./context"
-import { parseUrlParts } from "../urlHelpers"
+import type { NavigationOptions } from "../types"
+
+import { parseUrlParts, syncToUrl } from "../urlHelpers"
 
 export const createActions = (set: SetNavState, get: GetNavState) => ({
-	navigate: (update: any) => {
+	navigate: (update: any, options?: NavigationOptions) => {
+		const next = { ...get(), ...update }
+
 		set(update)
+		syncToUrl(next, options)
 	},
 
 	registerHeaderContent: (fn: any) => {
@@ -16,19 +21,7 @@ export const createActions = (set: SetNavState, get: GetNavState) => ({
 		set({ headerContent: null })
 	},
 
-	initFromUrl: () => {
-		const parsed = parseUrlParts()
-
-		set({
-			...(parsed.type !== undefined ? { type: parsed.type } : {}),
-			...(parsed.room !== undefined ? { room: parsed.room } : {}),
-			...(parsed.channel !== undefined
-				? { channel: parsed.channel }
-				: {}),
-			...(parsed.subview !== undefined
-				? { subview: parsed.subview }
-				: {}),
-			firstLoad: false,
-		})
+	initFromUrl: (pathname?: string) => {
+		set(parseUrlParts(pathname))
 	},
 })

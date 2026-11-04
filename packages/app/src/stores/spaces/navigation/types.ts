@@ -1,7 +1,10 @@
 export type NavigationType = "group" | "dm" | null
 
+export interface NavigationOptions {
+	replace?: boolean
+}
+
 export interface NavigationStoreState {
-	firstLoad: boolean
 	type: NavigationType
 	room: string | null
 	channel: string | null
@@ -15,10 +18,11 @@ export interface NavigationActions {
 		update: Partial<
 			Pick<NavigationStoreType, "type" | "room" | "channel" | "subview">
 		>,
+		options?: NavigationOptions,
 	) => void
 	registerHeaderContent: (fn: (() => any) | null) => void
 	unregisterHeaderContent: () => void
-	initFromUrl: () => void
+	initFromUrl: (pathname?: string) => void
 }
 
 export type NavigationStoreType = NavigationStoreState & {

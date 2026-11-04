@@ -1,13 +1,13 @@
 import type { NavigationStoreType } from "./types"
 
+import React from "react"
+import { useLocation } from "react-router"
 import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
 import { createActions } from "./actions/navigate"
-import { syncToUrl } from "./urlHelpers"
 
 export const SpacesNavigationStore = create<NavigationStoreType>()(
 	(set, get) => ({
-		firstLoad: true,
 		type: null,
 		room: null,
 		channel: null,
@@ -20,24 +20,19 @@ export const SpacesNavigationStore = create<NavigationStoreType>()(
 	}),
 )
 
-SpacesNavigationStore.subscribe((state, prevState) => {
-	if (state.firstLoad) return
-
-	if (
-		state.type === prevState.type &&
-		state.room === prevState.room &&
-		state.channel === prevState.channel &&
-		state.subview === prevState.subview
-	) {
-		return
-	}
-
-	syncToUrl(state)
-})
-
 export const useSpacesNavigation = () => SpacesNavigationStore((s) => s)
 
 export default useSpacesNavigation
 
-// export const useNavigationActions = () =>
-// 	SpacesNavigationStore((s) => s.actions)
+/**
+ * Keeps the spaces navigation store in sync with the current route.
+ * The url is the source of truth, pages must not hydrate it manually.
+ */
+export const useSpacesRouteSync = () => {
+	const { actions } = useSpacesNavigation()
+	const location = useLocation()
+
+	React.useEffect(() => {
+		actions.initFromUrl(location.pathname)
+	}, [actions, location.pathname])
+}
