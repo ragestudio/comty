@@ -6,7 +6,9 @@ import { Result } from "antd"
 import ChatInputBar from "./components/InputBar"
 import Timeline from "./components/Timeline"
 
-import { useGroupData } from "@comty/spaces-sdk/group"
+import PermissionNotice from "@components/Spaces/PermissionNotice"
+
+import { useGroupData, useGroupPermission } from "@comty/spaces-sdk/group"
 import {
 	getChatSessionKey,
 	useChatStatus,
@@ -29,6 +31,7 @@ interface ChatInnerProps {
 	useChatParam: ChatParams
 	sessionKey: string
 	groupId?: string
+	canWrite: boolean
 }
 
 const ChatInner = ({
@@ -37,6 +40,7 @@ const ChatInner = ({
 	useChatParam,
 	sessionKey,
 	groupId,
+	canWrite,
 }: ChatInnerProps) => {
 	const chatContainerRef = React.useRef<HTMLDivElement>(null)
 	const [replyTo, setReplyTo] = React.useState<ReplyTarget | null>(null)
@@ -103,27 +107,49 @@ const ChatInner = ({
 				onPausedChange={chatActions.setPausedUpdates}
 			/>
 
-			<ChatInputBar
-				send={chatActions.send}
-				typing={chatActions.typing}
-				channel_id={_id}
-				replyTo={replyTo}
-				onCancelReply={cancelReply}
-			/>
+			{canWrite ? (
+				<ChatInputBar
+					send={chatActions.send}
+					typing={chatActions.typing}
+					channel_id={_id}
+					replyTo={replyTo}
+					onCancelReply={cancelReply}
+				/>
+			) : (
+				<PermissionNotice
+					compact
+					title="You can't send messages"
+					description="Your roles don't have the write channels permission in this group."
+				/>
+			)}
 		</div>
 	)
 }
 
 const Chat = ({ _id, type = "group" }: ChatProps) => {
 	const data = useGroupData()
+	const canRead = useGroupPermission("READ_CHANNELS")
+	const canWrite = useGroupPermission("WRITE_CHANNELS")
 
 	if (!_id || !type) {
 		return null
 	}
 
-	if (type === "group" && !data) {
-		console.error("Chat with type group, must wait for group data")
-		return null
+	if (type === "group") {
+		if (!data) {
+			console.error("Chat with type group, must wait for group data")
+			return null
+		}
+
+		if (!canRead) {
+			return (
+				<PermissionNotice
+					centered
+					title="You can't read this channel"
+					description="Your roles don't have the read channels permission in this group."
+				/>
+			)
+		}
 	}
 
 	const useChatParam: ChatParams =
@@ -140,6 +166,7 @@ const Chat = ({ _id, type = "group" }: ChatProps) => {
 			useChatParam={useChatParam}
 			sessionKey={sessionKey}
 			groupId={type === "group" ? data?._id : undefined}
+			canWrite={type === "dm" ? true : canWrite}
 		/>
 	)
 }
