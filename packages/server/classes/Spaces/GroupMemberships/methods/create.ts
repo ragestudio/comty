@@ -2,6 +2,7 @@
 import { q } from "@ragestudio/scylla-odm/driver/mapping/q"
 import type GroupMemberships from "../index"
 import Groups from "@shared-classes/Spaces/Groups"
+import GroupBans from "@shared-classes/Spaces/GroupBans"
 
 export default async function (
 	this: typeof GroupMemberships,
@@ -14,6 +15,11 @@ export default async function (
 
 	if (typeof user_id !== "string") {
 		throw new OperationError(400, "user_id must be a string")
+	}
+
+	// banned users cannot join or be added
+	if (await GroupBans.get(group_id, user_id)) {
+		throw new OperationError(403, "User is banned from this group")
 	}
 
 	// check if is already a member
