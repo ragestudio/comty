@@ -4,6 +4,8 @@ import { Button } from "antd"
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 
+import { useUser, useUsersPresence } from "@comty/spaces-sdk/users"
+
 import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import Chat from "@components/Spaces/Chat"
@@ -12,6 +14,9 @@ import "./index.less"
 
 const DMChat = ({ to_user_id }) => {
 	const nav = useSpacesNavigation()
+
+	const user = useUser(to_user_id)
+	const presence = useUsersPresence([to_user_id])
 
 	const onClickCall = React.useCallback(() => {
 		// app.cores.mediartc.handlers().callUser(to_user_id, {
@@ -35,8 +40,9 @@ const DMChat = ({ to_user_id }) => {
 					</div>
 
 					<UserPreview
+						user={user}
 						user_id={to_user_id}
-						presence
+						presence={presence[to_user_id]}
 					/>
 				</div>
 				<div className="chat-page__header__right">
