@@ -1,11 +1,10 @@
-import React from "react"
 import classNames from "clsx"
 import { Splitter } from "antd"
 
 import DMRoomsList from "@components/Spaces/DMRoomsList"
 import DMRoom from "@components/Spaces/DMRoom"
 
-import useNavigation from "@/stores/spaces/navigation"
+import useNavigation, { useSpacesRouteSync } from "@/stores/spaces/navigation"
 
 import { BaseLeftPanel } from "@pages/spaces/layout"
 import styles from "@pages/spaces/index.module.less"
@@ -64,23 +63,7 @@ const MainPanel = () => {
 }
 
 const SpacesMainPage = () => {
-	const nav = useNavigation()
-
-	React.useEffect(() => {
-		const syncFromUrl = () => nav.actions.initFromUrl()
-
-		// the first render can happen before the router emits its location,
-		// so read the current url once on mount
-		syncFromUrl()
-
-		app.eventBus.on("router.navigate", syncFromUrl)
-		window.addEventListener("popstate", syncFromUrl)
-
-		return () => {
-			app.eventBus.off("router.navigate", syncFromUrl)
-			window.removeEventListener("popstate", syncFromUrl)
-		}
-	}, [])
+	useSpacesRouteSync()
 
 	return (
 		<Splitter className={styles.container}>

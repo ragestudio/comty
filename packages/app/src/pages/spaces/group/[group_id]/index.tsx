@@ -5,13 +5,11 @@ import Skeleton from "@components/Skeleton"
 import GroupHeader from "@components/Spaces/Group/GroupHeader"
 import MembersPanel from "@components/Spaces/Group/MembersPanel"
 import ChannelsPanel from "@components/Spaces/Group/ChannelsPanel"
-import {
-	ContentPanelHeader,
-	ContentPanelRender,
-} from "@components/Spaces/Group/ContentPanel"
+
+import ContentPanel from "@components/Spaces/Group/ContentPanel"
+
 import {
 	SettingsMenu,
-	SettingsRender,
 	useGroupSettingsPage,
 } from "@/components/Spaces/Group/SettingsPanel"
 
@@ -24,16 +22,19 @@ import {
 } from "@comty/spaces-sdk/group"
 import { subscribeGroupSocket } from "@comty/spaces-sdk/events"
 
-import useSpacesNavigation from "@/stores/spaces/navigation"
+import useSpacesNavigation, {
+	useSpacesRouteSync,
+} from "@/stores/spaces/navigation"
 import useTitle from "@hooks/useTitle"
 
 import { BaseLeftPanel, BaseRightPanel } from "@pages/spaces/layout"
 import SplitterSizes from "@pages/spaces/splitter_sizes"
 import styles from "@pages/spaces/index.module.less"
 
-const LeftPanel = () => {
+type SettingsPage = ReturnType<typeof useGroupSettingsPage>
+
+const LeftPanel = ({ settingsPage }: { settingsPage: SettingsPage }) => {
 	const nav = useSpacesNavigation()
-	const settingsPage = useGroupSettingsPage()
 
 	return (
 		<BaseLeftPanel>
@@ -59,11 +60,9 @@ const RightPanel = () => {
 	)
 }
 
-const MainPanel = () => {
-	const nav = useSpacesNavigation()
+const MainPanel = ({ settingsPage }: { settingsPage: SettingsPage }) => {
 	const loading = useGroupLoading()
 	const error = useGroupError()
-	const settingsPage = useGroupSettingsPage()
 
 	return (
 		<>
@@ -76,31 +75,26 @@ const MainPanel = () => {
 				/>
 			)}
 
-			{!loading && !error && nav.subview !== "settings" && (
-				<div className="group-page__content-panel">
-					<ContentPanelHeader />
-					<ContentPanelRender />
-				</div>
-			)}
-
-			{nav.subview === "settings" && (
-				<SettingsRender
-					settings={settingsPage.settings}
-					selectedKey={settingsPage.selectedKey}
-				/>
-			)}
+			{!loading && !error && <ContentPanel settingsPage={settingsPage} />}
 		</>
 	)
 }
 
 const GroupPage = (props) => {
-	const [documentTitle, setDocumentTitle] = useTitle()
+	const [, setDocumentTitle] = useTitle()
 
 	const nav = useSpacesNavigation()
 	const actions = useGroupActions()
 	const loading = useGroupLoading()
+	const error = useGroupError()
 	const data = useGroupData()
 	const channels = useGroupChannels()
+
+	const settingsPage = useGroupSettingsPage()
+
+	const groupId = props.params.group_id
+
+	useSpacesRouteSync()
 
 	const savedSizes = React.useMemo(() => SplitterSizes.loadSizes(), [])
 
@@ -109,43 +103,62 @@ const GroupPage = (props) => {
 	}, [])
 
 	React.useEffect(() => {
-		actions.init(props.params.group_id)
+		actions.init(groupId)
 
-		const cleanup = subscribeGroupSocket(props.params.group_id)
+		const cleanup = subscribeGroupSocket(groupId)
 
 		return () => {
 			cleanup()
 			actions.reset()
 		}
-	}, [props.params.group_id])
+	}, [groupId])
 
-	// set document title when group loads
+	// the url is the source of truth, only fallback to the first channel when
+	// the current target does not point to a channel of this group
 	React.useEffect(() => {
-		if (!data || loading) {
-			return undefined
+		if (loading || error) return
+		if (nav.type !== "group" || nav.room !== groupId) return
+		if (nav.subview) return
+
+		const items = channels?.items ?? []
+
+		if (items.length === 0) return
+		if (nav.channel && items.some((item) => item._id === nav.channel)) {
+			return
 		}
 
-		// @ts-ignore
-		setDocumentTitle(data.name)
+		const fallback =
+			items.find((channel) => channel.kind === "chat") ?? items[0]
 
-		// if no channel is selected, load the first text channel (if any)
-		if (!nav.channel && !nav.subview) {
-			const firstTextChannel = channels?.items?.find(
-				(channel) => channel.kind === "chat",
-			)
+		if (!fallback) return
 
-			if (firstTextChannel) {
-				nav.actions.navigate({ channel: firstTextChannel._id })
-			}
-		}
-	}, [data, loading])
+		nav.actions.navigate({ channel: fallback._id }, { replace: true })
+	}, [
+		loading,
+		error,
+		nav.type,
+		nav.room,
+		nav.subview,
+		nav.channel,
+		channels?.items,
+		groupId,
+	])
 
 	React.useEffect(() => {
-		nav.actions.initFromUrl()
-		window.addEventListener("popstate", nav.actions.initFromUrl)
+		if (!data || loading) return
 
-		return () => window.removeEventListener("popstate", nav.actions.initFromUrl)
-	}, [])
+		const channelName = nav.channel
+			? channels?.items?.find((channel) => channel._id === nav.channel)?.name
+			: null
+
+		if (nav.subview === "settings") {
+			setDocumentTitle(`${data.name} · Settings`)
+		} else if (channelName) {
+			setDocumentTitle(`${data.name} · ${channelName}`)
+		} else {
+			setDocumentTitle(data.name)
+		}
+	}, [data, loading, nav.channel, nav.subview, channels?.items])
 
 	return (
 		<Splitter
@@ -156,11 +169,11 @@ const GroupPage = (props) => {
 				defaultSize={savedSizes?.[0] ?? 330}
 				min={270}
 			>
-				<LeftPanel />
+				<LeftPanel settingsPage={settingsPage} />
 			</Splitter.Panel>
 
 			<Splitter.Panel min={500}>
-				<MainPanel />
+				<MainPanel settingsPage={settingsPage} />
 			</Splitter.Panel>
 
 			<Splitter.Panel

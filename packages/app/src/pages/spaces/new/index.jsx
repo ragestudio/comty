@@ -20,7 +20,9 @@ const CreateGroupPage = () => {
 
 	const [obj, setObj] = React.useState({
 		name: defaultGroupName,
-		visibility: "private",
+		description: null,
+		icon: null,
+		reachability: "private",
 	})
 
 	const updateField = (field, value) => {
@@ -54,11 +56,7 @@ const CreateGroupPage = () => {
 			<div className="spaces-create_new__form">
 				<div className="spaces-create_new__form__preview">
 					<div className="spaces-create_new__form__preview__icon bg-accent">
-						{obj.icon ? (
-							<img src={obj.icon} />
-						) : (
-							<Icons.Birdhouse />
-						)}
+						{obj.icon ? <img src={obj.icon} /> : <Icons.Birdhouse />}
 					</div>
 
 					<div className="spaces-create_new__form__preview__content">
@@ -118,7 +116,7 @@ const CreateGroupPage = () => {
 
 						<Select
 							placeholder="Select a visibility"
-							defaultValue="private"
+							value={obj.reachability}
 							options={[
 								{ value: "public", label: "Public" },
 								{ value: "private", label: "Private" },
