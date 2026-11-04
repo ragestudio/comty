@@ -1,20 +1,19 @@
-import type { Group } from "@db/groups"
+import type { GroupPermission } from "@comty/shared/types/spaces/permissions"
 import type GroupPermissions from "../index"
 
-import GroupRoles from "@shared-classes/Spaces/GroupRoles"
-import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
+import Gatekeeper from "../../Gatekeeper"
 
 export default async function (
 	this: typeof GroupPermissions,
 	user_id: string,
-	group: Group,
+	group: any,
 	action: keyof typeof GroupPermissions.enum,
 ) {
 	if (typeof user_id !== "string") {
 		throw new OperationError(400, "user_id must be provided")
 	}
 
-	if (typeof group !== "object") {
+	if (typeof group !== "object" || !group) {
 		throw new OperationError(400, "group must be provided")
 	}
 
@@ -27,63 +26,7 @@ export default async function (
 		throw new OperationError(400, "Invalid action")
 	}
 
-	// if the user is the owner of the group, they can do anything
-	if (group.owner_user_id === user_id) {
-		return true
-	}
+	const authz = await Gatekeeper.forGroup(group, user_id)
 
-	// get the user membership
-	let membershipArray = await GroupMemberships.model.find(
-		{
-			group_id: group._id,
-			user_id: user_id,
-		},
-		{
-			raw: true,
-		},
-	)
-
-	let membership = membershipArray[0]
-
-	if (!membership) {
-		throw new OperationError(404, "Membership not found")
-	}
-
-	if (!Array.isArray(membership.roles)) {
-		membership.roles = []
-	}
-
-	// if the user has admin, they can bypass all permissions
-	if (membership.roles.includes("admin")) {
-		return true
-	}
-
-	// add the member role to user due is a member
-	if (!membership.roles.includes("member")) {
-		membership.roles.push("member")
-	}
-
-	// get the group roles
-	const roles = await GroupRoles.getByGroupId(group._id)
-
-	// iterate for explicit permission
-	for (const roleKey of membership.roles) {
-		const role = roles.find((role) => role.role_key === roleKey)
-
-		if (!role) {
-			continue
-		}
-
-		if (!role.permissions) {
-			continue
-		}
-
-		if (role.permissions[action] !== true) {
-			continue
-		}
-
-		return true
-	}
-
-	return false
+	return authz.can(action as GroupPermission)
 }
