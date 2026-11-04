@@ -67,7 +67,7 @@ export default class GroupSoundpad {
 
 		return [
 			...groupItems.map((item) => ({
-				...item.toRaw(),
+				...item.toObject(),
 				built_in: false,
 			})),
 			...GroupSoundpad.getBuiltInItems().map((item) => ({
@@ -108,13 +108,19 @@ export default class GroupSoundpad {
 			throw new OperationError(400, "Missing user_id")
 		}
 
-		if (typeof payload.icon !== "string" || payload.icon.trim().length === 0) {
+		if (
+			typeof payload.icon !== "string" ||
+			payload.icon.trim().length === 0
+		) {
 			throw new OperationError(400, "Missing icon")
 		}
 
 		const icon = payload.icon.trim().slice(0, ICON_MAX_LENGTH)
 
-		if (typeof payload.name !== "string" || payload.name.trim().length === 0) {
+		if (
+			typeof payload.name !== "string" ||
+			payload.name.trim().length === 0
+		) {
 			throw new OperationError(400, "Missing name")
 		}
 
@@ -146,7 +152,9 @@ export default class GroupSoundpad {
 			created_at: new Date(),
 		})
 
-		return soundpadItem.toRaw()
+		await soundpadItem.save()
+
+		return soundpadItem.toObject()
 	}
 
 	static async removeItem(payload: {
