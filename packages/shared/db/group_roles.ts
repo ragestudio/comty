@@ -17,8 +17,23 @@ export const schema = new Schema(
 			type: ColumnTypes.Text,
 			required: true,
 		}),
+		label: defineColumn<string>()({
+			type: ColumnTypes.Text,
+		}),
+		color: defineColumn<string>()({
+			type: ColumnTypes.Text,
+		}),
+		position: defineColumn<number>()({
+			type: ColumnTypes.Int,
+		}),
+		is_default: defineColumn<boolean>()({
+			type: ColumnTypes.Boolean,
+		}),
 		permissions: defineColumn<Record<string, boolean>>()({
 			type: "map<Text, boolean>",
+		}),
+		created_at: defineColumn<Date>()({
+			type: ColumnTypes.Timestamp,
 		}),
 	},
 )
