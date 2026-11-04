@@ -22,6 +22,14 @@ class GroupsListActions extends ActionsBase<GroupsListStoreType> {
 		this.setState({ groups })
 	}
 
+	updateGroup = (group: Partial<Group> & { _id: string }) => {
+		this.setState((state) => ({
+			groups: state.groups.map((item) =>
+				item._id === group._id ? { ...item, ...group } : item,
+			),
+		}))
+	}
+
 	sortGroups = async (newOrderIds: string[]) => {
 		try {
 			await GroupsModel.sort(newOrderIds)

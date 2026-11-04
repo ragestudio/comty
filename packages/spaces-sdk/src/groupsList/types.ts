@@ -8,6 +8,7 @@ export interface GroupsListStoreType {
 	actions: {
 		fetchGroups: () => Promise<void>
 		setGroups: (groups: Group[]) => void
+		updateGroup: (group: Partial<Group> & { _id: string }) => void
 		sortGroups: (newOrderIds: string[]) => Promise<void>
 		handleMembershipCreated: (data: any) => void
 		handleMembershipDeleted: (data: any) => void
