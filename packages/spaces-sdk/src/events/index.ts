@@ -25,8 +25,7 @@ export function buildGroupSocketEvents(
 
 	return {
 		// Group
-		[`${prefix}:update`]: (payload: any) =>
-			actions.handleGroupUpdate(payload),
+		[`${prefix}:update`]: (payload: any) => actions.handleGroupUpdate(payload),
 
 		// Channels
 		[`${prefix}:channel:created`]: (payload: any) =>
@@ -106,7 +105,7 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		}
 	}
 
-	socket.on("connect", onReconnect)
+	socket.on("reconnected", onReconnect)
 
 	return () => {
 		socket.topics.subscribe("group:unsubscribe", groupId)
@@ -115,7 +114,7 @@ export function subscribeGroupSocket(groupId: string): () => void {
 			socket.off(event, handler)
 		}
 
-		socket.off("connect", onReconnect)
+		socket.off("reconnected", onReconnect)
 	}
 }
 
@@ -157,12 +156,51 @@ export function subscribeChatSocket(type: ChatType, params: ChatParams) {
 	const subscribeParams = config.params.subscribe(params)
 	const actions = ChatStore.getState().actions
 
-	const handleNewMessage = (data: any) => actions.handleNewMessage(data)
-	const handleMessageUpdated = (data: any) =>
+	// channel events are global on the socket, scope them to the active
+	// conversation so a group and a dm never mix their messages
+	const groupTopic =
+		type === "group" ? `chats:channel:${(params as any).channel_id}` : null
+
+	// the dm room id is assigned by the server, learn it from the
+	// subscription confirmation instead of guessing it
+	let directTopic: string | null = null
+
+	const handleTopicSubscribed = (topic: string) => {
+		if (type !== "dm" || typeof topic !== "string") return
+
+		if (topic.startsWith("chat:dm:")) directTopic = topic
+	}
+
+	const matchesTopic = (payload: any) => {
+		const topic = payload?.topic
+
+		if (typeof topic !== "string") return true
+
+		if (groupTopic) return topic === groupTopic
+
+		return directTopic !== null && topic === directTopic
+	}
+
+	const handleNewMessage = (data: any, payload: any) => {
+		if (!matchesTopic(payload)) return
+
+		actions.handleNewMessage(data)
+	}
+	const handleMessageUpdated = (data: any, payload: any) => {
+		if (!matchesTopic(payload)) return
+
 		actions.handleMessageUpdated(data)
-	const handleMessageDeleted = (data: any) =>
+	}
+	const handleMessageDeleted = (data: any, payload: any) => {
+		if (!matchesTopic(payload)) return
+
 		actions.handleMessageDeleted(data)
-	const handleTypingEvent = (data: any) => actions.handleTypingEvent(data)
+	}
+	const handleTypingEvent = (data: any, payload: any) => {
+		if (!matchesTopic(payload)) return
+
+		actions.handleTypingEvent(data)
+	}
 
 	const handleReconnect = () => {
 		// a reconnect may have missed messages, force a recovery pass
@@ -170,7 +208,8 @@ export function subscribeChatSocket(type: ChatType, params: ChatParams) {
 		actions.loadAfter().catch(logger.error)
 	}
 
-	socket.on("connect", handleReconnect)
+	socket.on("reconnected", handleReconnect)
+	socket.on("topic:subscribed", handleTopicSubscribed)
 	socket.on(config.events.message, handleNewMessage)
 	socket.on(config.events.messageUpdated, handleMessageUpdated)
 	socket.on(config.events.messageDeleted, handleMessageDeleted)
@@ -181,7 +220,8 @@ export function subscribeChatSocket(type: ChatType, params: ChatParams) {
 		.catch(logger.error)
 
 	return () => {
-		socket.off("connect", handleReconnect)
+		socket.off("reconnected", handleReconnect)
+		socket.off("topic:subscribed", handleTopicSubscribed)
 		socket.off(config.events.message, handleNewMessage)
 		socket.off(config.events.messageUpdated, handleMessageUpdated)
 		socket.off(config.events.messageDeleted, handleMessageDeleted)
