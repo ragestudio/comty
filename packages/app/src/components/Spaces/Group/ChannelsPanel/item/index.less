@@ -53,6 +53,19 @@
 		}
 	}
 
+	&.locked {
+		.group-page__channels-panel__list-item__content {
+			cursor: not-allowed;
+			opacity: 0.55;
+		}
+
+		.group-page__channels-panel__list-item__content__lock {
+			margin-left: auto;
+			font-size: 0.75rem;
+			color: var(--text-color-secondary);
+		}
+	}
+
 	/* &:hover:not(.invalid) {
 		.group-page__channels-panel__list-item__content {
 			background-color: var(--background-color-primary-2);

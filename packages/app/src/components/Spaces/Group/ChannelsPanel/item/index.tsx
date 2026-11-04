@@ -21,11 +21,13 @@ const ChannelsListItem = ({
 	selected,
 	handleOnClick,
 	hasUnread = false,
+	locked = false,
 }: {
 	channel: Channel
 	invalid?: boolean
 	selected?: boolean
 	hasUnread?: boolean
+	locked?: boolean
 	handleOnClick?: MouseEventHandler
 }) => {
 	const channelState = useGroupStatedChannel(channel?._id)
@@ -70,11 +72,12 @@ const ChannelsListItem = ({
 				["joined"]: isJoined,
 				["empty"]: channelState?.clients?.length === 0,
 				["has-unread"]: hasUnread,
+				["locked"]: locked,
 			})}
 		>
 			<div
 				className="group-page__channels-panel__list-item__content"
-				onClick={handleOnClick}
+				onClick={locked ? undefined : handleOnClick}
 			>
 				<div className="group-page__channels-panel__list-item__content__icon">
 					{channel.kind === "voice" && <Icons.Volume2 />}
@@ -91,6 +94,10 @@ const ChannelsListItem = ({
 						)}
 
 						<p>{channel.name}</p>
+
+						{locked && (
+							<Icons.Lock className="group-page__channels-panel__list-item__content__lock" />
+						)}
 					</div>
 
 					{channel.description && channel.kind !== "voice" && (
