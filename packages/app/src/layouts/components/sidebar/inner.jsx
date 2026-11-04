@@ -203,7 +203,6 @@ const SidebarInner = ({
 		) {
 			if (location.pathname?.startsWith("/spaces")) {
 				setGroupsListVisible(true)
-				spacesNav.actions.initFromUrl()
 			} else {
 				setGroupsListVisible(false)
 			}
@@ -287,11 +286,7 @@ const SidebarInner = ({
 
 							<GroupsList
 								compact={!expanded}
-								selected={
-									spacesNav.type === "group"
-										? spacesNav.room
-										: null
-								}
+								selected={spacesNav.type === "group" ? spacesNav.room : null}
 								onClickItem={handleOnClickGroupListItem}
 								onClickCreateNew={handleOnClickCreateNewGroup}
 								sortable
