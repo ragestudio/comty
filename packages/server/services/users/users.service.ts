@@ -3,6 +3,7 @@ import { Server } from "linebridge"
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
+import UserConnections from "@shared-classes/UserConnections"
 
 import SharedMiddlewares from "@shared-middlewares"
 
@@ -27,6 +28,7 @@ export class API extends Server {
 		db: new DbManager(),
 		redis: RedisClient(),
 		scylla: (global.scylla = new ScyllaDb()),
+		usersConnections: new UserConnections(this),
 	}
 
 	initialize = [
