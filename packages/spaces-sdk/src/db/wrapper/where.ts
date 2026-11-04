@@ -1,7 +1,12 @@
 import type { Store } from "tinybase"
 
 import { Collection } from "./collection"
-import { cmpKey, parseIndexFields, pickIndexValue } from "./keys"
+import {
+	cmpKey,
+	isIndexableValue,
+	parseIndexFields,
+	pickIndexValue,
+} from "./keys"
 
 // emulates dexie's WhereClause, every matcher returns a Collection
 export class WhereClause<T extends Record<string, any>> {
@@ -50,7 +55,15 @@ export class WhereClause<T extends Record<string, any>> {
 			this.store,
 			this.tableName,
 			this.primaryKey,
-			(row) => filter(pickIndexValue(row, fields)),
+			(row) => {
+				const rowValue = pickIndexValue(row, fields)
+
+				// an incomplete index value never matches a query, this keeps
+				// rows from leaking into unrelated conversations
+				if (!isIndexableValue(rowValue)) return false
+
+				return filter(rowValue)
+			},
 			fields,
 		)
 	}

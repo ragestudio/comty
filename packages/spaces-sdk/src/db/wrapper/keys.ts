@@ -26,6 +26,15 @@ export function pickIndexValue(
 	return fields.map((field) => row[field])
 }
 
+// mirror dexie semantics: rows with a missing index key are not indexed
+export function isIndexableValue(value: any): boolean {
+	if (value === undefined || value === null) return false
+
+	if (Array.isArray(value)) return value.every(isIndexableValue)
+
+	return true
+}
+
 // compare two index values, including compound arrays and dexie bounds
 export function cmpKey(a: any, b: any): number {
 	if (a === b) return 0
