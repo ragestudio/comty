@@ -90,7 +90,8 @@ export default class AuthorizationContext {
 			roleKeys.has("admin") ||
 			Array.from(roleKeys).some(
 				(roleKey) =>
-					this.rolesByKey.get(roleKey)?.permissions?.ADMINISTRATOR === true,
+					this.rolesByKey.get(roleKey)?.permissions?.ADMINISTRATOR ===
+					true,
 			)
 
 		this.topPosition = this.isAdmin
