@@ -2,6 +2,7 @@ import type { Server } from "linebridge"
 
 import Groups from "@shared-classes/Spaces/Groups"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 
 import GroupChatChannel from "./instance"
 
@@ -19,18 +20,25 @@ export default class GroupChatChannelController {
 			throw new OperationError(404, "Group not found")
 		}
 
-		let channel = await GroupChannels.get(group, channel_id, user_id)
+		// resolve the context once per request and reuse it for the
+		// channel operations (read/write/delete)
+		const authz = await Gatekeeper.forGroup(group as any, user_id)
+
+		authz.require("READ_CHANNELS", "You are not allowed to read this channel")
+
+		const channel = await GroupChannels.model.findOne({
+			group_id: group._id,
+			_id: channel_id,
+		})
 
 		if (!channel) {
 			throw new OperationError(404, "Channel not found")
 		}
 
-		//channel = channel.toRaw()
-
 		if (channel.kind !== "chat") {
 			throw new OperationError(400, "This channel is not a chat")
 		}
 
-		return new GroupChatChannel(this, channel)
+		return new GroupChatChannel(this, channel, { authz })
 	}
 }
