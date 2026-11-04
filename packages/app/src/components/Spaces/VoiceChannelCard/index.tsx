@@ -13,6 +13,7 @@ import { openDialog as openSoundpadDialog } from "@components/SoundpadDialog"
 import { openDialog as openShareCameraDialog } from "@components/ShareCameraDialog"
 
 import { type RTCReactiveState, useRTCStore, rtcService } from "@/rtc"
+import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import VoiceChannelStats from "./stats"
 
@@ -54,6 +55,7 @@ const ConnectionStateIndicator = ({ state }: { state: RTCReactiveState }) => {
 
 const VoiceChannelCard = () => {
 	const state = useRTCStore()
+	const nav = useSpacesNavigation()
 
 	const isScreensharing =
 		state.screenVideoProducerId || state.screenAudioProducerId
@@ -61,9 +63,9 @@ const VoiceChannelCard = () => {
 	const isDeafened = state.voiceState.deafened
 
 	const handleGoToChannel = () => {
-		app.location.push(
-			`/spaces/group/${state.channel.group_id}/${state.channel._id}/voice`,
-		)
+		if (!state.channel) return
+
+		nav.actions.navigate({ channel: state.channel._id, subview: "voice" })
 	}
 
 	const toggleScreenShare = async () => {
@@ -74,8 +76,14 @@ const VoiceChannelCard = () => {
 		}
 	}
 
-	const handleLeaveChannel = () => {
-		return rtcService.handlers.leaveChannel()
+	const handleLeaveChannel = async () => {
+		const channelId = state.channel?._id
+
+		await rtcService.handlers.leaveChannel()
+
+		if (channelId && nav.channel === channelId) {
+			nav.actions.navigate({ channel: null, subview: null }, { replace: true })
+		}
 	}
 
 	const handleToggleMute = () => {
