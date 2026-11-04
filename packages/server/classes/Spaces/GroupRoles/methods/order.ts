@@ -38,10 +38,19 @@ export default async function (
 		},
 	)) as any[]
 
-	const rolesByKey = new Map(roles.map((role) => [String(role.role_key), role]))
+	const rolesByKey = new Map(
+		roles
+			// the default role is persisted only after it is customized, but it
+			// is never part of the order
+			.filter((role) => !RESERVED_ROLE_KEYS.has(String(role.role_key)))
+			.map((role) => [String(role.role_key), role]),
+	)
 
 	if (roleKeys.length !== rolesByKey.size) {
-		throw new OperationError(400, "order must include every role of the group")
+		throw new OperationError(
+			400,
+			"order must include every role of the group",
+		)
 	}
 
 	const updated: GroupRole[] = []
