@@ -1,6 +1,8 @@
 import User from "@db_models/user"
 import UserFollow from "@db_models/userFollow"
 
+const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i
+
 export type GetUserData = {
 	user_id: string | string[]
 	from_user_id?: string
@@ -15,12 +17,32 @@ export default async (payload: GetUserData) => {
 		throw new OperationError(400, "Missing user_id")
 	}
 
-	const isMultipleUsers = Array.isArray(user_id)
+	const requestedIds = (Array.isArray(user_id) ? user_id : [user_id])
+		.map((id) => (typeof id === "string" ? id.trim() : ""))
+		.filter(Boolean)
+
+	if (requestedIds.length === 0) {
+		throw new OperationError(400, "Missing user_id")
+	}
+
+	// system messages and bots use sentinel ids that are not valid object ids,
+	// drop them before hitting the database
+	const validIds = requestedIds.filter((id) => OBJECT_ID_REGEX.test(id))
+
+	const isMultipleUsers = requestedIds.length > 1
+
+	if (validIds.length === 0) {
+		if (isMultipleUsers) return []
+
+		throw new OperationError(404, "User not found")
+	}
+
+	const targetIds = isMultipleUsers ? validIds : validIds[0]
 
 	let usersData = null
 
-	if (isMultipleUsers) {
-		usersData = await User.find({ _id: { $in: user_id } })
+	if (Array.isArray(targetIds)) {
+		usersData = await User.find({ _id: { $in: targetIds } })
 
 		if (!usersData || !usersData.length) {
 			return []
@@ -28,7 +50,7 @@ export default async (payload: GetUserData) => {
 
 		usersData = usersData.map((user) => user.toObject())
 	} else {
-		let query = User.findOne({ _id: user_id })
+		let query = User.findOne({ _id: targetIds })
 
 		if (Array.isArray(add) && add.length > 0) {
 			const fieldsToSelect = add.map((field) => `+${field}`).join(" ")
