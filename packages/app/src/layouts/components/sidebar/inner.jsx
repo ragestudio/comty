@@ -14,6 +14,7 @@ import GroupsList from "@/components/Spaces/GroupList"
 import { useSpacesNavigation } from "@/stores/spaces/navigation"
 
 import "./index.less"
+import { GroupListActionItem } from "@components/Spaces/GroupListItem"
 
 /** @type {any[]} */
 const ActionMenuItems = [
@@ -186,6 +187,15 @@ const SidebarInner = ({
 		}
 	}
 
+	const onClickSpacesHome = () => {
+		spacesNav.actions.navigate({
+			type: null,
+			room: null,
+			channel: null,
+			subview: null,
+		})
+	}
+
 	React.useEffect(() => {
 		if (
 			location.pathname &&
@@ -262,7 +272,19 @@ const SidebarInner = ({
 					className="app_sidebar_menu_wrapper"
 				>
 					{groupsListVisible && (
-						<div className="app_sidebar_menu_groups">
+						<div
+							className={classnames("app_sidebar_menu_groups", {
+								compact: !expanded,
+							})}
+						>
+							<GroupListActionItem
+								id="spaces-home-button"
+								title="Home"
+								compact={!expanded}
+								icon={<Icons.Home />}
+								onClick={onClickSpacesHome}
+							/>
+
 							<GroupsList
 								compact={!expanded}
 								selected={

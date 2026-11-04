@@ -1,4 +1,5 @@
 @import "@styles/vars.less";
+@import "../../../components/Spaces/GroupListItem/mixins.less";
 
 .app_sidebar_wrapper {
 	position: sticky;
@@ -237,7 +238,24 @@
 	display: flex;
 	flex-direction: column;
 
+	align-items: center;
+
 	width: 100%;
 
 	padding: 0 2px;
+	gap: 5px;
+
+	&.compact {
+		.group-list__item {
+			.group-list-item-compact();
+		}
+	}
+}
+
+// the sidebar expanded state is toggled on the html element, use it as a
+// fallback so the compact layout never depends on the react prop wiring
+html:not(.sidebar-expanded) {
+	.app_sidebar_menu_groups .group-list__item {
+		.group-list-item-compact();
+	}
 }
