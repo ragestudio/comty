@@ -1,0 +1,132 @@
+.permissions-settings {
+	display: flex;
+	flex-direction: row;
+
+	gap: 20px;
+
+	width: 100%;
+	height: 100%;
+
+	&__roles {
+		display: flex;
+		flex-direction: column;
+
+		width: 220px;
+		min-width: 220px;
+
+		gap: 6px;
+	}
+
+	&__role {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		gap: 4px;
+
+		width: 100%;
+
+		padding: 4px 6px;
+
+		border-radius: 6px;
+
+		color: inherit;
+
+		&.selected {
+			background: var(--accent-color, rgba(255, 255, 255, 0.1));
+		}
+
+		&__select {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			flex: 1;
+
+			gap: 8px;
+
+			border: none;
+			background: transparent;
+			color: inherit;
+
+			padding: 4px;
+
+			cursor: pointer;
+			text-align: left;
+
+			&:last-child {
+				margin-left: auto;
+			}
+		}
+
+		&__color {
+			width: 10px;
+			height: 10px;
+
+			border-radius: 50%;
+		}
+
+		&__actions {
+			display: flex;
+			flex-direction: row;
+
+			button {
+				border: none;
+				background: transparent;
+				color: inherit;
+				padding: 2px;
+				cursor: pointer;
+
+				opacity: 0.6;
+
+				&:hover {
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	&__editor {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+
+		gap: 15px;
+	}
+
+	&__field {
+		display: flex;
+		flex-direction: column;
+
+		gap: 5px;
+	}
+
+	&__permissions {
+		display: flex;
+		flex-direction: column;
+
+		gap: 15px;
+
+		&__group {
+			display: flex;
+			flex-direction: column;
+
+			gap: 4px;
+
+			h4 {
+				margin: 0;
+			}
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+
+		gap: 10px;
+	}
+
+	&__empty {
+		opacity: 0.6;
+	}
+}

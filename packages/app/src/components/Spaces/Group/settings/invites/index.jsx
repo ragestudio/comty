@@ -31,8 +31,7 @@ const GroupInviteItem = ({ invite, onClickDelete, onClickCopy }) => {
 
 				<p>
 					<Icons.CircleUserRound />
-					{String(invite.usages ?? 0)} /{" "}
-					{String(invite.max_usage ?? "∞")}
+					{String(invite.usages ?? 0)} / {String(invite.max_usage ?? "∞")}
 				</p>
 
 				<ConfirmButton
@@ -112,5 +111,6 @@ export default {
 	key: "invites",
 	label: "Invites",
 	icon: Icons.Link,
+	permission: "MANAGE_INVITES",
 	render: GroupInvitesSettings,
 }

@@ -6,13 +6,14 @@ import ConfirmButton from "@ui/ConfirmButton"
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
 
-import { useGroupData } from "@comty/spaces-sdk/group"
+import { useGroupActions, useGroupData } from "@comty/spaces-sdk/group"
 import GroupsModel from "@endpoints/groups"
 
 import "./index.less"
 
 const GeneralSettings = () => {
 	const data = useGroupData()
+	const actions = useGroupActions()
 
 	const baseValues = React.useMemo(() => {
 		return {
@@ -39,9 +40,11 @@ const GeneralSettings = () => {
 	}
 
 	const submit = async () => {
-		console.log("submit", values)
-		await GroupsModel.modify(data?._id, values)
-		baseValues
+		const updated = await GroupsModel.modify(data?._id, values)
+
+		actions.setData(updated)
+
+		app.message.success("Group updated")
 	}
 
 	const handleDeleteGroup = async () => {
@@ -175,5 +178,6 @@ export default {
 	key: "general",
 	label: "General",
 	icon: Icons.Settings,
+	permission: "UPDATE_GROUP",
 	render: GeneralSettings,
 }

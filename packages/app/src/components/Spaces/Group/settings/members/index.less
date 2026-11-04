@@ -1,32 +1,112 @@
 .settings-members {
-  display: flex;
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-  &__list {
+	gap: 10px;
 
-  }
+	height: 100%;
+}
+
+.settings-members__toolbar {
+	display: flex;
+	flex-direction: row;
+
+	gap: 10px;
+}
+
+.settings-members__list {
+	flex: 1;
+
+	min-height: 0;
 }
 
 .settings-members__list__item {
-  display: flex;
-  flex-direction: row;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 
-  gap: 10px;
+	gap: 10px;
 
-  &__avatar {
-    height: 30px;
-    width: 30px;
+	padding: 4px 0;
 
-    .lazy-load-image-background {
-      height: 100%;
-      width: 100%;
+	&__avatar {
+		height: 30px;
+		width: 30px;
+		min-width: 30px;
 
-      img {
-        height: 100%;
-        width: 100%;
+		.lazy-load-image-background {
+			height: 100%;
+			width: 100%;
 
-        object-fit: cover;
-      }
-    }
-  }
+			img {
+				height: 100%;
+				width: 100%;
+
+				object-fit: cover;
+			}
+		}
+	}
+
+	&__info {
+		display: flex;
+		flex-direction: column;
+
+		flex: 1;
+
+		min-width: 0;
+
+		p {
+			margin: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+}
+
+.settings-members__joined {
+	opacity: 0.6;
+	font-size: 0.75rem;
+}
+
+.settings-members__actions {
+	display: flex;
+	flex-direction: row;
+
+	gap: 4px;
+}
+
+.settings-members__add-results {
+	display: flex;
+	flex-direction: column;
+
+	gap: 6px;
+
+	margin-top: 10px;
+
+	max-height: 320px;
+	overflow-y: auto;
+}
+
+.settings-members__add-result {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	gap: 10px;
+
+	padding: 4px;
+
+	img {
+		width: 28px;
+		height: 28px;
+
+		border-radius: 50%;
+
+		object-fit: cover;
+	}
+
+	span {
+		flex: 1;
+	}
 }
