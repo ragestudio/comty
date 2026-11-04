@@ -7,6 +7,13 @@ export default async function (this: ChatChannel, user: any, payload: any) {
 		throw new OperationError(400, "Missing user object")
 	}
 
+	if (this.authz) {
+		this.authz.require(
+			"WRITE_CHANNELS",
+			"You are not allowed to write in this channel",
+		)
+	}
+
 	this.validateMessagePayload(payload)
 
 	const _id = this.snowflake.nextId().toString()

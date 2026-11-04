@@ -10,6 +10,8 @@ import writeMethod from "./write"
 import updateMethod from "./update"
 import deleteMethod from "./delete"
 
+import type { AuthorizationContext } from "../Gatekeeper"
+
 import ChannelMessagesModel from "@db/channel_messages"
 
 export type onWriteCallbackType = (
@@ -34,6 +36,7 @@ export type ChatChannelOptions = {
 	onRead?: onReadCallbackType
 	onDelete?: onDeleteCallbackType
 	topic?: string
+	authz?: AuthorizationContext
 }
 
 export default class ChatChannel {
@@ -41,6 +44,7 @@ export default class ChatChannel {
 		this.controller = controller
 		this.channel = channel
 		this.topic = options?.topic ?? "chats:channel"
+		this.authz = options?.authz
 
 		this.scylla = controller.server.contexts.scylla
 		this.snowflake = controller.server.contexts.snowflake
@@ -61,6 +65,7 @@ export default class ChatChannel {
 	snowflake: SnowflakeWorker
 	controller: any
 	channel: any
+	authz?: AuthorizationContext
 
 	onWrite: onWriteCallbackType
 	onRead: onReadCallbackType
@@ -82,17 +87,11 @@ export default class ChatChannel {
 
 	validateMessagePayload = (payload: any) => {
 		if (!payload.message && !payload.attachments && !payload.sticker) {
-			throw new OperationError(
-				400,
-				"Missing message or attachments or sticker",
-			)
+			throw new OperationError(400, "Missing message or attachments or sticker")
 		}
 
 		if (payload.message) {
-			if (
-				payload.message.length >
-				ChatChannel.defaultLimits.maxMessageLength
-			) {
+			if (payload.message.length > ChatChannel.defaultLimits.maxMessageLength) {
 				throw new OperationError(400, "Message is too long")
 			}
 		}
@@ -100,8 +99,7 @@ export default class ChatChannel {
 		if (payload.attachments) {
 			if (
 				payload.attachments &&
-				payload.attachments?.length >
-					ChatChannel.defaultLimits.maxAttachments
+				payload.attachments?.length > ChatChannel.defaultLimits.maxAttachments
 			) {
 				throw new OperationError(400, "Too many attachments")
 			}

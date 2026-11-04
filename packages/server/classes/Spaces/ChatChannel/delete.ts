@@ -2,6 +2,7 @@ import ChatChannel from "."
 
 import MessageModel from "@db/channel_messages"
 import ChannelLogModel from "@db/channel_log"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 
 export default async function (
 	this: ChatChannel,
@@ -26,10 +27,19 @@ export default async function (
 		throw new OperationError(404, "Message not found")
 	}
 
-	// check if is the owner of the message
-	// TODO: use permissions api
+	// check if is the owner of the message or can manage messages
 	if (message.user_id !== user._id.toString()) {
-		throw new OperationError(403, "You are not the owner of this message")
+		const groupId = this.channel?.group_id
+
+		const authz =
+			this.authz ??
+			(typeof groupId === "string" && groupId.length > 0
+				? await Gatekeeper.forGroup(groupId, user._id.toString())
+				: null)
+
+		if (!authz?.can("MANAGE_MESSAGES")) {
+			throw new OperationError(403, "You are not the owner of this message")
+		}
 	}
 
 	// create batch
