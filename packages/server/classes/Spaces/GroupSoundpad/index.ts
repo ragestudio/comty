@@ -1,63 +1,17 @@
+import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
+import type { Document } from "mongoose"
+
 import GroupSoundpadItem from "@db_models/groupSoundpadItem"
 
-import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
+import BuiltInItems from "./defaults.json"
 
 const ICON_MAX_LENGTH = 16
 const NAME_MAX_LENGTH = 48
 const SRC_MAX_LENGTH = 2048
 
 export default class GroupSoundpad {
-	static getBuiltInItems(): any[] {
-		return [
-			{
-				_id: "000001",
-				group_id: "comty",
-				user_id: "comty",
-				icon: "💩",
-				name: "Funny Fart",
-				src: "https://storage.ragestudio.net/comty-static-assets/soundpacks/isma/farti.mp3",
-			},
-			{
-				_id: "000002",
-				group_id: "comty",
-				user_id: "comty",
-				icon: "😽",
-				name: "El reportedo",
-				src: "https://storage.ragestudio.net:443/comty-cdn/627d4b628cf4b82edd0864ff/9bf80fd874b7a7d060ceee4a4933192a155d4cf9ba97997dee8faf2f15b6442b",
-			},
-			{
-				_id: "000003",
-				group_id: "comty",
-				user_id: "comty",
-				icon: "📣",
-				name: "Real DJ",
-				src: "https://storage.ragestudio.net:443/comty-cdn/627d4b628cf4b82edd0864ff/88f4d54094cab00d2d260e4be801152f8587c2c41c7cb69b1f34759cb08678ef",
-			},
-			{
-				_id: "000004",
-				group_id: "comty",
-				user_id: "comty",
-				icon: "🎙️",
-				name: "Casi vivo",
-				src: "https://storage.ragestudio.net/comty-static-assets/soundpad/ba.ogg",
-			},
-			{
-				_id: "000005",
-				group_id: "comty",
-				user_id: "comty",
-				icon: "🙂‍↕️",
-				name: "Ascension to heaven",
-				src: "https://storage.ragestudio.net/comty-static-assets/soundpad/dt.ogg",
-			},
-			{
-				_id: "000006",
-				group_id: "comty",
-				user_id: "comty",
-				icon: "🎪",
-				name: "Funny song",
-				src: "https://storage.ragestudio.net/comty-static-assets/soundpad/funny_song.ogg",
-			},
-		]
+	static getBuiltInItems(): SoundpadItemPayload[] {
+		return BuiltInItems
 	}
 
 	static async getItems(group_id: string): Promise<any[]> {
@@ -80,7 +34,7 @@ export default class GroupSoundpad {
 	static async getItem(payload: {
 		_id: string
 		group_id: string
-	}): Promise<any> {
+	}): Promise<Document<typeof GroupSoundpadItem>> {
 		const { _id, group_id } = payload
 
 		if (!_id) {
@@ -94,6 +48,32 @@ export default class GroupSoundpad {
 		return await GroupSoundpadItem.findOne({
 			_id: _id,
 			group_id: group_id,
+		})
+	}
+
+	static async updateItem(payload: SoundpadItemPayload) {
+		const { _id, group_id, icon, name, src } = payload
+
+		if (!group_id) {
+			throw new OperationError(400, "Missing group_id")
+		}
+
+		const queryFilter = {
+			_id: _id,
+			group_id: group_id,
+		}
+
+		const item = await GroupSoundpadItem.findOne(queryFilter)
+
+		if (!item) {
+			throw new OperationError(404, "Item not found")
+		}
+
+		return await GroupSoundpadItem.findOneAndUpdate(queryFilter, {
+			group_id: group_id,
+			icon: icon,
+			name: name,
+			src: src,
 		})
 	}
 
