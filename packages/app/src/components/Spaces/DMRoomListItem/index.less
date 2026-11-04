@@ -9,7 +9,7 @@
 
 	gap: 10px;
 	padding: 5px;
-	padding-left: 13px;
+	//padding-left: 13px;
 
 	border: 1px solid var(--border-color);
 	border-radius: 12px;
@@ -38,7 +38,7 @@
 		display: block;
 
 		top: auto;
-		left: 5px;
+		right: 5px;
 
 		width: 3px;
 		height: 0;
@@ -62,11 +62,13 @@
 
 		align-items: center;
 
-		padding: 6px 7px;
+		padding: 6px 15px;
 		font-size: 0.7rem;
 	}
 
 	&__icon {
+		position: relative;
+
 		width: @dmroom_icon_size;
 		height: @dmroom_icon_size;
 
@@ -75,15 +77,42 @@
 
 		border-radius: 12px;
 
-		overflow: hidden;
-
 		background-color: rgba(var(--bg_color_1), 1);
 
-		img {
+		&__image {
 			width: 100%;
 			height: 100%;
 
-			object-fit: cover;
+			overflow: hidden;
+
+			border-radius: inherit;
+			background-color: black;
+
+			img {
+				width: 100%;
+				height: 100%;
+
+				object-fit: cover;
+			}
+		}
+	}
+
+	&__presence {
+		position: absolute;
+
+		right: -2px;
+		bottom: -2px;
+
+		width: 9px;
+		height: 9px;
+
+		border-radius: 50%;
+		border: 2px solid rgba(var(--bg_color_2), 1);
+
+		background-color: rgba(var(--bg_color_6), 0.4);
+
+		&.online {
+			background-color: #3ddc84;
 		}
 	}
 
@@ -99,6 +128,11 @@
 
 		&__message {
 			width: 100%;
+
+			font-size: 0.75rem;
+
+			color: rgba(var(--bg_color_6), 0.7);
+
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;

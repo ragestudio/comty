@@ -1,7 +1,9 @@
-@group_icon_size: 50px;
+@import "./mixins.less";
 
 .group-list__item {
 	position: relative;
+
+	box-sizing: border-box;
 
 	display: flex;
 	flex-direction: row;
@@ -9,17 +11,25 @@
 	align-items: center;
 
 	width: 100%;
-	height: 50px;
+	height: @group_icon_size;
+	min-height: @group_icon_size;
+
+	flex-shrink: 0;
 
 	gap: 10px;
-	padding: 5px 10px;
+	padding: 0 5px 0 0;
 
 	border: 1px solid var(--border-color);
 	border-radius: 12px;
 
 	overflow: hidden;
-
 	cursor: pointer;
+
+	transition:
+		width 150ms ease-in-out,
+		height 150ms ease-in-out,
+		padding 150ms ease-in-out,
+		gap 150ms ease-in-out;
 
 	&.selected {
 		&::before {
@@ -33,6 +43,8 @@
 
 		position: absolute;
 		display: block;
+
+		z-index: 2;
 
 		top: auto;
 		right: 5px;
@@ -48,12 +60,22 @@
 		opacity: 0;
 	}
 
+	&.compact {
+		.group-list-item-compact();
+	}
+
 	&__icon {
 		display: inline-flex;
 		flex-direction: row;
 
 		align-items: center;
 		justify-content: center;
+
+		flex-shrink: 0;
+
+		transition:
+			width 150ms ease-in-out,
+			height 150ms ease-in-out;
 
 		font-size: 1.5rem;
 
@@ -80,15 +102,33 @@
 		display: flex;
 		flex-direction: column;
 
-		width: 100%;
-		height: 100%;
+		justify-content: center;
+
+		flex: 1;
+		min-width: 0;
 
 		overflow: hidden;
 
-		h3 {
-			word-break: break-all;
+		transition: opacity 150ms ease-in-out;
+
+		h3,
+		p {
+			margin: 0;
+
 			white-space: nowrap;
+			overflow: hidden;
 			text-overflow: ellipsis;
+		}
+
+		h3 {
+			font-size: 0.9rem;
+			font-weight: 700;
+		}
+
+		p {
+			font-size: 0.75rem;
+
+			color: rgba(var(--bg_color_6), 0.7);
 		}
 	}
 
@@ -107,16 +147,5 @@
 		.group-list__item__icon {
 			mask-image: linear-gradient(270deg, #0000 0px, #000 50px, #000 100%);
 		}
-	}
-
-	.group-list__item__icon {
-		z-index: -1;
-		position: absolute;
-
-		left: 0;
-		top: 0;
-
-		width: 100%;
-		height: 100%;
 	}
 }

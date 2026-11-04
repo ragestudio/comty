@@ -1,3 +1,5 @@
+@import "../GroupListItem/mixins.less";
+
 .groups-list {
 	display: flex;
 	flex-direction: column;
@@ -11,9 +13,7 @@
 
 	&.compact {
 		.group-list__item {
-			.group-list__item__content {
-				display: none;
-			}
+			.group-list-item-compact();
 		}
 	}
 }

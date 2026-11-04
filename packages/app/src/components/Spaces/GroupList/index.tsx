@@ -1,3 +1,5 @@
+import type { Group } from "@comty/shared/types/spaces/group"
+
 import React from "react"
 import { Result, Skeleton } from "antd"
 import { Icons } from "@components/Icons"
@@ -8,25 +10,48 @@ import { DragDropProvider } from "@dnd-kit/react"
 import { useSortable } from "@dnd-kit/react/sortable"
 import { move } from "@dnd-kit/helpers"
 
-//import useAckNotifications from "@hooks/useAckNotifications"
 import { useGroupsList } from "@comty/spaces-sdk/groupsList"
 
-import GroupListItem from "../GroupListItem"
+import GroupListItem, {
+	GroupListActionItem,
+} from "@components/Spaces/GroupListItem"
 
 import "./index.less"
 
-const SortableItem = ({ group, index, onClick, selected }: any) => {
+interface SortableItemProps {
+	group: Group
+	index: number
+	onClick?: (group: Group) => void
+	selected?: boolean
+	compact?: boolean
+}
+
+const SortableItem = ({
+	group,
+	index,
+	onClick,
+	selected,
+	compact,
+}: SortableItemProps) => {
 	const sortable = useSortable({ id: group._id, index })
 
 	return (
 		<GroupListItem
-			ref={sortable.ref}
-			key={group._id}
+			elementRef={sortable.ref}
 			group={group}
 			onClick={onClick}
 			selected={selected}
+			compact={compact}
 		/>
 	)
+}
+
+export interface GroupsListProps {
+	onClickItem?: (group: Group) => void
+	onClickCreateNew?: () => void
+	selected?: string | null
+	sortable?: boolean
+	compact?: boolean
 }
 
 const GroupsList = ({
@@ -35,7 +60,7 @@ const GroupsList = ({
 	selected,
 	sortable,
 	compact,
-}: any) => {
+}: GroupsListProps) => {
 	const { groups, loading, error, actions } = useGroupsList()
 
 	React.useEffect(() => {
@@ -82,14 +107,6 @@ const GroupsList = ({
 				compact: compact,
 			})}
 		>
-			{groups.length === 0 && (
-				<Result
-					status="info"
-					title="No spaces"
-					subTitle="You have no spaces yet"
-				/>
-			)}
-
 			{sortable && (
 				<DragDropProvider
 					onDragEnd={handleOnDragEndItems}
@@ -103,6 +120,7 @@ const GroupsList = ({
 								group={group}
 								onClick={onClickItem}
 								selected={selected === group._id}
+								compact={compact}
 							/>
 						)
 					})}
@@ -113,38 +131,22 @@ const GroupsList = ({
 				groups.map((group) => {
 					return (
 						<GroupListItem
-							ref={null}
 							key={group._id}
 							group={group}
 							onClick={onClickItem}
 							selected={selected === group._id}
+							compact={compact}
 						/>
 					)
 				})}
 
-			<div
+			<GroupListActionItem
 				id="create-space-button"
-				className={classnames("group-list__item", "bg-accent")}
+				icon={<Icons.Plus />}
+				title="Create a space"
+				compact={compact}
 				onClick={onClickCreateNew}
-			>
-				<div
-					className="group-list__item__icon"
-					style={{
-						alignItems: "center",
-						justifyContent: "center",
-					}}
-				>
-					<Icons.Plus
-						style={{
-							fontSize: "1rem",
-						}}
-					/>
-				</div>
-
-				<div className="group-list__item__content">
-					<h3>Create a space</h3>
-				</div>
-			</div>
+			/>
 		</div>
 	)
 }
