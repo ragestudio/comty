@@ -1,5 +1,8 @@
 import type { SpacesUser, UserIdInput } from "./types"
 
+// sentinel ids used by system messages and bots, they never resolve to a user
+const INVALID_USER_IDS = new Set(["0", "null", "undefined"])
+
 export function normalizeIds(input: UserIdInput): string[] {
 	if (!input) return []
 
@@ -12,7 +15,7 @@ export function normalizeIds(input: UserIdInput): string[] {
 
 		const id = value.trim()
 
-		if (id) ids.add(id)
+		if (id && !INVALID_USER_IDS.has(id)) ids.add(id)
 	}
 
 	return Array.from(ids)
