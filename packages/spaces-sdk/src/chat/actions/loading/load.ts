@@ -41,10 +41,7 @@ export default async function (
 				.anyOf(cached.map((m: any) => m.user_id))
 				.toArray()
 
-			this.state.actions.pushToTimeline(
-				cached,
-				isAfter ? "top" : "bottom",
-			)
+			this.state.actions.pushToTimeline(cached, isAfter ? "top" : "bottom")
 		}
 
 		if (cached.length < limit || isAfter) {
@@ -58,7 +55,7 @@ export default async function (
 			if (response.items.length > 0) {
 				if (response.users) await this.cache.cacheUsers(response.users)
 
-				await this.adapter.cacheMessages(response.items)
+				await this.adapter.cacheMessages(response.items, params)
 
 				this.state.actions.pushToTimeline(
 					response.items,
@@ -74,9 +71,7 @@ export default async function (
 				}
 			} else {
 				this.setState(
-					isAfter
-						? { hasMoreAfter: false }
-						: { hasMoreBefore: false },
+					isAfter ? { hasMoreAfter: false } : { hasMoreBefore: false },
 				)
 			}
 		}
@@ -98,8 +93,7 @@ export default async function (
 	} catch (err: any) {
 		logger.error(err)
 
-		if (generation === this.state.initGeneration)
-			this.setState({ error: err })
+		if (generation === this.state.initGeneration) this.setState({ error: err })
 	} finally {
 		if (generation === this.state.initGeneration) {
 			this.setState((state) => ({

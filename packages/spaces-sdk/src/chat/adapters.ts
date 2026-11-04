@@ -3,7 +3,7 @@ import type { ExtendedMessage as Message, ChatSyncState } from "./types"
 import db from "../db"
 
 export interface ChatAdapter {
-	storeMessage: (message: Message) => Promise<void>
+	storeMessage: (message: Message, params?: any) => Promise<void>
 	deleteMessage: (id: string) => Promise<void>
 	checkMessageExists: (id: string) => Promise<boolean>
 	getCachedMessages: (
@@ -12,7 +12,7 @@ export interface ChatAdapter {
 		beforeId?: string,
 		afterId?: string,
 	) => Promise<Message[]>
-	cacheMessages: (messages: Message[]) => Promise<void>
+	cacheMessages: (messages: Message[], params?: any) => Promise<void>
 	getSyncState: (chatId: string) => Promise<ChatSyncState | undefined>
 	updateSyncState: (
 		state: Partial<ChatSyncState> & { chat_id: string },
@@ -39,12 +39,7 @@ export const groupAdapter: ChatAdapter = {
 
 		if (beforeId) {
 			return collection
-				.between(
-					[channelId, MinKey],
-					[channelId, beforeId],
-					false,
-					false,
-				)
+				.between([channelId, MinKey], [channelId, beforeId], false, false)
 				.reverse()
 				.limit(limit)
 				.toArray()
@@ -52,12 +47,7 @@ export const groupAdapter: ChatAdapter = {
 
 		if (afterId) {
 			return collection
-				.between(
-					[channelId, afterId],
-					[channelId, MaxKey],
-					false,
-					false,
-				)
+				.between([channelId, afterId], [channelId, MaxKey], false, false)
 				.limit(limit)
 				.toArray()
 				.then((msgs) => msgs.reverse())
@@ -86,19 +76,27 @@ export const groupAdapter: ChatAdapter = {
 			chat_id: state.chat_id,
 			last_synced_at:
 				state.last_synced_at ?? current?.last_synced_at ?? Date.now(),
-			last_message_id:
-				state.last_message_id ?? current?.last_message_id ?? "",
+			last_message_id: state.last_message_id ?? current?.last_message_id ?? "",
 			has_more_before:
 				state.has_more_before ?? current?.has_more_before ?? true,
-			has_more_after:
-				state.has_more_after ?? current?.has_more_after ?? false,
+			has_more_after: state.has_more_after ?? current?.has_more_after ?? false,
 		})
 	},
 }
 
+// dm payloads do not carry the peer id, so it has to be taken from the
+// active chat params before persisting the message
+function tagDirectMessage(message: Message, params?: any): Message {
+	const toUserId = params?.to_user_id
+
+	if (!toUserId || message.to_user_id) return message
+
+	return { ...message, to_user_id: toUserId }
+}
+
 export const dmAdapter: ChatAdapter = {
-	storeMessage: async (message) => {
-		await db.direct_messages.put(message)
+	storeMessage: async (message, params) => {
+		await db.direct_messages.put(tagDirectMessage(message, params))
 	},
 	deleteMessage: async (id) => {
 		await db.direct_messages.delete(id)
@@ -133,12 +131,17 @@ export const dmAdapter: ChatAdapter = {
 			.limit(limit)
 			.toArray()
 	},
-	cacheMessages: async (messages: Message[]) => {
-		const toStore = messages.map((msg) => ({
-			...msg,
-			cached_at: Date.now(),
-			status: msg.status || "sent",
-		}))
+	cacheMessages: async (messages: Message[], params) => {
+		const now = Date.now()
+		const toStore = messages.map((msg) => {
+			const tagged = tagDirectMessage(msg, params)
+
+			return {
+				...tagged,
+				cached_at: now,
+				status: tagged.status || "sent",
+			}
+		})
 		await db.direct_messages.bulkPut(toStore)
 	},
 	getSyncState: async (chatId) => {
@@ -150,12 +153,10 @@ export const dmAdapter: ChatAdapter = {
 			chat_id: state.chat_id,
 			last_synced_at:
 				state.last_synced_at ?? current?.last_synced_at ?? Date.now(),
-			last_message_id:
-				state.last_message_id ?? current?.last_message_id ?? "",
+			last_message_id: state.last_message_id ?? current?.last_message_id ?? "",
 			has_more_before:
 				state.has_more_before ?? current?.has_more_before ?? true,
-			has_more_after:
-				state.has_more_after ?? current?.has_more_after ?? false,
+			has_more_after: state.has_more_after ?? current?.has_more_after ?? false,
 		})
 	},
 }

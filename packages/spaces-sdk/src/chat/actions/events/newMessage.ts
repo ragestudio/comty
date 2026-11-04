@@ -13,7 +13,7 @@ export default function (this: EventsActions, data: any): void {
 		this.cache.cacheUsers([data.user]).catch(logger.error)
 	}
 
-	this.adapter.storeMessage(data).catch(logger.error)
+	this.adapter.storeMessage(data, params).catch(logger.error)
 	this.adapter
 		.updateSyncState({ chat_id: chatId, last_message_id: data._id })
 		.catch(logger.error)

@@ -47,7 +47,7 @@ export default async function (
 			]
 
 			if (users.length > 0) await this.cache.cacheUsers(users)
-			await this.adapter.cacheMessages(allMessages)
+			await this.adapter.cacheMessages(allMessages, params)
 
 			this.state.actions.pushToTimeline(allMessages, "bottom")
 		}

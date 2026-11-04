@@ -23,14 +23,10 @@ export default async function (this: SyncActions): Promise<void> {
 
 	try {
 		const { logs, newMessages, updatedMessages, users } =
-			await ChatsService.channels.sync(
-				params.group_id!,
-				params.channel_id!,
-				{
-					last_synced_at: lastSyncAt,
-					last_message_id: lastId,
-				},
-			)
+			await ChatsService.channels.sync(params.group_id!, params.channel_id!, {
+				last_synced_at: lastSyncAt,
+				last_message_id: lastId,
+			})
 
 		if (generation !== this.state.initGeneration) return
 
@@ -39,22 +35,20 @@ export default async function (this: SyncActions): Promise<void> {
 				await this.adapter.deleteMessage(log.target_id)
 
 				this.setState((state) => ({
-					timeline: state.timeline.filter(
-						(m) => m._id !== log.target_id,
-					),
+					timeline: state.timeline.filter((m) => m._id !== log.target_id),
 				}))
 			}
 		}
 
 		if (updatedMessages?.length > 0) {
-			await this.adapter.cacheMessages(updatedMessages)
+			await this.adapter.cacheMessages(updatedMessages, params)
 			this.state.actions.pushToTimeline(updatedMessages, "bottom")
 		}
 
 		if (newMessages?.length > 0) {
 			if (users) await this.cache.cacheUsers(users)
 
-			await this.adapter.cacheMessages(newMessages)
+			await this.adapter.cacheMessages(newMessages, params)
 			this.state.actions.pushToTimeline(newMessages, "bottom")
 
 			const newest = newMessages.sort((a: any, b: any) =>

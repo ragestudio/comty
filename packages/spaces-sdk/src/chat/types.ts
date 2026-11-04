@@ -32,6 +32,8 @@ export function getChatSessionKey(type: ChatType, params: ChatParams) {
 export interface ExtendedMessage extends Message {
 	status?: MessageStatus
 	nonce?: string
+	// set on direct messages so the local cache can be scoped per peer
+	to_user_id?: string
 }
 
 export interface ChatSyncState {
