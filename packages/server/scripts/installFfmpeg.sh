@@ -33,6 +33,7 @@ if [[ "$OS" == "unsupported" ]] || [[ "$ARCH" == "unsupported" ]]; then
 fi
 
 INSTALL_DIR="/usr/local/bin"
+LIB_DIR="/usr/local/lib/ffmpeg"
 TEMP_DIR="/tmp/ffmpegdl"
 
 if [[ -d "$TEMP_DIR" ]]; then
@@ -60,7 +61,7 @@ download_ffmpeg() {
     fi
 
     # Create the download URL for the latest release
-    FFMPEG_URL="$BASE_URL/ffmpeg-master-latest-$URL_ARCH-gpl.tar.xz"
+    FFMPEG_URL="$BASE_URL/ffmpeg-master-latest-$URL_ARCH-gpl-shared.tar.xz"
 
     if [[ -z "$FFMPEG_URL" ]]; then
         echo -e "${RED}Could not determine the download URL for your system.${NC}"
@@ -130,11 +131,22 @@ install_binaries() {
     mv "$FFMPEG_BIN" "$INSTALL_DIR/ffmpeg"
     mv "$FFPROBE_BIN" "$INSTALL_DIR/ffprobe"
 
+    # Copy the shared libraries used by the binaries
+    mkdir -p "$LIB_DIR"
+    cp -a "$EXTRACTED_DIR"/lib/*.so* "$LIB_DIR/"
+
+    # Register the library path so the binaries work without env vars
+    if command -v ldconfig > /dev/null; then
+        echo "$LIB_DIR" > /etc/ld.so.conf.d/ffmpeg.conf
+        ldconfig
+    fi
+
     # Make binaries executable
     chmod +x "$INSTALL_DIR/ffmpeg"
     chmod +x "$INSTALL_DIR/ffprobe"
 
     echo -e "${GREEN}Binaries installed in $INSTALL_DIR${NC}"
+    echo -e "${GREEN}Libraries installed in $LIB_DIR${NC}"
 
     # Clean up extracted directory
     rm -rf "$EXTRACTED_DIR"
@@ -146,6 +158,7 @@ show_versions() {
 
     FFMPEG_PATH="$INSTALL_DIR/ffmpeg"
     FFPROBE_PATH="$INSTALL_DIR/ffprobe"
+    export LD_LIBRARY_PATH="$LIB_DIR"
 
     echo -e "${GREEN}FFmpeg installed at: $FFMPEG_PATH${NC}"
     if [[ -x "$FFMPEG_PATH" ]]; then
