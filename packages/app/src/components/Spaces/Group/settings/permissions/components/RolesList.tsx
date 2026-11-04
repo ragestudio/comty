@@ -25,6 +25,7 @@ const RolesList = ({
 			{roles.map((role) => (
 				<div
 					key={role.role_key}
+					onClick={() => onSelect(role.role_key)}
 					className={[
 						"permissions-settings__role",
 						role.role_key === selectedKey ? "selected" : null,
@@ -32,10 +33,7 @@ const RolesList = ({
 						.filter(Boolean)
 						.join(" ")}
 				>
-					<button
-						className="permissions-settings__role__select"
-						onClick={() => onSelect(role.role_key)}
-					>
+					<button className="permissions-settings__role__select">
 						<span
 							className="permissions-settings__role__color"
 							style={{ background: role.color ?? "#808080" }}

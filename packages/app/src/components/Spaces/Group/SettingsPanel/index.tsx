@@ -2,12 +2,9 @@ import type { GroupPermission } from "@comty/shared/types/spaces/permissions"
 
 import React from "react"
 import { Menu } from "antd"
-
 import { useGroupData } from "@comty/spaces-sdk/group"
 
 import settings_imports from "./settings_imports"
-
-import "./index.less"
 
 export type SettingTab = {
 	key: string

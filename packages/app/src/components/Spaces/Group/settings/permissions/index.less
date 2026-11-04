@@ -23,39 +23,16 @@
 		align-items: center;
 
 		gap: 4px;
+		padding: 4px 6px;
 
 		width: 100%;
 
-		padding: 4px 6px;
-
 		border-radius: 6px;
-
 		color: inherit;
+		cursor: pointer;
 
 		&.selected {
 			background: var(--accent-color, rgba(255, 255, 255, 0.1));
-		}
-
-		&__select {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			flex: 1;
-
-			gap: 8px;
-
-			border: none;
-			background: transparent;
-			color: inherit;
-
-			padding: 4px;
-
-			cursor: pointer;
-			text-align: left;
-
-			&:last-child {
-				margin-left: auto;
-			}
 		}
 
 		&__color {
@@ -68,6 +45,8 @@
 		&__actions {
 			display: flex;
 			flex-direction: row;
+
+			margin-left: auto;
 
 			button {
 				border: none;

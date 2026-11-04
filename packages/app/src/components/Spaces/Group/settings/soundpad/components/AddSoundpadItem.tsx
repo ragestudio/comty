@@ -2,7 +2,6 @@ import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
 import React from "react"
 import { Button, Input } from "antd"
-import classNames from "clsx"
 
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
@@ -12,6 +11,11 @@ import createBem from "@/utils/createBem"
 
 import EmojiPicker from "@/components/Expressions/EmojiPicker"
 import Popover from "@/ui/Popover"
+
+import {
+	SettingsSection,
+	SettingsSectionField,
+} from "@/components/Spaces/Group/SettingsPanel/layout"
 
 import styles from "./AddSoundpadItem.module.less"
 const b = createBem("soundpad-settings__add", styles)
@@ -55,8 +59,8 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 	}
 
 	return (
-		<div className={classNames(b(), "bg-accent", "border-default")}>
-			<div className={b.elem("field")}>
+		<SettingsSection>
+			<SettingsSectionField row>
 				<h3>
 					<Icons.PlusCircle /> Add new sound
 				</h3>
@@ -67,9 +71,9 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 				>
 					(Trims at max 10s)
 				</span>
-			</div>
+			</SettingsSectionField>
 
-			<div className={b.elem("field")}>
+			<SettingsSectionField row>
 				<Popover
 					className={b.elem("emoji-select")}
 					content={({ close }) => (
@@ -89,9 +93,9 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 					value={name}
 					onChange={(event) => setName(event.target.value)}
 				/>
-			</div>
+			</SettingsSectionField>
 
-			<div className={b.elem("field")}>
+			<SettingsSectionField row>
 				<UploadButton
 					accept="audio/*"
 					onSuccess={(uid, response) => {
@@ -108,7 +112,7 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 					value={src}
 					onChange={(event) => setSrc(event.target.value)}
 				/>
-			</div>
+			</SettingsSectionField>
 
 			<Button
 				type="primary"
@@ -119,7 +123,7 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 			>
 				Add
 			</Button>
-		</div>
+		</SettingsSection>
 	)
 }
 

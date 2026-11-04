@@ -2,19 +2,21 @@ import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
 import React from "react"
 import { Empty, Skeleton } from "antd"
-import classNames from "clsx"
 
 import { Icons } from "@components/Icons"
 import { useGroupData } from "@comty/spaces-sdk/group"
 import getErrorMessage from "@utils/getErrorMessage"
-import createBem from "@/utils/createBem"
 
 import AddSoundpadItem from "./components/AddSoundpadItem"
 import SoundpadItemRow from "./components/SoundpadItemRow"
 import { useSoundpadItems } from "./useSoundpadItems"
 
-import styles from "./index.module.less"
-const b = createBem("soundpad-settings", styles)
+import {
+	Settings,
+	SettingsHeader,
+	SettingsSection,
+	SettingsSectionFieldLabel,
+} from "@/components/Spaces/Group/SettingsPanel/layout"
 
 export const SoundpadSettings = () => {
 	const group = useGroupData()
@@ -97,34 +99,34 @@ export const SoundpadSettings = () => {
 
 	if (loading) {
 		return (
-			<div className={b()}>
+			<Settings>
 				<Skeleton active />
-			</div>
+			</Settings>
 		)
 	}
 
 	if (error) {
 		return (
-			<div className={b()}>
+			<Settings>
 				<p>Failed to load soundpad: {getErrorMessage(error)}</p>
-			</div>
+			</Settings>
 		)
 	}
 
 	return (
-		<div className={b()}>
-			<div className={b.elem("header")}>
+		<Settings>
+			<SettingsHeader>
 				<h2>
 					<Icons.Drum /> Soundpad
 				</h2>
-			</div>
+			</SettingsHeader>
 
 			<AddSoundpadItem onSubmit={onAdd} />
 
-			<div
-				className={classNames(b.elem("section"), "bg-accent", "border-default")}
-			>
-				<h4>Group sounds</h4>
+			<SettingsSection>
+				<SettingsSectionFieldLabel>
+					<h4>Group sounds</h4>
+				</SettingsSectionFieldLabel>
 
 				{customItems.length === 0 && (
 					<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -140,8 +142,8 @@ export const SoundpadSettings = () => {
 						onEdit={onEditSoundpadItem}
 					/>
 				))}
-			</div>
-		</div>
+			</SettingsSection>
+		</Settings>
 	)
 }
 

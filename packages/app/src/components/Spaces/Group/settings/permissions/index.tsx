@@ -8,6 +8,14 @@ import RoleEditor, { type RoleEditorPayload } from "./components/RoleEditor"
 import RolesList from "./components/RolesList"
 import { useGroupRoles } from "./useGroupRoles"
 
+import {
+	Settings,
+	SettingsContent,
+	SettingsHeader,
+	SettingsSection,
+	SettingsSectionFieldLabel,
+} from "@/components/Spaces/Group/SettingsPanel/layout"
+
 import "./index.less"
 
 const PermissionsSettings = () => {
@@ -79,34 +87,51 @@ const PermissionsSettings = () => {
 	}
 
 	if (loading) {
-		return <div className="permissions-settings">Loading...</div>
+		return <Settings>Loading...</Settings>
 	}
 
 	if (error) {
 		return (
-			<div className="permissions-settings">
+			<Settings>
 				<p>Failed to load roles: {error.message}</p>
-			</div>
+			</Settings>
 		)
 	}
 
 	return (
-		<div className="permissions-settings">
-			<RolesList
-				roles={roles}
-				selectedKey={selectedKey}
-				onSelect={setSelectedKey}
-				onCreate={onCreate}
-				onMove={onMove}
-			/>
+		<Settings>
+			<SettingsHeader>
+				<h2>
+					<Icons.ShieldUserIcon />
+					Roles & Permissions
+				</h2>
+			</SettingsHeader>
 
-			<RoleEditor
-				role={selectedRole}
-				canEditAdministrator={isOwner}
-				onSave={onSave}
-				onDelete={onDelete}
-			/>
-		</div>
+			<SettingsContent row>
+				<SettingsSection>
+					<RolesList
+						roles={roles}
+						selectedKey={selectedKey}
+						onSelect={setSelectedKey}
+						onCreate={onCreate}
+						onMove={onMove}
+					/>
+				</SettingsSection>
+
+				<SettingsSection
+					style={{
+						width: "100%",
+					}}
+				>
+					<RoleEditor
+						role={selectedRole}
+						canEditAdministrator={isOwner}
+						onSave={onSave}
+						onDelete={onDelete}
+					/>
+				</SettingsSection>
+			</SettingsContent>
+		</Settings>
 	)
 }
 

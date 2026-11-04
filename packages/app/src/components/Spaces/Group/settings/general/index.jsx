@@ -9,7 +9,14 @@ import { Icons } from "@components/Icons"
 import { useGroupActions, useGroupData } from "@comty/spaces-sdk/group"
 import GroupsModel from "@endpoints/groups"
 
-import "./index.less"
+import {
+	Settings,
+	SettingsHeader,
+	SettingsSection,
+	SettingsSectionField,
+	SettingsSectionFieldContent,
+	SettingsSectionFieldLabel,
+} from "@/components/Spaces/Group/SettingsPanel/layout"
 
 const GeneralSettings = () => {
 	const data = useGroupData()
@@ -73,94 +80,12 @@ const GeneralSettings = () => {
 	}
 
 	return (
-		<div className="group-settings-panel__fields">
-			<div className="group-settings-panel__fields__field">
-				<div className="group-settings-panel__fields__field__label">
-					<span>Name</span>
-				</div>
+		<Settings>
+			<SettingsHeader>
+				<h2>
+					<Icons.Settings /> General settings
+				</h2>
 
-				<div className="group-settings-panel__fields__field__content">
-					<Input
-						placeholder="Group Name"
-						defaultValue={values.name}
-						onChange={(e) => {
-							updateSetting("name", e.target.value)
-						}}
-					/>
-				</div>
-			</div>
-
-			<div className="group-settings-panel__fields__field">
-				<div className="group-settings-panel__fields__field__label">
-					<span>Description</span>
-				</div>
-
-				<div className="group-settings-panel__fields__field__content">
-					<Input
-						placeholder="Group Description"
-						defaultValue={values.description}
-						onChange={(e) => {
-							updateSetting("description", e.target.value)
-						}}
-					/>
-				</div>
-			</div>
-
-			<div className="group-settings-panel__fields__field">
-				<div className="group-settings-panel__fields__field__label">
-					<span>Images</span>
-				</div>
-
-				<div className="group-settings-panel__fields__field__content">
-					<UploadButton
-						onSuccess={(uid, response) => {
-							updateSetting("icon", response.url)
-						}}
-					>
-						<span>Change Icon</span>
-					</UploadButton>
-
-					<UploadButton
-						onSuccess={(uid, response) => {
-							updateSetting("cover", response.url)
-						}}
-					>
-						<span>Change Banner</span>
-					</UploadButton>
-				</div>
-			</div>
-
-			<div className="group-settings-panel__fields__field">
-				<div className="group-settings-panel__fields__field__label">
-					<span>Delete group</span>
-				</div>
-
-				<div className="group-settings-panel__fields__field__content">
-					<ConfirmButton
-						type="danger"
-						onConfirm={handleDeleteGroup}
-					>
-						Delete
-					</ConfirmButton>
-				</div>
-			</div>
-
-			<div className="group-settings-panel__fields__field">
-				<div className="group-settings-panel__fields__field__label">
-					<span>Leave group</span>
-				</div>
-
-				<div className="group-settings-panel__fields__field__content">
-					<ConfirmButton
-						type="danger"
-						onConfirm={handleLeaveGroup}
-					>
-						Leave
-					</ConfirmButton>
-				</div>
-			</div>
-
-			<div className="group-settings-panel__fields__bottom">
 				{hasChanges() ? "Pending changes" : null}
 				<Button
 					type="primary"
@@ -169,8 +94,98 @@ const GeneralSettings = () => {
 				>
 					Save
 				</Button>
-			</div>
-		</div>
+			</SettingsHeader>
+
+			<SettingsSection>
+				<SettingsSectionField>
+					<SettingsSectionFieldLabel>
+						<span>Name</span>
+					</SettingsSectionFieldLabel>
+
+					<SettingsSectionFieldContent>
+						<Input
+							placeholder="Group Name"
+							defaultValue={values.name}
+							onChange={(e) => {
+								updateSetting("name", e.target.value)
+							}}
+						/>
+					</SettingsSectionFieldContent>
+				</SettingsSectionField>
+
+				<SettingsSectionField>
+					<SettingsSectionFieldLabel>
+						<span>Description</span>
+					</SettingsSectionFieldLabel>
+
+					<SettingsSectionFieldContent>
+						<Input
+							placeholder="Group Description"
+							defaultValue={values.description}
+							onChange={(e) => {
+								updateSetting("description", e.target.value)
+							}}
+						/>
+					</SettingsSectionFieldContent>
+				</SettingsSectionField>
+			</SettingsSection>
+
+			<SettingsSection>
+				<SettingsSectionField>
+					<SettingsSectionFieldLabel>
+						<span>Images</span>
+					</SettingsSectionFieldLabel>
+
+					<SettingsSectionFieldContent>
+						<UploadButton
+							onSuccess={(uid, response) => {
+								updateSetting("icon", response.url)
+							}}
+						>
+							<span>Change Icon</span>
+						</UploadButton>
+
+						<UploadButton
+							onSuccess={(uid, response) => {
+								updateSetting("cover", response.url)
+							}}
+						>
+							<span>Change Banner</span>
+						</UploadButton>
+					</SettingsSectionFieldContent>
+				</SettingsSectionField>
+			</SettingsSection>
+
+			<SettingsSection>
+				<h3
+					style={{
+						color: "var(--danger-color)",
+					}}
+				>
+					Danger Zone
+				</h3>
+
+				<SettingsSectionField row>
+					<SettingsSectionFieldContent>
+						<ConfirmButton
+							type="danger"
+							onConfirm={handleDeleteGroup}
+							icon={<Icons.Trash />}
+						>
+							Delete Group
+						</ConfirmButton>
+
+						<ConfirmButton
+							type="danger"
+							onConfirm={handleLeaveGroup}
+							icon={<Icons.LogOut />}
+						>
+							Leave Group
+						</ConfirmButton>
+					</SettingsSectionFieldContent>
+				</SettingsSectionField>
+			</SettingsSection>
+		</Settings>
 	)
 }
 
