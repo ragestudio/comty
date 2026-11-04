@@ -127,9 +127,10 @@ jobs:
   create_release:
     name: Create GitHub Release
     needs: [check_versions, build_app, build_server, build_native]
+    # server and native failures must not block the release
     if: |
-      !cancelled() && !failure() && startsWith(github.ref, 'refs/tags/') &&
-      (needs.check_versions.outputs.app_changed == 'true' || needs.check_versions.outputs.server_changed == 'true' || needs.check_versions.outputs.native_changed == 'true')
+      !cancelled() && startsWith(github.ref, 'refs/tags/') &&
+      needs.build_app.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -147,14 +148,14 @@ jobs:
         run: zip -r dist.zip ./app-release-files
 
       - name: Download Android APK
-        if: needs.check_versions.outputs.native_changed == 'true'
+        if: needs.check_versions.outputs.native_changed == 'true' && needs.build_native.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: native-android-apk
           path: ./native-release-files
 
       - name: Rename Android APK
-        if: needs.check_versions.outputs.native_changed == 'true'
+        if: needs.check_versions.outputs.native_changed == 'true' && needs.build_native.result == 'success'
         run: mv ./native-release-files/*.apk ./spaces-android.apk
 
       - name: Generate Versions JSON
