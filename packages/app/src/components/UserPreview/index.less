@@ -26,6 +26,11 @@
 			width: 30px;
 			height: 30px;
 		}
+
+		.user-preview__presence {
+			left: 22px;
+			bottom: 1px;
+		}
 	}
 
 	&.big {
@@ -47,6 +52,27 @@
 		.user-preview__info {
 			padding: 20px;
 			width: 100%;
+		}
+	}
+
+	&__presence {
+		position: absolute;
+
+		left: 32px;
+		bottom: 3px;
+
+		width: 9px;
+		height: 9px;
+
+		border-radius: 50%;
+		border: 2px solid var(--background-color-accent);
+
+		background-color: rgba(var(--bg_color_6), 0.35);
+
+		pointer-events: none;
+
+		&.online {
+			background-color: #3ddc84;
 		}
 	}
 

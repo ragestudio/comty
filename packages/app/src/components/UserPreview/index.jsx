@@ -12,15 +12,18 @@ import "./index.less"
 const UserPreview = (props) => {
 	let [userData, setUserData] = React.useState(props.user)
 
+	const userId = props.user_id
+	const username = props.username
+
 	const fetchUser = React.useCallback(async () => {
-		if (!props.user_id && !props.username) {
+		if (!userId && !username) {
 			console.error("Cannot fetch user data without user_id or username")
 			return false
 		}
 
 		const data = await User.data({
-			user_id: props.user_id,
-			username: props.username,
+			user_id: userId,
+			username: username,
 		}).catch((err) => {
 			console.error(err)
 			app.message.error("Failed to fetch user data")
@@ -30,7 +33,7 @@ const UserPreview = (props) => {
 		if (data) {
 			setUserData(data)
 		}
-	}, [props])
+	}, [userId, username])
 
 	const handleOnClick = async () => {
 		if (typeof props.onClick === "function") {
@@ -41,16 +44,14 @@ const UserPreview = (props) => {
 	}
 
 	React.useEffect(() => {
-		if (!props.user) {
-			fetchUser()
-		}
-	}, [props])
-
-	React.useEffect(() => {
 		if (props.user) {
 			setUserData(props.user)
+
+			return
 		}
-	}, [props.user])
+
+		fetchUser()
+	}, [props.user, fetchUser])
 
 	if (!userData) {
 		return (
@@ -78,6 +79,14 @@ const UserPreview = (props) => {
 					src={userData.avatar}
 				/>
 			</div>
+
+			{typeof props.presence === "boolean" && (
+				<span
+					className={classnames("user-preview__presence", {
+						["online"]: props.presence,
+					})}
+				/>
+			)}
 
 			{!props.onlyIcon && (
 				<div
