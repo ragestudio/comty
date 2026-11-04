@@ -9,6 +9,8 @@ import channelsOrdered from "./channels/ordered"
 import channelNewMessage from "./channels/newMessage"
 import membershipCreated from "./memberships/created"
 import membershipDeleted from "./memberships/deleted"
+import membershipUpdated from "./memberships/updated"
+import rolesUpdated from "./roles/updated"
 import presenceOnline from "./presence/online"
 import presenceOffline from "./presence/offline"
 import voiceStarted from "./voice/started"
@@ -36,6 +38,10 @@ class EventsActions extends ActionsBase<GroupStoreType> {
 		membershipCreated.bind(this)
 	handleMembershipDeleted: OmitThisParameter<typeof membershipDeleted> =
 		membershipDeleted.bind(this)
+	handleMembershipUpdated: OmitThisParameter<typeof membershipUpdated> =
+		membershipUpdated.bind(this)
+	handleRolesUpdated: OmitThisParameter<typeof rolesUpdated> =
+		rolesUpdated.bind(this)
 	handleUserOnline: OmitThisParameter<typeof presenceOnline> =
 		presenceOnline.bind(this)
 	handleUserOffline: OmitThisParameter<typeof presenceOffline> =

@@ -1,7 +1,11 @@
 import type { Group } from "@comty/shared/types/spaces/group"
 import type { Channel, Channels } from "@comty/shared/types/spaces/channel"
 import type { StatedChannel } from "@comty/shared/types/rtc/statedChannel"
-import type { Member, Members } from "@comty/shared/types/spaces/member"
+import type {
+	Member,
+	MemberRole,
+	Members,
+} from "@comty/shared/types/spaces/member"
 import type { Message } from "@comty/shared/types/spaces/message"
 
 export interface GroupUpdatePayload {
@@ -20,6 +24,13 @@ export interface MembershipDeletedPayload {
 	membership_id: string
 	user_id: string
 	group_id: string
+}
+
+export interface MembershipUpdatedPayload {
+	membership_id: string
+	user_id: string
+	group_id: string
+	roles?: MemberRole[]
 }
 
 export interface ClientVoiceJoinPayload {
@@ -74,6 +85,7 @@ export interface GroupStoreState {
 	error: Error | null
 
 	initGeneration: number
+	rolesVersion: number
 	userConnections: Map<string, UserConnectionReference>
 }
 
@@ -83,6 +95,7 @@ export interface GroupStoreActions {
 	fetchGroup: () => Promise<Group | null>
 	fetchChannels: () => Promise<Channels | null>
 	fetchMembers: () => Promise<void>
+	fetchViewerPermissions: () => Promise<void>
 	syncRTCChannels: () => Promise<void>
 	evaluateConnections: (members: Member[]) => Promise<void>
 	evaluateDecorations: (items: (Member | string)[]) => Promise<void>
@@ -100,6 +113,8 @@ export interface GroupStoreActions {
 	handleChannelNewMessage: (payload: Message) => void
 	handleMembershipCreated: (payload: MembershipCreatedPayload) => Promise<void>
 	handleMembershipDeleted: (payload: MembershipDeletedPayload) => void
+	handleMembershipUpdated: (payload: MembershipUpdatedPayload) => void
+	handleRolesUpdated: () => void
 	handleUserOnline: (payload: { userId: string }) => void
 	handleUserOffline: (payload: { userId: string }) => void
 	handleVoiceChannelStarted: (payload: {

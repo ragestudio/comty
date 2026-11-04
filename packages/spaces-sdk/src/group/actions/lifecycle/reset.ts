@@ -4,6 +4,7 @@ import { createDefaultChannels, createDefaultMembers } from "@/group/constants"
 export default function (this: LifecycleActions): void {
 	this.setState((state) => ({
 		initGeneration: state.initGeneration + 1,
+		rolesVersion: 0,
 		groupId: null,
 		data: null,
 		channels: createDefaultChannels(),

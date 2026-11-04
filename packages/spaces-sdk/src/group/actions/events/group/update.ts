@@ -1,24 +1,36 @@
 import type EventsActions from "../index"
 import type { GroupUpdatePayload } from "@/group/types"
 
-import db from "@/db"
+import { cacheGroup } from "@/helpers/cache"
+import { GroupsListStore } from "@/groupsList"
 import logger from "@comty/shared/utils/logger"
 
 export default function (
 	this: EventsActions,
 	payload: GroupUpdatePayload,
 ): void {
-	this.setState((state) => {
-		if (!state.data || state.data._id !== payload._id) {
-			return state
-		}
+	// keep the sidebar entry in sync even when the group is not cached
+	GroupsListStore.getState().actions.updateGroup(payload as any)
 
-		const updatedGroup = { ...state.data, ...payload }
+	const state = this.state
 
-		db.groups.put(updatedGroup).catch((err) => {
-			logger.error("Failed to update group in cache", err)
-		})
+	if (!state.data || state.data._id !== payload._id) {
+		return
+	}
 
-		return { data: updatedGroup }
+	const ownerChanged =
+		typeof payload.owner_user_id === "string" &&
+		payload.owner_user_id !== state.data.owner_user_id
+
+	const updatedGroup = { ...state.data, ...payload }
+
+	this.setState({ data: updatedGroup })
+
+	cacheGroup(updatedGroup).catch((err) => {
+		logger.error("Failed to update group in cache", err)
 	})
+
+	if (ownerChanged) {
+		state.actions.fetchViewerPermissions()
+	}
 }

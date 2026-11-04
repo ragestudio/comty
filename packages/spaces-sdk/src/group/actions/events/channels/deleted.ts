@@ -10,9 +10,7 @@ export default function (this: EventsActions, payload: Channel): void {
 		const updatedChannels: Channels = {
 			...state.channels,
 			total_items: Math.max((state.channels?.total_items ?? 1) - 1, 0),
-			items: (state.channels?.items ?? []).filter(
-				(c) => c._id !== payload._id,
-			),
+			items: (state.channels?.items ?? []).filter((c) => c._id !== payload._id),
 		}
 
 		persistChannelsCache(state.groupId, updatedChannels)

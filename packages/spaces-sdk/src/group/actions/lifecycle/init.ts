@@ -81,13 +81,21 @@ export default async function (
 		const cached: CachedGroup = {
 			group: cachedGroup ?? null,
 			channels: cachedChannelsDoc ?? null,
-			memberships:
-				cachedMemberships.length > 0 ? cachedMemberships : null,
+			memberships: cachedMemberships.length > 0 ? cachedMemberships : null,
 			total_members: cachedTotalMembers > 0 ? cachedTotalMembers : null,
 		}
 
 		if (cached.group) {
-			this.setState({ data: cached.group })
+			// old cache entries can still contain viewer context, never reuse it
+			const {
+				viewer_permissions,
+				viewer_roles,
+				is_owner,
+				is_admin,
+				...cachedGroupData
+			} = cached.group
+
+			this.setState({ data: cachedGroupData })
 		}
 		if (cached.channels) {
 			this.setState({ channels: cached.channels })
@@ -99,8 +107,7 @@ export default async function (
 			this.setState({
 				members: {
 					items: populatedMembers,
-					total_items:
-						cached.total_members ?? populatedMembers.length,
+					total_items: cached.total_members ?? populatedMembers.length,
 					has_more: false,
 				},
 			})
@@ -110,19 +117,25 @@ export default async function (
 
 		this.state.actions.syncRTCChannels().catch(logger.error)
 
-		const hasAllCache =
-			cached.group && cached.channels && cached.memberships
+		const hasAllCache = cached.group && cached.channels && cached.memberships
 
 		if (!hasAllCache) {
 			const promises = []
 
 			if (!cached.group) promises.push(this.state.actions.fetchGroup())
-			if (!cached.channels)
-				promises.push(this.state.actions.fetchChannels())
-			if (!cached.memberships)
-				promises.push(this.state.actions.fetchMembers())
+			if (!cached.channels) promises.push(this.state.actions.fetchChannels())
+			if (!cached.memberships) promises.push(this.state.actions.fetchMembers())
 
 			await Promise.all(promises)
+		}
+
+		// viewer permissions are never trusted from the cache
+		await this.state.actions.fetchViewerPermissions()
+
+		// roles can change without bumping the group version, refresh members
+		// in the background so cached memberships never keep stale roles
+		if (hasAllCache) {
+			this.state.actions.fetchMembers().catch(logger.error)
 		}
 
 		if (isCurrentGeneration()) {

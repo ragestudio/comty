@@ -1,4 +1,5 @@
 import type { GroupStoreType } from "./types"
+import type { GroupPermission } from "@comty/shared/types/spaces/permissions"
 
 import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
@@ -28,12 +29,14 @@ export const GroupStore = create<GroupStoreType>()((set, get) => {
 		loading: true,
 		error: null,
 		initGeneration: 0,
+		rolesVersion: 0,
 		userConnections: new Map(),
 
 		actions: {
 			fetchGroup: fetchingActions.fetchGroup,
 			fetchChannels: fetchingActions.fetchChannels,
 			fetchMembers: fetchingActions.fetchMembers,
+			fetchViewerPermissions: fetchingActions.fetchViewerPermissions,
 			syncRTCChannels: evaluateActions.evaluateRTC,
 			evaluateConnections: evaluateActions.evaluateConnections,
 			evaluateDecorations: evaluateActions.evaluateDecorations,
@@ -54,6 +57,8 @@ export const GroupStore = create<GroupStoreType>()((set, get) => {
 			handleChannelNewMessage: eventsActions.handleChannelNewMessage,
 			handleMembershipCreated: eventsActions.handleMembershipCreated,
 			handleMembershipDeleted: eventsActions.handleMembershipDeleted,
+			handleMembershipUpdated: eventsActions.handleMembershipUpdated,
+			handleRolesUpdated: eventsActions.handleRolesUpdated,
 			handleUserOnline: eventsActions.handleUserOnline,
 			handleUserOffline: eventsActions.handleUserOffline,
 			handleVoiceChannelStarted: eventsActions.handleVoiceChannelStarted,
@@ -77,6 +82,15 @@ export const useGroupStatedChannel = (channelId?: string | null) =>
 	GroupStore((s) => (channelId ? s.statedChannels[channelId] : undefined))
 export const useGroupConnections = () => GroupStore((s) => s.connectedMembers)
 export const useGroupDecorations = () => GroupStore((s) => s.membersDecorations)
+export const useGroupRolesVersion = () => GroupStore((s) => s.rolesVersion)
 export const useGroupLoading = () => GroupStore((s) => s.loading)
 export const useGroupError = () => GroupStore((s) => s.error)
+export const useGroupPermissions = () =>
+	GroupStore((s) => s.data?.viewer_permissions)
+export const useGroupPermission = (permission: GroupPermission): boolean =>
+	GroupStore(
+		(s) =>
+			s.data?.is_owner === true ||
+			s.data?.viewer_permissions?.[permission] === true,
+	)
 export const useGroupActions = () => GroupStore((s) => s.actions)
