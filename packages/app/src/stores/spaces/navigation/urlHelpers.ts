@@ -40,9 +40,7 @@ export function parseUrlParts(): Partial<NavigationStoreType> {
 		_channel && RESERVED_SUBVIEWS.has(_channel) ? null : _channel || null
 
 	const resolvedSubview =
-		_channel && RESERVED_SUBVIEWS.has(_channel)
-			? _channel
-			: _subview || null
+		_channel && RESERVED_SUBVIEWS.has(_channel) ? _channel : _subview || null
 
 	return {
 		type: (_type as NavigationType) || null,
@@ -52,8 +50,25 @@ export function parseUrlParts(): Partial<NavigationStoreType> {
 	}
 }
 
+export function getCurrentPath(): string {
+	const path = app.isDesktop
+		? window.location.hash.replace(/^#/, "")
+		: window.location.pathname
+
+	if (!path) return "/"
+
+	return path.length > 1 ? path.replace(/\/$/, "") : path
+}
+
 export function syncToUrl(state: Partial<NavigationStoreType>) {
 	const pathname = composePathname(state)
+
+	// the url is already in sync, avoid duplicate history entries
+	if (getCurrentPath() === pathname) return
+
+	if (typeof app.location?.push === "function") {
+		return app.location.push(pathname)
+	}
 
 	if (app.isDesktop) {
 		window.location.hash = `#${pathname}`

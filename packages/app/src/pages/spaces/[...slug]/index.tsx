@@ -9,6 +9,8 @@ import useNavigation from "@/stores/spaces/navigation"
 
 import { BaseLeftPanel } from "@pages/spaces/layout"
 import styles from "@pages/spaces/index.module.less"
+import Icons from "@/components/Icons"
+import Button from "@/ui/Button"
 
 const MIN_PANELS_WIDTH = {
 	left: 300,
@@ -24,9 +26,15 @@ const LeftPanel = () => {
 	const nav = useNavigation()
 
 	const onClickDMListItem = (item) => {
+		const to_user_id = item.to_user_id ?? item.pair_key?.split?.("-")[1]
+
+		if (!to_user_id) return
+
 		nav.actions.navigate({
 			type: "dm",
-			room: item.to_user_id,
+			room: to_user_id,
+			channel: null,
+			subview: null,
 		})
 	}
 
@@ -50,10 +58,30 @@ const LeftPanel = () => {
 const MainPanel = () => {
 	const nav = useNavigation()
 
-	return <>{nav.room && <DMRoom to_user_id={nav.room} />}</>
+	return (
+		<>{nav.room && nav.type === "dm" && <DMRoom to_user_id={nav.room} />}</>
+	)
 }
 
 const SpacesMainPage = () => {
+	const nav = useNavigation()
+
+	React.useEffect(() => {
+		const syncFromUrl = () => nav.actions.initFromUrl()
+
+		// the first render can happen before the router emits its location,
+		// so read the current url once on mount
+		syncFromUrl()
+
+		app.eventBus.on("router.navigate", syncFromUrl)
+		window.addEventListener("popstate", syncFromUrl)
+
+		return () => {
+			app.eventBus.off("router.navigate", syncFromUrl)
+			window.removeEventListener("popstate", syncFromUrl)
+		}
+	}, [])
+
 	return (
 		<Splitter className={styles.container}>
 			<Splitter.Panel
