@@ -60,7 +60,32 @@ export const useSoundpadItems = (groupId?: string) => {
 
 				await refresh()
 			} catch (error) {
-				app.message.error(getErrorMessage(error, "Failed to remove sound"))
+				app.message.error(
+					getErrorMessage(error, "Failed to remove sound"),
+				)
+				throw error
+			}
+		},
+		[groupId, refresh],
+	)
+
+	const update = React.useCallback(
+		async (item: SoundpadItemPayload) => {
+			if (!groupId) return
+
+			try {
+				const result = await GroupsModel.soundpad.updateItem(
+					groupId,
+					item,
+				)
+
+				await refresh()
+
+				return result
+			} catch (error) {
+				app.message.error(
+					getErrorMessage(error, "Failed to update sound"),
+				)
 				throw error
 			}
 		},
@@ -73,6 +98,7 @@ export const useSoundpadItems = (groupId?: string) => {
 		error,
 		refresh,
 		add,
+		update,
 		remove,
 	}
 }

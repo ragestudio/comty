@@ -2,11 +2,19 @@ import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
 import React from "react"
 import { Button, Input } from "antd"
+import classNames from "clsx"
 
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
 
 import isUrl from "@utils/isURL"
+import createBem from "@/utils/createBem"
+
+import EmojiPicker from "@/components/Expressions/EmojiPicker"
+import Popover from "@/ui/Popover"
+
+import styles from "./AddSoundpadItem.module.less"
+const b = createBem("soundpad-settings__add", styles)
 
 export type AddSoundpadItemProps = {
 	onSubmit: (
@@ -47,15 +55,33 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 	}
 
 	return (
-		<div className="soundpad-settings__add">
-			<div className="soundpad-settings__add__fields">
-				<Input
-					placeholder="Icon"
-					maxLength={16}
-					value={icon}
-					style={{ width: 70 }}
-					onChange={(event) => setIcon(event.target.value)}
-				/>
+		<div className={classNames(b(), "bg-accent", "border-default")}>
+			<div className={b.elem("field")}>
+				<h3>
+					<Icons.PlusCircle /> Add new sound
+				</h3>
+				<span
+					style={{
+						fontSize: 12,
+					}}
+				>
+					(Trims at max 10s)
+				</span>
+			</div>
+
+			<div className={b.elem("field")}>
+				<Popover
+					className={b.elem("emoji-select")}
+					content={({ close }) => (
+						<EmojiPicker
+							injectChar={(char) => setIcon(char)}
+							close={close}
+						/>
+					)}
+					position="bottom"
+				>
+					<Button>{icon}</Button>
+				</Popover>
 
 				<Input
 					placeholder="Sound name"
@@ -63,32 +89,36 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 					value={name}
 					onChange={(event) => setName(event.target.value)}
 				/>
+			</div>
 
-				<Input
-					placeholder="HTTPS audio URL"
-					value={src}
-					onChange={(event) => setSrc(event.target.value)}
-				/>
-
+			<div className={b.elem("field")}>
 				<UploadButton
 					accept="audio/*"
 					onSuccess={(uid, response) => {
 						setSrc(response.url)
 					}}
 				>
-					<Icons.Upload /> Upload
+					Upload
 				</UploadButton>
 
-				<Button
-					type="primary"
-					icon={<Icons.Plus />}
-					disabled={!canSubmit || submitting}
-					loading={submitting}
-					onClick={submit}
-				>
-					Add
-				</Button>
+				<span>or</span>
+
+				<Input
+					placeholder="HTTPS audio URL"
+					value={src}
+					onChange={(event) => setSrc(event.target.value)}
+				/>
 			</div>
+
+			<Button
+				type="primary"
+				icon={<Icons.Plus />}
+				disabled={!canSubmit || submitting}
+				loading={submitting}
+				onClick={submit}
+			>
+				Add
+			</Button>
 		</div>
 	)
 }

@@ -1,15 +1,26 @@
 import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
-import { Button, Tag } from "antd"
+import { Button, Input, Tag } from "antd"
 
 import ConfirmButton from "@ui/ConfirmButton"
 import { Icons } from "@components/Icons"
+import createBem from "@/utils/createBem"
+
+import styles from "./SoundpadItemRow.module.less"
+import Popover from "@/ui/Popover"
+import EmojiPicker from "@/components/Expressions/EmojiPicker"
+import React from "react"
+
+const b = createBem("soundpad-settings__item", styles)
 
 export type SoundpadItemRowProps = {
 	item: SoundpadItemPayload
 	playing: boolean
 	onPreview: (item: SoundpadItemPayload) => void
 	onDelete: (item: SoundpadItemPayload) => void
+	onEdit?: (
+		item: SoundpadItemPayload,
+	) => Promise<SoundpadItemPayload> | SoundpadItemPayload
 }
 
 const SoundpadItemRow = ({
@@ -17,28 +28,67 @@ const SoundpadItemRow = ({
 	playing,
 	onPreview,
 	onDelete,
+	onEdit,
 }: SoundpadItemRowProps) => {
-	return (
-		<div className="soundpad-settings__item">
-			<div className="soundpad-settings__item__icon">{item.icon}</div>
+	const [data, setData] = React.useState<typeof item>(item)
 
-			<div className="soundpad-settings__item__info">
-				<p>{item.name}</p>
-				{item.built_in && <Tag>Default</Tag>}
+	const editDataField = (field: string, value: any) => {
+		setData((prev) => ({
+			...prev,
+			[field]: value,
+		}))
+	}
+
+	const handleSaveEdit = React.useCallback(async () => {
+		if (typeof onEdit === "function") {
+			setData(await onEdit(data))
+		}
+	}, [data])
+
+	const hasChanges = React.useCallback(() => {
+		return item !== data
+	}, [item, data])
+
+	return (
+		<div className={b()}>
+			<Popover
+				className={b.elem("emoji-select")}
+				content={({ close }) => (
+					<EmojiPicker
+						injectChar={(char: string) => editDataField("icon", char)}
+						close={close}
+					/>
+				)}
+				position="bottom"
+			>
+				<div className={b.elem("icon")}>{data.icon}</div>
+			</Popover>
+
+			<div className={b.elem("info")}>
+				<Input
+					value={data.name}
+					onChange={(e) => editDataField("name", e.target.value)}
+				/>
 			</div>
 
 			<Button
 				size="small"
 				icon={playing ? <Icons.Square /> : <Icons.Play />}
-				onClick={() => onPreview(item)}
+				onClick={() => onPreview(data)}
 			>
 				{playing ? "Stop" : "Preview"}
 			</Button>
 
-			{!item.built_in && (
+			<ConfirmButton
+				icon={<Icons.Trash />}
+				onConfirm={() => onDelete(data)}
+			/>
+
+			{hasChanges() && (
 				<ConfirmButton
-					icon={<Icons.Trash />}
-					onConfirm={() => onDelete(item)}
+					icon={<Icons.Save />}
+					onConfirm={() => handleSaveEdit()}
+					onCancel={() => setData(item)}
 				/>
 			)}
 		</div>

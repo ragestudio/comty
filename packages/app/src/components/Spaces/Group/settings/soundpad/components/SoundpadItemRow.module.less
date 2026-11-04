@@ -1,0 +1,59 @@
+.soundpad-settings__item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	gap: 10px;
+
+	padding: 6px 10px;
+
+	border-radius: 8px;
+
+	background: var(--background-color-accent);
+
+	&__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 32px;
+		height: 32px;
+
+		font-size: 1.2rem;
+
+		border-radius: 6px;
+
+		background: var(--background-color-accent-2);
+	}
+
+	&__info {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		flex: 1;
+
+		gap: 8px;
+
+		min-width: 0;
+
+		p {
+			margin: 0;
+
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
+	&__emoji-select {
+		:global {
+			.popover-content {
+				.emoji-picker {
+					max-height: 200px;
+					overflow-y: scroll;
+				}
+			}
+		}
+	}
+}
