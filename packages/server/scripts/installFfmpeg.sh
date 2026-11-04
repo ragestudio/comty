@@ -50,7 +50,7 @@ download_ffmpeg() {
     echo -e "${YELLOW}Downloading the latest stable version of FFmpeg...${NC}"
 
     # Base URL for downloads from John van Sickle's FFmpeg builds
-    BASE_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.1-latest"
+    BASE_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest"
 
     # Map architecture to the expected format in the URL
     if [[ "$ARCH" == "amd64" ]]; then
@@ -60,7 +60,7 @@ download_ffmpeg() {
     fi
 
     # Create the download URL for the latest release
-    FFMPEG_URL="$BASE_URL-$URL_ARCH-gpl-7.1.tar.xz"
+    FFMPEG_URL="$BASE_URL/ffmpeg-master-latest-$URL_ARCH-gpl.tar.xz"
 
     if [[ -z "$FFMPEG_URL" ]]; then
         echo -e "${RED}Could not determine the download URL for your system.${NC}"
@@ -74,7 +74,7 @@ download_ffmpeg() {
     if command -v wget > /dev/null; then
         wget -q --show-progress -O "$ARCHIVE_FILE" "$FFMPEG_URL"
     elif command -v curl > /dev/null; then
-        curl -L -o "$ARCHIVE_FILE" "$FFMPEG_URL"
+        curl -fL -o "$ARCHIVE_FILE" "$FFMPEG_URL"
     else
         echo -e "${RED}wget or curl is required to download FFmpeg.${NC}"
         exit 1
