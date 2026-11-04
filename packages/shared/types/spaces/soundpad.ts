@@ -5,4 +5,6 @@ export interface SoundpadItemPayload {
 	icon: string
 	name: string
 	src: string
+	built_in?: boolean
+	created_at?: Date | string
 }

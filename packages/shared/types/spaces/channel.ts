@@ -6,6 +6,7 @@ export interface Channel {
 	name: string
 	description?: string
 	explicit: boolean
+	params?: Record<string, string>
 
 	last_message_id?: string
 
