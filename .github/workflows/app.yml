@@ -30,7 +30,8 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install
+        # only the web app and its workspace dependencies are needed
+        run: pnpm install --filter "@comty/app..."
 
       # the package ships no dist in the repository and it is resolved at runtime
       - name: Build linebridge client
