@@ -265,6 +265,8 @@ export const Member = ({
 export const MemberMemo = React.memo(Member, (prevProps, nextProps) => {
 	return (
 		prevProps.member._id === nextProps.member._id &&
+		prevProps.member.roles === nextProps.member.roles &&
+		prevProps.member.user === nextProps.member.user &&
 		prevProps.connected === nextProps.connected &&
 		prevProps.decorations === nextProps.decorations
 	)
