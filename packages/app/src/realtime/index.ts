@@ -24,7 +24,9 @@ export function initRealtime() {
 		for (const event of WS_EVENTS) {
 			const name = `wsmanager:${namespace}:${event}`
 
-			client.eventBus.on(name, (data) => app.eventBus.emit(name, data))
+			client.eventBus.on(name, async (data) =>
+				app.eventBus.emit(name, data),
+			)
 		}
 	}
 
@@ -33,7 +35,10 @@ export function initRealtime() {
 
 		if (!socket) return
 
+		// the socket can be reopened after a reconnect, drop the previous
+		// registrations first so handlers never pile up
 		for (const [event, handler] of Object.entries(baseWsEvents)) {
+			socket.off(event, handler as any)
 			socket.on(event, handler as any)
 		}
 	})
