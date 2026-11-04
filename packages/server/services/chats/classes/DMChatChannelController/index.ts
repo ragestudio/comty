@@ -37,6 +37,10 @@ export default class DMChatChannelController {
 			throw new OperationError(400, "to_user_id must be a string")
 		}
 
+		if (!mongoose.Types.ObjectId.isValid(to_user_id)) {
+			throw new OperationError(400, "Invalid to_user_id")
+		}
+
 		// create the sorted pairkey
 		const pair_key = genPairKey(from_user_id, to_user_id)
 
@@ -81,42 +85,36 @@ export default class DMChatChannelController {
 			},
 		)
 
-		if (activity.length === 0) {
-			return []
-		}
-
-		const pairs = activity.map((reg) =>
-			genPairKey(reg.user_id, reg.to_user_id),
-		)
-
-		const users = new Map()
-
 		// filter invalid user_ids (must be objectId)
 		activity = activity.filter((reg) => {
-			if (
-				reg.to_user_id &&
-				!mongoose.Types.ObjectId.isValid(reg.to_user_id)
-			) {
+			if (!reg.to_user_id || !mongoose.Types.ObjectId.isValid(reg.to_user_id)) {
 				return false
 			}
 
 			return true
 		})
 
-		// if there are any activities, fetch the users
-		if (activity.length > 0) {
-			const data = await User.find({
-				_id: {
-					$in: activity.map((a) => a.to_user_id),
-				},
-			}).catch((err) => {
-				console.error(err)
-				return []
-			})
+		if (activity.length === 0) {
+			return []
+		}
 
-			for (const user of data) {
-				users.set(user._id.toString(), user)
-			}
+		const pairs = Array.from(
+			new Set(activity.map((reg) => genPairKey(reg.user_id, reg.to_user_id))),
+		)
+
+		const users = new Map()
+
+		const data = await User.find({
+			_id: {
+				$in: activity.map((a) => a.to_user_id),
+			},
+		}).catch((err) => {
+			console.error(err)
+			return []
+		})
+
+		for (const user of data) {
+			users.set(user._id.toString(), user)
 		}
 
 		let rooms = (await RoomsModel.find(
