@@ -2,6 +2,10 @@ import GroupSoundpadItem from "@db_models/groupSoundpadItem"
 
 import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
+const ICON_MAX_LENGTH = 16
+const NAME_MAX_LENGTH = 48
+const SRC_MAX_LENGTH = 2048
+
 export default class GroupSoundpad {
 	static getBuiltInItems(): any[] {
 		return [
@@ -61,7 +65,16 @@ export default class GroupSoundpad {
 			group_id: group_id,
 		})
 
-		return [...groupItems, ...GroupSoundpad.getBuiltInItems()]
+		return [
+			...groupItems.map((item) => ({
+				...item.toRaw(),
+				built_in: false,
+			})),
+			...GroupSoundpad.getBuiltInItems().map((item) => ({
+				...item,
+				built_in: true,
+			})),
+		]
 	}
 
 	static async getItem(payload: {
@@ -85,7 +98,7 @@ export default class GroupSoundpad {
 	}
 
 	static async addItem(payload: SoundpadItemPayload): Promise<any> {
-		const { group_id, user_id, icon, name, src } = payload
+		const { group_id, user_id } = payload
 
 		if (!group_id) {
 			throw new OperationError(400, "Missing group_id")
@@ -95,24 +108,45 @@ export default class GroupSoundpad {
 			throw new OperationError(400, "Missing user_id")
 		}
 
-		if (!icon) {
+		if (typeof payload.icon !== "string" || payload.icon.trim().length === 0) {
 			throw new OperationError(400, "Missing icon")
 		}
 
-		if (!src) {
-			throw new OperationError(400, "Missing src")
+		const icon = payload.icon.trim().slice(0, ICON_MAX_LENGTH)
+
+		if (typeof payload.name !== "string" || payload.name.trim().length === 0) {
+			throw new OperationError(400, "Missing name")
 		}
 
-		let soundpadItem = await GroupSoundpadItem.create({
+		const name = payload.name.trim().slice(0, NAME_MAX_LENGTH)
+
+		if (
+			typeof payload.src !== "string" ||
+			payload.src.length > SRC_MAX_LENGTH
+		) {
+			throw new OperationError(400, "Invalid src")
+		}
+
+		try {
+			const url = new URL(payload.src)
+
+			if (url.protocol !== "https:") {
+				throw new Error("invalid protocol")
+			}
+		} catch {
+			throw new OperationError(400, "src must be a valid HTTPS URL")
+		}
+
+		const soundpadItem = await GroupSoundpadItem.create({
 			group_id: group_id,
 			user_id: user_id,
 			icon: icon,
 			name: name,
-			src: src,
+			src: payload.src,
 			created_at: new Date(),
 		})
 
-		return soundpadItem
+		return soundpadItem.toRaw()
 	}
 
 	static async removeItem(payload: {
