@@ -46,6 +46,11 @@ export function buildGroupSocketEvents(
 			actions.handleMembershipCreated(payload),
 		[`${prefix}:membership:deleted`]: (payload: any) =>
 			actions.handleMembershipDeleted(payload),
+		[`${prefix}:membership:updated`]: (payload: any) =>
+			actions.handleMembershipUpdated(payload),
+
+		// Roles
+		[`${prefix}:roles:updated`]: () => actions.handleRolesUpdated(),
 
 		// Voice channels
 		[`${prefix}:vc:started`]: (payload: any) =>
