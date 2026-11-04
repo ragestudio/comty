@@ -1,69 +1,120 @@
 import type API from "@services/groups/groups.service"
+
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
-import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
 import GroupRoles from "@shared-classes/Spaces/GroupRoles"
-import Groups from "@shared-classes/Spaces/Groups"
+import { resolveMemberRoles } from "@shared-classes/Spaces/GroupRoles/helpers"
 
 export type MemberPutPayload = {
-	add_roles: string[]
-	remove_roles: string[]
+	add_roles?: string[]
+	remove_roles?: string[]
 }
 
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],
 	useContexts: ["scylla"] as const,
-	fn: async (req, res) => {
-		const user_id = req.auth.user_id
-		const { group_id, member_id } = req.params as {
+	fn: async (req) => {
+		const { member_id } = req.params as {
 			group_id: string
 			member_id: string
 		}
-		const payload = req.body as MemberPutPayload
+		const payload = (req.body ?? {}) as MemberPutPayload
 
-		const group = await Groups.get(group_id)
+		const authz = await Gatekeeper.fromRequest(req)
 
-		if (!group) {
-			throw new OperationError(404, "group not found")
-		}
+		authz.require("MANAGE_ROLES")
 
-		// search for member by id
-		let member = await GroupMemberships.getOneById(group_id, member_id)
+		let member = await GroupMemberships.getOneById(authz.group._id, member_id)
 
 		if (!member) {
-			throw new OperationError(404, "member not found")
+			throw new OperationError(404, "Member not found")
 		}
 
-		// check for membership management permission
+		const isSelf = member.user_id === authz.userId
+
+		// the owner can always manage their own roles
 		if (
-			!(await GroupPermissions.canPerformAction(
-				user_id,
-				group,
-				"MANAGE_MEMBERSHIPS",
-			))
+			!(isSelf && authz.isOwner) &&
+			!authz.canActOn({
+				user_id: member.user_id,
+				roles: member.roles,
+			})
 		) {
 			throw new OperationError(
 				403,
-				"you do not have permission to manage memberships",
+				"You cannot manage a member with an equal or higher role",
 			)
 		}
 
-		// if roles to update
-		if (
-			Array.isArray(payload.add_roles) ||
-			Array.isArray(payload.remove_roles)
-		) {
-			member = await GroupRoles.updateMember({
-				group: group,
-				membership: member,
-				user_id: member.user_id,
-				add: payload.add_roles ?? [],
-				remove: payload.remove_roles ?? [],
-			})
+		const addRoles = Array.isArray(payload.add_roles) ? payload.add_roles : []
+		const removeRoles = Array.isArray(payload.remove_roles)
+			? payload.remove_roles
+			: []
+
+		for (const roleKey of addRoles) {
+			if (!authz.canAssignRole(roleKey)) {
+				throw new OperationError(403, `You cannot assign the role ${roleKey}`)
+			}
+		}
+
+		for (const roleKey of removeRoles) {
+			if (!authz.canRemoveRole(roleKey)) {
+				throw new OperationError(403, `You cannot remove the role ${roleKey}`)
+			}
+		}
+
+		member = await GroupRoles.updateMember({
+			group: authz.group,
+			membership: member,
+			user_id: member.user_id,
+			add: addRoles,
+			remove: removeRoles,
+		})
+
+		const groupRoles = await GroupRoles.getByGroupId(authz.group._id)
+		const rolesByKey = new Map(groupRoles.map((role) => [role.role_key, role]))
+
+		const resolvedRoles = resolveMemberRoles(
+			member.roles,
+			rolesByKey,
+			member.user_id === authz.group.owner_user_id,
+		)
+
+		const membershipPayload = {
+			group_id: authz.group._id,
+			membership_id: member._id,
+			user_id: member.user_id,
+			roles: resolvedRoles,
+		}
+
+		if (global.websockets) {
+			try {
+				global.websockets.senders.toTopic(
+					`group:${authz.group._id}`,
+					`group:${authz.group._id}:membership:updated`,
+					membershipPayload,
+				)
+			} catch (error) {
+				console.error("Failed to broadcast membership update", error)
+			}
+
+			try {
+				global.websockets.senders.toUserId(
+					member.user_id,
+					"groups:membership:updated",
+					membershipPayload,
+				)
+			} catch (error) {
+				console.error("Failed to send membership update to user", error)
+			}
 		}
 
 		return {
 			ok: true,
-			member: member,
+			member: {
+				...member.toRaw(),
+				roles: resolvedRoles,
+			},
 		}
 	},
 })

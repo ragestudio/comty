@@ -1,22 +1,13 @@
-import Groups from "@shared-classes/Spaces/Groups"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		const group = await Groups.get(
-			req.params.group_id,
-			req.auth.session.user_id,
-		)
+		const authz = await Gatekeeper.fromRequest(req)
 
-		if (!group) {
-			throw new OperationError(404, "Group not found")
-		}
+		authz.require("MANAGE_CHANNELS")
 
-		return await GroupChannels.create(
-			group,
-			req.body,
-			req.auth.session.user_id,
-		)
+		return await GroupChannels.create(authz.group, req.body)
 	},
 }

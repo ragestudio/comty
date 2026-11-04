@@ -1,57 +1,75 @@
-import Groups from "@shared-classes/Spaces/Groups"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
-import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
+import GroupRoles from "@shared-classes/Spaces/GroupRoles"
+import User from "@db_models/user"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		if (typeof req.body.user_id !== "string") {
-			throw new OperationError(400, "user_id must be a string")
-		}
+		const { member_id } = req.params
 
-		const group = await Groups.get(
-			req.params.group_id,
-			req.auth.session.user_id,
-		)
+		const authz = await Gatekeeper.fromRequest(req)
 
-		if (!group) {
-			throw new OperationError(404, "Group not found")
-		}
+		authz.require("READ_MEMBERSHIPS")
 
-		if (
-			!(await GroupPermissions.canPerformAction(
-				req.auth.user_id,
-				group,
-				"READ_MEMBERSHIPS",
-			))
-		) {
-			throw new OperationError(
-				403,
-				"You are not allowed to delete members",
-			)
-		}
-
-		let membership = await GroupMemberships.get(
-			group._id,
-			req.body.user_id,
-			req.params.member_id,
+		const membership = await GroupMemberships.getOneById(
+			authz.group._id,
+			member_id,
 		)
 
 		if (!membership) {
 			throw new OperationError(404, "Membership not found")
 		}
 
-		membership = membership.toRaw()
+		const member = membership.toRaw()
 
-		if (!Array.isArray(membership.roles)) {
-			membership.roles = []
+		const roles = await GroupRoles.getByGroupId(authz.group._id)
+		const rolesByKey = new Map(roles.map((role) => [role.role_key, role]))
+
+		const roleKeys = new Set(Array.isArray(member.roles) ? member.roles : [])
+
+		const resolvedRoles = []
+
+		if (member.user_id === authz.group.owner_user_id) {
+			resolvedRoles.push({
+				_id: "owner",
+				label: "Owner",
+				color: "orange",
+			})
 		}
 
-		membership.roles.push({
+		for (const roleKey of roleKeys) {
+			if (roleKey === "member") continue
+
+			const role = rolesByKey.get(roleKey)
+
+			resolvedRoles.push({
+				_id: roleKey,
+				label: role?.label ?? roleKey,
+				color: role?.color,
+			})
+		}
+
+		resolvedRoles.push({
 			_id: "member",
 			label: "Member",
 		})
 
-		return membership
+		member.roles = resolvedRoles
+
+		try {
+			const user = await User.findById(member.user_id).lean()
+
+			if (user) {
+				member.user = {
+					user_id: String(user._id),
+					...user,
+				}
+			}
+		} catch {
+			// invalid user id, leave the member without profile
+		}
+
+		return member
 	},
 }

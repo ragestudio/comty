@@ -1,28 +1,24 @@
-import Groups from "@shared-classes/Spaces/Groups"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 import LastChannelMessageIdModel from "@db/group_channels_last_message_id"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		const group = await Groups.get(
-			req.params.group_id,
-			req.auth.session.user_id,
-		)
+		const authz = await Gatekeeper.fromRequest(req)
 
-		if (!group) {
-			throw new OperationError(404, "Group not found")
-		}
+		authz.require("READ_CHANNELS")
 
-		let channels = await GroupChannels.getAllByGroup(
-			group,
-			req.auth.session.user_id,
-		)
+		let channels = await GroupChannels.getAllByGroup(authz.group)
 
 		channels = channels.map((channel) => channel.toRaw())
 
 		const lastMessageIds = await Promise.all(
-			channels.map(c => LastChannelMessageIdModel.findOne({ channel_id: c._id }).catch(() => null))
+			channels.map((c) =>
+				LastChannelMessageIdModel.findOne({ channel_id: c._id }).catch(
+					() => null,
+				),
+			),
 		)
 
 		channels.forEach((c, index) => {
@@ -33,7 +29,7 @@ export default {
 
 		const channelOrder = await GroupChannels.orderModel
 			.findOne({
-				group_id: req.params.group_id,
+				group_id: authz.group._id,
 			})
 			.catch(() => null)
 

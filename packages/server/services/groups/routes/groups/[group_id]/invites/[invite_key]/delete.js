@@ -1,29 +1,13 @@
-import Groups from "@shared-classes/Spaces/Groups"
-import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import GroupInvites from "@shared-classes/Spaces/GroupInvites"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		const group = await Groups.get(req.params.group_id, req.auth.user_id)
+		const authz = await Gatekeeper.fromRequest(req)
 
-		if (!group) {
-			throw new OperationError(404, "Group not found")
-		}
+		authz.require("MANAGE_INVITES")
 
-		if (
-			!(await GroupPermissions.canPerformAction(
-				req.auth.user_id,
-				group,
-				"MANAGE_INVITES",
-			))
-		) {
-			throw new OperationError(
-				403,
-				"You don't have permission to manage invites",
-			)
-		}
-
-		return await GroupInvites.delete(group, req.params.invite_key)
+		return await GroupInvites.delete(authz.group, req.params.invite_key)
 	},
 }

@@ -1,16 +1,19 @@
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import GroupSoundpad from "@shared-classes/Spaces/GroupSoundpad"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
-	fn: async (req, res) => {
-		const user_id = req.auth.session.user_id
+	fn: async (req) => {
+		const authz = await Gatekeeper.fromRequest(req)
+
+		authz.require("MANAGE_SOUNDPAD")
 
 		return await GroupSoundpad.addItem({
-			group_id: req.params.group_id,
-			user_id: user_id,
-			icon: req.body.icon,
-			name: req.body.name,
-			src: req.body.src,
+			group_id: authz.group._id,
+			user_id: authz.userId,
+			icon: req.body?.icon,
+			name: req.body?.name,
+			src: req.body?.src,
 		})
 	},
 }

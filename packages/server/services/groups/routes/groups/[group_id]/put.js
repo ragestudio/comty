@@ -1,30 +1,13 @@
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import Groups from "@shared-classes/Spaces/Groups"
-import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		const group = await Groups.get(req.params.group_id, {
-			raw: false,
-		})
+		const authz = await Gatekeeper.fromRequest(req)
 
-		if (!group) {
-			throw new OperationError(404, "Group not found")
-		}
+		authz.require("UPDATE_GROUP")
 
-		if (
-			!(await GroupPermissions.canPerformAction(
-				req.auth.user_id,
-				group,
-				"UPDATE_GROUP",
-			))
-		) {
-			throw new OperationError(
-				403,
-				"You are not allowed to update this group",
-			)
-		}
-
-		return await Groups.update(group, req.body)
+		return await Groups.update(authz.group, req.body)
 	},
 }
