@@ -15,6 +15,8 @@
 		"setup": "linebridge boot scripts/setup/index.js",
 		"dev": "linebridge gateway",
 		"dev:exp": "DEBUG=true ../../modules/linebridge/gateway/debug",
+		"script:scylla_sync": "tsx ./scripts/scylla_sync.ts",
+		"script:scylla_migrate": "tsx ./scripts/scylla_migrate.ts",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
@@ -66,6 +68,7 @@
 		"eslint": "^10.13.0",
 		"globals": "^17.13.0",
 		"sinon": "^22.1.0",
+		"tsx": "^4.23.15",
 		"vitest": "^4.1.12"
 	},
 	"optionalDependencies": {
