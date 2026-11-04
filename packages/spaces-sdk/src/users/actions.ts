@@ -108,6 +108,12 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 		(ids) => this.requestDecorations(ids),
 	)
 
+	private presenceQueue = new BatchQueue(
+		USERS_BATCH_SIZE,
+		USERS_BATCH_DELAY_MS,
+		(ids) => this.requestPresence(ids),
+	)
+
 	setUsers(users: SpacesUser[], options: { persist?: boolean } = {}): void {
 		if (!Array.isArray(users) || users.length === 0) return
 
@@ -285,13 +291,40 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 		}
 	}
 
+	async ensurePresence(input: UserIdInput): Promise<void> {
+		const ids = normalizeIds(input)
+
+		if (ids.length === 0) return
+
+		await this.presenceQueue.push(ids)
+	}
+
+	clearPresence(input?: UserIdInput): void {
+		const ids = normalizeIds(input)
+		const targets = ids.length > 0 ? ids : Object.keys(this.state.connections)
+
+		if (targets.length === 0) return
+
+		const connections = { ...this.state.connections }
+		let changed = false
+
+		for (const id of targets) {
+			if (!(id in connections)) continue
+
+			delete connections[id]
+			changed = true
+		}
+
+		if (changed) this.setState({ connections })
+	}
+
 	reset(): void {
 		this.syncedAt.clear()
 		this.decorationsSyncedAt.clear()
 		this.missing.clear()
 		this.pendingDecorations.clear()
 
-		this.setState({ users: {}, error: null })
+		this.setState({ users: {}, connections: {}, error: null })
 	}
 
 	private async loadCached(ids: string[]): Promise<void> {
@@ -342,6 +375,30 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 		} catch (error) {
 			logger.error("failed to fetch users", error)
 			this.setState({ error: error as Error })
+		}
+	}
+
+	private async requestPresence(ids: string[]): Promise<void> {
+		try {
+			const data = await UserModel.isUserConnected(ids.join(","))
+			const entries = Array.isArray(data) ? data : [data]
+			const patch: Record<string, boolean> = {}
+
+			for (const entry of entries) {
+				const id = entry?.userId ?? entry?.user_id ?? entry?.id
+
+				if (!id) continue
+
+				patch[String(id)] = Boolean(entry.connected)
+			}
+
+			if (Object.keys(patch).length === 0) return
+
+			this.setState((state) => ({
+				connections: { ...state.connections, ...patch },
+			}))
+		} catch (error) {
+			logger.error("failed to fetch users presence", error)
 		}
 	}
 

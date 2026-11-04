@@ -16,8 +16,12 @@ export type EnsureUsersOptions = {
 	decorations?: boolean
 }
 
+export type UsersPresence = Record<string, boolean>
+
 export interface UsersStoreState {
 	users: Record<string, SpacesUser>
+	// live presence, never persisted, refetched while a view needs it
+	connections: UsersPresence
 	error: Error | null
 }
 
@@ -35,6 +39,8 @@ export interface UsersStoreActions {
 	) => void
 	hydrateFromCache: (users: SpacesUser[]) => void
 	invalidate: (userIds?: UserIdInput) => void
+	ensurePresence: (userIds: UserIdInput) => Promise<void>
+	clearPresence: (userIds?: UserIdInput) => void
 	reset: () => void
 }
 

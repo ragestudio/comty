@@ -11,3 +11,6 @@ export const USERS_DECORATIONS_FRESH_MS = 10 * 60 * 1000
 // requests are grouped in small batches to avoid one request per component
 export const USERS_BATCH_SIZE = 50
 export const USERS_BATCH_DELAY_MS = 10
+
+// presence is not cached, active views refresh it on this interval
+export const USERS_PRESENCE_REFRESH_MS = 30 * 1000
