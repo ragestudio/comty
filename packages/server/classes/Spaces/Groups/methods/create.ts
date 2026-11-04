@@ -4,9 +4,20 @@ import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 import type Groups from "../index"
 
+const REACHABILITY_VALUES = new Set(["public", "private"])
+
 export default async function (this: typeof Groups, payload: any) {
 	if (!payload.name || payload.name.length < 3) {
 		throw new OperationError(400, "Group `name` is missing or too short")
+	}
+
+	const reachability = payload.reachability ?? "private"
+
+	if (!REACHABILITY_VALUES.has(reachability)) {
+		throw new OperationError(
+			400,
+			"Group reachability must be public or private",
+		)
 	}
 
 	const groupId = global.snowflake.nextId().toString()
@@ -20,7 +31,7 @@ export default async function (this: typeof Groups, payload: any) {
 		icon: payload.icon,
 		cover: payload.cover,
 		owner_user_id: payload.owner_user_id,
-		reachability: payload.reachability,
+		reachability: reachability,
 		created_at: created_at,
 	})
 

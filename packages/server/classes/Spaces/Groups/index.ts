@@ -11,6 +11,7 @@ import GroupsModel from "@db/groups"
 import GroupsUserOrdersModel from "@db/groups_user_orders"
 import GroupInviteKeyModel from "@db/group_invite_key"
 import sendSystemMessage from "./methods/sendSystemMessage"
+import transferOwnershipMethod from "./methods/transferOwnership"
 
 export default class Groups {
 	static get model() {
@@ -41,14 +42,16 @@ export default class Groups {
 		typeof deleteMethod
 	>
 
-	static canUserIdReach = canUserIdReachMethod.bind(
-		this,
-	) as OmitThisParameter<typeof canUserIdReachMethod>
-	static sort = sortMerthod.bind(this) as OmitThisParameter<
-		typeof sortMerthod
+	static canUserIdReach = canUserIdReachMethod.bind(this) as OmitThisParameter<
+		typeof canUserIdReachMethod
+	>
+	static sort = sortMerthod.bind(this) as OmitThisParameter<typeof sortMerthod>
+
+	static sendSystemMessage = sendSystemMessage.bind(this) as OmitThisParameter<
+		typeof sendSystemMessage
 	>
 
-	static sendSystemMessage = sendSystemMessage.bind(
+	static transferOwnership = transferOwnershipMethod.bind(
 		this,
-	) as OmitThisParameter<typeof sendSystemMessage>
+	) as OmitThisParameter<typeof transferOwnershipMethod>
 }
