@@ -1,5 +1,5 @@
 import Groups from "@shared-classes/Spaces/Groups"
-import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import setFind from "@shared-utils/setFind"
 
 export default {
@@ -14,17 +14,11 @@ export default {
 			throw new OperationError(404, "Group not found")
 		}
 
-		if (
-			!(await GroupPermissions.canPerformAction(
-				req.auth.user_id,
-				group,
-				"MANAGE_CLIENTS",
-			))
-		) {
-			throw new OperationError(
-				403,
-				"You are not allowed to disconnect clients",
-			)
+		const authz = await Gatekeeper.forGroup(group, req.auth.user_id)
+
+		// manage_clients is kept as a legacy bypass
+		if (!authz.can("VOICE_KICK_MEMBERS") && !authz.can("MANAGE_CLIENTS")) {
+			throw new OperationError(403, "You are not allowed to disconnect clients")
 		}
 
 		const channel = ctx.mediaChannels.instances.get(channel_id)
@@ -33,10 +27,7 @@ export default {
 			throw new OperationError(404, "Channel not found")
 		}
 
-		const client = setFind(
-			channel.clients,
-			(item) => item.userId === user_id,
-		)
+		const client = setFind(channel.clients, (item) => item.userId === user_id)
 
 		if (!client) {
 			throw new OperationError(404, "Client not found with this user id")

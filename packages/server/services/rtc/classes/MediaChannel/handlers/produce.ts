@@ -1,13 +1,36 @@
 import Producer from "../producer"
 import validateRtpParameters from "../utils/validateRtpParameters"
 import setFind from "@shared-utils/setFind"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 
 import type { RTCClient } from "@services/rtc/types"
+import type { GroupPermission } from "@comty/shared/types/spaces/permissions"
 
 export type ProducePayload = {
 	transportId: string
 	kind: string
 	rtpParameters: any
+	appData?: any
+}
+
+const resolveProducerPermission = (
+	payload: ProducePayload,
+): GroupPermission => {
+	const mediaTag = payload.appData?.mediaTag
+
+	if (mediaTag === "user-mic") {
+		return "VOICE_SPEAK"
+	}
+
+	if (mediaTag === "user-cam" || mediaTag === "screen-video") {
+		return "VOICE_STREAM"
+	}
+
+	if (mediaTag === "screen-audio") {
+		return "VOICE_STREAM"
+	}
+
+	return payload.kind === "audio" ? "VOICE_SPEAK" : "VOICE_STREAM"
 }
 
 async function produceHandler(
@@ -30,6 +53,20 @@ async function produceHandler(
 
 		if (!payload.transportId || !payload.kind || !payload.rtpParameters) {
 			throw new OperationError(400, "Missing required parameters")
+		}
+
+		const groupId = this.data?.group_id
+
+		if (typeof groupId === "string" && groupId.length > 0) {
+			const permission = resolveProducerPermission(payload)
+			const authz = await Gatekeeper.forGroup(groupId, client.userId)
+
+			if (!authz.can(permission)) {
+				throw new OperationError(
+					403,
+					"You are not allowed to publish this media",
+				)
+			}
 		}
 
 		const transport = clientInst.transports?.get(payload.transportId)

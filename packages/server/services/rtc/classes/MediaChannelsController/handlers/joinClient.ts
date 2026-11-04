@@ -2,6 +2,7 @@ import GroupChannelsModel from "@db/group_channels"
 
 import type MediaChannelsController from "../index"
 import { RTCClient } from "@services/rtc/types"
+import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import setFind from "@shared-utils/setFind"
 import { hydrateClientUser } from "@shared-utils/clientUser"
 
@@ -31,9 +32,13 @@ export default async function (
 		await hydrateClientUser(client, this.server.contexts.redis?.client)
 
 		// Validate channel access
-		const group = await this.validateGroupAccess(
-			client.userId,
-			channel.group_id,
+		await this.validateGroupAccess(client.userId, channel.group_id)
+
+		const authz = await Gatekeeper.forGroup(channel.group_id, client.userId)
+
+		authz.require(
+			"VOICE_CONNECT",
+			"You are not allowed to join this voice channel",
 		)
 
 		// cancel any pending disconnect timeout
@@ -41,6 +46,23 @@ export default async function (
 
 		// check cache for existing membership
 		const joinedChannel = await this.users.get(client.userId)
+
+		// enforce the channel user limit for new joins
+		const rawParams: any = channel.params
+		const userLimitValue =
+			rawParams instanceof Map
+				? rawParams.get("user_limit")
+				: rawParams?.user_limit
+
+		const userLimit = Number.parseInt(String(userLimitValue ?? "0"), 10)
+
+		if (userLimit > 0 && joinedChannel !== channelId) {
+			const existingInstance = await this.getInstance(channelId, client)
+
+			if (existingInstance && existingInstance.clients.size >= userLimit) {
+				throw new OperationError(403, "Channel is full")
+			}
+		}
 
 		// // if the user is already in the channel, skip
 		// if (joinedChannel === channelId) {
@@ -90,7 +112,10 @@ export default async function (
 		let channelInstance = await this.getInstance(channelId, client)
 
 		if (!channelInstance || channelInstance?.closed === true) {
-			channelInstance = await this.createChannelInstance(group._id, channelId)
+			channelInstance = await this.createChannelInstance(
+				channel.group_id,
+				channelId,
+			)
 		}
 
 		await this.users.set(client.userId, channelId)
