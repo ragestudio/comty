@@ -10,13 +10,35 @@ import logger from "@comty/shared/utils/logger"
 
 const CACHED_MEMBERS_PER_GROUP_LIMIT = 2000
 
-// cache group data
+const stripViewerContext = (group: Group): Group => {
+	const {
+		viewer_permissions,
+		viewer_roles,
+		is_owner,
+		is_admin,
+		...cachedGroup
+	} = group
+
+	return cachedGroup as Group
+}
+
+// cache group data, viewer context is per user and must never be persisted
 export const cacheGroup = async (group: Group): Promise<void> => {
 	try {
+		const cached = await db.groups.get(group._id).catch(() => null)
+
 		await db.groups.put({
-			...group,
-			channels: { items: [], total_items: 0, has_more: false },
-			members: { items: [], total_items: 0, has_more: false },
+			...stripViewerContext(group),
+			channels: cached?.channels ?? {
+				items: [],
+				total_items: 0,
+				has_more: false,
+			},
+			members: cached?.members ?? {
+				items: [],
+				total_items: 0,
+				has_more: false,
+			},
 			cached_at: Date.now(),
 		})
 	} catch (err) {
