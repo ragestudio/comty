@@ -1,5 +1,8 @@
 {
 	"mode": "prod",
+	"node": {
+		"addr": "0.0.0.0"
+	},
 	"control_api": {
 		"enabled": true
 	},
