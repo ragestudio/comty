@@ -7,6 +7,20 @@ import jwt from "jsonwebtoken"
 import User from "@db_models/user"
 import AuthSessionModel from "@db/auth_session"
 
+if (!process.env.ECDSA_PRIVATE_KEY && process.env.ECDSA_PRIVATE_KEY_B64) {
+	process.env.ECDSA_PRIVATE_KEY = Buffer.from(
+		process.env.ECDSA_PRIVATE_KEY_B64,
+		"base64",
+	).toString("utf-8")
+}
+
+if (!process.env.ECDSA_PUBLIC_KEY && process.env.ECDSA_PUBLIC_KEY_B64) {
+	process.env.ECDSA_PUBLIC_KEY = Buffer.from(
+		process.env.ECDSA_PUBLIC_KEY_B64,
+		"base64",
+	).toString("utf-8")
+}
+
 export const JWT_ALGORITHM = (process.env.JWT_ALGORITHM ??
 	"ES256") as unknown as Algorithm
 export const SIGN_OPTIONS: Record<string, SignOptions> = {

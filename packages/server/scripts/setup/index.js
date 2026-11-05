@@ -4,10 +4,14 @@ import Config from "@db_models/config"
 
 import fs from "node:fs/promises"
 import path from "node:path"
+import { fileURLToPath } from "node:url"
 
 const forceFlag = process.argv.includes("--force")
 
-const tasksPath = path.resolve(__dirname, "./tasks")
+const tasksPath = path.resolve(
+	path.dirname(fileURLToPath(import.meta.url)),
+	"./tasks",
+)
 
 async function main() {
 	// create the context for tasks

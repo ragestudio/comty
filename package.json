@@ -7,7 +7,7 @@
 		"dev:server": "pnpm --filter @comty/server dev",
 		"dev:client": "pnpm --filter @comty/app dev",
 		"dev:desktop": "pnpm --filter comty-desktop dev",
-		"setup:server": "pnpm --filter @comty/server setup"
+		"setup:server": "pnpm --filter @comty/server run setup"
 	},
 	"_web_app_path": "packages/app",
 	"workspaces": [
