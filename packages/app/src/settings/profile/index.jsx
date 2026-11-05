@@ -1,9 +1,112 @@
 import React from "react"
+import { Button, Input } from "antd"
 
 import loadable from "@loadable/component"
 import UserModel from "@endpoints/user"
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
+import applyUserUpdate from "../../auth/userUpdate"
+
+import "./index.less"
+
+const AvatarUploadButton = (props) => (
+	<UploadButton
+		{...props}
+		accept="image/*"
+		beforeUpload={(file) => {
+			if (!file.type?.startsWith("image/")) {
+				app.message.error("Please select a valid image file for your avatar.")
+				return false
+			}
+
+			return true
+		}}
+	/>
+)
+
+const AvatarEditor = (props) => {
+	const [mode, setMode] = React.useState("upload")
+	const [url, setUrl] = React.useState("")
+	const [removing, setRemoving] = React.useState(false)
+	const [customAvatar, setCustomAvatar] = React.useState(
+		props.ctx.processedCtx.userData?.avatar_is_custom === true,
+	)
+
+	const removeAvatar = async () => {
+		setRemoving(true)
+		try {
+			const result = await props.ctx.dispatchUpdate(null)
+			if (result !== false) setCustomAvatar(false)
+		} finally {
+			setRemoving(false)
+		}
+	}
+
+	const uploadContext = {
+		...props.ctx,
+		onUpdateItem: async (value) => {
+			const result = await props.ctx.onUpdateItem(value)
+			if (result !== false) setCustomAvatar(true)
+			return result
+		},
+	}
+
+	const saveExternalUrl = async () => {
+		const result = await props.ctx.dispatchUpdate(url)
+		if (result !== false) setCustomAvatar(true)
+	}
+
+	return (
+		<div>
+			{props.ctx.currentValue && (
+				<div
+					className="profile-avatar-preview"
+				>
+					<img src={props.ctx.currentValue} />
+					{customAvatar && (
+						<Button
+							aria-label="Remove avatar"
+							title="Remove avatar"
+							icon={<Icons.X size={16} />}
+							danger
+							loading={removing}
+							disabled={removing}
+							onClick={removeAvatar}
+						/>
+					)}
+				</div>
+			)}
+
+			<div className="profile-avatar-actions">
+				<div onClick={() => setMode("upload")}>
+					<AvatarUploadButton ctx={uploadContext}>
+						Upload image
+					</AvatarUploadButton>
+				</div>
+				<Button
+					type="default"
+					onClick={() => setMode("url")}
+				>
+					Use external URL
+				</Button>
+			</div>
+
+			{mode === "url" && (
+				<div className="profile-avatar-url-form">
+					<Input
+						className="profile-avatar-url-input"
+						value={url}
+						onChange={(event) => setUrl(event.target.value)}
+						placeholder="Image URL..."
+					/>
+					<Button onClick={saveExternalUrl}>
+						Save
+					</Button>
+				</div>
+			)}
+		</div>
+	)
+}
 
 export default {
 	id: "profile",
@@ -103,8 +206,8 @@ export default {
 			icon: "SquareUser",
 			title: "Avatar",
 			description: "Change your avatar (Upload an image or use an URL)",
-			component: loadable(() => import("../components/urlInput")),
-			extraActions: [React.createElement(UploadButton)],
+			component: AvatarEditor,
+			extraActions: [],
 			defaultValue: (ctx) => {
 				return ctx.userData.avatar
 			},
@@ -114,8 +217,9 @@ export default {
 				})
 
 				if (result) {
+					applyUserUpdate(result)
 					app.message.success("Avatar updated")
-					return value
+					return result.avatar
 				}
 			},
 		},

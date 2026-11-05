@@ -1,4 +1,5 @@
 import User from "@db_models/user"
+import defaultAvatar from "@shared-utils/defaultAvatar"
 
 export default async (user_id, update) => {
 	if (typeof user_id === "undefined") {
@@ -18,6 +19,9 @@ export default async (user_id, update) => {
 	const updateKeys = Object.keys(update)
 
 	updateKeys.forEach((key) => {
+		if (key === "avatar" && update[key] === null) {
+			update[key] = defaultAvatar(user.username)
+		}
 		user[key] = update[key]
 	})
 

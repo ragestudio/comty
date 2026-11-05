@@ -266,6 +266,10 @@ const Sidebar = () => {
 				setTopItems(GenerateMenuItems(TopMenuItems))
 				setBottomItems(GenerateMenuItems(BottomMenuItems))
 			},
+			"user:update": () => {
+				setTopItems(GenerateMenuItems(TopMenuItems))
+				setBottomItems(GenerateMenuItems(BottomMenuItems))
+			},
 		}
 
 		for (const [event, handler] of Object.entries(events)) {

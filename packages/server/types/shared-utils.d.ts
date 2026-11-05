@@ -78,3 +78,7 @@ declare module "@shared-utils/readFileHash" {
 		stream: import("stream").Readable,
 	): Promise<string>
 }
+
+declare module "@shared-utils/defaultAvatar" {
+	export default function defaultAvatar(username: string): string
+}

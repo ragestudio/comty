@@ -1,0 +1,39 @@
+.profile-avatar-preview {
+	box-sizing: border-box;
+	width: 120px;
+	height: 120px;
+	flex: 0 0 120px;
+	position: relative;
+	margin-bottom: 16px;
+	border-radius: 8px;
+	overflow: hidden;
+
+	img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.profile-avatar-preview button {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+}
+
+.profile-avatar-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.profile-avatar-url-form {
+	display: flex;
+	width: 100%;
+	margin-top: 16px;
+}
+
+.profile-avatar-url-input {
+	flex: 1;
+}

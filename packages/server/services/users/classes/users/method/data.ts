@@ -1,5 +1,13 @@
 import User from "@db_models/user"
 import UserFollow from "@db_models/userFollow"
+import defaultAvatar from "@shared-utils/defaultAvatar"
+
+function addAvatarMetadata(user: any) {
+	return {
+		...user,
+		avatar_is_custom: user.avatar !== defaultAvatar(user.username),
+	}
+}
 
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i
 
@@ -48,7 +56,7 @@ export default async (payload: GetUserData) => {
 			return []
 		}
 
-		usersData = usersData.map((user) => user.toObject())
+		usersData = usersData.map((user) => addAvatarMetadata(user.toObject()))
 	} else {
 		let query = User.findOne({ _id: targetIds })
 
@@ -63,7 +71,7 @@ export default async (payload: GetUserData) => {
 			throw new OperationError(404, "User not found")
 		}
 
-		usersData = usersData.toObject()
+		usersData = addAvatarMetadata(usersData.toObject())
 
 		usersData = [usersData]
 	}

@@ -7,6 +7,7 @@ import Account from "@classes/account"
 
 import requiredFields from "@shared-utils/requiredFields"
 import verifyTurnstileToken from "../../../utils/verifyTurnstileToken"
+import defaultAvatar from "@shared-utils/defaultAvatar"
 
 export default async (payload) => {
 	requiredFields(["username", "password", "email"], payload)
@@ -67,9 +68,7 @@ export default async (payload) => {
 		username: username,
 		email: email,
 		public_name: public_name,
-		avatar:
-			avatar ??
-			`https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
+		avatar: avatar ?? defaultAvatar(username),
 		roles: roles,
 		created_at: new Date().getTime(),
 		accept_tos: accept_tos,

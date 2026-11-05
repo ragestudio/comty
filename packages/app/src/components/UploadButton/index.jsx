@@ -117,6 +117,7 @@ const UploadButton = (props) => {
 			customRequest={handleUpload}
 			multiple={props.multiple ?? false}
 			accept={props.accept}
+			beforeUpload={props.beforeUpload}
 			fileList={[]}
 			className={
 				!props.render &&
@@ -177,6 +178,7 @@ UploadButton.propTypes = {
 	onError: PropTypes.func,
 	onSuccess: PropTypes.func,
 	multiple: PropTypes.bool,
+	beforeUpload: PropTypes.func,
 	disabled: PropTypes.bool,
 	icon: PropTypes.node,
 	children: PropTypes.node,
