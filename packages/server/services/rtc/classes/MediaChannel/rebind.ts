@@ -24,7 +24,10 @@ export default function rebindClient(
 
 	// a reconstructed client (service restart or remote instance) has no
 	// transports, the media session cannot be preserved
-	if (!currentClient.transports) return { ok: false }
+	if (currentClient.staled) return { ok: false }
+	if (!currentClient.transports || currentClient.transports.size === 0) {
+		return { ok: false }
+	}
 
 	const target = currentClient as any
 	const source = nextClient as any

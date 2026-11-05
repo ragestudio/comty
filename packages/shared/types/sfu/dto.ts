@@ -78,6 +78,8 @@ export type SfuRequestKeyframePayload = {
 
 export type SfuRouterDump = RouterDump & {
 	rtpCapabilities: RtpCapabilities
+	// channel this router serves, used to validate a restored session
+	channelId?: string
 }
 
 export type SfuRouterSummary = {

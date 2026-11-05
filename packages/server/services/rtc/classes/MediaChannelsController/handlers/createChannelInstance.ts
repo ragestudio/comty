@@ -9,6 +9,13 @@ export default async function (
 	groupId: string,
 	channelId: string,
 ): Promise<MediaChannelInstance> {
+	// the lock owner may have already started the instance
+	const existing = this.instances.get(channelId)
+
+	if (existing && !existing.closed) {
+		return existing
+	}
+
 	// get the channel
 	const channel = await GroupChannelsModel.findOne({
 		_id: channelId,
@@ -31,76 +38,12 @@ export default async function (
 		targetSFUNode,
 	)
 
-	channelInstance.events.on("started", (_ch) => {
-		this.sendToGroupTopic(groupId, "vc:started", {
-			..._ch.data,
-			started_at: _ch.started_at,
-			channelId: channelId,
-		})
-	})
+	// the state is written with this epoch, a rolling restart on the same node
+	// adopts it and any older owner is fenced out
+	channelInstance.ownershipEpoch = this.ownership.epochOf(channelId) ?? 0
 
-	channelInstance.events.on("closed", (_ch) => {
-		this.sendToGroupTopic(groupId, "vc:ended", { channelId: _ch.channelId })
-	})
-
-	channelInstance.events.on("client:join", (_ch, client) => {
-		this.sendToGroupTopic(groupId, "client:vc:join", {
-			userId: client.userId,
-			channelId: _ch.channelId,
-			user: {
-				_id: client?.context?.user?._id,
-				username: client?.context?.user?.username,
-				avatar: client?.context?.user?.avatar,
-			},
-			voiceState: client.voiceState,
-			channelClients: _ch.getConnectedClientsSerialized(),
-		})
-	})
-	channelInstance.events.on("client:leave", (_ch, client) => {
-		this.sendToGroupTopic(groupId, "client:vc:left", {
-			userId: client.userId,
-			channelId: _ch.channelId,
-			channelClients: _ch.getConnectedClientsSerialized(),
-		})
-	})
-	channelInstance.events.on("client:event", (_ch, client, payload) => {
-		this.sendToGroupTopic(groupId, "client:vc:event", {
-			event: payload.event,
-			userId: client.userId,
-			channelId: _ch.channelId,
-			user: {
-				_id: client?.context?.user?._id,
-				username: client?.context?.user?.username,
-				avatar: client?.context?.user?.avatar,
-			},
-			data: payload.data,
-		})
-	})
-
-	channelInstance.events.on("producer:open", (producer) => {
-		this.sendToGroupTopic(groupId, "client:vc:producer:open", {
-			userId: producer.client.userId,
-			channelId: producer.channelId,
-			producer: producer.serialize(),
-			user: {
-				_id: producer.client?.context?.user?._id,
-				username: producer.client?.context?.user?.username,
-				avatar: producer.client?.context?.user?.avatar,
-			},
-		})
-	})
-	channelInstance.events.on("producer:close", (producer) => {
-		this.sendToGroupTopic(groupId, "client:vc:producer:close", {
-			userId: producer.client.userId,
-			channelId: producer.channelId,
-			producer: producer.serialize(),
-			user: {
-				_id: producer.client?.context?.user?._id,
-				username: producer.client?.context?.user?.username,
-				avatar: producer.client?.context?.user?.avatar,
-			},
-		})
-	})
+	// lifecycle events published to the group topic
+	this.attachChannelEvents(channelInstance, groupId)
 
 	// initialize the channel instance with the remote router
 	await channelInstance.initialize()

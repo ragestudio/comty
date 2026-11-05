@@ -70,14 +70,15 @@ ScyllaDB:
 
 Redis:
 
-| Variable                            | Descripción                        |
-| :---------------------------------- | :--------------------------------- |
-| `REDIS_HOST`                        | Hostname (por defecto `localhost`) |
-| `REDIS_PORT`                        | Puerto (por defecto `6379`)        |
-| `REDIS_AUTH`                        | Cadena `usuario:contraseña`        |
-| `REDIS_USERNAME` / `REDIS_PASSWORD` | Credenciales                       |
-| `REDIS_NO_AUTH`                     | Desactiva la autenticación         |
-| `REDIS_DB`                          | Índice de base de datos            |
+| Variable | Descripción |
+| :-- | :-- |
+| `REDIS_URL` | URL completa, prioridad sobre el resto y sobre `gateway.config.json` |
+| `REDIS_HOST` | Hostname (por defecto `localhost`) |
+| `REDIS_PORT` | Puerto (por defecto `6379`) |
+| `REDIS_AUTH` | Cadena `usuario:contraseña` |
+| `REDIS_USERNAME` / `REDIS_PASSWORD` | Credenciales |
+| `REDIS_NO_AUTH` | Desactiva la autenticación |
+| `REDIS_DB` | Índice de base de datos |
 
 ### Almacenamiento
 

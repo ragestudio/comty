@@ -7,4 +7,6 @@ export interface Client {
 	voiceState: VoiceState
 	user?: Partial<User>
 	self?: boolean
+	// transport ids of the client session, persisted to restore a channel
+	transports?: string[]
 }

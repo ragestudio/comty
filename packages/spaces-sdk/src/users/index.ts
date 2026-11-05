@@ -99,7 +99,9 @@ export function useUser(
 ): SpacesUser | undefined {
 	const enabled = options.enabled !== false
 
-	const user = UsersStore((state) => (userId ? state.users[userId] : undefined))
+	const user = UsersStore((state) =>
+		userId ? state.users[userId] : undefined,
+	)
 
 	React.useEffect(() => {
 		if (userId && enabled) void usersActions.ensure(userId)
@@ -110,11 +112,19 @@ export function useUser(
 
 const EMPTY_IDS: string[] = []
 
+// the server watches one topic per user, ids are batched per event
+const PRESENCE_BATCH_SIZE = 100
+
 // active presence subscriptions, keyed by user id. the counter lets
 // multiple views share the same id without extra requests
 const presenceSubscriptions = new Map<string, number>()
 let presenceInterval: ReturnType<typeof setInterval> | null = null
 let presenceSocket: ReturnType<typeof getSocket> | null = null
+
+// coalesces the subscriptions of every view that mounts in the same tick
+const pendingSubscribes = new Set<string>()
+const pendingUnsubscribes = new Set<string>()
+let pendingFlush: ReturnType<typeof setTimeout> | null = null
 
 function refreshPresence(ids: string[]) {
 	if (ids.length === 0) return
@@ -124,6 +134,71 @@ function refreshPresence(ids: string[]) {
 
 function refreshAllPresence() {
 	refreshPresence(Array.from(presenceSubscriptions.keys()))
+}
+
+function sendPresenceTopics(ids: string[], subscribe: boolean) {
+	const socket = getSocket()
+
+	if (!socket || ids.length === 0) return
+
+	const event = subscribe ? "presence:subscribe" : "presence:unsubscribe"
+
+	for (let index = 0; index < ids.length; index += PRESENCE_BATCH_SIZE) {
+		socket.emit(event, {
+			userIds: ids.slice(index, index + PRESENCE_BATCH_SIZE),
+		})
+	}
+}
+
+function flushPresenceTopics() {
+	if (pendingFlush) {
+		clearTimeout(pendingFlush)
+		pendingFlush = null
+	}
+
+	const subscribe = Array.from(pendingSubscribes)
+	const unsubscribe = Array.from(pendingUnsubscribes)
+
+	pendingSubscribes.clear()
+	pendingUnsubscribes.clear()
+
+	sendPresenceTopics(subscribe, true)
+	sendPresenceTopics(unsubscribe, false)
+}
+
+function schedulePresenceFlush() {
+	if (pendingFlush) return
+
+	pendingFlush = setTimeout(flushPresenceTopics, 0)
+}
+
+// the gateway drops every topic subscription when the socket reconnects
+function resubscribePresence() {
+	pendingSubscribes.clear()
+	pendingUnsubscribes.clear()
+
+	sendPresenceTopics(Array.from(presenceSubscriptions.keys()), true)
+}
+
+const handlePresenceOnline = (payload: any) => {
+	const id = payload?.userId
+
+	if (!id || !presenceSubscriptions.has(id)) return
+
+	usersActions.setConnection(id, true)
+}
+
+const handlePresenceOffline = (payload: any) => {
+	const id = payload?.userId
+
+	if (!id || !presenceSubscriptions.has(id)) return
+
+	usersActions.setConnection(id, false)
+}
+
+const handlePresenceReconnect = () => {
+	refreshAllPresence()
+	resubscribePresence()
 }
 
 function startPresenceManager() {
@@ -139,21 +214,35 @@ function startPresenceManager() {
 	const socket = getSocket()
 
 	if (socket && socket !== presenceSocket) {
-		presenceSocket?.off("reconnected", refreshAllPresence)
-		socket.on("reconnected", refreshAllPresence)
+		presenceSocket?.off("reconnected", handlePresenceReconnect)
+		presenceSocket?.off("user:online", handlePresenceOnline)
+		presenceSocket?.off("user:offline", handlePresenceOffline)
+
+		socket.on("reconnected", handlePresenceReconnect)
+		socket.on("user:online", handlePresenceOnline)
+		socket.on("user:offline", handlePresenceOffline)
+
 		presenceSocket = socket
+
+		// the socket may have been recreated while views were mounted
+		resubscribePresence()
 	}
 }
 
 function stopPresenceManager() {
 	if (presenceSubscriptions.size > 0) return
 
+	// release the gateway subscriptions before detaching
+	flushPresenceTopics()
+
 	if (presenceInterval) {
 		clearInterval(presenceInterval)
 		presenceInterval = null
 	}
 
-	presenceSocket?.off("reconnected", refreshAllPresence)
+	presenceSocket?.off("reconnected", handlePresenceReconnect)
+	presenceSocket?.off("user:online", handlePresenceOnline)
+	presenceSocket?.off("user:offline", handlePresenceOffline)
 	presenceSocket = null
 }
 
@@ -164,12 +253,19 @@ export function subscribeUsersPresence(userIds: UserIdInput): () => void {
 	for (const id of ids) {
 		const count = presenceSubscriptions.get(id) ?? 0
 
-		if (count === 0) added.push(id)
+		if (count === 0) {
+			added.push(id)
+			pendingUnsubscribes.delete(id)
+			pendingSubscribes.add(id)
+		}
 
 		presenceSubscriptions.set(id, count + 1)
 	}
 
-	if (added.length > 0) refreshPresence(added)
+	if (added.length > 0) {
+		refreshPresence(added)
+		schedulePresenceFlush()
+	}
 
 	startPresenceManager()
 
@@ -188,12 +284,17 @@ export function subscribeUsersPresence(userIds: UserIdInput): () => void {
 			if (count <= 1) {
 				presenceSubscriptions.delete(id)
 				removed.push(id)
+				pendingSubscribes.delete(id)
+				pendingUnsubscribes.add(id)
 			} else {
 				presenceSubscriptions.set(id, count - 1)
 			}
 		}
 
-		if (removed.length > 0) usersActions.clearPresence(removed)
+		if (removed.length > 0) {
+			usersActions.clearPresence(removed)
+			schedulePresenceFlush()
+		}
 
 		stopPresenceManager()
 	}

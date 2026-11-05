@@ -1,6 +1,4 @@
 import API from "@services/rtc/rtc.service"
-import type { MediaChannel } from "@classes/MediaChannel"
-import type { StatedChannel } from "@comty/shared/types/rtc/statedChannel"
 
 import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import GroupsModel from "@db/groups"
@@ -25,19 +23,6 @@ export default defineRoute(API)({
 			throw new OperationError(403, "You are not a member of this group")
 		}
 
-		let state = (await ctx.mediaChannels.findChannelsByGroupId(
-			group_id,
-		)) as MediaChannel[]
-
-		let result: StatedChannel[] = []
-
-		if (Array.isArray(state)) {
-			// map channel clients
-			result = state.map((channel) => {
-				return channel.serialized_state()
-			})
-		}
-
-		return result
+		return await ctx.mediaChannels.findChannelsByGroupId(group_id)
 	},
 })

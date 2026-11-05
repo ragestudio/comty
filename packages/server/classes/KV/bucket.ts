@@ -48,16 +48,24 @@ export class Bucket {
 
 	async getEntry<T = unknown>(key: string) {
 		try {
-			const entry = await this.bucket.get(key)
-
-			if (!entry) return null
-
-			return {
-				value: JSON.parse(td.decode(entry.value)) as T,
-				revision: entry.revision,
-			}
+			return await this.readEntry<T>(key)
 		} catch {
 			return null
+		}
+	}
+
+	/**
+	 * Same as getEntry but infrastructure errors are thrown instead of hidden.
+	 * Used when a read failure must not be confused with a missing key.
+	 */
+	async readEntry<T = unknown>(key: string) {
+		const entry = await this.bucket.get(key)
+
+		if (!entry) return null
+
+		return {
+			value: JSON.parse(td.decode(entry.value)) as T,
+			revision: entry.revision,
 		}
 	}
 

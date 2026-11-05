@@ -5,18 +5,8 @@ import type { RTC_ConnectTransportPayload as TransportPayloadReq } from "@comty/
 export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, payload: TransportPayloadReq, ctx) => {
-		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
-
-		// if (payload.isDm === true) {
-		// 	channelInstance = ctx.userCalls.getClientChannel(client)
-		// } else {
-		// 	channelInstance = await ctx.mediaChannels.getClientChannel(client)
-		// }
-
-		if (!channelInstance) {
-			throw new OperationError(404, "No channel available")
-		}
-
-		return await channelInstance.connectTransport(client, payload)
+		return await ctx.mediaChannels.runChannelOperation(client, (channel) =>
+			channel.connectTransport(client, payload),
+		)
 	},
 })

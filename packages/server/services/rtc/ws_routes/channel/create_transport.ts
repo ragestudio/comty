@@ -6,21 +6,11 @@ export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["mediaChannels"],
 	fn: async (
 		client: RTCClient,
-		payload,
+		_payload,
 		ctx,
 	): Promise<SerializedCreateTransport> => {
-		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
-
-		// if (payload.isDm === true) {
-		// 	channelInstance = ctx.userCalls.getClientChannel(client)
-		// } else {
-		// 	channelInstance = await ctx.mediaChannels.getClientChannel(client)
-		// }
-
-		if (!channelInstance) {
-			throw new OperationError(404, "No channel available")
-		}
-
-		return await channelInstance.createTransport(client)
+		return await ctx.mediaChannels.runChannelOperation(client, (channel) =>
+			channel.createTransport(client),
+		)
 	},
 })

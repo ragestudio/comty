@@ -28,6 +28,9 @@ export default async function (
 		const channelInstance = await this.getInstance(currentChannelId, client)
 
 		if (!channelInstance) {
+			// nothing to leave on this node, drop the stale mapping anyway
+			await this.users.remove(client.userId, currentChannelId)
+
 			return
 		}
 

@@ -16,6 +16,8 @@ export class SfuNodeDiscovery extends EventEmitter {
 	kv_bucket: Bucket
 	nodes: SFUNode[] = []
 
+	private lastRefreshAt = 0
+
 	constructor(controller: MediaChannelsController) {
 		super()
 		this.controller = controller
@@ -30,6 +32,22 @@ export class SfuNodeDiscovery extends EventEmitter {
 		this.controller.ipc.on("node_unregister", this.handleUnregNode)
 
 		this.kv_bucket = await this.controller.kv.bucket(BUCKET)
+
+		await this.refresh()
+	}
+
+	/**
+	 * reloads the registered nodes from the bucket. used when a persisted
+	 * session references a node that is not in memory yet
+	 */
+	async refresh(force: boolean = false) {
+		if (!this.kv_bucket) return
+
+		const now = Date.now()
+
+		if (!force && now - this.lastRefreshAt < 5000) return
+
+		this.lastRefreshAt = now
 
 		const keys = await this.kv_bucket.keys()
 

@@ -11,6 +11,11 @@ export default async function (
 		return null
 	}
 
+	// the event is cluster wide, only the node that owns the socket reacts
+	if (ctx.node_id && ctx.node_id !== this.nodeId) {
+		return null
+	}
+
 	const userId = ctx.meta.user_id
 
 	try {
@@ -36,6 +41,15 @@ export default async function (
 				},
 			)
 		}
+
+		// only the watchers of this user receive the presence event
+		await globalThis.websockets.senders.toTopic(
+			`presence:user:${userId}`,
+			"user:offline",
+			{
+				userId: userId,
+			},
+		)
 
 		// check if this userId is connected to any channel
 		const channelId = await this.users.get(userId)

@@ -7,6 +7,8 @@ import RemoteRouterTransport from "./transport"
 export class RemoteRouter {
 	node: SFUNode
 	id: string
+	// channel the sfu router serves, when reported by the node
+	channelId?: string
 	closed: boolean = false
 	rtpCapabilities: RtpCapabilities
 
@@ -17,6 +19,7 @@ export class RemoteRouter {
 
 		this.node = node
 		this.id = data.id
+		this.channelId = data.channelId
 		this.rtpCapabilities = data.rtpCapabilities
 	}
 

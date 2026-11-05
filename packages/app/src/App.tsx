@@ -4,6 +4,7 @@ import ReactAdapter from "@ragestudio/vessel/adapters/react"
 import React from "react"
 import * as Router from "@ragestudio/vessel/router"
 import * as Sentry from "@sentry/browser"
+import client from "comty.js/core/client"
 
 import { ThemeProvider } from "@cores/style/style.core"
 import NotificationsRenderer from "./cores/notifications/render"
@@ -59,6 +60,13 @@ class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 	static async initialize() {
 		window.app.version = config.package.version
 		window.app.isCapacitor = window["IS_MOBILE_HOST"]
+
+		const apiPreferLocal = localStorage.getItem("api-prefer-local")
+
+		if (apiPreferLocal == "true") {
+			console.log("Preferring to use local origin API")
+			client.setOrigin(`${window.location.origin}/api`)
+		}
 
 		// register all keyboard shortcuts
 		registerAllKeyboardShortcuts()

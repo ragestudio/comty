@@ -5,10 +5,8 @@ import type { StopProducePayload } from "@classes/MediaChannel/handlers/stopProd
 export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, payload: StopProducePayload, ctx) => {
-		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
-
-		if (!channelInstance) return null
-
-		return await channelInstance.stopProduce(client, payload)
+		return await ctx.mediaChannels.runChannelOperation(client, (channel) =>
+			channel.stopProduce(client, payload),
+		)
 	},
 })

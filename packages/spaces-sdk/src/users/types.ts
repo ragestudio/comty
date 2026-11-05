@@ -1,7 +1,10 @@
 import type { User } from "@comty/shared/types/user"
 
 export type UserIdInput =
-	string | Iterable<string | null | undefined> | null | undefined
+	| string
+	| Iterable<string | null | undefined>
+	| null
+	| undefined
 
 export type SpacesUser = Omit<User, "decorations" | "badges"> & {
 	cached_at?: number
@@ -26,7 +29,10 @@ export interface UsersStoreState {
 }
 
 export interface UsersStoreActions {
-	ensure: (userIds: UserIdInput, options?: EnsureUsersOptions) => Promise<void>
+	ensure: (
+		userIds: UserIdInput,
+		options?: EnsureUsersOptions,
+	) => Promise<void>
 	ensureDecorations: (
 		userIds: UserIdInput,
 		options?: Omit<EnsureUsersOptions, "decorations">,
@@ -40,6 +46,7 @@ export interface UsersStoreActions {
 	hydrateFromCache: (users: SpacesUser[]) => void
 	invalidate: (userIds?: UserIdInput) => void
 	ensurePresence: (userIds: UserIdInput) => Promise<void>
+	setConnection: (userId: string, connected: boolean) => void
 	clearPresence: (userIds?: UserIdInput) => void
 	reset: () => void
 }

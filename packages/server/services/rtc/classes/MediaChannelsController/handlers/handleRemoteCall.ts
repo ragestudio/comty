@@ -5,6 +5,13 @@ import type { SerializedRTCClient } from "./serializeClient"
 
 import synthesizeClient from "linebridge/classes/Nats/synthesizeClient"
 
+// controller methods that do not take a client as first argument
+const CLIENTLESS_METHODS = new Set([
+	"leaveUser",
+	"disconnectUser",
+	"rebuildChannel",
+])
+
 function respond(
 	msg: Msg,
 	ok: boolean,
@@ -105,9 +112,18 @@ export default async function (
 			return respond(msg, true, data)
 		}
 
-		// user based cleanup has no client attached
-		if (payload.method === "leaveUser") {
-			const data = await this.leaveUser(payload.args?.[0])
+		// cleanup and moderation methods have no client attached
+		if (CLIENTLESS_METHODS.has(payload.method)) {
+			const fn = (this as any)[payload.method]
+
+			if (typeof fn !== "function") {
+				throw new OperationError(
+					400,
+					`Unknown method ${payload.method}`,
+				)
+			}
+
+			const data = await fn(...(payload.args ?? []))
 
 			return respond(msg, true, data)
 		}

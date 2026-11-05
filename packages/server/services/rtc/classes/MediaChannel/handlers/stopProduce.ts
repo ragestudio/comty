@@ -12,7 +12,6 @@ async function stopProduceHandler(
 	try {
 		const { producerId } = payload
 
-		// Get the producer for this client and kind
 		const userProducers = this.producers.get(client.userId)
 
 		if (!userProducers || !userProducers.has(producerId)) {
@@ -20,26 +19,8 @@ async function stopProduceHandler(
 			return { success: true }
 		}
 
-		const producerInst = userProducers.get(producerId)
-
-		if (!producerInst) {
-			return { success: true }
-		}
-
-		if (producerInst.producer?.closed) {
-			// Producer already closed
-			return { success: true }
-		}
-
-		// Close the producer
-		await producerInst.producer.close()
-
-		// // Ensure cleanup is called even if events don't fire
-		// await producerInst.onProducerClose()
-
-		if (this.controller) {
-			this.controller.markInstanceDirty(this.channelId)
-		}
+		// handles both live producers and restored serialized entries
+		await this.closeProducerEntry(client.userId, producerId)
 
 		return { success: true }
 	} catch (error) {
