@@ -9,6 +9,11 @@ export default async function (
 		return null
 	}
 
+	// the event is cluster wide, only the node that owns the socket reacts
+	if (ctx.node_id && ctx.node_id !== this.nodeId) {
+		return null
+	}
+
 	const userId = ctx.meta.user_id
 
 	// cancel any pending disconnect

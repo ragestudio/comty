@@ -60,6 +60,9 @@ export default async function (
 		channels: createDefaultChannels(),
 		members: createDefaultMembers(),
 		statedChannels: {},
+		connectedMembers: [],
+		membersDecorations: {},
+		userConnections: new Map(),
 	})
 
 	try {
@@ -81,7 +84,8 @@ export default async function (
 		const cached: CachedGroup = {
 			group: cachedGroup ?? null,
 			channels: cachedChannelsDoc ?? null,
-			memberships: cachedMemberships.length > 0 ? cachedMemberships : null,
+			memberships:
+				cachedMemberships.length > 0 ? cachedMemberships : null,
 			total_members: cachedTotalMembers > 0 ? cachedTotalMembers : null,
 		}
 
@@ -107,7 +111,8 @@ export default async function (
 			this.setState({
 				members: {
 					items: populatedMembers,
-					total_items: cached.total_members ?? populatedMembers.length,
+					total_items:
+						cached.total_members ?? populatedMembers.length,
 					has_more: false,
 				},
 			})
@@ -117,14 +122,17 @@ export default async function (
 
 		this.state.actions.syncRTCChannels().catch(logger.error)
 
-		const hasAllCache = cached.group && cached.channels && cached.memberships
+		const hasAllCache =
+			cached.group && cached.channels && cached.memberships
 
 		if (!hasAllCache) {
 			const promises = []
 
 			if (!cached.group) promises.push(this.state.actions.fetchGroup())
-			if (!cached.channels) promises.push(this.state.actions.fetchChannels())
-			if (!cached.memberships) promises.push(this.state.actions.fetchMembers())
+			if (!cached.channels)
+				promises.push(this.state.actions.fetchChannels())
+			if (!cached.memberships)
+				promises.push(this.state.actions.fetchMembers())
 
 			await Promise.all(promises)
 		}

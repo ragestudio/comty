@@ -8,6 +8,7 @@ import { GroupsListStore } from "../groupsList"
 
 import GROUP_CONFIG from "../chat/configs/group"
 import DM_CONFIG from "../chat/configs/dm"
+import { USERS_PRESENCE_REFRESH_MS } from "../users/constants"
 import logger from "@comty/shared/utils/logger"
 
 const CHAT_CONFIGS: Record<string, any> = {
@@ -25,7 +26,8 @@ export function buildGroupSocketEvents(
 
 	return {
 		// Group
-		[`${prefix}:update`]: (payload: any) => actions.handleGroupUpdate(payload),
+		[`${prefix}:update`]: (payload: any) =>
+			actions.handleGroupUpdate(payload),
 
 		// Channels
 		[`${prefix}:channel:created`]: (payload: any) =>
@@ -92,27 +94,48 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		socket.on(event, handler)
 	}
 
+	// presence is not fully event driven, a missed event must not stick
+	const refreshConnections = () => {
+		const state = GroupStore.getState()
+
+		if (state.groupId !== groupId) return
+		if (state.members.items.length === 0) return
+
+		state.userConnections.clear()
+
+		state.actions
+			.evaluateConnections(state.members.items)
+			.catch(logger.error)
+	}
+
 	const onReconnect = () => {
 		const state = GroupStore.getState()
 
-		if (state.groupId === groupId) {
-			logger.log("Reconnected! Triggering resilience sync...")
-			state.actions.syncRTCChannels().catch(logger.error)
+		if (state.groupId !== groupId) return
 
-			if (state.members.items.length > 0) {
-				state.actions
-					.evaluateConnections(state.members.items)
-					.catch(logger.error)
-				state.actions
-					.evaluateDecorations(state.members.items)
-					.catch(logger.error)
-			}
+		logger.log("Reconnected! Triggering resilience sync...")
+
+		state.actions.syncRTCChannels().catch(logger.error)
+
+		refreshConnections()
+
+		if (state.members.items.length > 0) {
+			state.actions
+				.evaluateDecorations(state.members.items)
+				.catch(logger.error)
 		}
 	}
+
+	const refreshTimer = setInterval(
+		refreshConnections,
+		USERS_PRESENCE_REFRESH_MS,
+	)
 
 	socket.on("reconnected", onReconnect)
 
 	return () => {
+		clearInterval(refreshTimer)
+
 		socket.topics.subscribe("group:unsubscribe", groupId)
 
 		for (const [event, handler] of Object.entries(events)) {

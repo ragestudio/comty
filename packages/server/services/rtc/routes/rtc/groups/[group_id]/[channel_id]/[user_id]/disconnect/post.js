@@ -1,6 +1,5 @@
 import Groups from "@shared-classes/Spaces/Groups"
 import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
-import setFind from "@shared-utils/setFind"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
@@ -18,30 +17,15 @@ export default {
 
 		// manage_clients is kept as a legacy bypass
 		if (!authz.can("VOICE_KICK_MEMBERS") && !authz.can("MANAGE_CLIENTS")) {
-			throw new OperationError(403, "You are not allowed to disconnect clients")
-		}
-
-		const channel = ctx.mediaChannels.instances.get(channel_id)
-
-		if (!channel) {
-			throw new OperationError(404, "Channel not found")
-		}
-
-		const client = setFind(channel.clients, (item) => item.userId === user_id)
-
-		if (!client) {
-			throw new OperationError(404, "Client not found with this user id")
+			throw new OperationError(
+				403,
+				"You are not allowed to disconnect clients",
+			)
 		}
 
 		console.log("disconnecting client", user_id)
 
-		await channel.leaveClient(client, { emitEventToSelf: true })
-
-		return {
-			ok: true,
-			user_id: user_id,
-			client_id: client.id,
-			channel_id: channel_id,
-		}
+		// resolves the owner, the channel may live on another node
+		return await ctx.mediaChannels.disconnectUser(channel_id, user_id)
 	},
 }

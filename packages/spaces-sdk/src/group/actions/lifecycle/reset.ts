@@ -12,6 +12,7 @@ export default function (this: LifecycleActions): void {
 		statedChannels: {},
 		connectedMembers: [],
 		membersDecorations: {},
+		userConnections: new Map(),
 		loading: true,
 		error: null,
 	}))

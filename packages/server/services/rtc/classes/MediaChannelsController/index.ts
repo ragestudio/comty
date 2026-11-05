@@ -32,6 +32,7 @@ import serializeClient from "./handlers/serializeClient"
 import requestToChannelOwner from "./handlers/requestToChannelOwner"
 import handleRemoteCall from "./handlers/handleRemoteCall"
 import leaveUser from "./handlers/leaveUser"
+import disconnectUser from "./handlers/disconnectUser"
 
 import Bind from "@comty/shared/utils/bind"
 
@@ -89,6 +90,7 @@ export default class MediaChannelsController {
 	requestToChannelOwner = Bind(this, requestToChannelOwner)
 	handleRemoteCall = Bind(this, handleRemoteCall)
 	leaveUser = Bind(this, leaveUser)
+	disconnectUser = Bind(this, disconnectUser)
 
 	async initialize() {
 		// initialize KV engine
@@ -169,7 +171,11 @@ export default class MediaChannelsController {
 	startOwnershipRenew() {
 		if (this.ownershipTimer) return
 
+		let ticks = 0
+
 		this.ownershipTimer = setInterval(() => {
+			ticks++
+
 			this.ownership
 				.renewAll(this.instances.keys())
 				.catch((error) =>
@@ -178,6 +184,13 @@ export default class MediaChannelsController {
 						error,
 					),
 				)
+
+			// refresh the shared state so an idle channel does not expire
+			if (ticks % 6 === 0) {
+				for (const channelId of this.instances.keys()) {
+					this.markInstanceDirty(channelId)
+				}
+			}
 		}, OWNERSHIP_RENEW_MS)
 	}
 
