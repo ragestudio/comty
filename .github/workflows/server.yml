@@ -39,6 +39,7 @@ jobs:
           images: ragestudio/comty-server
           tags: |
             type=raw,value=latest
+            type=sha,format=long,prefix=sha-
             type=raw,value={{version}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
 
       - name: Build and push Docker image
@@ -51,4 +52,6 @@ jobs:
           cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            ULTRAGATEWAY_VERSION=${{ vars.ULTRAGATEWAY_VERSION }}
           push: true
