@@ -87,7 +87,7 @@ const AvatarEditor = (props) => {
 					ctx={uploadContext}
 					onSelect={() => setMode("upload")}
 				>
-						Upload image
+					Upload image
 				</AvatarUploadButton>
 				<Button
 					type="default"
