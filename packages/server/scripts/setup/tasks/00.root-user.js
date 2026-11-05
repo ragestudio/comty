@@ -1,4 +1,5 @@
 import User from "@db_models/user"
+import PasswordHash from "@db_models/passwordHash"
 import bcrypt from "bcrypt"
 
 export default {
@@ -16,10 +17,11 @@ export default {
 
 		const defaultUsername = "root"
 		const defaultPwd = "changemeorgethacked"
+		const hash = await bcrypt.hash(defaultPwd, 6)
 
 		let user = new User({
 			username: defaultUsername,
-			password: await bcrypt.hash(defaultPwd, 6),
+			password: hash,
 			email: "example@comty.app",
 			roles: ["admin"],
 			created_at: new Date().getTime(),
@@ -29,11 +31,21 @@ export default {
 
 		await user.save()
 
+		try {
+			await PasswordHash.create({
+				user_id: user._id.toString(),
+				hash,
+			})
+		} catch (error) {
+			await User.deleteOne({ _id: user._id })
+			throw error
+		}
+
 		console.log(
 			`Root user created. Username: ${defaultUsername}, password: ${defaultPwd}\nPlease change the password after first login!!.`,
 		)
 
 		return null
 	},
-	crashOnFail: true,
+	crashOnError: true,
 }

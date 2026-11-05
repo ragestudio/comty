@@ -45,7 +45,7 @@ module.exports = async (job) => {
 				"Sending notification",
 			)
 
-			global.ipc.invoke("ems", "new:login", authData)
+			await global.ipc.invoke("ems", "new:login", authData)
 		}
 	} catch (error) {
 		console.error(error)

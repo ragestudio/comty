@@ -11,6 +11,15 @@ function getConnectionConfig(obj) {
 		DB_AUTH_SOURCE,
 	} = obj
 
+	const hasUsername = DB_USER !== undefined && DB_USER !== null && DB_USER !== ""
+	const hasPassword = DB_PWD !== undefined && DB_PWD !== null && DB_PWD !== ""
+
+	if (hasUsername !== hasPassword) {
+		throw new Error(
+			"MongoDB configuration requires both DB_USER and DB_PWD, or neither.",
+		)
+	}
+
 	let auth = [DB_DRIVER ?? "mongodb", "://"]
 
 	auth.push(DB_HOSTNAME ?? "localhost")
@@ -19,15 +28,19 @@ function getConnectionConfig(obj) {
 	auth = auth.join("")
 
 	const params = {
-		auth: {},
 		dbName: DB_NAME,
-		user: DB_USER,
-		pass: DB_PWD,
 		maxPoolSize: 100,
 	}
 
-	if (DB_AUTH_SOURCE) {
-		params.auth.authSource = DB_AUTH_SOURCE
+	if (hasUsername && hasPassword) {
+		params.auth = {
+			username: DB_USER,
+			password: DB_PWD,
+		}
+	}
+
+	if (hasUsername && DB_AUTH_SOURCE) {
+		params.authSource = DB_AUTH_SOURCE
 	}
 
 	return [auth, params]
