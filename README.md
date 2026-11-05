@@ -93,7 +93,7 @@ Experience Comty across your devices:
 
 Ready to build with us? Check our developer documentation to get your local environment running:
 
-👉 Read the [Getting Started Guide](./docs/development/getting-started.md)
+👉 Read the [Docs](https://docs.comty.app)
 
 ---
 
