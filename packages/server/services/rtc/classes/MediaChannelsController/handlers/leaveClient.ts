@@ -13,6 +13,18 @@ export default async function (
 			return
 		}
 
+		// the channel may be owned by another node
+		const owner = await this.ownership.resolve(currentChannelId)
+
+		if (owner && owner.node_id !== this.nodeId) {
+			return await this.requestToChannelOwner(owner.node_id, {
+				target: "controller",
+				method: "leaveClient",
+				args: [],
+				client: this.serializeClient(client),
+			})
+		}
+
 		const channelInstance = await this.getInstance(currentChannelId, client)
 
 		if (!channelInstance) {

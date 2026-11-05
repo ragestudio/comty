@@ -73,6 +73,15 @@ export default async function (this: MediaChannel) {
 					`[CHANNEL:${this.channelId}] Failed to self delete from state bucket`,
 				)
 			}
+
+			// release the claim so another node can take the channel over
+			try {
+				await this.controller.ownership?.release(this.channelId)
+			} catch (err) {
+				console.error(
+					`[CHANNEL:${this.channelId}] Failed to release channel ownership`,
+				)
+			}
 		}
 
 		console.info(`[CHANNEL:${this.channelId}] closed`)

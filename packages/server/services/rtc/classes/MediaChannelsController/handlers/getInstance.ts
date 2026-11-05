@@ -3,6 +3,8 @@ import type MediaChannelsController from ".."
 
 import { MediaChannel, SerializedMediaChannel } from "@classes/MediaChannel"
 import { normalizeClientUser } from "@shared-utils/clientUser"
+import { RemoteMediaChannel } from "../remote"
+import type { MediaChannelRef } from "../remote"
 
 function DeserializeMaps(state: SerializedMediaChannel) {
 	const producersMap = new Map<string, Map<string, any>>()
@@ -11,7 +13,9 @@ function DeserializeMaps(state: SerializedMediaChannel) {
 	if (state.producers) {
 		for (const [userId, userProducers] of Object.entries(state.producers)) {
 			const innerMap = new Map<string, any>()
-			for (const [producerId, producerData] of Object.entries(userProducers)) {
+			for (const [producerId, producerData] of Object.entries(
+				userProducers,
+			)) {
 				innerMap.set(producerId, producerData)
 			}
 			producersMap.set(userId, innerMap)
@@ -31,11 +35,18 @@ export default async function (
 	this: MediaChannelsController,
 	channelId: string,
 	bindClient?: RTCClient,
-) {
+): Promise<MediaChannelRef | null> {
 	const instance = this.instances.get(channelId)
 
 	if (instance) {
 		return instance
+	}
+
+	// another node owns the channel, operations must be forwarded there
+	const owner = await this.ownership.resolve(channelId)
+
+	if (owner && owner.node_id !== this.nodeId) {
+		return new RemoteMediaChannel(this, channelId, owner.node_id)
 	}
 
 	// if instance not found, try to reconstruct from state
@@ -54,7 +65,9 @@ export default async function (
 
 		// if state is available, but sfu_node is not found, is needed to throw an error
 		if (!sfu_node) {
-			throw new Error(`Failed to find SFU node for channel [${channelId}]`)
+			throw new Error(
+				`Failed to find SFU node for channel [${channelId}]`,
+			)
 		}
 
 		const router = await sfu_node.getRouter(state.router_id)
@@ -64,7 +77,10 @@ export default async function (
 			throw new Error(`Failed to get router for channel [${channelId}]`)
 		}
 
-		console.log(`Restoring channel instance for channel [${channelId}]`, state)
+		console.log(
+			`Restoring channel instance for channel [${channelId}]`,
+			state,
+		)
 
 		// TODO: Check the ownership controller of the channel.
 		// If the channel is not owned by this controller, try to ask to the controller owner.
@@ -123,7 +139,10 @@ export default async function (
 		restoredInstance.producers = producers
 		restoredInstance.consumers = consumers
 
-		console.log("Restored channel instance from state bucket", restoredInstance)
+		console.log(
+			"Restored channel instance from state bucket",
+			restoredInstance,
+		)
 
 		//await restoredInstance.initialize()
 

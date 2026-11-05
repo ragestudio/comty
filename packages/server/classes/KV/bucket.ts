@@ -46,6 +46,35 @@ export class Bucket {
 		return this.bucket.put(key, te.encode(value))
 	}
 
+	async getEntry<T = unknown>(key: string) {
+		try {
+			const entry = await this.bucket.get(key)
+
+			if (!entry) return null
+
+			return {
+				value: JSON.parse(td.decode(entry.value)) as T,
+				revision: entry.revision,
+			}
+		} catch {
+			return null
+		}
+	}
+
+	// create fails when the key already exists, used for atomic claims
+	async create<T = unknown>(key: string, value: T) {
+		return this.bucket.create(key, te.encode(JSON.stringify(value)))
+	}
+
+	// update only succeeds when the revision still matches
+	async update<T = unknown>(key: string, value: T, revision: number) {
+		return this.bucket.update(
+			key,
+			te.encode(JSON.stringify(value)),
+			revision,
+		)
+	}
+
 	keys(): Promise<AsyncIterable<string>> {
 		return this.bucket.keys()
 	}

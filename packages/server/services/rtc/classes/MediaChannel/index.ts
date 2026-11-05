@@ -13,6 +13,7 @@ import Bind from "@comty/shared/utils/bind"
 import { getClientUser } from "@shared-utils/clientUser"
 import { SFUNode } from "@classes/MediaChannelsController/sfu/node"
 import { EventEmitter } from "tseep/lib/ee-safe"
+import setFind from "@shared-utils/setFind"
 
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
@@ -30,6 +31,7 @@ import closeHandler from "./handlers/close"
 import handleClientEventHandler from "./handlers/clientEvent"
 
 import defaults from "./defaults"
+import rebindClient from "./rebind"
 
 export type SerializedMediaChannel = {
 	controller_id: string | null
@@ -119,7 +121,10 @@ export class MediaChannel {
 				this.controller.markInstanceDirty(this.channelId)
 			}
 		} catch (error) {
-			console.error(`[CHANNEL:${this.channelId}] Error initializing `, error)
+			console.error(
+				`[CHANNEL:${this.channelId}] Error initializing `,
+				error,
+			)
 			throw error
 		}
 	}
@@ -143,7 +148,9 @@ export class MediaChannel {
 		const consumersMap = new Map<string, any[]>()
 
 		if (state.producers) {
-			for (const [userId, userProducers] of Object.entries(state.producers)) {
+			for (const [userId, userProducers] of Object.entries(
+				state.producers,
+			)) {
 				const innerMap = new Map<string, any>()
 				for (const [producerId, producerData] of Object.entries(
 					userProducers,
@@ -155,7 +162,9 @@ export class MediaChannel {
 		}
 
 		if (state.consumers) {
-			for (const [consumerId, consumers] of Object.entries(state.consumers)) {
+			for (const [consumerId, consumers] of Object.entries(
+				state.consumers,
+			)) {
 				consumersMap.set(consumerId, consumers)
 			}
 		}
@@ -184,6 +193,14 @@ export class MediaChannel {
 			this.controller.markInstanceDirty(this.channelId)
 		}
 	}
+
+	/**
+	 * Route future events of an already joined client to its current socket.
+	 * A websocket reconnection creates a new session, the runtime state
+	 * (transports, voice state) must be preserved while emissions use the new
+	 * connection.
+	 */
+	rebindClient = Bind(this, rebindClient)
 
 	_setupTransportEvents(transport: any, client: RTCClient) {
 		transport.on("dtlsstatechange", (dtlsState: string) => {

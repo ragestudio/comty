@@ -10,6 +10,10 @@ import { SFUNode } from "./sfu/node"
 import { Bucket, KvManager } from "@shared-classes/KV"
 import { Users } from "./users"
 import { IPC } from "./ipc"
+import { ChannelOwnership, OWNERSHIP_RENEW_MS } from "./ownership"
+import type { ChannelOwner } from "./ownership"
+import { RemoteMediaChannel } from "./remote"
+import type { MediaChannelRef } from "./remote"
 
 import createChannelInstanceHandler from "./handlers/createChannelInstance"
 import validateGroupAccess from "./handlers/validateGroupAccess"
@@ -24,6 +28,10 @@ import findChannelsByGroupId from "./handlers/findChannelsByGroupId"
 import getUserJoinedGroupsIds from "./handlers/getUserJoinedGroupsIds"
 import flushDirtyInstancesState from "./handlers/flushDirtyInstancesState"
 import getInstance from "./handlers/getInstance"
+import serializeClient from "./handlers/serializeClient"
+import requestToChannelOwner from "./handlers/requestToChannelOwner"
+import handleRemoteCall from "./handlers/handleRemoteCall"
+import leaveUser from "./handlers/leaveUser"
 
 import Bind from "@comty/shared/utils/bind"
 
@@ -36,6 +44,9 @@ export default class MediaChannelsController {
 	snowflakeWorker: SnowflakeWorker
 	controller_id: string
 
+	// node this controller runs on, channels are routed to their owner node
+	nodeId: string = process.env.LB_NODE_ID ?? "local"
+
 	server: Server
 	ipc: IPC | null = null
 	kv: KvManager = new KvManager()
@@ -43,7 +54,9 @@ export default class MediaChannelsController {
 
 	sfuDiscovery = new SfuNodeDiscovery(this)
 	mediaChannelsStateBucket: Bucket
-	//mediaChannelsOwnershipBucket: Bucket
+	ownership: ChannelOwnership
+	ownershipTimer: NodeJS.Timeout | null = null
+	remoteChannelSub: any = null
 
 	instances: Map<string, MediaChannel> = new Map()
 	pendingDisconnectsTimeout: Map<string, PendingDisconnectEntry> = new Map()
@@ -72,6 +85,11 @@ export default class MediaChannelsController {
 
 	getInstance = Bind(this, getInstance)
 
+	serializeClient = Bind(this, serializeClient)
+	requestToChannelOwner = Bind(this, requestToChannelOwner)
+	handleRemoteCall = Bind(this, handleRemoteCall)
+	leaveUser = Bind(this, leaveUser)
+
 	async initialize() {
 		// initialize KV engine
 		this.kv.init(this.server.nats.connection)
@@ -97,6 +115,14 @@ export default class MediaChannelsController {
 			},
 		)
 
+		// channel ownership, a channel is served by exactly one controller
+		this.ownership = new ChannelOwnership(this.controller_id, this.nodeId)
+
+		this.ownership.init(await this.kv.bucket("mediachannels-ownership"))
+
+		this.startOwnershipRenew()
+		this.subscribeRemoteChannelCalls()
+
 		// register SFU discovery event handlers & init discovery
 		await this.sfuDiscovery.init()
 
@@ -111,12 +137,19 @@ export default class MediaChannelsController {
 		)
 	}
 
-	async getClientChannel(client: RTCClient): Promise<MediaChannel> {
+	async getClientChannel(client: RTCClient): Promise<MediaChannelRef> {
 		let channelId =
 			(await this.users.get(client.userId)) || client.channel_id
 
 		if (!channelId) {
 			throw new Error("No channel joined")
+		}
+
+		// the channel is served by another node, forward the operation there
+		const owner = await this.ownership.resolve(channelId)
+
+		if (owner && owner.node_id !== this.nodeId) {
+			return new RemoteMediaChannel(this, channelId, owner.node_id)
 		}
 
 		let channelInstance = await this.getInstance(channelId, client)
@@ -130,6 +163,51 @@ export default class MediaChannelsController {
 		}
 
 		return channelInstance
+	}
+
+	/** keeps the ownership claims alive while the channel exists */
+	startOwnershipRenew() {
+		if (this.ownershipTimer) return
+
+		this.ownershipTimer = setInterval(() => {
+			this.ownership
+				.renewAll(this.instances.keys())
+				.catch((error) =>
+					console.error(
+						"[media-channels] failed to renew channel ownership",
+						error,
+					),
+				)
+		}, OWNERSHIP_RENEW_MS)
+	}
+
+	/** listens for channel operations forwarded by other nodes */
+	subscribeRemoteChannelCalls() {
+		const nats = this.server.nats?.connection
+
+		if (!nats) return
+
+		this.remoteChannelSub = nats.subscribe(`rtc.channel.${this.nodeId}`)
+
+		const loop = async () => {
+			for await (const msg of this.remoteChannelSub) {
+				try {
+					await this.handleRemoteCall(msg)
+				} catch (error) {
+					console.error(
+						"[media-channels] failed to handle remote call",
+						error,
+					)
+				}
+			}
+		}
+
+		loop()
+	}
+
+	/** claims a channel for this controller, returns the current owner */
+	claimChannel = async (channelId: string): Promise<ChannelOwner> => {
+		return await this.ownership.claim(channelId)
 	}
 
 	markInstanceDirty = (channelId: string) => {

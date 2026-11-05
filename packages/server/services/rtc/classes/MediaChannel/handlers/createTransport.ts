@@ -14,7 +14,7 @@ async function createTransportHandler(this: MediaChannel, client: RTCClient) {
 		}
 
 		if (!clientInst.transports) {
-			client.transports = new Map()
+			clientInst.transports = new Map()
 		}
 
 		const transport = await this.router.createWebRtcTransport()

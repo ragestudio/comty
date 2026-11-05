@@ -1,6 +1,7 @@
 import GroupChannelsModel from "@db/group_channels"
 
 import type MediaChannelsController from "../index"
+import type MediaChannel from "@classes/MediaChannel"
 import { RTCClient } from "@services/rtc/types"
 import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import setFind from "@shared-utils/setFind"
@@ -44,6 +45,18 @@ export default async function (
 		// cancel any pending disconnect timeout
 		this.cancelPendingDisconnect(client.userId)
 
+		// a channel has a single controller, the join runs there
+		const owner = await this.claimChannel(channelId)
+
+		if (owner.node_id !== this.nodeId) {
+			return await this.requestToChannelOwner(owner.node_id, {
+				target: "controller",
+				method: "joinClient",
+				args: [group_id, channelId],
+				client: this.serializeClient(client),
+			})
+		}
+
 		// check cache for existing membership
 		const joinedChannel = await this.users.get(client.userId)
 
@@ -57,9 +70,16 @@ export default async function (
 		const userLimit = Number.parseInt(String(userLimitValue ?? "0"), 10)
 
 		if (userLimit > 0 && joinedChannel !== channelId) {
-			const existingInstance = await this.getInstance(channelId, client)
+			// ownership was just claimed, so the instance is always local
+			const existingInstance = (await this.getInstance(
+				channelId,
+				client,
+			)) as MediaChannel | null
 
-			if (existingInstance && existingInstance.clients.size >= userLimit) {
+			if (
+				existingInstance &&
+				existingInstance.clients.size >= userLimit
+			) {
 				throw new OperationError(403, "Channel is full")
 			}
 		}
@@ -76,7 +96,10 @@ export default async function (
 				await this.leaveClient(client)
 			} else {
 				// check if reconnection is possible
-				const channelInstance = await this.getInstance(channelId, client)
+				const channelInstance = (await this.getInstance(
+					channelId,
+					client,
+				)) as MediaChannel | null
 
 				if (channelInstance && !channelInstance.closed) {
 					// replace old client reference
@@ -109,7 +132,10 @@ export default async function (
 		}
 
 		// get or create channel instance
-		let channelInstance = await this.getInstance(channelId, client)
+		let channelInstance = (await this.getInstance(
+			channelId,
+			client,
+		)) as MediaChannel | null
 
 		if (!channelInstance || channelInstance?.closed === true) {
 			channelInstance = await this.createChannelInstance(

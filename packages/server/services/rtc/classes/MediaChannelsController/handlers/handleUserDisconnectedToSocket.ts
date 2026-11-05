@@ -56,20 +56,12 @@ export default async function (
 		const timeout = setTimeout(async () => {
 			this.pendingDisconnectsTimeout.delete(userId)
 
-			const channel = await this.getInstance(channelId)
+			console.log(
+				`[media-channels] Grace period expired for user ${userId}, leaving channel`,
+			)
 
-			if (channel && channel.leaveClient) {
-				// clean cache
-				await this.users.remove(userId, channelId)
-
-				console.log(
-					`[media-channels] Grace period expired for user ${userId}, leaving channel`,
-				)
-
-				await channel.leaveClient({
-					userId: userId,
-				})
-			}
+			// handles the owner lookup and forwarding across nodes
+			await this.leaveUser(userId)
 		}, GRACE_PERIOD_MS)
 
 		this.pendingDisconnectsTimeout.set(userId, { timeout, channelId })
