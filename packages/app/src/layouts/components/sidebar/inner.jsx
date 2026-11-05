@@ -94,21 +94,26 @@ export function authorizedItems({ onClickDropdownItem, onDropdownOpenChange }) {
 			ignore_click: "true",
 			className: "user_avatar",
 			label: (
-				<Dropdown
-					menu={{
-						items: ActionMenuItems,
-						onClick: onClickDropdownItem,
-					}}
-					autoFocus
-					placement="top"
-					trigger={["click"]}
-					onOpenChange={onDropdownOpenChange}
-				>
-					<Avatar
-						shape="square"
-						src={app.userData?.avatar}
-					/>
-				</Dropdown>
+				<div className="sidebar-profile-label">
+					<Dropdown
+						menu={{
+							items: ActionMenuItems,
+							onClick: onClickDropdownItem,
+						}}
+						autoFocus
+						placement="top"
+						trigger={["click"]}
+						onOpenChange={onDropdownOpenChange}
+					>
+						<Avatar
+							shape="square"
+							src={app.userData?.avatar}
+						/>
+					</Dropdown>
+					<span className="sidebar-profile-username">
+						{app.userData.username}
+					</span>
+				</div>
 			),
 		})
 	} else {

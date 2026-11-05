@@ -78,6 +78,8 @@
 						width: 100%;
 					}
 				}
+
+					padding: 0 !important;
 			}
 		}
 	}
@@ -175,6 +177,12 @@
 				width: 0;
 			}
 
+			.ant-menu-item:not(.user_avatar) {
+				padding-left: calc(
+					(@sidebar_width - @sidebar_padding - 2px - 24px) / 2
+				) !important;
+			}
+
 			.ant-menu-item {
 				position: relative;
 
@@ -185,7 +193,8 @@
 
 				width: 100%;
 
-				padding: 0 0 0 calc(@sidebar_width / 2);
+				padding: 0 10px 0
+					calc((@sidebar_width - @sidebar_padding - 2px - 24px) / 2);
 				margin: 5px 0;
 
 				transition: all 150ms ease-in-out;
@@ -193,18 +202,49 @@
 				.ant-menu-item-icon {
 					font-size: 1rem;
 
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					width: 24px;
+					flex: 0 0 24px;
 					margin: 0 !important;
+				}
+
+				.notifications_icon {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					width: 24px;
 				}
 
 				.ant-menu-title-content {
 					text-overflow: clip;
 					opacity: 0;
 					width: 0;
+					margin-inline-start: 10px;
 				}
 
 				&.user_avatar {
+					.sidebar-profile-label {
+						display: grid;
+						grid-template-columns: calc(@sidebar_width - @sidebar_padding - 2px)
+							minmax(0, 1fr);
+						align-items: center;
+						width: 100%;
+					}
+
+					.sidebar-profile-username {
+						display: none;
+						grid-column: 2;
+						min-width: 0;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+
 					.ant-menu-title-content {
 						width: 100%;
+						margin-inline-start: 0;
 
 						display: inline-flex;
 
@@ -214,7 +254,9 @@
 						opacity: 1;
 
 						.ant-dropdown-trigger {
-							width: 100%;
+							grid-column: 1;
+							width: auto;
+							justify-self: center;
 
 							img {
 								width: fit-content;
@@ -232,6 +274,11 @@
 			}
 		}
 	}
+}
+
+.app_sidebar.expanded .app_sidebar_menu_wrapper .ant-menu
+	.ant-menu-item.user_avatar .sidebar-profile-username {
+	display: inline-block;
 }
 
 .app_sidebar_menu_groups {
