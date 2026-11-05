@@ -70,14 +70,15 @@ ScyllaDB:
 
 Redis:
 
-| Variable                            | Description                    |
-| :---------------------------------- | :----------------------------- |
-| `REDIS_HOST`                        | Hostname (default `localhost`) |
-| `REDIS_PORT`                        | Port (default `6379`)          |
-| `REDIS_AUTH`                        | `user:password` string         |
-| `REDIS_USERNAME` / `REDIS_PASSWORD` | Credentials                    |
-| `REDIS_NO_AUTH`                     | Disable auth                   |
-| `REDIS_DB`                          | Database index                 |
+| Variable | Description |
+| :-- | :-- |
+| `REDIS_URL` | Full URL, takes priority over the rest and over `gateway.config.json` |
+| `REDIS_HOST` | Hostname (default `localhost`) |
+| `REDIS_PORT` | Port (default `6379`) |
+| `REDIS_AUTH` | `user:password` string |
+| `REDIS_USERNAME` / `REDIS_PASSWORD` | Credentials |
+| `REDIS_NO_AUTH` | Disable auth |
+| `REDIS_DB` | Database index |
 
 ### Storage
 
