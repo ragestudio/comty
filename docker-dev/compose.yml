@@ -6,7 +6,6 @@
 # Optional SFU node (voice/video):
 #   docker compose -f docker-dev/compose.yml --profile sfu up -d
 #
-# All ports are published on 127.0.0.1 so they are only reachable from your machine.
 
 services:
   redis:
@@ -16,7 +15,7 @@ services:
     ulimits:
       memlock: -1
     ports:
-      - "127.0.0.1:6379:6379"
+      - "6379:6379"
     command: "dragonfly --logtostderr --cache_mode=true --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
     networks:
       - comty-dev
@@ -26,7 +25,7 @@ services:
     container_name: comty-dev-mongodb
     restart: unless-stopped
     ports:
-      - "127.0.0.1:27017:27017"
+      - "27017:27017"
     volumes:
       - mongodb:/data/db
     healthcheck:
@@ -44,7 +43,7 @@ services:
     # Reduced resources for local development. Tweak if you have more to spare.
     command: "--smp 1 --memory 1G --overprovisioned 1 --developer-mode 1"
     ports:
-      - "127.0.0.1:9042:9042"
+      - "9042:9042"
     volumes:
       - scylla:/var/lib/scylla
     networks:
@@ -56,8 +55,8 @@ services:
     restart: unless-stopped
     command: "--jetstream --store_dir /data --http_port 8222"
     ports:
-      - "127.0.0.1:4222:4222"
-      - "127.0.0.1:8222:8222"
+      - "4222:4222"
+      - "8222:8222"
     volumes:
       - nats:/data
     networks:
@@ -70,8 +69,8 @@ services:
     restart: unless-stopped
     command: "server -dir=/data -s3 -s3.port=8333"
     ports:
-      - "127.0.0.1:8333:8333"
-      - "127.0.0.1:9333:9333"
+      - "8333:8333"
+      - "9333:9333"
     volumes:
       - seaweedfs:/data
     networks:
