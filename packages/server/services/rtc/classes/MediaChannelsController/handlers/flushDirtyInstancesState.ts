@@ -30,6 +30,17 @@ export default async function (this: MediaChannelsController) {
 					return
 				}
 
+				// never overwrite the session of another controller with a
+				// detached instance
+				const epoch = this.ownership.epochOf(channelId)
+
+				if (
+					epoch !== null &&
+					epoch !== channelInstance.ownershipEpoch
+				) {
+					return
+				}
+
 				try {
 					const serializedState = channelInstance.serialize()
 

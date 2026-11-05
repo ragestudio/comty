@@ -70,6 +70,20 @@ export default async function (
 				if (!state || state.closed) continue
 				if (state.data?.group_id !== groupId) continue
 
+				// a session written by this node is ours even when the instance
+				// is not loaded yet (a restarted service). hiding it here makes
+				// the clients drop the channel and ignore the first events
+				if (state.ownership?.node_id === this.nodeId) {
+					channels.set(key, toStatedChannel(state))
+					continue
+				}
+
+				// a state entry left by a dead node must not be exposed as an
+				// active channel
+				const owner = await this.ownership.resolve(key)
+
+				if (!owner) continue
+
 				channels.set(key, toStatedChannel(state))
 			}
 		} catch (error) {

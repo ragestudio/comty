@@ -2,6 +2,7 @@ import GroupChannelsModel from "@db/group_channels"
 
 import type MediaChannelsController from "../index"
 import type MediaChannel from "@classes/MediaChannel"
+import type { MediaChannelRef } from "../remote"
 import { RTCClient } from "@services/rtc/types"
 import Gatekeeper from "@shared-classes/Spaces/Gatekeeper"
 import setFind from "@shared-utils/setFind"
@@ -46,10 +47,10 @@ export default async function (
 		this.cancelPendingDisconnect(client.userId)
 
 		// a channel has a single controller, the join runs there
-		const owner = await this.claimChannel(channelId)
+		const claim = await this.claimChannel(channelId)
 
-		if (owner.node_id !== this.nodeId) {
-			return await this.requestToChannelOwner(owner.node_id, {
+		if (!claim.owned) {
+			return await this.requestToChannelOwner(claim.owner.node_id, {
 				target: "controller",
 				method: "joinClient",
 				args: [group_id, channelId],
@@ -60,6 +61,39 @@ export default async function (
 		// check cache for existing membership
 		const joinedChannel = await this.users.get(client.userId)
 
+		// moving to another channel, leave the previous one first
+		if (joinedChannel && joinedChannel !== channelId) {
+			await this.leaveClient(client)
+		}
+
+		// resolves the session on this node, restoring it from the shared
+		// state when its owner is gone or creating a new one
+		const resolved = (await this.getInstance(channelId, {
+			bindClient: client,
+			create: { groupId: channel.group_id },
+		})) as MediaChannelRef | null
+
+		if (!resolved) {
+			throw new OperationError(404, "Channel instance not available")
+		}
+
+		// ownership moved while joining, forward the join to the new owner
+		if ((resolved as any).is_remote) {
+			return await this.requestToChannelOwner((resolved as any).nodeId, {
+				target: "controller",
+				method: "joinClient",
+				args: [group_id, channelId],
+				client: this.serializeClient(client),
+			})
+		}
+
+		const channelInstance = resolved as MediaChannel
+
+		const previous = setFind(
+			channelInstance.clients,
+			(c: RTCClient) => c.userId === client.userId,
+		)
+
 		// enforce the channel user limit for new joins
 		const rawParams: any = channel.params
 		const userLimitValue =
@@ -68,85 +102,27 @@ export default async function (
 				: rawParams?.user_limit
 
 		const userLimit = Number.parseInt(String(userLimitValue ?? "0"), 10)
+		const isReconnection = joinedChannel === channelId || Boolean(previous)
 
-		if (userLimit > 0 && joinedChannel !== channelId) {
-			// ownership was just claimed, so the instance is always local
-			const existingInstance = (await this.getInstance(
-				channelId,
-				client,
-			)) as MediaChannel | null
-
-			if (
-				existingInstance &&
-				existingInstance.clients.size >= userLimit
-			) {
-				throw new OperationError(403, "Channel is full")
-			}
+		if (
+			userLimit > 0 &&
+			!isReconnection &&
+			channelInstance.clients.size >= userLimit
+		) {
+			throw new OperationError(403, "Channel is full")
 		}
 
-		// // if the user is already in the channel, skip
-		// if (joinedChannel === channelId) {
-		// 	return null
-		// }
-
-		// check if this is a reconnection (user already in a channel)
-		if (joinedChannel) {
-			// if joining a different channel, leave the old one first
-			if (joinedChannel !== channelId) {
-				await this.leaveClient(client)
-			} else {
-				// check if reconnection is possible
-				const channelInstance = (await this.getInstance(
-					channelId,
-					client,
-				)) as MediaChannel | null
-
-				if (channelInstance && !channelInstance.closed) {
-					// replace old client reference
-					const oldClient = setFind(
-						channelInstance.clients,
-						(c: RTCClient) => c.userId === client.userId,
-					)
-
-					if (oldClient) {
-						this.cleanupOrphanedResources(oldClient)
-						channelInstance.clients.delete(oldClient)
-					}
-
-					// update cache
-					await this.users.set(client.userId, channelId)
-
-					console.log(
-						`[media-channels] User ${client.userId} reconnected to channel ${channelId}`,
-					)
-
-					return await channelInstance.joinClient(client, {
-						isReconnection: true,
-					})
-				}
-
-				console.log(
-					`[media-channels] User ${client.userId} rejoining after channel was closed`,
-				)
-			}
-		}
-
-		// get or create channel instance
-		let channelInstance = (await this.getInstance(
-			channelId,
-			client,
-		)) as MediaChannel | null
-
-		if (!channelInstance || channelInstance?.closed === true) {
-			channelInstance = await this.createChannelInstance(
-				channel.group_id,
-				channelId,
-			)
+		// a previous reference of the same user belongs to an older socket
+		if (previous && previous !== client) {
+			this.cleanupOrphanedResources(previous)
+			channelInstance.clients.delete(previous)
 		}
 
 		await this.users.set(client.userId, channelId)
 
-		return await channelInstance.joinClient(client)
+		return await channelInstance.joinClient(client, {
+			isReconnection: isReconnection,
+		})
 	} catch (error) {
 		console.error(`Error joining client ${client.userId}:`, error)
 		throw error

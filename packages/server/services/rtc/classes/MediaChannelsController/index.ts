@@ -11,11 +11,12 @@ import { Bucket, KvManager } from "@shared-classes/KV"
 import { Users } from "./users"
 import { IPC } from "./ipc"
 import { ChannelOwnership, OWNERSHIP_RENEW_MS } from "./ownership"
-import type { ChannelOwner } from "./ownership"
+import type { ChannelClaim, ChannelOwner } from "./ownership"
 import { RemoteMediaChannel } from "./remote"
 import type { MediaChannelRef } from "./remote"
 
 import createChannelInstanceHandler from "./handlers/createChannelInstance"
+import attachChannelEvents from "./handlers/attachChannelEvents"
 import validateGroupAccess from "./handlers/validateGroupAccess"
 
 import joinClient from "./handlers/joinClient"
@@ -33,8 +34,16 @@ import requestToChannelOwner from "./handlers/requestToChannelOwner"
 import handleRemoteCall from "./handlers/handleRemoteCall"
 import leaveUser from "./handlers/leaveUser"
 import disconnectUser from "./handlers/disconnectUser"
+import rebuildInstance from "./handlers/rebuildInstance"
+import pruneInstances from "./handlers/pruneInstances"
+import {
+	isStaleMediaSessionError,
+	isStaleRouterError,
+} from "./handlers/staleSessionError"
+import { MEDIA_SESSION_RESET } from "@comty/shared/types/rtc/errors"
 
 import Bind from "@comty/shared/utils/bind"
+import GroupChannelsModel from "@db/group_channels"
 
 type PendingDisconnectEntry = {
 	timeout: NodeJS.Timeout
@@ -57,9 +66,12 @@ export default class MediaChannelsController {
 	mediaChannelsStateBucket: Bucket
 	ownership: ChannelOwnership
 	ownershipTimer: NodeJS.Timeout | null = null
+	pruneTimer: NodeJS.Timeout | null = null
 	remoteChannelSub: any = null
 
 	instances: Map<string, MediaChannel> = new Map()
+	// serializes restore and creation of a channel on this node
+	instanceLocks: Map<string, Promise<void>> = new Map()
 	pendingDisconnectsTimeout: Map<string, PendingDisconnectEntry> = new Map()
 
 	dirtyInstances: Set<string> = new Set()
@@ -101,10 +113,7 @@ export default class MediaChannelsController {
 		this.ipc = new IPC(this.server.nats.connection)
 
 		// create flush timer
-		this.flushTimer = setInterval(
-			() => this.flushDirtyInstancesState(),
-			2000,
-		)
+		this.flushTimer = setInterval(() => this.flushDirtyInstancesState(), 2000)
 
 		// initialize media channels state bucket
 		this.mediaChannelsStateBucket = await this.kv.bucket(
@@ -123,16 +132,14 @@ export default class MediaChannelsController {
 		this.ownership.init(await this.kv.bucket("mediachannels-ownership"))
 
 		this.startOwnershipRenew()
+		this.startPruneTimer()
 		this.subscribeRemoteChannelCalls()
 
 		// register SFU discovery event handlers & init discovery
 		await this.sfuDiscovery.init()
 
 		// websocket connection tracking
-		this.server.eventBus.on(
-			"user:connected",
-			this.handleUserConnectedToSocket,
-		)
+		this.server.eventBus.on("user:connected", this.handleUserConnectedToSocket)
 		this.server.eventBus.on(
 			"user:disconnect",
 			this.handleUserDisconnectedToSocket,
@@ -140,31 +147,125 @@ export default class MediaChannelsController {
 	}
 
 	async getClientChannel(client: RTCClient): Promise<MediaChannelRef> {
-		let channelId =
-			(await this.users.get(client.userId)) || client.channel_id
+		const channelId = (await this.users.get(client.userId)) || client.channel_id
 
 		if (!channelId) {
-			throw new Error("No channel joined")
+			throw new OperationError(400, "No channel joined")
 		}
 
-		// the channel is served by another node, forward the operation there
-		const owner = await this.ownership.resolve(channelId)
+		// resolves the local instance or a proxy of the node that owns it,
+		// taking over the channel when its owner is gone
+		let channelInstance = await this.getInstance(channelId, {
+			bindClient: client,
+			attachClient: true,
+		})
 
-		if (owner && owner.node_id !== this.nodeId) {
-			return new RemoteMediaChannel(this, channelId, owner.node_id)
-		}
-
-		let channelInstance = await this.getInstance(channelId, client)
-
-		if (channelInstance && channelInstance.closed) {
-			channelInstance = null
-		}
-
+		// the session was lost and no state is left, start a new one instead
+		// of breaking every operation of a client that is still in the channel
 		if (!channelInstance) {
-			throw new Error("Media channel instance not found")
+			const groupId = await this.resolveChannelGroupId(channelId)
+
+			if (groupId) {
+				channelInstance = await this.getInstance(channelId, {
+					bindClient: client,
+					attachClient: true,
+					create: { groupId },
+				})
+			}
+		}
+
+		if (!channelInstance || channelInstance.closed) {
+			throw new OperationError(404, "Media channel instance not found")
 		}
 
 		return channelInstance
+	}
+
+	private async resolveChannelGroupId(
+		channelId: string,
+	): Promise<string | null> {
+		try {
+			const channel = await GroupChannelsModel.findOne(
+				{ _id: channelId },
+				{ raw: true },
+			)
+
+			return channel?.group_id ? String(channel.group_id) : null
+		} catch {
+			return null
+		}
+	}
+
+	/**
+	 * Runs a channel operation and recovers the media session when the sfu
+	 * lost the router behind it. The recovery runs on the channel owner, so
+	 * any node can trigger it without owning the session.
+	 */
+	async runChannelOperation<T>(
+		client: RTCClient,
+		operation: (channel: MediaChannelRef) => Promise<T>,
+	): Promise<T> {
+		const channel = await this.getClientChannel(client)
+
+		try {
+			return await operation(channel)
+		} catch (error) {
+			if (!isStaleMediaSessionError(error)) {
+				throw error
+			}
+
+			// only a missing router means the whole channel lost its session,
+			// a single missing transport only affects this client
+			if (!isStaleRouterError(error)) {
+				throw new OperationError(409, MEDIA_SESSION_RESET)
+			}
+
+			console.warn(
+				`[media-channels] stale media session on channel [${channel.channelId}], recovering`,
+			)
+
+			await this.rebuildChannel(channel.channelId)
+
+			const recovered = await this.getClientChannel(client)
+
+			try {
+				return await operation(recovered)
+			} catch (retryError) {
+				if (!isStaleMediaSessionError(retryError)) {
+					throw retryError
+				}
+
+				// the client still holds transports of the dead session
+				throw new OperationError(409, MEDIA_SESSION_RESET)
+			}
+		}
+	}
+
+	/** serializes restore and creation of a channel on this node */
+	async withInstanceLock<T>(
+		channelId: string,
+		fn: () => Promise<T>,
+	): Promise<T> {
+		const previous = this.instanceLocks.get(channelId) ?? Promise.resolve()
+
+		let release!: () => void
+		const gate = new Promise<void>((resolve) => {
+			release = resolve
+		})
+
+		const tail = previous.then(() => gate)
+		this.instanceLocks.set(channelId, tail)
+
+		try {
+			await previous.catch(() => null)
+			return await fn()
+		} finally {
+			release()
+
+			if (this.instanceLocks.get(channelId) === tail) {
+				this.instanceLocks.delete(channelId)
+			}
+		}
 	}
 
 	/** keeps the ownership claims alive while the channel exists */
@@ -178,6 +279,7 @@ export default class MediaChannelsController {
 
 			this.ownership
 				.renewAll(this.instances.keys())
+				.then((lost) => this.handleLostOwnership(lost))
 				.catch((error) =>
 					console.error(
 						"[media-channels] failed to renew channel ownership",
@@ -185,13 +287,47 @@ export default class MediaChannelsController {
 					),
 				)
 
-			// refresh the shared state so an idle channel does not expire
+			// refresh the shared state so an idle channel does not expire. this
+			// must not count as activity, an empty channel still has to be reaped
 			if (ticks % 6 === 0) {
 				for (const channelId of this.instances.keys()) {
-					this.markInstanceDirty(channelId)
+					this.dirtyInstances.add(channelId)
 				}
 			}
 		}, OWNERSHIP_RENEW_MS)
+	}
+
+	/** the channel moved to another node, this instance must stop serving it */
+	async handleLostOwnership(channelIds: string[]) {
+		for (const channelId of channelIds) {
+			const instance = this.instances.get(channelId)
+
+			if (!instance || instance.closed) continue
+
+			console.warn(
+				`[media-channels] lost ownership of channel [${channelId}], detaching`,
+			)
+
+			await instance
+				.detach()
+				.catch((error) =>
+					console.error(
+						`[media-channels] failed to detach channel [${channelId}]`,
+						error,
+					),
+				)
+		}
+	}
+
+	/** reaps idle instances and orphaned persisted sessions */
+	startPruneTimer() {
+		if (this.pruneTimer) return
+
+		this.pruneTimer = setInterval(() => {
+			this.pruneInstances().catch((error) =>
+				console.error("[media-channels] failed to prune channels", error),
+			)
+		}, 30_000)
 	}
 
 	/** listens for channel operations forwarded by other nodes */
@@ -207,10 +343,7 @@ export default class MediaChannelsController {
 				try {
 					await this.handleRemoteCall(msg)
 				} catch (error) {
-					console.error(
-						"[media-channels] failed to handle remote call",
-						error,
-					)
+					console.error("[media-channels] failed to handle remote call", error)
 				}
 			}
 		}
@@ -218,12 +351,36 @@ export default class MediaChannelsController {
 		loop()
 	}
 
-	/** claims a channel for this controller, returns the current owner */
-	claimChannel = async (channelId: string): Promise<ChannelOwner> => {
+	/** claims a channel for this controller, returns the current claim */
+	claimChannel = async (channelId: string): Promise<ChannelClaim> => {
 		return await this.ownership.claim(channelId)
 	}
 
+	/** rebuilds the media session on the node that owns the channel */
+	rebuildChannel = async (channelId: string): Promise<boolean> => {
+		const owner = await this.ownership.resolve(channelId)
+
+		if (owner && owner.node_id !== this.nodeId) {
+			return await this.requestToChannelOwner(owner.node_id, {
+				target: "controller",
+				method: "rebuildChannel",
+				args: [channelId],
+			})
+		}
+
+		return await this.rebuildInstance(channelId)
+	}
+
+	rebuildInstance = Bind(this, rebuildInstance)
+	pruneInstances = Bind(this, pruneInstances)
+
 	markInstanceDirty = (channelId: string) => {
+		const instance = this.instances.get(channelId)
+
+		if (instance) {
+			instance.lastActivityAt = Date.now()
+		}
+
 		this.dirtyInstances.add(channelId)
 	}
 
@@ -233,6 +390,7 @@ export default class MediaChannelsController {
 
 	flushDirtyInstancesState = Bind(this, flushDirtyInstancesState)
 	createChannelInstance = Bind(this, createChannelInstanceHandler)
+	attachChannelEvents = Bind(this, attachChannelEvents)
 
 	joinClient = Bind(this, joinClient)
 	leaveClient = Bind(this, leaveClient)
@@ -295,3 +453,5 @@ export default class MediaChannelsController {
 		}
 	}
 }
+
+export type { ChannelClaim, ChannelOwner }

@@ -31,7 +31,7 @@ import type {
 export interface SfuRoutesContract {
 	alive: { payload: undefined; result: SfuAliveResult }
 	createRouter: { payload: SfuCreateRouterPayload; result: SfuRouterDump }
-	getRouter: { payload: SfuGetRouterPayload; result: SfuRouterDump }
+	getRouter: { payload: SfuGetRouterPayload; result: SfuRouterDump | null }
 	listRouters: {
 		payload: SfuListRoutersPayload
 		result: SfuListRoutersResult

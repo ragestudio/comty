@@ -5,12 +5,8 @@ import type { RTC_ConsumePayload as ConsumePayloadReq } from "@comty/shared/type
 export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, payload: ConsumePayloadReq, ctx) => {
-		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
-
-		if (!channelInstance) {
-			throw new OperationError(404, "No channel available")
-		}
-
-		return await channelInstance.consume(client, payload)
+		return await ctx.mediaChannels.runChannelOperation(client, (channel) =>
+			channel.consume(client, payload),
+		)
 	},
 })

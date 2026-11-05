@@ -24,22 +24,10 @@ async function leaveClientHandler(
 
 		const clientProducers = this.producers.get(client.userId)
 
-		const otherClients = Array.from(this.clients).filter(
-			(c: RTCClient) => c.userId !== client.userId,
-		)
-
 		if (clientProducers instanceof Map) {
-			for (const [id, producerInst] of clientProducers) {
-				if (
-					producerInst &&
-					producerInst.producer &&
-					!producerInst.producer.closed
-				) {
-					producerInst.producer.close()
-					// Ensure cleanup is called
-					await producerInst.onProducerClose()
-					clientProducers.delete(id)
-				}
+			// handles live producers and restored serialized entries
+			for (const producerId of [...clientProducers.keys()]) {
+				await this.closeProducerEntry(client.userId, producerId)
 			}
 
 			this.producers.delete(client.userId)
@@ -49,10 +37,10 @@ async function leaveClientHandler(
 		const clientConsumers = this.consumers.get(client.userId)
 
 		if (Array.isArray(clientConsumers)) {
-			for (const consumer of clientConsumers) {
-				if (consumer && !consumer.closed) {
-					consumer.close()
-				}
+			for (const consumer of [...clientConsumers]) {
+				if (!consumer?.id) continue
+
+				await this.closeConsumerEntry(client.userId, consumer.id)
 			}
 
 			this.consumers.delete(client.userId)
@@ -70,6 +58,10 @@ async function leaveClientHandler(
 		}
 
 		// Notify other clients about client leaving
+		const otherClients = Array.from(this.clients).filter(
+			(c: RTCClient) => c.userId !== client.userId,
+		)
+
 		for (const otherClient of otherClients) {
 			await (otherClient as RTCClient).emit(`media:channel:client:left`, {
 				userId: client.userId,

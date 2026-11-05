@@ -28,7 +28,11 @@ export default async function (
 
 	const channel = await this.getInstance(channelId)
 
-	if (!channel) return
+	if (!channel) {
+		await this.users.remove(userId, channelId)
+
+		return
+	}
 
 	await this.users.remove(userId, channelId)
 	await channel.leaveClient({ userId } as RTCClient)

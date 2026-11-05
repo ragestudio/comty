@@ -6,7 +6,11 @@ import type { SerializedRTCClient } from "./serializeClient"
 import synthesizeClient from "linebridge/classes/Nats/synthesizeClient"
 
 // controller methods that do not take a client as first argument
-const CLIENTLESS_METHODS = new Set(["leaveUser", "disconnectUser"])
+const CLIENTLESS_METHODS = new Set([
+	"leaveUser",
+	"disconnectUser",
+	"rebuildChannel",
+])
 
 function respond(
 	msg: Msg,

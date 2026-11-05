@@ -2,6 +2,18 @@ import type MediaChannelsController from "."
 import type MediaChannel from "@classes/MediaChannel"
 import type { RTCClient } from "@services/rtc/types"
 
+// the owner answered that it no longer serves the channel
+function isChannelMovedError(error: any): boolean {
+	if (!error || Number(error.code) !== 409) return false
+
+	const message = String(error.message ?? "")
+
+	return (
+		message.includes("Channel moved to another node") ||
+		message.includes("Channel is not owned by this node")
+	)
+}
+
 /**
  * Proxy for a voice channel served by another node.
  *
@@ -43,13 +55,29 @@ export class RemoteMediaChannel {
 		args: any[] = [],
 		client?: RTCClient | Partial<RTCClient> | null,
 	): Promise<any> {
-		return await this.controller.requestToChannelOwner(this.nodeId, {
-			target: "channel",
-			channel_id: this.channelId,
-			method,
-			args,
-			client: this.controller.serializeClient(client),
-		})
+		const send = (nodeId: string) =>
+			this.controller.requestToChannelOwner(nodeId, {
+				target: "channel",
+				channel_id: this.channelId,
+				method,
+				args,
+				client: this.controller.serializeClient(client),
+			})
+
+		try {
+			return await send(this.nodeId)
+		} catch (error: any) {
+			if (!isChannelMovedError(error)) throw error
+
+			// the channel was taken over by another node, follow it once
+			const owner = await this.controller.ownership.resolve(this.channelId)
+
+			if (!owner || owner.node_id === this.nodeId) throw error
+
+			this.nodeId = owner.node_id
+
+			return await send(this.nodeId)
+		}
 	}
 
 	joinClient(client: RTCClient, options?: any) {

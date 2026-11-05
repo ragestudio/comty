@@ -20,7 +20,14 @@ export class RemoteRouterTransport extends EventEmitter {
 	iceCandidates: SfuTransportDump["iceCandidates"]
 	dtlsParameters: SfuTransportDump["dtlsParameters"]
 
-	constructor(node: SFUNode, data: SfuTransportDump) {
+	/**
+	 * A restored transport only needs its id, the media session lives on the
+	 * sfu node and every operation is routed by it.
+	 */
+	constructor(
+		node: SFUNode,
+		data: Pick<SfuTransportDump, "id"> & Partial<SfuTransportDump>,
+	) {
 		super()
 
 		this.node = node

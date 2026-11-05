@@ -28,10 +28,18 @@ import connectTransportHandler from "./handlers/connectTransport"
 import createTransportHandler from "./handlers/createTransport"
 
 import closeHandler from "./handlers/close"
+import detachHandler from "./handlers/detach"
 import handleClientEventHandler from "./handlers/clientEvent"
 
 import defaults from "./defaults"
 import rebindClient from "./rebind"
+
+// owner that wrote the state, used as fencing token when restoring it
+export type SerializedMediaChannelOwnership = {
+	controller_id: string
+	node_id: string
+	epoch: number
+}
 
 export type SerializedMediaChannel = {
 	controller_id: string | null
@@ -45,6 +53,9 @@ export type SerializedMediaChannel = {
 	consumers: Record<string, any[]>
 	started_at: string
 	mediaCodecs: any[]
+	ownership?: SerializedMediaChannelOwnership
+	// last time the owner refreshed the state, used to detect orphans
+	flushed_at?: number
 }
 
 export interface SerializedConsumer extends Partial<Consumer> {
@@ -65,6 +76,10 @@ export class MediaChannel {
 	started_at: Date
 
 	closed: boolean = false
+	// ownership epoch this instance was created or restored with
+	ownershipEpoch: number = 0
+	// last time the instance received activity, used to reap idle channels
+	lastActivityAt: number = Date.now()
 	events: EventEmitter = new EventEmitter()
 
 	clients: Set<RTCClient> = new Set()
@@ -121,10 +136,7 @@ export class MediaChannel {
 				this.controller.markInstanceDirty(this.channelId)
 			}
 		} catch (error) {
-			console.error(
-				`[CHANNEL:${this.channelId}] Error initializing `,
-				error,
-			)
+			console.error(`[CHANNEL:${this.channelId}] Error initializing `, error)
 			throw error
 		}
 	}
@@ -142,15 +154,15 @@ export class MediaChannel {
 	stopConsume = Bind(this, stopConsumeHandler)
 	consumerControl = Bind(this, consumerControlHandler)
 	close = Bind(this, closeHandler)
+	// local teardown that keeps the shared state and the sfu router untouched
+	detach = Bind(this, detachHandler)
 
 	static deserializeMaps(state: SerializedMediaChannel) {
 		const producersMap = new Map<string, Map<string, any>>()
 		const consumersMap = new Map<string, any[]>()
 
 		if (state.producers) {
-			for (const [userId, userProducers] of Object.entries(
-				state.producers,
-			)) {
+			for (const [userId, userProducers] of Object.entries(state.producers)) {
 				const innerMap = new Map<string, any>()
 				for (const [producerId, producerData] of Object.entries(
 					userProducers,
@@ -162,9 +174,7 @@ export class MediaChannel {
 		}
 
 		if (state.consumers) {
-			for (const [consumerId, consumers] of Object.entries(
-				state.consumers,
-			)) {
+			for (const [consumerId, consumers] of Object.entries(state.consumers)) {
 				consumersMap.set(consumerId, consumers)
 			}
 		}
@@ -236,9 +246,163 @@ export class MediaChannel {
 		return Array.from(this.clients).map((c) => c.userId)
 	}
 
-	getConnectedClientsSerialized(): SerializedClient[] {
+	/**
+	 * Closes a producer of the channel. Live entries wrap a mediasoup producer,
+	 * restored ones are plain data and the media only lives on the sfu node.
+	 */
+	async closeProducerEntry(
+		userId: string,
+		producerId: string,
+	): Promise<boolean> {
+		const userProducers = this.producers.get(userId)
+
+		if (!userProducers) return false
+
+		const entry: any = userProducers.get(producerId)
+
+		if (!entry) return false
+
+		if (entry.producer && typeof entry.producer.close === "function") {
+			if (!entry.producer.closed) {
+				await entry.producer.close()
+			}
+
+			if (typeof entry.onProducerClose === "function") {
+				await entry.onProducerClose()
+			}
+		} else {
+			// restored producer, release the media on the sfu and notify the group
+			await this.closeRemoteProducer(producerId)
+
+			userProducers.delete(producerId)
+
+			this.events.emit("producer:close", this.producerView(userId, entry))
+		}
+
+		if (userProducers.size === 0) {
+			this.producers.delete(userId)
+		}
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
+		}
+
+		return true
+	}
+
+	/**
+	 * Closes a consumer of the channel. Restored consumers are plain data, the
+	 * sfu node drops them with the transport or the router.
+	 */
+	async closeConsumerEntry(
+		userId: string,
+		consumerId: string,
+	): Promise<boolean> {
+		const userConsumers = this.consumers.get(userId)
+
+		if (!Array.isArray(userConsumers)) return false
+
+		const index = userConsumers.findIndex(
+			(consumer: any) => consumer?.id === consumerId,
+		)
+
+		if (index === -1) return false
+
+		const consumer: any = userConsumers[index]
+
+		if (consumer && typeof consumer.close === "function" && !consumer.closed) {
+			consumer.close()
+		}
+
+		userConsumers.splice(index, 1)
+
+		if (userConsumers.length === 0) {
+			this.consumers.delete(userId)
+		}
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
+		}
+
+		return true
+	}
+
+	/** asks the sfu node to close a producer that is not in memory anymore */
+	async closeRemoteProducer(producerId: string) {
+		try {
+			await this.sfu_node.request("closeProducer", {
+				producer_id: producerId,
+			})
+		} catch (error) {
+			// the sfu may have closed it already
+		}
+	}
+
+	/** producer shaped object for a restored (plain serialized) entry */
+	private producerView(userId: string, entry: any) {
+		const client: any = setFind(
+			this.clients,
+			(c: RTCClient) => c.userId === userId,
+		) ?? {
+			userId,
+			context: { user: { _id: userId } },
+		}
+
+		return {
+			client,
+			channelId: this.channelId,
+			serialize: () => ({
+				id: entry.id ?? entry.producerId,
+				producerId: entry.producerId ?? entry.id,
+				channelId: this.channelId,
+				groupId: entry.groupId ?? this.data?.group_id,
+				userId: userId,
+				kind: entry.kind ?? null,
+				appData: entry.appData ?? null,
+			}),
+		}
+	}
+
+	/**
+	 * Replaces a restored placeholder with the live client of the same user.
+	 * Returns false when there is nothing to bind.
+	 */
+	bindClient(client: RTCClient): boolean {
+		// only a local client with a real socket can replace a restored entry,
+		// synthesized proxies are rebuilt on every remote call
+		if (!(client as any).socket) return false
+
+		const current = setFind(
+			this.clients,
+			(c: RTCClient) => c.userId === client.userId,
+		)
+
+		if (!current || !current.staled) return false
+
+		client.channel_id = this.channelId
+		client.voiceState = current.voiceState ?? client.voiceState
+
+		// the transports of a restored client still exist on the sfu node,
+		// keep their proxies so the media session keeps working
+		if (!client.transports) {
+			client.transports = current.transports ?? new Map()
+		}
+
+		this.clients.delete(current)
+		this.clients.add(client)
+
+		return true
+	}
+
+	getConnectedClientsSerialized(
+		includeTransports: boolean = false,
+	): SerializedClient[] {
 		return Array.from(this.clients).map((c) => {
-			return {
+			const serialized: SerializedClient & {
+				_id: string
+				user_id: string
+				voice_state: any
+			} = {
 				_id: c.userId,
 				userId: c.userId,
 				user_id: c.userId,
@@ -247,6 +411,12 @@ export class MediaChannel {
 				voice_state: c.voiceState,
 				user: getClientUser(c) ?? { _id: c.userId },
 			}
+
+			if (includeTransports && c.transports) {
+				serialized.transports = Array.from(c.transports.keys())
+			}
+
+			return serialized
 		})
 	}
 
@@ -319,9 +489,18 @@ export class MediaChannel {
 			started_at: this.started_at.toISOString(),
 			data: this.data,
 			mediaCodecs: this.mediaCodecs,
-			clients: this.getConnectedClientsSerialized(),
+			// transports are needed to keep producing after a restore
+			clients: this.getConnectedClientsSerialized(true),
 			producers,
 			consumers,
+			ownership: this.controller
+				? {
+						controller_id: this.controller.controller_id,
+						node_id: this.controller.nodeId,
+						epoch: this.ownershipEpoch,
+					}
+				: undefined,
+			flushed_at: Date.now(),
 		}
 	}
 
@@ -348,7 +527,9 @@ export class MediaChannel {
 			)
 
 			for (const otherClient of otherClients) {
-				if (otherClient.staled || !otherClient.emit) {
+				// restored clients emit through the cluster, the socket
+				// reference is not required
+				if (!otherClient.emit) {
 					continue
 				}
 
@@ -370,7 +551,7 @@ export class MediaChannel {
 	async broadcastToClients(event: string, payload: any) {
 		try {
 			for (const client of this.clients) {
-				if (client.staled || !client.emit) {
+				if (!client.emit) {
 					continue
 				}
 

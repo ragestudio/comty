@@ -17,29 +17,8 @@ async function stopConsumeHandler(
 			throw new Error("Missing consumer_id")
 		}
 
-		const userConsumers = this.consumers.get(client.userId)
-
-		if (!userConsumers) {
-			return
-		}
-
-		const consumerIndex = userConsumers.findIndex(
-			(c) => c.id === consumer_id,
-		)
-
-		if (consumerIndex !== -1) {
-			const consumer = userConsumers[consumerIndex]
-			
-			// Close the remote consumer (which triggers IPC close to SFU node)
-			consumer.close()
-
-			// Remove from channel consumers array
-			userConsumers.splice(consumerIndex, 1)
-
-			if (this.controller) {
-				this.controller.markInstanceDirty(this.channelId)
-			}
-		}
+		// handles both live consumers and restored serialized entries
+		await this.closeConsumerEntry(client.userId, consumer_id)
 	} catch (error) {
 		console.error(
 			`[CHANNEL:${this.channelId}] Error stopping consumer for ${client.userId}:`,

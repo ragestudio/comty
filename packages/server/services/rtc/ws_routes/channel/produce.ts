@@ -5,18 +5,8 @@ import type { RTC_ProducePayload as ProducePayloadReq } from "@comty/shared/type
 export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, payload: ProducePayloadReq, ctx) => {
-		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
-
-		// if (payload.isDm === true) {
-		// 	channelInstance = ctx.userCalls.getClientChannel(client)
-		// } else {
-		// 	channelInstance = await ctx.mediaChannels.getClientChannel(client)
-		// }
-
-		if (!channelInstance) {
-			throw new OperationError(404, "No channel available")
-		}
-
-		return await channelInstance.produce(client, payload)
+		return await ctx.mediaChannels.runChannelOperation(client, (channel) =>
+			channel.produce(client, payload),
+		)
 	},
 })
