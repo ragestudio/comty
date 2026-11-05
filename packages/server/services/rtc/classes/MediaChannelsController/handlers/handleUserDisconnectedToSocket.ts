@@ -42,6 +42,15 @@ export default async function (
 			)
 		}
 
+		// only the watchers of this user receive the presence event
+		await globalThis.websockets.senders.toTopic(
+			`presence:user:${userId}`,
+			"user:offline",
+			{
+				userId: userId,
+			},
+		)
+
 		// check if this userId is connected to any channel
 		const channelId = await this.users.get(userId)
 

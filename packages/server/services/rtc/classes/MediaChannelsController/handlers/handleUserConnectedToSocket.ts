@@ -33,4 +33,13 @@ export default async function (
 			},
 		)
 	}
+
+	// only the watchers of this user receive the presence event
+	await globalThis.websockets.senders.toTopic(
+		`presence:user:${userId}`,
+		"user:online",
+		{
+			userId: userId,
+		},
+	)
 }
