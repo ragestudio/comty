@@ -6,6 +6,7 @@ import LatencyIndicator from "@components/PerformanceIndicators/latency"
 import SponsorsList from "@components/SponsorsList"
 
 import client from "comty.js/core/client"
+import { version as spacessdkVersion } from "@comty/spaces-sdk"
 
 import config from "@config"
 
@@ -30,7 +31,6 @@ export default {
 		const [serverManifest, setServerManifest] = React.useState(null)
 		const [serverOrigin, setServerOrigin] = React.useState(null)
 		const [secureConnection, setSecureConnection] = React.useState(false)
-		const [capInfo, setCapInfo] = React.useState(null)
 
 		const checkServerVersion = async () => {
 			const serverManifest = await client.instance("/")
@@ -212,6 +212,34 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
+								<Icons.Package />
+							</div>
+
+							<p>Spaces SDK</p>
+						</div>
+
+						<div className="field_value">
+							{spacessdkVersion ?? "Unknown"}
+						</div>
+					</div>
+
+					<div className="inline_field">
+						<div className="field_header">
+							<div className="field_icon">
+								<Icons.Package />
+							</div>
+
+							<p>Comty.js</p>
+						</div>
+
+						<div className="field_value">
+							{client.version ?? "Unknown"}
+						</div>
+					</div>
+
+					<div className="inline_field">
+						<div className="field_header">
+							<div className="field_icon">
 								<Icons.React />
 							</div>
 
@@ -236,62 +264,6 @@ export default {
 							{antd.version ?? "Unknown"}
 						</div>
 					</div>
-
-					<div className="inline_field">
-						<div className="field_header">
-							<div className="field_icon">
-								<Icons.Package />
-							</div>
-
-							<p>Comty.js</p>
-						</div>
-
-						<div className="field_value">
-							{client.version ?? "Unknown"}
-						</div>
-					</div>
-
-					{capInfo && (
-						<div className="inline_field">
-							<div className="field_header">
-								<div className="field_icon">
-									<Icons.Info />
-								</div>
-
-								<p>App ID</p>
-							</div>
-
-							<div className="field_value">{capInfo.id}</div>
-						</div>
-					)}
-
-					{capInfo && (
-						<div className="inline_field">
-							<div className="field_header">
-								<div className="field_icon">
-									<Icons.Info />
-								</div>
-
-								<p>App Build</p>
-							</div>
-
-							<div className="field_value">{capInfo.build}</div>
-						</div>
-					)}
-
-					{capInfo && (
-						<div className="inline_field">
-							<div className="field_header">
-								<div className="field_icon">
-									<Icons.Info />
-								</div>
-
-								<p>App Version</p>
-							</div>
-
-							<div className="field_value">{capInfo.version}</div>
-						</div>
-					)}
 
 					<div className="inline_field">
 						<div className="field_header">
