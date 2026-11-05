@@ -39,13 +39,13 @@ const Account = ({ params }) => {
 			return null
 		}
 
-		const result = await FollowsModel.toggleFollow({
-			user_id: user._id,
-		}).catch((error) => {
-			console.error(error)
-			app.message.error(error.message)
-			return false
-		})
+		const result = await FollowsModel.toggleFollow(user._id).catch(
+			(error) => {
+				console.error(error)
+				app.message.error(error.message)
+				return false
+			},
+		)
 
 		if (!result) {
 			return null
