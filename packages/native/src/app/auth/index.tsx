@@ -35,27 +35,33 @@ const AuthView = () => {
 		setLoading(true)
 
 		try {
-			await authManager.login({
+			const response = await authManager.login({
 				username: data.username,
 				password: data.password,
 				mfa_code: code,
 			})
+
+			if (response.mfa_required) {
+				sheet.open(
+					"login_code",
+					<LoginCode
+						onDone={(code: string) => {
+							sheet.close("login_code")
+							onSubmit(data, event, code)
+						}}
+					/>,
+				)
+			}
+
+			if (response.activation_required) {
+				throw new Error("This accounts needs to be activated.")
+			}
 		} catch (errOrAction: any) {
 			if (!errOrAction.action_required) {
 				console.error(errOrAction, errOrAction.response?.data)
 				setError(errOrAction.response?.data?.error ?? errOrAction)
 				return
 			}
-
-			sheet.open(
-				"login_code",
-				<LoginCode
-					onDone={(code: string) => {
-						sheet.close("login_code")
-						onSubmit(data, event, code)
-					}}
-				/>,
-			)
 		} finally {
 			setLoading(false)
 		}
