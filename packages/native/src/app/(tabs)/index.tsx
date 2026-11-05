@@ -90,8 +90,6 @@ const LeftBar = () => {
 }
 
 export default function HomeScreen() {
-	const groupsList = useGroupsList()
-
 	return (
 		<XStack
 			flex={1}
