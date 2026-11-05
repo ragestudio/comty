@@ -209,7 +209,9 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 
 		// try the persistent cache before hitting the network
 		if (!options.force) {
-			const notLoaded = ids.filter((id) => !this.state.users[id]?.username)
+			const notLoaded = ids.filter(
+				(id) => !this.state.users[id]?.username,
+			)
 
 			if (notLoaded.length > 0) {
 				await this.loadCached(notLoaded)
@@ -299,9 +301,18 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 		await this.presenceQueue.push(ids)
 	}
 
+	setConnection(userId: string, connected: boolean): void {
+		if (!userId) return
+
+		this.setState((state) => ({
+			connections: { ...state.connections, [userId]: connected },
+		}))
+	}
+
 	clearPresence(input?: UserIdInput): void {
 		const ids = normalizeIds(input)
-		const targets = ids.length > 0 ? ids : Object.keys(this.state.connections)
+		const targets =
+			ids.length > 0 ? ids : Object.keys(this.state.connections)
 
 		if (targets.length === 0) return
 
@@ -329,7 +340,10 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 
 	private async loadCached(ids: string[]): Promise<void> {
 		try {
-			const cached = (await db.users.bulkGet(ids)) as (SpacesUser | undefined)[]
+			const cached = (await db.users.bulkGet(ids)) as (
+				| SpacesUser
+				| undefined
+			)[]
 
 			this.hydrateFromCache(
 				cached.filter((user): user is SpacesUser => Boolean(user)),

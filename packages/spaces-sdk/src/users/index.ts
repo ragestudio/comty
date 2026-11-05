@@ -99,7 +99,9 @@ export function useUser(
 ): SpacesUser | undefined {
 	const enabled = options.enabled !== false
 
-	const user = UsersStore((state) => (userId ? state.users[userId] : undefined))
+	const user = UsersStore((state) =>
+		userId ? state.users[userId] : undefined,
+	)
 
 	React.useEffect(() => {
 		if (userId && enabled) void usersActions.ensure(userId)
