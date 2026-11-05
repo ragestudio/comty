@@ -14,6 +14,8 @@ const AvatarUploadButton = (props) => (
 		{...props}
 		accept="image/*"
 		beforeUpload={(file) => {
+			props.onSelect?.()
+
 			if (!file.type?.startsWith("image/")) {
 				app.message.error("Please select a valid image file for your avatar.")
 				return false
@@ -62,7 +64,10 @@ const AvatarEditor = (props) => {
 				<div
 					className="profile-avatar-preview"
 				>
-					<img src={props.ctx.currentValue} />
+					<img
+						src={props.ctx.currentValue}
+						alt="Current profile avatar"
+					/>
 					{customAvatar && (
 						<Button
 							aria-label="Remove avatar"
@@ -78,11 +83,12 @@ const AvatarEditor = (props) => {
 			)}
 
 			<div className="profile-avatar-actions">
-				<div onClick={() => setMode("upload")}>
-					<AvatarUploadButton ctx={uploadContext}>
+				<AvatarUploadButton
+					ctx={uploadContext}
+					onSelect={() => setMode("upload")}
+				>
 						Upload image
-					</AvatarUploadButton>
-				</div>
+				</AvatarUploadButton>
 				<Button
 					type="default"
 					onClick={() => setMode("url")}

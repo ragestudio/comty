@@ -1,4 +1,4 @@
-export default (user) => {
+export default function applyUserUpdate(user) {
 	if (!user?._id) return
 
 	if (app.userData?._id === user._id) {
