@@ -4,8 +4,6 @@ import { Icons } from "@components/Icons"
 
 import ProfileEditor from "./editor"
 
-import "./index.less"
-
 export default {
 	id: "profile",
 	icon: "User",
