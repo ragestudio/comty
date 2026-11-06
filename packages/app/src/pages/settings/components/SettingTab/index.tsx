@@ -96,16 +96,21 @@ const SettingTab: React.FC<SettingTabProps> = ({
 							key={index}
 							className="settings_content_group bg-accent"
 						>
-							<div className="settings_content_group_header">
-								<h1>
-									{fromDecoratorIcon
-										? React.createElement((Icons as any)[fromDecoratorIcon])
-										: null}
-									<Translation>
-										{(t) => t(fromDecoratorTitle ?? groupKey)}
-									</Translation>
-								</h1>
-							</div>
+							{fromDecoratorTitle !== null && fromDecoratorIcon && (
+								<div className="settings_content_group_header">
+									<h1>
+										{fromDecoratorIcon
+											? React.createElement((Icons as any)[fromDecoratorIcon])
+											: null}
+
+										{fromDecoratorTitle !== null && (
+											<Translation>
+												{(t) => t(fromDecoratorTitle ?? groupKey)}
+											</Translation>
+										)}
+									</h1>
+								</div>
+							)}
 
 							<div className="settings_list">
 								{(settings as Setting[]).map((setting, idx) => (
