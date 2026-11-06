@@ -9,7 +9,7 @@
 		"fontFamily": "'Noto Sans', sans-serif",
 		"layoutMargin": "unset",
 		"layoutPadding": "10px 10px 10px 10px",
-		"borderRadius": "8px",
+		"borderRadius": "12px",
 		"text-color-white": "#d8d8d8",
 		"text-color-black": "#000000",
 		"page-transition-duration": "150ms",

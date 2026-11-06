@@ -24,6 +24,7 @@ const Sidebar = () => {
 	)
 	const [selectedMenuItem, setSelectedMenuItem] = React.useState(null)
 	const [dropdownOpen, setDropdownOpen] = React.useState(false)
+	const [nextShouldCollapse, setNextShouldCollapse] = React.useState(false)
 
 	const collapseDebounceRef = React.useRef(null)
 
@@ -136,9 +137,9 @@ const Sidebar = () => {
 			to = to ?? !expanded
 
 			setExpanded(to)
+			setNextShouldCollapse(false)
 
 			app.layout.toggleRootContainerClassname("sidebar-expanded", to)
-
 			app.eventBus.emit("sidebar.expanded", to)
 		},
 		[expanded, dropdownOpen],
@@ -186,7 +187,13 @@ const Sidebar = () => {
 			}
 
 			if (typeof ItemsClickHandlers[e.key] === "function") {
-				return ItemsClickHandlers[e.key](e)
+				return ItemsClickHandlers[e.key](e, {
+					toggleExpanded,
+					toggleVisibility,
+					addMenuItem,
+					removeMenuItem,
+					setDropdownOpen,
+				})
 			}
 
 			app.cores.sfx.play("sidebar.switch_tab")
@@ -202,6 +209,7 @@ const Sidebar = () => {
 
 	const handleMouseEnter = React.useCallback(() => {
 		if (!visible || app.layout.drawer.isMaskVisible() || dropdownOpen) {
+			setNextShouldCollapse(false)
 			return false
 		}
 
@@ -215,6 +223,7 @@ const Sidebar = () => {
 
 	const handleMouseLeave = React.useCallback(() => {
 		if (!visible || dropdownOpen) {
+			setNextShouldCollapse(true)
 			return false
 		}
 
@@ -230,24 +239,11 @@ const Sidebar = () => {
 		)
 	}, [visible, dropdownOpen, toggleExpanded])
 
-	const onDropdownOpenChange = React.useCallback(
-		(to) => {
-			if (!to && expanded) {
-				toggleExpanded(false)
-			}
-
-			setDropdownOpen(to)
-		},
-		[expanded, toggleExpanded],
-	)
-
-	const onClickDropdownItem = React.useCallback((item) => {
-		const handler = ItemsClickHandlers[item.key]
-
-		if (typeof handler === "function") {
-			handler()
+	React.useEffect(() => {
+		if (dropdownOpen === false && nextShouldCollapse === true) {
+			toggleExpanded(false)
 		}
-	}, [])
+	}, [dropdownOpen, nextShouldCollapse])
 
 	// Initialize
 	React.useEffect(() => {
@@ -290,8 +286,6 @@ const Sidebar = () => {
 					onMouseEnter={handleMouseEnter}
 					onMouseLeave={handleMouseLeave}
 					onHandleClick={handleClick}
-					onDropdownOpenChange={onDropdownOpenChange}
-					onClickDropdownItem={onClickDropdownItem}
 				/>
 			)}
 		</AnimatePresence>

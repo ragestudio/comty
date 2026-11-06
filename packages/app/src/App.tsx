@@ -15,6 +15,7 @@ import { startWebPersistence } from "@comty/spaces-sdk/db/persister-web"
 import { initializeRtcAdapter } from "@comty/spaces-sdk/rtc/web"
 
 import AppCrash from "@components/AppCrash"
+import { PopoverHost } from "@ui/Popover"
 import Layout from "./layout"
 import StaticMethods from "./statics/methods"
 import StaticEvents from "./statics/events"
@@ -128,6 +129,7 @@ class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 			<ThemeProvider>
 				<AppCrash>
 					<NotificationsRenderer ref={this.notificationsRef} />
+					<PopoverHost />
 					<Router.Router
 						declarations={routesDeclarations}
 						staticRenders={ComtyApp.staticRenders}

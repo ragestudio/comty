@@ -1,4 +1,4 @@
-@import "@styles/vars.less";
+@import "@/styles/vars.less";
 @import "../../../components/Spaces/GroupListItem/mixins.less";
 
 .app_sidebar_wrapper {
@@ -72,12 +72,14 @@
 					width: 100%;
 				}
 
-				.ant-menu-item:not(.user_avatar) {
+				.ant-menu-item {
 					.ant-menu-title-content {
 						opacity: 1;
 						width: 100%;
 					}
 				}
+
+				padding: 0 !important;
 			}
 		}
 	}
@@ -185,7 +187,8 @@
 
 				width: 100%;
 
-				padding: 0 0 0 calc(@sidebar_width / 2);
+				padding: 0 10px 0
+					calc((@sidebar_width - @sidebar_padding - 2px - 24px) / 2);
 				margin: 5px 0;
 
 				transition: all 150ms ease-in-out;
@@ -193,37 +196,26 @@
 				.ant-menu-item-icon {
 					font-size: 1rem;
 
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					width: 24px;
+					flex: 0 0 24px;
 					margin: 0 !important;
+				}
+
+				.notifications_icon {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					width: 24px;
 				}
 
 				.ant-menu-title-content {
 					text-overflow: clip;
 					opacity: 0;
 					width: 0;
-				}
-
-				&.user_avatar {
-					.ant-menu-title-content {
-						width: 100%;
-
-						display: inline-flex;
-
-						align-items: flex-start;
-						justify-content: center;
-
-						opacity: 1;
-
-						.ant-dropdown-trigger {
-							width: 100%;
-
-							img {
-								width: fit-content;
-								border-radius: 10px;
-							}
-						}
-					}
-
-					padding: 0 !important;
+					margin-inline-start: 10px;
 				}
 			}
 
@@ -231,6 +223,23 @@
 				background-color: var(--background-color-primary) !important;
 			}
 		}
+	}
+}
+
+.sidebar-profile-button {
+	&__avatar {
+		min-height: @sidebar_avatar_size!important;
+		min-width: @sidebar_avatar_size!important;
+
+		max-width: @sidebar_avatar_size!important;
+		max-height: @sidebar_avatar_size!important;
+
+		border-radius: @sidebar_border_radius;
+	}
+
+	&__label {
+		font-weight: 600;
+		font-family: "Space Grotesk", sans-serif;
 	}
 }
 

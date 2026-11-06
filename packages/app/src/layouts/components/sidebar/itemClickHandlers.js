@@ -1,18 +1,25 @@
+import React from "react"
+
 import { openModal as openSettingsModal } from "@/pages/settings"
+import Popover from "@/ui/Popover"
+
+import { ActionMenu } from "./actionMenu"
 
 export default {
+	account: (e, control) => {
+		control.setDropdownOpen(true)
+
+		const closeHook = Popover.open(e.domEvent, {
+			onClose: () => control.setDropdownOpen(false),
+			content: (props) =>
+				React.createElement(ActionMenu, { ...props, closeHook }),
+		})
+	},
 	apps: () => {
 		app.controls.openAppsMenu()
 	},
-	addons: () => {
-		window.app.location.push("/addons")
-	},
-	studio: () => {
-		window.app.location.push("/studio")
-	},
 	settings: () => {
 		openSettingsModal()
-		//window.app.navigation.goToSettings()
 	},
 	notifications: () => {
 		window.app.controls.openNotifications()
@@ -22,14 +29,5 @@ export default {
 	},
 	create: () => {
 		window.app.controls.openCreator()
-	},
-	profile: () => {
-		window.app.navigation.goToAccount()
-	},
-	login: () => {
-		window.app.navigation.goAuth()
-	},
-	logout: () => {
-		app.auth.logout()
 	},
 }

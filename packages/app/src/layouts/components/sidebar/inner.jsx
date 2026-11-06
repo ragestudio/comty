@@ -1,9 +1,9 @@
 import React from "react"
 import config from "@config"
+import { Menu } from "antd"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { motion, usePresence } from "motion/react"
-import { Menu, Avatar, Dropdown } from "antd"
 import { useLocation } from "react-router"
 
 import { Icons } from "@components/Icons"
@@ -12,73 +12,11 @@ import NotificationsButton from "@components/NotificationsButton"
 
 import GroupsList from "@/components/Spaces/GroupList"
 import { useSpacesNavigation } from "@/stores/spaces/navigation"
-
-import "./index.less"
 import { GroupListActionItem } from "@components/Spaces/GroupListItem"
 
-/** @type {any[]} */
-const ActionMenuItems = [
-	{
-		key: "profile",
-		label: (
-			<>
-				<Icons.User />
-				<Translation>{(t) => t("Profile")}</Translation>
-			</>
-		),
-	},
-	{
-		key: "studio",
-		label: (
-			<>
-				<Icons.CircleFadingPlusIcon />
-				<Translation>{(t) => t("Studio")}</Translation>
-			</>
-		),
-	},
-	{
-		key: "addons",
-		label: (
-			<>
-				<Icons.Box />
-				<Translation>{(t) => t("Addons")}</Translation>
-			</>
-		),
-	},
-	{
-		key: "settings",
-		label: (
-			<>
-				<Icons.Settings />
-				<Translation>{(t) => t("Settings")}</Translation>
-			</>
-		),
-	},
-	{
-		type: "divider",
-	},
-	{
-		key: "switch_account",
-		label: (
-			<>
-				<Icons.SquareArrowRightEnter />
-				<Translation>{(t) => t("Switch account")}</Translation>
-			</>
-		),
-	},
-	{
-		key: "logout",
-		label: (
-			<>
-				<Icons.LogOut />
-				<Translation>{(t) => t("Logout")}</Translation>
-			</>
-		),
-		danger: true,
-	},
-]
+import "./index.less"
 
-export function authorizedItems({ onClickDropdownItem, onDropdownOpenChange }) {
+export function authorizedItems() {
 	let items = []
 
 	if (app.userData) {
@@ -91,24 +29,18 @@ export function authorizedItems({ onClickDropdownItem, onDropdownOpenChange }) {
 
 		items.push({
 			key: "account",
-			ignore_click: "true",
-			className: "user_avatar",
+			className: "sidebar-profile-button",
+			icon: (
+				<img
+					className="sidebar-profile-button__avatar"
+					src={app.userData?.avatar}
+					alt={`${app.userData?.avatar} avatar`}
+				/>
+			),
 			label: (
-				<Dropdown
-					menu={{
-						items: ActionMenuItems,
-						onClick: onClickDropdownItem,
-					}}
-					autoFocus
-					placement="top"
-					trigger={["click"]}
-					onOpenChange={onDropdownOpenChange}
-				>
-					<Avatar
-						shape="square"
-						src={app.userData?.avatar}
-					/>
-				</Dropdown>
+				<span className="sidebar-profile-button__label">
+					@{app.userData.username}
+				</span>
 			),
 		})
 	} else {
@@ -130,8 +62,6 @@ const SidebarInner = ({
 	onMouseEnter,
 	onMouseLeave,
 	onHandleClick,
-	onDropdownOpenChange,
-	onClickDropdownItem,
 }) => {
 	const location = useLocation()
 	const spacesNav = useSpacesNavigation()
@@ -286,7 +216,11 @@ const SidebarInner = ({
 
 							<GroupsList
 								compact={!expanded}
-								selected={spacesNav.type === "group" ? spacesNav.room : null}
+								selected={
+									spacesNav.type === "group"
+										? spacesNav.room
+										: null
+								}
 								onClickItem={handleOnClickGroupListItem}
 								onClickCreateNew={handleOnClickCreateNewGroup}
 								sortable
@@ -310,13 +244,7 @@ const SidebarInner = ({
 					<Menu
 						mode="inline"
 						onClick={onHandleClick}
-						items={[
-							...bottomItems,
-							...authorizedItems({
-								onClickDropdownItem,
-								onDropdownOpenChange,
-							}),
-						]}
+						items={[...bottomItems, ...authorizedItems()]}
 						selectedKeys={[selectedKeyId]}
 					/>
 				</div>
