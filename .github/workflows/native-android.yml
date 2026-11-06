@@ -57,6 +57,19 @@ jobs:
           fi
           echo '//git.ragestudio.net/:_authToken=${GITEA_NPM_TOKEN}' >> "${HOME}/.npmrc"
 
+      # fail early with the real edge response instead of pnpm's generic 403
+      - name: Check Gitea tarball access
+        run: |
+          url=$(node -p "require('./packages/native/package.json').dependencies['@ragestudio/react-native-webrtc']")
+          status=$(curl -sS -D "${RUNNER_TEMP}/gitea-headers" -o "${RUNNER_TEMP}/gitea-body" -w '%{http_code}' -r 0-99 -H "Authorization: Bearer ${GITEA_NPM_TOKEN}" "${url}" || true)
+          magic=$(head -c 2 "${RUNNER_TEMP}/gitea-body" | od -An -tx1 | tr -d ' \n')
+          echo "Gitea tarball status: ${status} (magic: ${magic})"
+          if [ "${magic}" != "1f8b" ]; then
+            cat "${RUNNER_TEMP}/gitea-headers"
+            head -c 800 "${RUNNER_TEMP}/gitea-body"
+            exit 1
+          fi
+
       - name: Install dependencies
         run: pnpm install --filter "@comty/native-app..." --filter "@linebridge/client"
 
