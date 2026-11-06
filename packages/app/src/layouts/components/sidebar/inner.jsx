@@ -34,6 +34,7 @@ export function authorizedItems() {
 				<img
 					className="sidebar-profile-button__avatar"
 					src={app.userData?.avatar}
+					alt={`${app.userData?.avatar} avatar`}
 				/>
 			),
 			label: (
