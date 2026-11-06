@@ -1,4 +1,4 @@
-@import "@styles/vars.less";
+@import "@/styles/vars.less";
 @import "../../../components/Spaces/GroupListItem/mixins.less";
 
 .app_sidebar_wrapper {
@@ -72,14 +72,14 @@
 					width: 100%;
 				}
 
-				.ant-menu-item:not(.user_avatar) {
+				.ant-menu-item {
 					.ant-menu-title-content {
 						opacity: 1;
 						width: 100%;
 					}
 				}
 
-					padding: 0 !important;
+				padding: 0 !important;
 			}
 		}
 	}
@@ -177,12 +177,6 @@
 				width: 0;
 			}
 
-			.ant-menu-item:not(.user_avatar) {
-				padding-left: calc(
-					(@sidebar_width - @sidebar_padding - 2px - 24px) / 2
-				) !important;
-			}
-
 			.ant-menu-item {
 				position: relative;
 
@@ -223,50 +217,6 @@
 					width: 0;
 					margin-inline-start: 10px;
 				}
-
-				&.user_avatar {
-					.sidebar-profile-label {
-						display: grid;
-						grid-template-columns: calc(@sidebar_width - @sidebar_padding - 2px)
-							minmax(0, 1fr);
-						align-items: center;
-						width: 100%;
-					}
-
-					.sidebar-profile-username {
-						display: none;
-						grid-column: 2;
-						min-width: 0;
-						overflow: hidden;
-						text-overflow: ellipsis;
-						white-space: nowrap;
-					}
-
-					.ant-menu-title-content {
-						width: 100%;
-						margin-inline-start: 0;
-
-						display: inline-flex;
-
-						align-items: flex-start;
-						justify-content: center;
-
-						opacity: 1;
-
-						.ant-dropdown-trigger {
-							grid-column: 1;
-							width: auto;
-							justify-self: center;
-
-							img {
-								width: fit-content;
-								border-radius: 10px;
-							}
-						}
-					}
-
-					padding: 0 !important;
-				}
 			}
 
 			.ant-menu-item-selected {
@@ -276,9 +226,21 @@
 	}
 }
 
-.app_sidebar.expanded .app_sidebar_menu_wrapper .ant-menu
-	.ant-menu-item.user_avatar .sidebar-profile-username {
-	display: inline-block;
+.sidebar-profile-button {
+	&__avatar {
+		min-height: @sidebar_avatar_size!important;
+		min-width: @sidebar_avatar_size!important;
+
+		max-width: @sidebar_avatar_size!important;
+		max-height: @sidebar_avatar_size!important;
+
+		border-radius: @sidebar_border_radius;
+	}
+
+	&__label {
+		font-weight: 600;
+		font-family: "Space Grotesk";
+	}
 }
 
 .app_sidebar_menu_groups {
