@@ -16,6 +16,11 @@
 	align-items: center;
 }
 
+.popover-imperative {
+	position: fixed;
+	z-index: 1000;
+}
+
 .popover {
 	position: absolute;
 	display: flex;
@@ -27,7 +32,6 @@
 	//min-width: 200px;
 	max-width: 400px;
 
-	animation: popover-fade-in 0.2s ease-out;
 	pointer-events: auto;
 
 	&.hidden {
@@ -65,25 +69,10 @@
 	display: flex;
 	flex-direction: column;
 
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-	background-color: var(--backgroundColorAccent);
-
-	border: 1px solid var(--border-color);
-	border-radius: var(--borderRadius);
 	padding: 5px 7px;
 }
 
 .popover.disabled {
 	opacity: 0.6;
 	pointer-events: none;
-}
-
-@keyframes popover-fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
 }
