@@ -1,3 +1,3 @@
 export default (string) => {
-    return string.startsWith("http://") || string.startsWith("https://")
+	return string.startsWith("http://") || string.startsWith("https://")
 }
