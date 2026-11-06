@@ -20,20 +20,36 @@ export const getContentMotion = (position: PopoverPosition) => {
 	const hidden = {
 		opacity: 0,
 		scale: 0.96,
-		x:
-			position === "left"
-				? ANIMATION_DISTANCE
-				: position === "right"
-					? -ANIMATION_DISTANCE
-					: 0,
-		y:
-			position === "top"
-				? ANIMATION_DISTANCE
-				: position === "bottom"
-					? -ANIMATION_DISTANCE
-					: 0,
+		x: 0,
+		y: 0,
 	}
 
+	switch (position) {
+		case "left": {
+			hidden.x = ANIMATION_DISTANCE
+			hidden.y = 0
+			break
+		}
+		case "right": {
+			hidden.x = -ANIMATION_DISTANCE
+			hidden.y = 0
+			break
+		}
+		case "top": {
+			hidden.x = 0
+			hidden.y = ANIMATION_DISTANCE
+			break
+		}
+		case "bottom": {
+			hidden.x = 0
+			hidden.y = -ANIMATION_DISTANCE
+			break
+		}
+		default: {
+			hidden.x = 0
+			hidden.y = 0
+		}
+	}
 	return {
 		initial: hidden,
 		animate: { opacity: 1, scale: 1, x: 0, y: 0 },
