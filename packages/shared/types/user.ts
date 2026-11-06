@@ -15,6 +15,7 @@ export interface User {
 
 	decorations?: Record<string, string>
 	links?: Record<string, string>
+	badges?: Array<string>
 
 	roles?: string[]
 	verified?: boolean

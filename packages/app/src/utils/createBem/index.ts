@@ -2,26 +2,35 @@ import type { ClassValue } from "clsx"
 
 import clsx from "clsx"
 
-export function createBem(blockName: string, styles: Record<string, string>) {
-	const blockHelper = (...modifiers: ClassValue[]) => {
+export interface BemHelper {
+	(...modifiers: ClassValue[]): string
+	elem: (elementName: string, ...modifiers: ClassValue[]) => string
+	sub: (elementName: string) => BemHelper
+}
+
+export function createBem(
+	blockName: string,
+	styles: Record<string, string>,
+): BemHelper {
+	const resolve = (key: string, modifiers: ClassValue[]) => {
 		const activeModifiers = clsx(modifiers).split(" ").filter(Boolean)
 
 		const modifierClasses = activeModifiers.map(
-			(mod) => styles[`${blockName}--${mod}`],
+			(mod) => styles[`${key}--${mod}`],
 		)
 
-		return clsx(styles[blockName], modifierClasses)
+		return clsx(styles[key], modifierClasses)
 	}
 
-	blockHelper.elem = (elementName: string, ...modifiers: ClassValue[]) => {
-		const fullElemKey = `${blockName}__${elementName}`
-		const activeModifiers = clsx(modifiers).split(" ").filter(Boolean)
-		const modifierClasses = activeModifiers.map(
-			(mod) => styles[`${fullElemKey}--${mod}`],
-		)
+	const blockHelper: BemHelper = (...modifiers) =>
+		resolve(blockName, modifiers)
 
-		return clsx(styles[fullElemKey], modifierClasses)
-	}
+	blockHelper.elem = (elementName, ...modifiers) =>
+		resolve(`${blockName}__${elementName}`, modifiers)
+
+	// helper for a sub block, so nested elements can be composed
+	blockHelper.sub = (elementName) =>
+		createBem(`${blockName}__${elementName}`, styles)
 
 	return blockHelper
 }

@@ -42,15 +42,13 @@ export default async (payload: GetUserData) => {
 	let usersData = null
 
 	if (Array.isArray(targetIds)) {
-		usersData = await User.find({ _id: { $in: targetIds } })
+		usersData = await User.find({ _id: { $in: targetIds } }).lean()
 
 		if (!usersData || !usersData.length) {
 			return []
 		}
-
-		usersData = usersData.map((user) => user.toObject())
 	} else {
-		let query = User.findOne({ _id: targetIds })
+		let query = User.findOne({ _id: targetIds }).lean()
 
 		if (Array.isArray(add) && add.length > 0) {
 			const fieldsToSelect = add.map((field) => `+${field}`).join(" ")
@@ -62,8 +60,6 @@ export default async (payload: GetUserData) => {
 		if (!usersData) {
 			throw new OperationError(404, "User not found")
 		}
-
-		usersData = usersData.toObject()
 
 		usersData = [usersData]
 	}

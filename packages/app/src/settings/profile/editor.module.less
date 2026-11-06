@@ -1,0 +1,69 @@
+.profile-editor {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	width: 100%;
+
+	gap: 20px;
+
+	flex-grow: 0;
+
+	&__preview {
+		flex: 1;
+
+		:global {
+			.userCard {
+				width: 100%;
+				min-width: unset;
+			}
+		}
+	}
+
+	&__content {
+		flex: 2;
+
+		display: flex;
+		flex-direction: column;
+
+		gap: 10px;
+		height: 100%;
+
+		&__field {
+			display: flex;
+			flex-direction: column;
+
+			gap: 5px;
+			padding: 0 10px;
+
+			&__header {
+				display: flex;
+				flex-direction: row;
+
+				align-items: center;
+				justify-content: space-between;
+
+				gap: 7;
+			}
+
+			&--row {
+				flex-direction: row;
+			}
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		margin-top: auto;
+		margin-left: auto;
+
+		padding-top: 15px;
+
+		gap: 10px;
+	}
+}

@@ -17,6 +17,12 @@ interface ExtraActionsProps {
 	actions?: (SettingAction | React.ComponentType<any> | React.ReactNode)[]
 }
 
+interface SettingItemComponentProps {
+	setting: Setting
+	ctx: any
+	onUpdate?: (value: any) => void
+}
+
 function shouldUseHorizontalLayout(type: string) {
 	switch (type) {
 		case "switch":
@@ -75,12 +81,6 @@ const SettingItemExtraActions: React.FC<ExtraActionsProps> = ({
 			})}
 		</>
 	)
-}
-
-interface SettingItemComponentProps {
-	setting: Setting
-	ctx: any
-	onUpdate?: (value: any) => void
 }
 
 const SettingItemComponent: React.FC<SettingItemComponentProps> = ({

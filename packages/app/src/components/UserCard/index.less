@@ -120,8 +120,10 @@
 		.username_text {
 			position: relative;
 
-			display: flex;
+			display: inline-flex;
 			flex-direction: column;
+
+			word-break: break-all;
 
 			gap: 5px;
 
@@ -133,7 +135,7 @@
 				font-size: 1.5rem;
 				font-weight: 600;
 
-				line-height: 1rem;
+				line-height: 1.5rem;
 
 				font-family: "Space grotesk", sans-serif;
 			}
@@ -147,6 +149,7 @@
 			#verified {
 				fill: var(--app-color);
 				font-size: 0.8rem;
+				min-width: 0.8rem;
 			}
 
 			.user-badges {

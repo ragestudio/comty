@@ -60,6 +60,17 @@ const useUserData = (username) => {
 		load()
 	}, [username])
 
+	React.useEffect(() => {
+		const handleUserUpdate = (updatedUser) => {
+			if (updatedUser?._id === user?._id) {
+				setUser((current) => ({ ...current, ...updatedUser }))
+			}
+		}
+
+		app.eventBus.on("user:update", handleUserUpdate)
+		return () => app.eventBus.off("user:update", handleUserUpdate)
+	}, [user?._id])
+
 	return {
 		loading: loading,
 		user: user,
