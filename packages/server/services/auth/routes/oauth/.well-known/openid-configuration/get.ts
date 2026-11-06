@@ -2,8 +2,7 @@ import API from "@services/auth/auth.service"
 
 export default defineRoute(API)({
 	fn: async (req, res) => {
-		const baseUrl =
-			process.env.OIDC_ISSUER_URL || `http://indev-api.comty.app`
+		const baseUrl = process.env.OIDC_ISSUER_URL || `https://api.comty.app`
 
 		return {
 			issuer: baseUrl,
