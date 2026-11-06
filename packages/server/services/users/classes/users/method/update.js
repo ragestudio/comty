@@ -1,5 +1,6 @@
 import User from "@db_models/user"
 import defaultAvatar from "@shared-utils/defaultAvatar"
+import isUrl from "@shared-utils/isUrl"
 
 export default async (user_id, update) => {
 	if (typeof user_id === "undefined") {
@@ -19,11 +20,18 @@ export default async (user_id, update) => {
 	const updateKeys = Object.keys(update)
 
 	updateKeys.forEach((key) => {
-		if (key === "avatar" && update[key] === null) {
-			update[key] = defaultAvatar(user.username)
-		}
 		user[key] = update[key]
 	})
+
+	// validate user avatar, if not valid or empty, set the default
+	if (!user.avatar || !isUrl(user.avatar)) {
+		user.avatar = defaultAvatar(user.username)
+	}
+
+	// validate public_name
+	if (typeof user.public_name === "string" && user.public_name.length <= 0) {
+		user.public_name = null
+	}
 
 	await user.save()
 

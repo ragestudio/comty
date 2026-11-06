@@ -1,13 +1,5 @@
 import User from "@db_models/user"
 import UserFollow from "@db_models/userFollow"
-import defaultAvatar from "@shared-utils/defaultAvatar"
-
-function addAvatarMetadata(user: any) {
-	return {
-		...user,
-		avatar_is_custom: user.avatar !== defaultAvatar(user.username),
-	}
-}
 
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i
 
@@ -50,15 +42,13 @@ export default async (payload: GetUserData) => {
 	let usersData = null
 
 	if (Array.isArray(targetIds)) {
-		usersData = await User.find({ _id: { $in: targetIds } })
+		usersData = await User.find({ _id: { $in: targetIds } }).lean()
 
 		if (!usersData || !usersData.length) {
 			return []
 		}
-
-		usersData = usersData.map((user) => addAvatarMetadata(user.toObject()))
 	} else {
-		let query = User.findOne({ _id: targetIds })
+		let query = User.findOne({ _id: targetIds }).lean()
 
 		if (Array.isArray(add) && add.length > 0) {
 			const fieldsToSelect = add.map((field) => `+${field}`).join(" ")
@@ -70,8 +60,6 @@ export default async (payload: GetUserData) => {
 		if (!usersData) {
 			throw new OperationError(404, "User not found")
 		}
-
-		usersData = addAvatarMetadata(usersData.toObject())
 
 		usersData = [usersData]
 	}
