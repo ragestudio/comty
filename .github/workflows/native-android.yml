@@ -2,6 +2,9 @@ name: Native Android
 
 on:
   workflow_call:
+    secrets:
+      GITEA_NPM_TOKEN:
+        required: true
   workflow_dispatch:
   push:
     tags:
@@ -23,6 +26,7 @@ jobs:
       CI: "1"
       EXPO_NO_TELEMETRY: "1"
       GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
+      GITEA_NPM_TOKEN: ${{ secrets.GITEA_NPM_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,6 +46,16 @@ jobs:
         with:
           node-version: "24"
           cache: "pnpm"
+
+      # the native app pulls a tarball from a private gitea registry behind
+      # cloudflare and anubis, so pnpm must send the token with the request
+      - name: Configure Gitea registry auth
+        run: |
+          if [ -z "${GITEA_NPM_TOKEN}" ]; then
+            echo "GITEA_NPM_TOKEN is not set" >&2
+            exit 1
+          fi
+          echo '//git.ragestudio.net/:_authToken=${GITEA_NPM_TOKEN}' >> .npmrc
 
       - name: Install dependencies
         run: pnpm install --filter "@comty/native-app..." --filter "@linebridge/client"

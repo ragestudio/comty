@@ -123,6 +123,7 @@ jobs:
     needs: check_versions
     if: needs.check_versions.outputs.native_changed == 'true'
     uses: ./.github/workflows/native-android.yml
+    secrets: inherit
 
   create_release:
     name: Create GitHub Release
