@@ -27,6 +27,12 @@
 		"title": "Details",
 		"icon": "UserPen"
 	},
+	"account.preview": {
+		"title": null
+	},
+	"account.other": {
+		"title": null
+	},
 	"sync.accounts": {
 		"title": "Synced Accounts",
 		"icon": "MdLinearScale"
