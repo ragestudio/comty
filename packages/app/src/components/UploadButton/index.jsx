@@ -121,7 +121,7 @@ const UploadButton = (props) => {
 			fileList={[]}
 			className={
 				!props.render &&
-				classnames("uploadButton", {
+				classnames("uploadButton", props.className, {
 					["uploading"]: !!progress || uploading,
 				})
 			}

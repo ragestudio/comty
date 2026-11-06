@@ -1,71 +1,73 @@
 .uploadButton {
-    display: inline-flex;
-    flex-direction: row;
+	display: inline-flex;
+	flex-direction: row;
 
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 
-    background-color: var(--background-color-accent);
-    border-radius: 8px;
+	background-color: var(--background-color-accent);
+	border-radius: 8px;
 
-    padding: 5px 15px;
+	padding: 5px 15px;
 
-    cursor: pointer;
+	cursor: pointer;
 
-    transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
 
-    &.uploading {
-        border-radius: 12px;
+	&.uploading {
+		border-radius: 12px;
 
-        .uploadButton-content {
-            gap: 15px;
-        }
-    }
+		.uploadButton-content {
+			gap: 15px;
+		}
+	}
 
-    .ant-upload {
-        display: inline-flex;
-        flex-direction: row;
+	.ant-upload {
+		display: inline-flex;
+		flex-direction: row;
 
-        align-items: center;
-        justify-content: center;
-    }
+		align-items: center;
+		justify-content: center;
 
-    .uploadButton-content {
-        display: inline-flex;
-        flex-direction: row;
+		width: 100%;
+	}
 
-        align-items: center;
+	.uploadButton-content {
+		display: inline-flex;
+		flex-direction: row;
 
-        gap: 7px;
+		align-items: center;
 
-        transition: all 150ms ease-in-out;
+		gap: 7px;
 
-        .ant-progress {
-            position: relative;
+		transition: all 150ms ease-in-out;
 
-            display: inline-flex;
-            flex-direction: row;
+		.ant-progress {
+			position: relative;
 
-            align-items: center;
-            justify-content: center;
+			display: inline-flex;
+			flex-direction: row;
 
-            height: 17px;
-            width: 17px;
+			align-items: center;
+			justify-content: center;
 
-            .ant-progress-inner,
-            .ant-progress-circle {
-                position: absolute;
+			height: 17px;
+			width: 17px;
 
-                top: 0;
-                left: 0;
+			.ant-progress-inner,
+			.ant-progress-circle {
+				position: absolute;
 
-                width: 100% !important;
-                height: 100% !important;
-            }
+				top: 0;
+				left: 0;
 
-            svg {
-                margin: 0 !important;
-            }
-        }
-    }
+				width: 100% !important;
+				height: 100% !important;
+			}
+
+			svg {
+				margin: 0 !important;
+			}
+		}
+	}
 }
