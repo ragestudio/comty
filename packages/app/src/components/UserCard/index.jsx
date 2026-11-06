@@ -57,13 +57,14 @@ const UserCard = (props) => {
 						}
 					/>
 
-					{decorations?.avatar_frame && (
-						<img
-							className="avatar__frame"
-							src={decorations.avatar_frame.obj_url}
-							style={decorations.avatar_frame.style}
-						/>
-					)}
+					{decorations?.avatar_frame &&
+						decorations.avatar_frame.obj_url && (
+							<img
+								className="avatar__frame"
+								src={decorations.avatar_frame.obj_url}
+								style={decorations.avatar_frame.style}
+							/>
+						)}
 				</div>
 
 				<div className="username_text">
