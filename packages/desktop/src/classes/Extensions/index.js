@@ -1,5 +1,6 @@
 import { Readable } from "node:stream"
 import { finished } from "node:stream/promises"
+import { createHash } from "node:crypto"
 import { ipcMain } from "electron"
 
 import fs from "node:fs"
@@ -166,6 +167,15 @@ export default class ExtensionManager extends Map {
 			throw new Error("Extension manifest does not contain a bundle")
 		}
 
+		if (
+			typeof manifest.integrity !== "string" ||
+			!/^sha512-[a-f0-9]{128}$/.test(manifest.integrity)
+		) {
+			throw new Error(
+				"Extension manifest does not contain a valid bundle integrity hash",
+			)
+		}
+
 		manifest.id = manifest.name.replace("/", "-").replace("@", "")
 		manifest.bundle = new URL(manifest.bundle, url.origin)
 		manifest.path = path.resolve(
@@ -215,6 +225,16 @@ export default class ExtensionManager extends Map {
 		await finished(
 			bundleResponse.pipe(fs.createWriteStream(extensionBundlePath)),
 		)
+
+		// verify downloaded bundle integrity against the manifest-declared digest
+		const bundleDigest = createHash("sha512")
+			.update(await fs.promises.readFile(extensionBundlePath))
+			.digest("hex")
+
+		if (`sha512-${bundleDigest}` !== manifest.integrity) {
+			await fs.promises.rm(manifest.path, { recursive: true, force: true })
+			throw new Error("Extension bundle failed integrity verification")
+		}
 
 		// rename cause idk cant write with .asar extension
 		await fs.promises.rename(
