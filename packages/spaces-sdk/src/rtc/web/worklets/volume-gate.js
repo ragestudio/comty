@@ -71,8 +71,7 @@ class VolumeGateProcessor extends AudioWorkletProcessor {
 				const inputSquare = inputSample * inputSample
 
 				envelope =
-					this.alpha * this.previousLevel +
-					(1 - this.alpha) * inputSquare
+					this.alpha * this.previousLevel + (1 - this.alpha) * inputSquare
 
 				this.previousLevel = envelope
 

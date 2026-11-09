@@ -1,137 +1,170 @@
+// reads pcm frames directly from the shared capture ring written by the native
+// addon. runs on the audio thread, no per-frame messages
+const HEADER = {
+	sampleRate: 2,
+	channels: 3,
+	bitsPerSample: 4,
+	captureWrite: 6,
+	captureRead: 7,
+}
+
 class PCMInputProcessor extends AudioWorkletProcessor {
-	constructor() {
+	constructor(options) {
 		super()
-		this.ringBufferSize = 16384
-		this.mask = this.ringBufferSize - 1
-		this.ringBuffer = new Float32Array(this.ringBufferSize)
 
-		this.writeOffset = 0
-		this.readOffset = 0
-		this.availableSamples = 0
-		this.isPlaying = false
+		const { buffer, layout } = options.processorOptions
 
+		this.header = new Int32Array(buffer, 0, layout.headerBytes / 4)
+		this.bytes = new Uint8Array(
+			buffer,
+			layout.captureOffset,
+			layout.captureCapacity,
+		)
+		this.s16 = new Int16Array(
+			buffer,
+			layout.captureOffset,
+			layout.captureCapacity / 2,
+		)
+		this.f32 = new Float32Array(
+			buffer,
+			layout.captureOffset,
+			layout.captureCapacity / 4,
+		)
+
+		this.mask = layout.captureCapacity - 1
 		this.channels = 2
 		this.bitsPerSample = 16
-		this.preBuffer = 256
 
-		// max desired latency in samples before aggressive catch-up
-		this.maxBufferSamples = 4096
-
-		this.port.onmessage = (event) => {
-			const { buffer, sampleRate, channels, bitsPerSample } = event.data
-
-			if (buffer) {
-				this.channels = channels || this.channels
-				this.bitsPerSample = bitsPerSample || this.bitsPerSample
-
-				this.processIncomingData(buffer)
-			}
-		}
-	}
-
-	processIncomingData(buffer) {
-		const arrayBuffer = buffer.buffer || buffer
-		const byteOffset = buffer.byteOffset || 0
-		const byteLength = buffer.byteLength
-
-		let view
-
-		switch (this.bitsPerSample) {
-			case 16:
-				view = new Int16Array(arrayBuffer, byteOffset, byteLength / 2)
-
-				for (let i = 0; i < view.length; i++) {
-					this._writeSample(view[i] / 32768.0)
-				}
-
-				break
-
-			case 8:
-				view = new Uint8Array(arrayBuffer, byteOffset, byteLength)
-
-				for (let i = 0; i < view.length; i++) {
-					this._writeSample((view[i] - 128) / 128.0)
-				}
-
-				break
-
-			case 24:
-				view = new Uint8Array(arrayBuffer, byteOffset, byteLength)
-
-				for (let i = 0; i < view.length; i += 3) {
-					let int32 =
-						view[i] | (view[i + 1] << 8) | (view[i + 2] << 16)
-
-					int32 = (int32 << 8) >> 8
-					this._writeSample(int32 / 8388608.0)
-				}
-				break
-
-			case 32:
-				view = new Float32Array(arrayBuffer, byteOffset, byteLength / 4)
-
-				for (let i = 0; i < view.length; i++) {
-					this._writeSample(view[i])
-				}
-				break
-		}
-	}
-
-	_writeSample(sample) {
-		this.ringBuffer[this.writeOffset] = sample
-		this.writeOffset = (this.writeOffset + 1) & this.mask
-
-		if (this.availableSamples < this.ringBufferSize) {
-			this.availableSamples++
-		} else {
-			// drop one complete frame to keep channel alignment
-			this.readOffset = (this.readOffset + this.channels) & this.mask
-		}
+		this.primed = false
+		this.preBufferFrames = 256
+		this.maxBufferFrames = 4096
 	}
 
 	process(inputs, outputs) {
 		const output = outputs[0]
-		const channelsNeeded = output.length
-		const framesNeeded = output[0].length
-		const inputChannels = this.channels
-		const samplesNeeded = framesNeeded * inputChannels
 
-		if (!this.isPlaying) {
-			if (this.availableSamples >= inputChannels * this.preBuffer) {
-				this.isPlaying = true
-			} else {
-				return true
-			}
-		}
-
-		if (this.availableSamples < samplesNeeded) {
-			this.isPlaying = false
+		if (!output || output.length === 0) {
 			return true
 		}
 
-		// latency guard: drop excess if buffer grows beyond desired max
-		if (this.availableSamples > this.maxBufferSamples) {
-			const excessSamples = this.availableSamples - this.maxBufferSamples
-			const excessFrames = Math.floor(excessSamples / inputChannels)
-			const skipSamples = excessFrames * inputChannels
+		const framesNeeded = output[0].length
+		const outputChannels = output.length
 
-			this.readOffset = (this.readOffset + skipSamples) & this.mask
-			this.availableSamples -= skipSamples
+		const sampleRate = Atomics.load(this.header, HEADER.sampleRate)
+		const channels = Atomics.load(this.header, HEADER.channels)
+
+		if (sampleRate > 0 && channels > 0) {
+			this.channels = channels
+			this.bitsPerSample =
+				Atomics.load(this.header, HEADER.bitsPerSample) || this.bitsPerSample
 		}
 
-		for (let i = 0; i < framesNeeded; i++) {
-			for (let c = 0; c < channelsNeeded; c++) {
-				const inputChannel = c % inputChannels
-				const sampleIndex = (this.readOffset + inputChannel) & this.mask
+		const bytesPerSample = this.bitsPerSample / 8
+		const frameBytes = this.channels * bytesPerSample
 
-				output[c][i] = this.ringBuffer[sampleIndex]
+		let read = Atomics.load(this.header, HEADER.captureRead)
+		const write = Atomics.load(this.header, HEADER.captureWrite)
+		let availableFrames = Math.floor(((write - read) >>> 0) / frameBytes)
+
+		if (!this.primed) {
+			if (availableFrames < this.preBufferFrames) {
+				return true
 			}
 
-			this.readOffset = (this.readOffset + inputChannels) & this.mask
-			this.availableSamples -= inputChannels
+			this.primed = true
 		}
 
+		if (availableFrames < framesNeeded) {
+			this.primed = false
+			return true
+		}
+
+		// latency guard: drop excess instead of playing behind
+		if (availableFrames > this.maxBufferFrames) {
+			const skipFrames = availableFrames - this.maxBufferFrames
+			read = (read + skipFrames * frameBytes) >>> 0
+		}
+
+		this.readFrames(
+			read,
+			framesNeeded,
+			output,
+			outputChannels,
+			bytesPerSample,
+			frameBytes,
+		)
+
+		read = (read + framesNeeded * frameBytes) >>> 0
+		Atomics.store(this.header, HEADER.captureRead, read)
+
 		return true
+	}
+
+	readFrames(read, frames, output, outputChannels, bytesPerSample, frameBytes) {
+		const channels = this.channels
+
+		if (this.bitsPerSample === 16) {
+			const mask = this.s16.length - 1
+			const base = (read >>> 1) & mask
+
+			for (let i = 0; i < frames; i++) {
+				const frameIndex = base + i * channels
+
+				for (let c = 0; c < outputChannels; c++) {
+					const sampleIndex = (frameIndex + (c % channels)) & mask
+
+					output[c][i] = this.s16[sampleIndex] / 32768
+				}
+			}
+
+			return
+		}
+
+		if (this.bitsPerSample === 32) {
+			const mask = this.f32.length - 1
+			const base = (read >>> 2) & mask
+
+			for (let i = 0; i < frames; i++) {
+				const frameIndex = base + i * channels
+
+				for (let c = 0; c < outputChannels; c++) {
+					const sampleIndex = (frameIndex + (c % channels)) & mask
+
+					output[c][i] = this.f32[sampleIndex]
+				}
+			}
+
+			return
+		}
+
+		// 8 and 24 bit fallback, reads byte by byte
+		for (let i = 0; i < frames; i++) {
+			for (let c = 0; c < outputChannels; c++) {
+				const sampleOffset =
+					(read + i * frameBytes + (c % channels) * bytesPerSample) & this.mask
+
+				output[c][i] = this.readSample(sampleOffset, bytesPerSample)
+			}
+		}
+	}
+
+	readSample(offset, bytesPerSample) {
+		if (bytesPerSample === 1) {
+			return (this.bytes[offset] - 128) / 128
+		}
+
+		if (bytesPerSample === 3) {
+			let value =
+				this.bytes[offset] |
+				(this.bytes[(offset + 1) & this.mask] << 8) |
+				(this.bytes[(offset + 2) & this.mask] << 16)
+
+			value = (value << 8) >> 8
+
+			return value / 8388608
+		}
+
+		return 0
 	}
 }
 

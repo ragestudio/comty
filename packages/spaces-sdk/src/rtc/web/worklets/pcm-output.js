@@ -1,43 +1,59 @@
+// writes interleaved s16 stereo into the shared playback ring read by the
+// native output stream. runs on the audio thread, no per-frame messages
+const PLAYBACK_WRITE = 8
+const PLAYBACK_READ = 9
+
 class PCMOutputProcessor extends AudioWorkletProcessor {
 	constructor(options) {
 		super()
 
-		this.bufferSize = options?.processorOptions?.bufferSize || 256
-		this.interleaved = new Int16Array(this.bufferSize * 2)
-		this.writeIndex = 0
+		const { buffer, layout } = options.processorOptions
+
+		this.header = new Int32Array(buffer, 0, layout.headerBytes / 4)
+		this.capacity = layout.playbackCapacity
+		this.samples = new Int16Array(
+			buffer,
+			layout.playbackOffset,
+			layout.playbackCapacity / 2,
+		)
+		this.sampleMask = this.samples.length - 1
 	}
 
-	process(inputs, outputs, parameters) {
+	process(inputs) {
 		const input = inputs[0]
 
-		if (!input || input.length === 0) {
+		if (!input || input.length === 0 || !input[0]) {
 			return true
 		}
 
-		const isSilent = !input || input.length === 0
-		const left = isSilent ? null : input[0]
-		const right = isSilent ? null : input.length > 1 ? input[1] : input[0]
+		const left = input[0]
+		const right = input[1] ?? input[0]
+		const frames = left.length
+		const bytesNeeded = frames * 4
 
-		const length = left.length
+		const write = Atomics.load(this.header, PLAYBACK_WRITE)
+		const read = Atomics.load(this.header, PLAYBACK_READ)
+		const available = this.capacity - ((write - read) >>> 0)
 
-		for (let i = 0; i < length; i++) {
-			let sL = Math.max(-1, Math.min(1, left[i]))
-			let sR = Math.max(-1, Math.min(1, right[i]))
-
-			this.interleaved[this.writeIndex * 2] =
-				sL < 0 ? sL * 0x8000 : sL * 0x7fff
-			this.interleaved[this.writeIndex * 2 + 1] =
-				sR < 0 ? sR * 0x8000 : sR * 0x7fff
-
-			this.writeIndex++
-
-			if (this.writeIndex >= this.bufferSize) {
-				const outBuffer = this.interleaved.slice().buffer
-
-				this.port.postMessage(outBuffer, [outBuffer])
-				this.writeIndex = 0
-			}
+		if (available < bytesNeeded) {
+			return true
 		}
+
+		let sampleIndex = (write >>> 1) & this.sampleMask
+
+		for (let i = 0; i < frames; i++) {
+			const leftSample = Math.max(-1, Math.min(1, left[i]))
+			const rightSample = Math.max(-1, Math.min(1, right[i]))
+
+			this.samples[sampleIndex] =
+				leftSample < 0 ? leftSample * 0x8000 : leftSample * 0x7fff
+			this.samples[(sampleIndex + 1) & this.sampleMask] =
+				rightSample < 0 ? rightSample * 0x8000 : rightSample * 0x7fff
+
+			sampleIndex = (sampleIndex + 2) & this.sampleMask
+		}
+
+		Atomics.store(this.header, PLAYBACK_WRITE, (write + bytesNeeded) >>> 0)
 
 		return true
 	}
