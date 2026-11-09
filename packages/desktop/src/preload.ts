@@ -4,11 +4,23 @@ import { fileURLToPath } from "node:url"
 
 import { contextBridge, ipcRenderer } from "electron"
 
-import Settings, { type AppChannel } from "./classes/Settings/index.js"
+import Settings, {
+	isAppChannel,
+	type AppChannel,
+} from "./classes/Settings/index.js"
 import { addonVersion } from "./sysaudio/addon.js"
 import SysAudioBridge from "./sysaudio/index.js"
 
 const settings = new Settings()
+
+// keep the channel in sync for older renderers that still write it inside
+// the app_settings object instead of using the channel bridge
+const storedAppSettings = settings.get("app_settings")
+
+let lastAppChannel: unknown =
+	storedAppSettings && typeof storedAppSettings === "object"
+		? (storedAppSettings as Record<string, unknown>)["desktop:app_channel"]
+		: undefined
 
 function readAppBuildInfo(): { version: string; build: string } {
 	const preloadPath = fileURLToPath(import.meta.url)
@@ -42,7 +54,23 @@ contextBridge.exposeInMainWorld("__ELECTRON__", {
 	settings: {
 		path: settings.path,
 		get: (key: string) => settings.get(key),
-		set: (key: string, value: unknown) => settings.set(key, value),
+		set: (key: string, value: unknown) => {
+			settings.set(key, value)
+
+			if (key !== "app_settings" || !value || typeof value !== "object") {
+				return
+			}
+
+			const channel = (value as Record<string, unknown>)["desktop:app_channel"]
+
+			if (channel === lastAppChannel) return
+
+			lastAppChannel = channel
+
+			if (isAppChannel(channel)) {
+				void ipcRenderer.invoke("app:channel:set", channel)
+			}
+		},
 		delete: (key: string) => settings.delete(key),
 		clear: () => settings.clear(),
 	},
