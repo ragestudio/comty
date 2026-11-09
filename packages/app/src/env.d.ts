@@ -9,9 +9,29 @@ declare global {
 		off(event: string, listener: (...args: any[]) => void): void
 	}
 
+	type AppChannel = "stable" | "indev"
+
+	interface ElectronBridge {
+		desktop: true
+		settings: {
+			path: string
+			get: (key: string) => unknown
+			set: (key: string, value: unknown) => void
+			delete: (key: string) => void
+			clear: () => void
+		}
+		channel: {
+			get: () => Promise<AppChannel>
+			set: (channel: AppChannel) => Promise<AppChannel>
+		}
+		restart: () => Promise<unknown>
+		extensions: () => Promise<unknown>
+	}
+
 	interface Window {
 		ipcRenderer: any
 		_hacks: any
+		__ELECTRON__?: ElectronBridge
 	}
 }
 
