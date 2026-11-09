@@ -85,7 +85,7 @@ Experience Comty across your devices:
 | :-------------------------- | :------------------------------------- |
 | 🌐 **Web App**              | [https://comty.app](https://comty.app) |
 | 🖥️ **Desktop App**          | Check releases page                    |
-| 📱 **Android App (Native)** | Not ready yet                          |
+| 📱 **Android App (Native)** | <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/ragestudio/comty/releases"><img src="https://raw.githubusercontent.com/ImranR98/Obtainium/main/assets/graphics/badge_obtainium.png" width="200" alt="Get it on Obtainium"></a>                                                                   |
 
 ---
 
