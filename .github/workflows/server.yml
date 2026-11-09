@@ -14,11 +14,15 @@ jobs:
     env:
       IS_ACTION_RUNNER: true
     steps:
+      # the server only needs linebridge, avoid fetching the private
+      # desktop submodules (sysaudio) during checkout
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
+
+      - name: Checkout linebridge submodule
+        run: git submodule update --init modules/linebridge
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

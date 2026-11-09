@@ -109,6 +109,7 @@ jobs:
     needs: check_versions
     if: needs.check_versions.outputs.app_changed == 'true'
     uses: ./.github/workflows/app.yml
+    secrets: inherit
 
   build_server:
     name: Build Server

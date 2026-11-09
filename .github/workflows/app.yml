@@ -2,6 +2,9 @@ name: App
 
 on:
   workflow_call:
+    secrets:
+      GITEA_GIT_TOKEN:
+        required: false
   workflow_dispatch:
 
 permissions:
@@ -12,6 +15,20 @@ jobs:
     name: Build App
     runs-on: ubuntu-latest
     steps:
+      # the sysaudio submodule lives on a private gitea instance, so the token
+      # is injected through an url rewrite before checkout fetches submodules
+      - name: Configure git auth for private submodules
+        env:
+          GITEA_USER: ${{ vars.GITEA_USER || 'oauth2' }}
+          GITEA_GIT_TOKEN: ${{ secrets.GITEA_GIT_TOKEN }}
+        run: |
+          if [ -z "${GITEA_GIT_TOKEN}" ]; then
+            echo "::error::GITEA_GIT_TOKEN is required to clone private submodules from git.ragestudio.net"
+            exit 1
+          fi
+
+          git config --global url."https://${GITEA_USER}:${GITEA_GIT_TOKEN}@git.ragestudio.net/".insteadOf "https://git.ragestudio.net/"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
