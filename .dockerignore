@@ -37,6 +37,9 @@
 packages/server/nats-data
 packages/server/docs
 
+# Wrapper specific excludes
+packages/wrapper/public
+
 # Other packages (not needed for server build)
 scripts
 docker/data
