@@ -13,7 +13,6 @@
 		"!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}",
 		"!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
 	],
-	"asarUnpack": ["addons/sysaudio/dist/sysaudio.node"],
 	"win": {
 		"executableName": "Comty",
 		"icon": "resources/icon.ico"

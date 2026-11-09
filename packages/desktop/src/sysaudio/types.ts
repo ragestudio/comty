@@ -33,6 +33,7 @@ export interface SysAudioAddon {
 export interface AppInfo {
 	pid: number
 	isDev: boolean
+	userData: string
 }
 
 export const SYSAUDIO_REQUEST = "sysaudio:request"

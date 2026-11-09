@@ -17,6 +17,7 @@ const handlers: IpcHandlers = {
 	"app:info": (main) => ({
 		pid: process.pid,
 		isDev: main.isDev,
+		userData: main.app.getPath("userData"),
 	}),
 	"app:channel:get": (main) => main.settings.getChannel(),
 	"app:channel:set": (main, event, channel: unknown) =>

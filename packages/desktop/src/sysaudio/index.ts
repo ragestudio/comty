@@ -1,6 +1,8 @@
+import path from "node:path"
+
 import { contextBridge, ipcRenderer } from "electron"
 
-import { loadAddon } from "./addon.js"
+import { isAddonAvailable, loadAddon } from "./addon.js"
 import {
 	createSharedAudioBuffer,
 	SHARED_VERSION,
@@ -32,7 +34,7 @@ export class SysAudioBridge {
 
 	register(): void {
 		contextBridge.exposeInMainWorld("__SYS_AUDIO__", {
-			available: true,
+			available: isAddonAvailable(),
 			version: SHARED_VERSION,
 		})
 
@@ -83,7 +85,10 @@ export class SysAudioBridge {
 
 	private ensureInitialized(): Promise<void> {
 		if (!this.initializing) {
-			this.initializing = this.initialize()
+			this.initializing = this.initialize().catch((error) => {
+				this.initializing = null
+				throw error
+			})
 		}
 
 		return this.initializing
@@ -95,7 +100,9 @@ export class SysAudioBridge {
 		this.mainPid = info.pid
 
 		const shared = createSharedAudioBuffer()
-		const addon = loadAddon()
+		const addon = loadAddon(
+			info.userData ? path.join(info.userData, "native") : undefined,
+		)
 
 		addon.initialize({
 			excluded_pid: info.pid,
@@ -113,7 +120,9 @@ export class SysAudioBridge {
 		this.addon = addon
 	}
 
-	private async onControlMessage(message: BridgeControlRequest): Promise<void> {
+	private async onControlMessage(
+		message: BridgeControlRequest,
+	): Promise<void> {
 		if (!message || typeof message.id !== "number") {
 			return
 		}

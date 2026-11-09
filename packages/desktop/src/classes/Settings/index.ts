@@ -1,3 +1,5 @@
+import fs from "node:fs"
+
 import ElectronStore from "electron-store"
 
 export const APP_CHANNELS = ["stable", "indev"] as const
@@ -70,13 +72,19 @@ export default class Settings {
 	}
 
 	private migrateChannel(): void {
-		const current = this.channelStore.get("channel")
+		// the dedicated store is the source of truth once it exists, legacy
+		// values are only used to seed it the first time it is created
+		if (fs.existsSync(this.channelStore.path)) {
+			return
+		}
 
 		const legacy = this.store.get("desktop:app_channel")
 		const appSettings = this.store.get("app_settings")
 		const rendererLegacy =
 			appSettings && typeof appSettings === "object"
-				? (appSettings as Record<string, unknown>)["desktop:app_channel"]
+				? (appSettings as Record<string, unknown>)[
+						"desktop:app_channel"
+					]
 				: undefined
 
 		const candidate = isAppChannel(legacy)
@@ -86,7 +94,7 @@ export default class Settings {
 				: undefined
 
 		// only seed the dedicated store while it still holds the default
-		if (current === "stable" && candidate && candidate !== "stable") {
+		if (candidate && candidate !== "stable") {
 			this.channelStore.set("channel", candidate)
 		}
 
