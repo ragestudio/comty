@@ -12,7 +12,8 @@
 	"scripts": {
 		"build": "tsc",
 		"build:addon": "pnpm --dir addons/sysaudio run build",
-		"dev": "tsc && electron .",
+		"dev": "tsc && cross-env ELECTRON_IS_DEV=1 electron .",
+		"dev:channel": "tsc && electron .",
 		"typecheck": "tsc --noEmit",
 		"postinstall": "electron-builder install-app-deps",
 		"pack:dir": "pnpm build:addon && pnpm build && electron-builder --dir",
@@ -26,6 +27,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^26.6.6",
+		"cross-env": "10.1.0",
 		"electron": "45.2.3",
 		"electron-builder": "^26.18.0",
 		"electron-devtools-installer": "^4.0.0",

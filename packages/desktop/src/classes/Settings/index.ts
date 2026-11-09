@@ -1,7 +1,5 @@
 import ElectronStore from "electron-store"
 
-import isDev from "../../utils/isDev.js"
-
 export const APP_CHANNELS = ["stable", "indev"] as const
 
 export type AppChannel = (typeof APP_CHANNELS)[number]
@@ -23,16 +21,14 @@ export default class Settings {
 	private readonly channelStore: ElectronStore<ChannelStore>
 
 	constructor() {
-		const suffix = isDev() ? "_dev" : ""
-
-		// the renderer and the main process share this file, keep the app
-		// channel in its own store so a renderer write cannot revert it
+		// the dev and production user data dirs are already separated by main,
+		// so the file names stay the same for both
 		this.store = new ElectronStore<Record<string, unknown>>({
-			name: `settings${suffix}`,
+			name: "settings",
 		})
 
 		this.channelStore = new ElectronStore<ChannelStore>({
-			name: `app-channel${suffix}`,
+			name: "app-channel",
 			defaults: channelDefaults,
 		})
 

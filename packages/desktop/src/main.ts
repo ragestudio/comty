@@ -24,6 +24,7 @@ import Settings from "./classes/Settings/index.js"
 import ipcHandlers, { type IpcHandler } from "./ipc/index.js"
 import { ModulesManager } from "./classes/Modules/index.js"
 import { TrayManager } from "./classes/Tray/index.js"
+import isDev from "./utils/isDev.js"
 
 export const currentDir = path.dirname(fileURLToPath(import.meta.url))
 
@@ -162,15 +163,21 @@ export class Main {
 		this.mainWindow = window
 
 		const appChannel = this.settings.getChannel()
+		const dev = isDev()
 
-		if (Main.isDev) {
+		const url = dev
+			? vars.developmentUrl
+			: appChannel === "indev"
+				? vars.indevUrl
+				: vars.productionUrl
+
+		if (dev) {
 			window.webContents.openDevTools()
-			window.loadURL(vars.developmentUrl).catch(logLoadError)
-		} else {
-			const url = appChannel === "indev" ? vars.indevUrl : vars.productionUrl
-
-			window.loadURL(url).catch(logLoadError)
 		}
+
+		console.log(`[app] loading ${url} (channel: ${dev ? "dev" : appChannel})`)
+
+		window.loadURL(url).catch(logLoadError)
 
 		if (os.platform() === "win32") {
 			window.maximize()
