@@ -691,6 +691,9 @@ importers:
       '@types/node':
         specifier: ^26.6.6
         version: 26.6.6
+      cross-env:
+        specifier: 10.1.0
+        version: 10.1.0
       electron:
         specifier: 45.2.3
         version: 45.2.3(supports-color@11.0.0)
