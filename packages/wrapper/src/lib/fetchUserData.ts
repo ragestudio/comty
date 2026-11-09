@@ -1,25 +1,40 @@
-export default async (username: string) => {
-	if (typeof username !== "string") {
+import type { ComtyUser } from "../types"
+
+const API_BASE_URL = "https://api.comty.app"
+const REQUEST_TIMEOUT_MS = 10_000
+
+export default async function fetchUserData(
+	username: string,
+): Promise<ComtyUser> {
+	if (typeof username !== "string" || username.length === 0) {
 		throw new Error("Invalid or missing username")
 	}
 
-	let response = await fetch(
-		`https://api.comty.app/users/${username}/resolve-user_id`,
+	const resolveResponse = await fetch(
+		`${API_BASE_URL}/users/${encodeURIComponent(username)}/resolve-user_id`,
+		{ signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
 	)
 
-	if (!response.ok) {
-		throw new Error(`Failed to resolve user ID: ${response.status}`)
+	if (!resolveResponse.ok) {
+		throw new Error(`Failed to resolve user id: ${resolveResponse.status}`)
 	}
 
-	let { user_id } = await response.json()
+	const { user_id: userId } = (await resolveResponse.json()) as {
+		user_id?: string
+	}
 
-	response = await fetch(
-		`https://api.comty.app/users/${user_id}/data?basic=true`,
+	if (!userId) {
+		throw new Error(`User not found: ${username}`)
+	}
+
+	const dataResponse = await fetch(
+		`${API_BASE_URL}/users/${encodeURIComponent(userId)}/data?basic=true`,
+		{ signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
 	)
 
-	if (!response.ok) {
-		throw new Error(`Failed to user avatar data: ${response.status}`)
+	if (!dataResponse.ok) {
+		throw new Error(`Failed to fetch user data: ${dataResponse.status}`)
 	}
 
-	return await response.json()
+	return (await dataResponse.json()) as ComtyUser
 }

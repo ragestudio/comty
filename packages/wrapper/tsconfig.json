@@ -1,0 +1,22 @@
+{
+	"$schema": "http://json.schemastore.org/tsconfig",
+	"compilerOptions": {
+		"target": "es2024",
+		"module": "es2022",
+		"moduleResolution": "bundler",
+		"lib": ["es2024"],
+		"types": ["node"],
+		"strict": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"noEmit": true,
+		"paths": {
+			"@/*": ["./src/*"],
+			"@lib/*": ["./src/lib/*"],
+		},
+	},
+	"include": ["src/**/*.ts"],
+}
