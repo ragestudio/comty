@@ -7,22 +7,28 @@
 	"version": "0.12.1",
 	"license": "MIT",
 	"type": "module",
-	"main": "./src/boot.js",
+	"main": "./dist/boot.js",
 	"homepage": "https://comty.app",
 	"scripts": {
-		"dev": "electron .",
+		"build": "tsc",
+		"build:addon": "pnpm --dir addons/sysaudio run build",
+		"dev": "tsc && electron .",
+		"typecheck": "tsc --noEmit",
 		"postinstall": "electron-builder install-app-deps",
-		"pack:linux": "electron-builder --linux --config",
-		"pack:win": "electron-builder --win --config"
+		"pack:dir": "pnpm build:addon && pnpm build && electron-builder --dir",
+		"pack:linux": "pnpm build:addon && pnpm build && electron-builder --linux",
+		"pack:win": "pnpm build:addon && pnpm build && electron-builder --win"
 	},
 	"dependencies": {
-		"electron-store": "^11.0.2",
-		"mime": "^4.1.0",
+		"electron-store": "^12.0.0",
+		"mime": "^4.1.2",
 		"radix-router": "^3.0.1"
 	},
 	"devDependencies": {
-		"electron": "43.2.0",
-		"electron-builder": "^26.15.3",
-		"electron-devtools-installer": "^4.0.0"
+		"@types/node": "^26.6.6",
+		"electron": "45.2.3",
+		"electron-builder": "^26.18.0",
+		"electron-devtools-installer": "^4.0.0",
+		"typescript": "^7.0.2"
 	}
 }
