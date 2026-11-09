@@ -64,16 +64,17 @@ jobs:
           submodules: recursive
 
       # packages/wrapper contains route paths with * and : which are not valid
-      # on windows, and the desktop build does not need that package
+      # on windows, so only the directories needed by the desktop build are
+      # checked out (root files are always included in cone mode)
       - name: Checkout repository (sparse)
         if: runner.os == 'Windows'
         uses: actions/checkout@v4
         with:
           submodules: recursive
           sparse-checkout: |
-            /*
-            !/packages/wrapper/
-          sparse-checkout-cone-mode: false
+            packages/desktop
+            modules
+          sparse-checkout-cone-mode: true
 
       - name: Install Linux build dependencies
         if: runner.os == 'Linux'
