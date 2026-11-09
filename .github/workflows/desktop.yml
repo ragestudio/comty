@@ -58,9 +58,22 @@ jobs:
           git config --global url."https://${GITEA_USER}:${GITEA_GIT_TOKEN}@git.ragestudio.net/".insteadOf "https://git.ragestudio.net/"
 
       - name: Checkout repository
+        if: runner.os != 'Windows'
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      # packages/wrapper contains route paths with * and : which are not valid
+      # on windows, and the desktop build does not need that package
+      - name: Checkout repository (sparse)
+        if: runner.os == 'Windows'
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          sparse-checkout: |
+            /*
+            !/packages/wrapper/
+          sparse-checkout-cone-mode: false
 
       - name: Install Linux build dependencies
         if: runner.os == 'Linux'
