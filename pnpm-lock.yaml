@@ -1184,6 +1184,12 @@ importers:
       7zip-min:
         specifier: ^3.0.1
         version: 3.0.1
+      '@linebridge/cli':
+        specifier: workspace:^
+        version: link:../../modules/linebridge/cli
+      '@linebridge/engine-neo':
+        specifier: workspace:^
+        version: link:../../modules/linebridge/engines/neo
       '@octokit/rest':
         specifier: ^22.0.1
         version: 22.0.1
@@ -1213,7 +1219,14 @@ importers:
         version: 13.1.0
       sharp:
         specifier: ^0.35.4
-        version: 0.35.5(@types/node@26.6.4)
+        version: 0.35.5(@types/node@26.6.6)
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.5
+        version: 26.6.6
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
 packages:
 
@@ -23716,7 +23729,7 @@ snapshots:
       '@img/sharp-win32-x64': 0.35.5
       '@types/node': 25.9.9
 
-  sharp@0.35.5(@types/node@26.6.4):
+  sharp@0.35.5(@types/node@26.6.6):
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
@@ -23747,7 +23760,7 @@ snapshots:
       '@img/sharp-win32-arm64': 0.35.5
       '@img/sharp-win32-ia32': 0.35.5
       '@img/sharp-win32-x64': 0.35.5
-      '@types/node': 26.6.4
+      '@types/node': 26.6.6
 
   shebang-command@2.0.0:
     dependencies:
