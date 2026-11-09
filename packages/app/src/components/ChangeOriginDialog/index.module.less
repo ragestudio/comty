@@ -1,0 +1,40 @@
+.change-origin-dialog {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	&__header {
+		display: flex;
+		flex-direction: column;
+
+		gap: 7px;
+
+		h2 {
+			color: var(--danger-color);
+			font-weight: bold;
+		}
+	}
+
+	&__field {
+		display: flex;
+		flex-direction: column;
+
+		gap: 3px;
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		margin-left: auto;
+
+		gap: 5px;
+
+		&__danger {
+			color: var(--danger-color);
+		}
+	}
+}

@@ -27,6 +27,7 @@ import initRtcEvents from "./realtime/rtcEvents"
 import config from "@config"
 import routesDeclarations from "@config/routes"
 import onPageMount from "@hooks/onPageMount"
+import isURL from "./utils/isURL"
 
 import "@styles/index.less"
 
@@ -63,10 +64,19 @@ class ComtyApp extends React.Component<VesselAppProps> implements VesselApp {
 		window.app.isCapacitor = window["IS_MOBILE_HOST"]
 
 		const apiPreferLocal = localStorage.getItem("api-prefer-local")
+		const apiOriginOverride = localStorage.getItem("api-origin-override")
+
+		if (typeof apiOriginOverride === "string" && isURL(apiOriginOverride)) {
+			client.setOrigin(apiOriginOverride, {
+				persist: false,
+			})
+		}
 
 		if (apiPreferLocal == "true") {
 			console.log("Preferring to use local origin API")
-			client.setOrigin(`${window.location.origin}/api`)
+			client.setOrigin(`${window.location.origin}/api`, {
+				persist: false,
+			})
 		}
 
 		// register all keyboard shortcuts

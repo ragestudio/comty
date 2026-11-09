@@ -24,12 +24,18 @@ declare global {
 			get: () => Promise<AppChannel>
 			set: (channel: AppChannel) => Promise<AppChannel>
 		}
+		versions: {
+			app: string
+			build: string
+			electron: string
+			sysaudio: string
+		}
 		restart: () => Promise<unknown>
 		extensions: () => Promise<unknown>
 	}
 
 	interface Window {
-		ipcRenderer: any
+		ipcRenderer?: any
 		_hacks: any
 		__ELECTRON__?: ElectronBridge
 	}
