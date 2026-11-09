@@ -1,0 +1,123 @@
+name: Desktop
+
+on:
+  workflow_call:
+    secrets:
+      GITEA_GIT_TOKEN:
+        required: false
+  workflow_dispatch:
+  push:
+    tags:
+      - "desktop-*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            script: pack:linux
+            artifact: desktop-linux
+            paths: |
+              packages/desktop/release/*.AppImage
+              packages/desktop/release/*.deb
+          - name: Windows
+            os: windows-latest
+            script: pack:win
+            artifact: desktop-windows
+            paths: |
+              packages/desktop/release/*.exe
+              packages/desktop/release/*.exe.blockmap
+              packages/desktop/release/latest.yml
+    steps:
+      # the sysaudio submodule lives on a private gitea instance, so the token
+      # is injected through an url rewrite before checkout fetches submodules
+      - name: Configure git auth for private submodules
+        shell: bash
+        env:
+          GITEA_USER: ${{ vars.GITEA_USER || 'oauth2' }}
+          GITEA_GIT_TOKEN: ${{ secrets.GITEA_GIT_TOKEN }}
+        run: |
+          if [ -z "${GITEA_GIT_TOKEN}" ]; then
+            echo "::error::GITEA_GIT_TOKEN is required to clone private submodules from git.ragestudio.net"
+            exit 1
+          fi
+
+          git config --global url."https://${GITEA_USER}:${GITEA_GIT_TOKEN}@git.ragestudio.net/".insteadOf "https://git.ragestudio.net/"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config libpipewire-0.3-dev libspa-0.2-dev
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --filter comty-desktop
+
+      # the addon is a submodule and is not part of the pnpm workspace, so its
+      # own toolchain is installed locally before node-gyp runs
+      - name: Install sysaudio addon dependencies
+        working-directory: packages/desktop/addons/sysaudio
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Build desktop app
+        run: pnpm --filter comty-desktop run ${{ matrix.script }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.paths }}
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Publish desktop release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/desktop-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./desktop-release-files
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./desktop-release-files/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
