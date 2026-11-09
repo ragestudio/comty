@@ -1,14 +1,18 @@
 {
 	"appId": "com.ragestudio.comty-desktop",
 	"productName": "Comty",
+	"directories": {
+		"output": "release"
+	},
 	"files": [
-		"src/**/**",
-		"addons/**/*.node",
-		"resources/**/**",
+		"dist/**/*",
+		"addons/sysaudio/dist/sysaudio.node",
+		"resources/**/*",
 		"!electron.vite.config.{js,ts,mjs,cjs}",
 		"!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}",
 		"!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
 	],
+	"asarUnpack": ["addons/sysaudio/dist/sysaudio.node"],
 	"win": {
 		"executableName": "Comty",
 		"icon": "resources/icon.ico"
