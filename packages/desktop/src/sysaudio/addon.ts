@@ -30,3 +30,17 @@ export function loadAddon(): SysAudioAddon {
 
 	return require(resolveSysAudioBinary()) as SysAudioAddon
 }
+
+function readAddonVersion(): string {
+	try {
+		const manifest = JSON.parse(
+			fs.readFileSync(path.join(addonPath, "package.json"), "utf8"),
+		) as { version?: string }
+
+		return manifest.version ?? "unknown"
+	} catch {
+		return "unknown"
+	}
+}
+
+export const addonVersion = readAddonVersion()
