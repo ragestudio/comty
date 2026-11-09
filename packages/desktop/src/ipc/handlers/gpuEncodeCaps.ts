@@ -1,14 +1,45 @@
 import { app } from "electron"
 import { execSync } from "node:child_process"
 
-export default async function () {
-	const hardwareCodecs = new Set()
+interface EncoderInfo {
+	name?: string
+	codec?: string
+	codec_name?: string
+}
+
+interface GpuInfoReport {
+	videoAcceleratorInfo?: {
+		encoderInfo?: EncoderInfo[]
+	}
+	gpu?: {
+		videoAcceleratorInfo?: {
+			encoderInfo?: EncoderInfo[]
+		}
+	}
+}
+
+function addCodec(codecs: Set<string>, name: string) {
+	if (name.includes("h264") || name.includes("avc")) {
+		codecs.add("video/h264")
+	} else if (name.includes("av1")) {
+		codecs.add("video/AV1")
+	} else if (name.includes("vp9")) {
+		codecs.add("video/VP9")
+	} else if (name.includes("vp8")) {
+		codecs.add("video/VP8")
+	}
+}
+
+export default async function getGpuEncodeCaps(): Promise<string[]> {
+	const hardwareCodecs = new Set<string>()
 
 	try {
-		const raw = await app.getGPUInfo("complete")
-		const gpuInfo = typeof raw === "string" ? JSON.parse(raw) : raw
+		const raw = (await app.getGPUInfo("complete")) as unknown
+		const gpuInfo = (
+			typeof raw === "string" ? JSON.parse(raw) : raw
+		) as GpuInfoReport
 
-		// try structured encoder info from complete gpu report
+		// try structured encoder info from the complete gpu report
 		const encoderSources = [
 			gpuInfo?.videoAcceleratorInfo?.encoderInfo,
 			gpuInfo?.gpu?.videoAcceleratorInfo?.encoderInfo,
@@ -17,40 +48,32 @@ export default async function () {
 		for (const encoderInfo of encoderSources) {
 			if (!Array.isArray(encoderInfo)) continue
 
-			for (const enc of encoderInfo) {
+			for (const encoder of encoderInfo) {
 				const name = (
-					enc.name ||
-					enc.codec ||
-					enc.codec_name ||
+					encoder.name ||
+					encoder.codec ||
+					encoder.codec_name ||
 					""
 				).toLowerCase()
 
-				if (name.includes("h264") || name.includes("avc")) {
-					hardwareCodecs.add("video/h264")
-				} else if (name.includes("av1")) {
-					hardwareCodecs.add("video/AV1")
-				} else if (name.includes("vp9")) {
-					hardwareCodecs.add("video/VP9")
-				} else if (name.includes("vp8")) {
-					hardwareCodecs.add("video/VP8")
-				}
+				addCodec(hardwareCodecs, name)
 			}
 		}
 
-		// try text-based fallback from complete gpu report
+		// try text based fallback from the complete gpu report
 		if (hardwareCodecs.size === 0) {
-			const rawStr = typeof raw === "string" ? raw : JSON.stringify(raw)
+			const rawString = typeof raw === "string" ? raw : JSON.stringify(raw)
 
 			if (
-				rawStr.includes("Encode h264") ||
-				rawStr.includes("Encode avc")
+				rawString.includes("Encode h264") ||
+				rawString.includes("Encode avc")
 			) {
 				hardwareCodecs.add("video/h264")
 			}
-			if (rawStr.includes("Encode av1")) {
+			if (rawString.includes("Encode av1")) {
 				hardwareCodecs.add("video/AV1")
 			}
-			if (rawStr.includes("Encode vp9")) {
+			if (rawString.includes("Encode vp9")) {
 				hardwareCodecs.add("video/VP9")
 			}
 		}
@@ -67,35 +90,24 @@ export default async function () {
 			)
 
 			if (output.includes("VAEntrypointEncSlice")) {
-				// parse profiles from vainfo output
-				const profiles = new Set()
-				const lines = output.split("\n")
+				const profiles = new Set<string>()
 
 				let currentProfile = ""
 
-				for (const line of lines) {
+				for (const line of output.split("\n")) {
 					const profileMatch = line.match(/VAProfile(\w+)\s*:/)
 
 					if (profileMatch) {
 						currentProfile = profileMatch[1].toLowerCase()
 					}
 
-					if (
-						currentProfile &&
-						line.includes("VAEntrypointEncSlice")
-					) {
+					if (currentProfile && line.includes("VAEntrypointEncSlice")) {
 						profiles.add(currentProfile)
 					}
 				}
 
 				for (const profile of profiles) {
-					if (profile.includes("h264")) {
-						hardwareCodecs.add("video/h264")
-					} else if (profile.includes("av1")) {
-						hardwareCodecs.add("video/AV1")
-					} else if (profile.includes("vp9")) {
-						hardwareCodecs.add("video/VP9")
-					}
+					addCodec(hardwareCodecs, profile)
 				}
 			}
 		} catch {

@@ -3,7 +3,9 @@ import path from "node:path"
 
 import mime from "mime"
 
-export default {
+import type { ApiRoute } from "../types.js"
+
+const route: ApiRoute = {
 	path: "/extensions/assets/:namespace/**",
 	such: "wildcard",
 	method: "get",
@@ -11,34 +13,31 @@ export default {
 		const namespace = req.params.namespace
 		const extension = main.extensions.get(namespace)
 
-		// check if exists in main.extensions
-		if (!extension) {
+		// check if the extension is loaded
+		if (!extension?.path) {
 			res.statusCode = 404
 			res.end(JSON.stringify({ error: "Extension not available" }))
 			return null
 		}
 
-		let filePathRequested = req.url.replace(
+		let filePathRequested = (req.url ?? "").replace(
 			`/extensions/assets/${namespace}`,
 			"",
 		)
 
-		// Normalize the file path to prevent directory traversal attacks
+		// normalize the path to prevent directory traversal attacks
 		filePathRequested = path.normalize(filePathRequested)
 
-		// Remove leading slash if present
 		if (filePathRequested.startsWith("/")) {
 			filePathRequested = filePathRequested.substring(1)
 		}
 
-		// Construct the full file path
 		const fullPath = path.join(extension.path, filePathRequested)
 
-		// Resolve both paths to check if the requested file is within the extension's base path
 		const resolvedFullPath = path.resolve(fullPath)
 		const resolvedBasePath = path.resolve(extension.path)
 
-		// Check if the resolved full path is within the extension's base path
+		// ensure the requested file is inside the extension directory
 		if (
 			!resolvedFullPath.startsWith(resolvedBasePath + path.sep) &&
 			resolvedFullPath !== resolvedBasePath
@@ -52,7 +51,6 @@ export default {
 			return null
 		}
 
-		// Check if file exists and is a file (not a directory)
 		const fileStats = await fs.promises.stat(fullPath)
 
 		if (!fileStats.isFile()) {
@@ -62,25 +60,22 @@ export default {
 			return null
 		}
 
-		// Stream the file to the response
 		const fileStream = fs.createReadStream(fullPath)
 
-		// set content type and length
-		res.setHeader("Content-Type", mime.getType(fullPath))
+		res.setHeader(
+			"Content-Type",
+			mime.getType(fullPath) ?? "application/octet-stream",
+		)
 		res.setHeader("Content-Length", fileStats.size)
 
-		// write the head
 		res.writeHead(200)
 
-		// pipe the buffer
 		fileStream.pipe(res)
 
-		// close the stream when it ends
 		fileStream.on("close", () => {
 			res.end()
 		})
 
-		// handle stream erros
 		fileStream.on("error", (error) => {
 			console.error(error)
 
@@ -89,3 +84,5 @@ export default {
 		})
 	},
 }
+
+export default route
