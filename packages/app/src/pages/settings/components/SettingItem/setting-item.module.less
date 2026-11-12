@@ -1,0 +1,146 @@
+.app-setting-item {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	padding: 0 15px;
+
+	gap: 10px;
+
+	:global(.uploadButton) {
+		background-color: var(--background-color-primary);
+		border: 1px solid var(--border-color);
+	}
+}
+
+.app-setting-item--horizontal {
+	flex-direction: row;
+
+	justify-content: space-between;
+
+	gap: 50px;
+
+	.app-setting-item__content {
+		width: fit-content;
+	}
+}
+
+.app-setting-item--mobile {
+	.app-setting-item__header {
+		flex-direction: column;
+
+		gap: 5px;
+	}
+
+	.app-setting-item__title {
+		justify-content: space-between;
+	}
+
+	.app-setting-item__info {
+		gap: 5px;
+	}
+
+	.app-setting-item__content {
+		width: 100%;
+		padding: 0;
+	}
+}
+
+.app-setting-item--padding {
+	// modifier used by the mobile padding rule below
+}
+
+.app-setting-item--mobile.app-setting-item--padding {
+	.app-setting-item__content {
+		padding: 5px 20px;
+	}
+}
+
+.app-setting-item__header {
+	display: inline-flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: space-between;
+
+	width: 100%;
+}
+
+.app-setting-item__info {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+}
+
+.app-setting-item__title {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	width: 100%;
+
+	color: var(--background-color-contrast);
+
+	gap: 5px;
+
+	h1 {
+		font-size: 1rem;
+		margin: 0;
+		color: var(--background-color-contrast);
+	}
+}
+
+.app-setting-item__description {
+	p {
+		color: var(--background-color-contrast);
+		font-size: 0.7rem;
+		margin: 0;
+	}
+}
+
+.app-setting-item__actions {
+	display: inline-flex;
+	align-items: center;
+
+	gap: 10px;
+
+	:global(.ant-btn) {
+		background-color: var(--background-color-primary-2);
+	}
+
+	:global(.ant-btn:not([disabled])):hover {
+		color: var(--colorPrimary);
+		border: 1px solid var(--colorPrimary);
+	}
+}
+
+.app-setting-item__content {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	--ignore-dragger: true;
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	span {
+		color: var(--background-color-contrast);
+	}
+
+	button {
+		width: min-content;
+	}
+
+	:global(.ant-btn.ant-btn-icon-only) {
+		width: 32px;
+	}
+}

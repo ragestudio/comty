@@ -1,0 +1,145 @@
+.app-settings-menu {
+	position: relative;
+
+	top: 0;
+	left: 0;
+
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+
+	width: 100%;
+	min-width: 160px;
+
+	height: fit-content;
+
+	border-radius: 18px;
+	border: 1px solid var(--border-color);
+
+	gap: 3px;
+
+	padding: 10px 10px;
+
+	overflow-y: scroll;
+
+	:global {
+		.ant-menu {
+			padding-inline-start: 0;
+			padding-inline-end: 0;
+			padding: 0;
+			width: 100%;
+		}
+
+		.ant-menu-item-group-list {
+			gap: 0px !important;
+		}
+
+		.ant-menu-item-group-title {
+			padding: 5px 5px;
+		}
+
+		.ant-menu-item {
+			padding: 5px 15px !important;
+			margin: 0 !important;
+
+			align-items: center;
+
+			.ant-menu-item-icon {
+				min-width: 24px;
+				min-height: 24px;
+
+				background-color: var(--backgroundColorPrimary);
+
+				padding: 5px;
+				border-radius: 8px;
+			}
+
+			.ant-menu-title-content {
+				height: fit-content;
+				line-height: 1rem;
+
+				span {
+					line-height: 1rem;
+					height: fit-content;
+				}
+			}
+		}
+	}
+}
+
+:global(.app_modal_settings) {
+	.app-settings-menu {
+		width: fit-content;
+		height: 100%;
+	}
+}
+
+.app-settings-menu__search {
+	position: sticky;
+
+	top: 0;
+	margin-top: 0;
+	z-index: 2;
+
+	width: 100%;
+}
+
+.app-settings-menu__item-content {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	height: fit-content;
+
+	gap: 10px;
+
+	svg {
+		margin: 0 !important;
+	}
+}
+
+.app-settings-menu__extra-item {
+	display: flex;
+	flex-direction: row;
+
+	gap: 10px;
+}
+
+.app-settings-menu__extra-item--support {
+	color: #f72585;
+}
+
+.app-settings-menu :global(.ant-menu-item-group-list) {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	gap: 3px;
+}
+
+.app-settings-menu :global(.ant-menu-item) {
+	margin: 0;
+
+	border-radius: 24px;
+
+	&::before {
+		height: 35%;
+		left: 10px;
+	}
+
+	:global(.ant-menu-title-content) {
+		height: fit-content;
+	}
+}
+
+.app-settings-menu :global(.ant-menu-item-danger) {
+	:global(.ant-menu-title-content) {
+		color: #ff4d4f;
+
+		svg {
+			color: #ff4d4f;
+		}
+	}
+}

@@ -58,16 +58,18 @@ export interface SettingTabModule {
 	label: string
 	group: string
 	order?: number
-	settings: Setting[]
+	settings?: Setting[]
 	ctxData?: () => Promise<any> | any
 	onLoad?: (ctx: any) => Promise<void> | void
 	render?: ComponentType<{ ctx: any }>
 	footer?: ComponentType<{ ctx: any }>
+	danger?: boolean
+	disabled?: boolean
 }
 
 export interface SettingsGroup {
 	group: string
-	groupModule: SettingTabModule[]
+	children: SettingTabModule[]
 }
 
 export interface SettingItemCtx {

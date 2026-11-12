@@ -1,70 +1,92 @@
 import React from "react"
 import * as antd from "antd"
-import { Translation } from "react-i18next"
-import { Icons } from "@components/Icons"
 
-import { composedTabs, composeGroupsFromSettingsTab } from "@/settings"
-import groupsDecorators from "@config/settingsGroupsDecorators"
-import SettingItemComponent from "../SettingItemComponent"
-import { SettingTabModule, Setting } from "../../types"
+import { filterSettingsByQuery } from "../../search"
+import { settingsStore } from "../../store"
+import type { Setting } from "../../types"
+import SettingTabGroups from "./groups"
+import SettingTabHeader from "./header"
+import SettingTabSettings from "./settings"
 
 interface SettingTabProps {
-	activeKey: string
 	baseConfig?: any
 	onUpdate?: (key: string, value: any) => void
 	withGroups?: boolean
+	tabId?: string
+	search?: boolean
+	showTabHeader?: boolean
+	query?: string
 }
 
 const SettingTab: React.FC<SettingTabProps> = ({
-	activeKey,
 	baseConfig,
 	onUpdate,
 	withGroups,
+	tabId,
+	search,
+	showTabHeader,
+	query: queryProp,
 }) => {
+	const activeKey = settingsStore((state) => state.activeKey)
+	const tabKey = tabId ?? activeKey
+	const tab = settingsStore((state) =>
+		tabKey ? state.tabs[tabKey] : undefined,
+	)
+	const tabGroups = settingsStore((state) =>
+		tabKey ? state.tabGroups[tabKey] : undefined,
+	)
+
 	const [loading, setLoading] = React.useState(true)
-	const [tab, setTab] = React.useState<SettingTabModule | null>(null)
-	const [ctx, setCtx] = React.useState<any>({})
-
-	const loadTab = React.useCallback(async () => {
-		setLoading(true)
-
-		const currentTab = (composedTabs as any)[activeKey] as SettingTabModule
-
-		if (!currentTab) {
-			setLoading(false)
-			return
-		}
-
-		let tabCtx = {}
-
-		if (typeof currentTab.ctxData === "function") {
-			tabCtx = await currentTab.ctxData()
-		}
-
-		if (typeof currentTab.onLoad === "function") {
-			await currentTab.onLoad(tabCtx)
-		}
-
-		setTab(currentTab)
-		setCtx({
-			baseConfig,
-			...tabCtx,
-		})
-		setLoading(false)
-	}, [activeKey, baseConfig])
+	const [ctxData, setCtxData] = React.useState<any>({})
 
 	React.useEffect(() => {
-		loadTab()
-	}, [loadTab])
+		let active = true
 
-	const handleSettingUpdate = React.useCallback(
-		async (key: string, value: any) => {
-			if (onUpdate) {
-				onUpdate(key, value)
+		const loadTab = async () => {
+			setLoading(true)
+
+			if (!tab) {
+				if (active) {
+					setCtxData({})
+					setLoading(false)
+				}
+
+				return
 			}
-		},
-		[onUpdate],
+
+			let data = {}
+
+			if (typeof tab.ctxData === "function") {
+				data = await tab.ctxData()
+			}
+
+			if (!search && typeof tab.onLoad === "function") {
+				await tab.onLoad(data)
+			}
+
+			if (!active) return
+
+			setCtxData(data)
+			setLoading(false)
+		}
+
+		loadTab()
+
+		return () => {
+			active = false
+		}
+	}, [tab, search])
+
+	const ctx = React.useMemo(
+		() => ({
+			baseConfig,
+			...ctxData,
+		}),
+		[baseConfig, ctxData],
 	)
+
+	const query = search ? (queryProp ?? "") : ""
+	const trimmedQuery = query.trim()
 
 	if (loading) {
 		return <antd.Skeleton active />
@@ -74,78 +96,65 @@ const SettingTab: React.FC<SettingTabProps> = ({
 		return null
 	}
 
-	if (tab.render) {
+	if (tab.render && !search) {
 		return React.createElement(tab.render, {
 			ctx: ctx,
 		})
 	}
 
+	const header = showTabHeader ? <SettingTabHeader tab={tab} /> : null
+
 	if (withGroups) {
-		const groups = composeGroupsFromSettingsTab(tab.settings)
+		const filteredGroups: [string, Setting[]][] = []
+
+		for (const [groupKey, settings] of Object.entries(tabGroups ?? {})) {
+			const filteredSettings = filterSettingsByQuery(settings, query)
+
+			if (filteredSettings.length > 0) {
+				filteredGroups.push([groupKey, filteredSettings])
+			}
+		}
+
+		if (search && filteredGroups.length === 0) {
+			return null
+		}
 
 		return (
 			<>
-				{Object.entries(groups).map(([groupKey, settings], index) => {
-					const decorator = (groupsDecorators as any)[groupKey]
-					const fromDecoratorIcon = decorator?.icon
-					const fromDecoratorTitle = decorator?.title
+				{header}
 
-					return (
-						<div
-							id={groupKey}
-							key={index}
-							className="settings_content_group bg-accent"
-						>
-							{fromDecoratorTitle !== null && fromDecoratorIcon && (
-								<div className="settings_content_group_header">
-									<h1>
-										{fromDecoratorIcon
-											? React.createElement((Icons as any)[fromDecoratorIcon])
-											: null}
+				<SettingTabGroups
+					groups={filteredGroups}
+					ctx={ctx}
+					search={search}
+					onUpdate={onUpdate}
+				/>
 
-										{fromDecoratorTitle !== null && (
-											<Translation>
-												{(t) => t(fromDecoratorTitle ?? groupKey)}
-											</Translation>
-										)}
-									</h1>
-								</div>
-							)}
-
-							<div className="settings_list">
-								{(settings as Setting[]).map((setting, idx) => (
-									<SettingItemComponent
-										key={idx}
-										setting={setting}
-										ctx={ctx}
-										onUpdate={(value) => handleSettingUpdate(setting.id, value)}
-									/>
-								))}
-							</div>
-						</div>
-					)
-				})}
-
-				{tab.footer && React.createElement(tab.footer, { ctx })}
+				{!trimmedQuery &&
+					tab.footer &&
+					React.createElement(tab.footer, { ctx })}
 			</>
 		)
 	}
 
+	const filteredSettings = filterSettingsByQuery(tab.settings ?? [], query)
+
+	if (search && filteredSettings.length === 0) {
+		return null
+	}
+
 	return (
 		<>
-			{tab.settings.map((setting, index) => (
-				<SettingItemComponent
-					key={index}
-					setting={setting}
-					ctx={{
-						...ctx,
-						baseConfig,
-					}}
-					onUpdate={(value) => handleSettingUpdate(setting.id, value)}
-				/>
-			))}
+			{header}
 
-			{tab.footer && React.createElement(tab.footer, { ctx })}
+			<SettingTabSettings
+				settings={filteredSettings}
+				ctx={ctx}
+				search={search}
+				onUpdate={onUpdate}
+			/>
+
+			{!trimmedQuery && tab.footer && React.createElement(tab.footer, { ctx })}
 		</>
 	)
 }

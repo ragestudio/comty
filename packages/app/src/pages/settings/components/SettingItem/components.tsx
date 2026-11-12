@@ -1,7 +1,6 @@
 import * as antd from "antd"
 import Button from "@ui/Button"
 import { SliderPicker } from "react-color"
-import { SettingItemCtx } from "../../types"
 
 export const SettingsComponents: Record<
 	string,
