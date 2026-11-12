@@ -223,5 +223,7 @@
     "Expansible actions": "Acciones expansibles",
     "Show the actions in a expandable list": "Muestra las acciones en una lista expansible",
     "Automatically show or hide the actions bar": "Muestra o oculta automáticamente la barra de acciones",
-    "Online Friends": "Amigos en línea"
+    "Online Friends": "Amigos en línea",
+    "search_settings": "Buscar ajustes",
+    "no_settings_found": "No se encontraron ajustes"
 }

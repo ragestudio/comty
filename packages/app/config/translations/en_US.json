@@ -99,5 +99,7 @@
     "settings_aspect_primaryColor": "Primary color",
     "settings_aspect_primaryColor_description": "Change primary color of the application.",
     "settings_aspect_resetTheme": "Reset theme",
-    "settings_aspect_resetTheme_description": "Reset theme to default."
+    "settings_aspect_resetTheme_description": "Reset theme to default.",
+    "search_settings": "Search settings",
+    "no_settings_found": "No settings found"
 }
