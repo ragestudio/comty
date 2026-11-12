@@ -215,7 +215,6 @@ const SidebarInner = ({
 							/>
 
 							<GroupsList
-								compact={!expanded}
 								selected={
 									spacesNav.type === "group"
 										? spacesNav.room

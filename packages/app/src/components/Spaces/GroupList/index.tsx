@@ -23,7 +23,6 @@ interface SortableItemProps {
 	index: number
 	onClick?: (group: Group) => void
 	selected?: boolean
-	compact?: boolean
 }
 
 const SortableItem = ({
@@ -31,7 +30,6 @@ const SortableItem = ({
 	index,
 	onClick,
 	selected,
-	compact,
 }: SortableItemProps) => {
 	const sortable = useSortable({ id: group._id, index })
 
@@ -41,7 +39,6 @@ const SortableItem = ({
 			group={group}
 			onClick={onClick}
 			selected={selected}
-			compact={compact}
 		/>
 	)
 }
@@ -51,7 +48,6 @@ export interface GroupsListProps {
 	onClickCreateNew?: () => void
 	selected?: string | null
 	sortable?: boolean
-	compact?: boolean
 }
 
 const GroupsList = ({
@@ -59,7 +55,6 @@ const GroupsList = ({
 	onClickCreateNew,
 	selected,
 	sortable,
-	compact,
 }: GroupsListProps) => {
 	const { groups, loading, error, actions } = useGroupsList()
 
@@ -102,11 +97,7 @@ const GroupsList = ({
 	}
 
 	return (
-		<div
-			className={classnames("groups-list", {
-				compact: compact,
-			})}
-		>
+		<div className={classnames("groups-list")}>
 			{sortable && (
 				<DragDropProvider
 					onDragEnd={handleOnDragEndItems}
@@ -120,7 +111,6 @@ const GroupsList = ({
 								group={group}
 								onClick={onClickItem}
 								selected={selected === group._id}
-								compact={compact}
 							/>
 						)
 					})}
@@ -135,7 +125,6 @@ const GroupsList = ({
 							group={group}
 							onClick={onClickItem}
 							selected={selected === group._id}
-							compact={compact}
 						/>
 					)
 				})}
@@ -144,7 +133,6 @@ const GroupsList = ({
 				id="create-space-button"
 				icon={<Icons.Plus />}
 				title="Create a space"
-				compact={compact}
 				onClick={onClickCreateNew}
 			/>
 		</div>

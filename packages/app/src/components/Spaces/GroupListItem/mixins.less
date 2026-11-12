@@ -1,39 +1,10 @@
 @group_icon_size: 50px;
 
 .group-list-item-compact() {
-	flex: 0 0 @group_icon_size;
-
-	width: @group_icon_size;
-	min-width: @group_icon_size;
 	max-width: @group_icon_size;
 
-	height: @group_icon_size;
-	min-height: @group_icon_size;
-	max-height: @group_icon_size;
-
-	aspect-ratio: 1;
-
-	gap: 0;
-	padding: 0;
-
-	.group-list__item__icon {
-		position: absolute;
-		inset: 0;
-
-		width: auto;
-		height: auto;
-
-		min-width: 0;
-		min-height: 0;
-
-		border-radius: inherit;
-	}
-
 	.group-list__item__content {
-		flex: 0 0 0;
-
 		width: 0;
-
 		opacity: 0;
 	}
 }
