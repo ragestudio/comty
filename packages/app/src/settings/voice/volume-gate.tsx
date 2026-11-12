@@ -38,6 +38,7 @@ function useMicLevel(deviceId?: string | null) {
 		let analyser: AnalyserNode | null = null
 		let sink: GainNode | null = null
 		let timer: ReturnType<typeof setInterval> | null = null
+		let idleHandle: number | null = null
 
 		const stopTemporaryStream = () => {
 			if (!temporaryStream) return
@@ -142,10 +143,37 @@ function useMicLevel(deviceId?: string | null) {
 			}, 100)
 		}
 
-		setup()
+		const scheduleSetup = () => {
+			const requestIdleCallback = (window as any).requestIdleCallback
+
+			if (typeof requestIdleCallback === "function") {
+				idleHandle = requestIdleCallback(
+					() => {
+						setup()
+					},
+					{ timeout: 1000 },
+				)
+
+				return
+			}
+
+			idleHandle = window.setTimeout(() => {
+				setup()
+			}, 0)
+		}
+
+		scheduleSetup()
 
 		return () => {
 			disposed = true
+
+			if (idleHandle !== null) {
+				if (typeof (window as any).cancelIdleCallback === "function") {
+					;(window as any).cancelIdleCallback(idleHandle)
+				} else {
+					clearTimeout(idleHandle)
+				}
+			}
 
 			if (timer) clearInterval(timer)
 
