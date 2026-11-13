@@ -1,11 +1,17 @@
+import type API from "@services/users/users.service"
+
 import User from "@db_models/user"
 import Decorations from "@db_models/decorations"
 
-export default {
+type RouteParams = {
+	user_id: string
+}
+
+export default defineRoute<API>()({
 	fn: async (req) => {
-		const { user_id } = req.params
-		const isMultiple: boolean = user_id.includes(",")
-		const ids: string[] = isMultiple ? user_id.split(",") : [user_id]
+		const { user_id } = req.params as RouteParams
+		const isMultiple = user_id.includes(",")
+		const ids = isMultiple ? user_id.split(",") : [user_id]
 
 		const users = await User.find(
 			{ _id: { $in: ids } },
@@ -18,8 +24,8 @@ export default {
 
 		const decoIds = [
 			...new Set(
-				users.flatMap((u) =>
-					Object.values(u.decorations || {}).map(String),
+				users.flatMap((user) =>
+					Object.values(user.decorations || {}).map(String),
 				),
 			),
 		]
@@ -32,14 +38,14 @@ export default {
 			: []
 
 		const decoDict = Object.fromEntries(
-			decos.map((dec) => [String(dec._id), dec]),
+			decos.map((decoration) => [String(decoration._id), decoration]),
 		)
 		const userDict = Object.fromEntries(
-			users.map((u) => [String(u._id), u]),
+			users.map((user) => [String(user._id), user]),
 		)
 
 		const result = ids.map((id) => {
-			const hydrated = {}
+			const hydrated: Record<string, any> = {}
 			const userDecos = userDict[id]?.decorations || {}
 
 			for (const key in userDecos) {
@@ -57,4 +63,4 @@ export default {
 
 		return isMultiple ? result : result[0]
 	},
-}
+})

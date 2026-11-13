@@ -2,6 +2,8 @@ import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
 import type { RTC_SoundpadPayload as SoundpadPayload } from "@comty/shared/types/rtc/events/index"
 
+import { normalizeSoundpadDispatch } from "@shared-classes/Spaces/Soundpad/validation"
+
 export default defineRoute<API, HandlerKind["ws"]>()({
 	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, payload: SoundpadPayload, ctx) => {
@@ -17,6 +19,8 @@ export default defineRoute<API, HandlerKind["ws"]>()({
 			throw new OperationError(404, "No channel available")
 		}
 
-		return await channelInstance.handleSoundpadDispatch(client, payload)
+		const data = normalizeSoundpadDispatch(payload)
+
+		return await channelInstance.handleSoundpadDispatch(client, data)
 	},
 })
