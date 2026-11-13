@@ -111,7 +111,9 @@ export interface GroupStoreActions {
 	handleChannelUpdated: (payload: Channel) => void
 	handleChannelsOrdered: (payload: string[]) => void
 	handleChannelNewMessage: (payload: Message) => void
-	handleMembershipCreated: (payload: MembershipCreatedPayload) => Promise<void>
+	handleMembershipCreated: (
+		payload: MembershipCreatedPayload,
+	) => Promise<void>
 	handleMembershipDeleted: (payload: MembershipDeletedPayload) => void
 	handleMembershipUpdated: (payload: MembershipUpdatedPayload) => void
 	handleRolesUpdated: () => void

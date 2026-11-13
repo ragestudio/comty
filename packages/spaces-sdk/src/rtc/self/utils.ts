@@ -12,13 +12,15 @@ export function pickVideoCodec(
 ): RtpCodecCapability | undefined {
 	const videoCodecs = (capabilities.codecs ?? []).filter(
 		(codec) =>
-			codec.kind === "video" && !codec.mimeType?.toLowerCase().includes("rtx"),
+			codec.kind === "video" &&
+			!codec.mimeType?.toLowerCase().includes("rtx"),
 	)
 
 	if (preferred?.mimeType) {
 		const match = videoCodecs.find(
 			(codec) =>
-				codec.mimeType?.toLowerCase() === preferred.mimeType.toLowerCase(),
+				codec.mimeType?.toLowerCase() ===
+				preferred.mimeType.toLowerCase(),
 		)
 
 		if (match) return match
@@ -58,7 +60,9 @@ export function computeScreenEncoding(
 
 	const maxBitrate = Math.min(
 		Math.round(
-			defaults.screenVideoEncodingParams.maxBitrate * pixelRatio * fpsRatio,
+			defaults.screenVideoEncodingParams.maxBitrate *
+				pixelRatio *
+				fpsRatio,
 		),
 		defaults.maxScreenBitrate,
 	)

@@ -25,7 +25,8 @@ class PCMOutputProcessor extends AudioWorkletProcessor {
 			let sL = Math.max(-1, Math.min(1, left[i]))
 			let sR = Math.max(-1, Math.min(1, right[i]))
 
-			this.interleaved[this.writeIndex * 2] = sL < 0 ? sL * 0x8000 : sL * 0x7fff
+			this.interleaved[this.writeIndex * 2] =
+				sL < 0 ? sL * 0x8000 : sL * 0x7fff
 			this.interleaved[this.writeIndex * 2 + 1] =
 				sR < 0 ? sR * 0x8000 : sR * 0x7fff
 

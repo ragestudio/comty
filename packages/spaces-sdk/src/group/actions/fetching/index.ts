@@ -10,7 +10,8 @@ class FetchingActions extends ActionsBase<GroupStoreType> {
 	fetchGroup: OmitThisParameter<typeof fetchGroup> = fetchGroup.bind(this)
 	fetchChannels: OmitThisParameter<typeof fetchChannels> =
 		fetchChannels.bind(this)
-	fetchMembers: OmitThisParameter<typeof fetchMembers> = fetchMembers.bind(this)
+	fetchMembers: OmitThisParameter<typeof fetchMembers> =
+		fetchMembers.bind(this)
 	fetchViewerPermissions: OmitThisParameter<typeof fetchViewerPermissions> =
 		fetchViewerPermissions.bind(this)
 }

@@ -42,7 +42,9 @@ export class SysAudioLegacyCapture extends SysAudioCaptureBase {
 
 		await this.initializeInput()
 
-		const outputSupported = await this.ipc!.invoke("sysaudio:output_supported")
+		const outputSupported = await this.ipc!.invoke(
+			"sysaudio:output_supported",
+		)
 
 		if (outputSupported) {
 			await this.initializeOutput()
@@ -67,9 +69,13 @@ export class SysAudioLegacyCapture extends SysAudioCaptureBase {
 	private createInputWorklet() {
 		if (!this.inputCtx) return
 
-		this.pcmInputWorklet = new AudioWorkletNode(this.inputCtx, "pcm-input", {
-			outputChannelCount: [2],
-		})
+		this.pcmInputWorklet = new AudioWorkletNode(
+			this.inputCtx,
+			"pcm-input",
+			{
+				outputChannelCount: [2],
+			},
+		)
 	}
 
 	private attachIpcListener() {
@@ -123,7 +129,9 @@ export class SysAudioLegacyCapture extends SysAudioCaptureBase {
 	private async initializeOutput() {
 		if (!this.ipc) return
 
-		const outputSupported = await this.ipc.invoke("sysaudio:output_supported")
+		const outputSupported = await this.ipc.invoke(
+			"sysaudio:output_supported",
+		)
 
 		if (!outputSupported) return
 
@@ -140,7 +148,10 @@ export class SysAudioLegacyCapture extends SysAudioCaptureBase {
 		// the output context is created before any gesture, so keep it unlocked
 		keepContextRunning(this.outputCtx)
 
-		this.pcmOutputWorklet = new AudioWorkletNode(this.outputCtx, "pcm-output")
+		this.pcmOutputWorklet = new AudioWorkletNode(
+			this.outputCtx,
+			"pcm-output",
+		)
 
 		this.outputBus.connect(this.pcmOutputWorklet)
 
@@ -190,7 +201,9 @@ export class SysAudioLegacyCapture extends SysAudioCaptureBase {
 				// already disconnected
 			}
 
-			this.inputDestination.stream.getTracks().forEach((track) => track.stop())
+			this.inputDestination.stream
+				.getTracks()
+				.forEach((track) => track.stop())
 
 			this.inputDestination = null
 		}

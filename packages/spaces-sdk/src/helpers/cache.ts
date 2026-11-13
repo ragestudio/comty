@@ -71,7 +71,10 @@ export const cacheMembers = async (
 		await db.members.bulkPut(stripped)
 
 		// enforce per-group member limit (keep most recent)
-		const total = await db.members.where("group_id").equals(group_id).count()
+		const total = await db.members
+			.where("group_id")
+			.equals(group_id)
+			.count()
 
 		if (total > CACHED_MEMBERS_PER_GROUP_LIMIT) {
 			const oldest = await db.members

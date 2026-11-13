@@ -56,7 +56,8 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 		if (sampleRate > 0 && channels > 0) {
 			this.channels = channels
 			this.bitsPerSample =
-				Atomics.load(this.header, HEADER.bitsPerSample) || this.bitsPerSample
+				Atomics.load(this.header, HEADER.bitsPerSample) ||
+				this.bitsPerSample
 		}
 
 		const bytesPerSample = this.bitsPerSample / 8
@@ -100,7 +101,14 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 		return true
 	}
 
-	readFrames(read, frames, output, outputChannels, bytesPerSample, frameBytes) {
+	readFrames(
+		read,
+		frames,
+		output,
+		outputChannels,
+		bytesPerSample,
+		frameBytes,
+	) {
 		const channels = this.channels
 
 		if (this.bitsPerSample === 16) {
@@ -141,7 +149,8 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 		for (let i = 0; i < frames; i++) {
 			for (let c = 0; c < outputChannels; c++) {
 				const sampleOffset =
-					(read + i * frameBytes + (c % channels) * bytesPerSample) & this.mask
+					(read + i * frameBytes + (c % channels) * bytesPerSample) &
+					this.mask
 
 				output[c][i] = this.readSample(sampleOffset, bytesPerSample)
 			}

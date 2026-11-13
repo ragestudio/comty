@@ -60,7 +60,8 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 				view = new Uint8Array(arrayBuffer, byteOffset, byteLength)
 
 				for (let i = 0; i < view.length; i += 3) {
-					let int32 = view[i] | (view[i + 1] << 8) | (view[i + 2] << 16)
+					let int32 =
+						view[i] | (view[i + 1] << 8) | (view[i + 2] << 16)
 
 					int32 = (int32 << 8) >> 8
 					this._writeSample(int32 / 8388608.0)

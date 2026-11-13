@@ -100,9 +100,10 @@ export class Producers extends Map<string, Producer> {
 		}
 
 		try {
-			producer = (await this.core.transports.send.produce<ProducerAppData>(
-				payload,
-			)) as Producer
+			producer =
+				(await this.core.transports.send.produce<ProducerAppData>(
+					payload,
+				)) as Producer
 		} catch (error) {
 			this.core.eventBus.emit("rtc:producer:error", { error })
 			logger.error("Failed to produce error", error)

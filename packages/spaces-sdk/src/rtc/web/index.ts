@@ -45,7 +45,10 @@ export function initializeRtcAdapter(): Promise<void> {
 		try {
 			return await processMicStream(stream)
 		} catch (error) {
-			console.error("[spaces-adapter] failed to process mic stream", error)
+			console.error(
+				"[spaces-adapter] failed to process mic stream",
+				error,
+			)
 			return stream
 		}
 	})

@@ -39,7 +39,12 @@ export const groupAdapter: ChatAdapter = {
 
 		if (beforeId) {
 			return collection
-				.between([channelId, MinKey], [channelId, beforeId], false, false)
+				.between(
+					[channelId, MinKey],
+					[channelId, beforeId],
+					false,
+					false,
+				)
 				.reverse()
 				.limit(limit)
 				.toArray()
@@ -47,7 +52,12 @@ export const groupAdapter: ChatAdapter = {
 
 		if (afterId) {
 			return collection
-				.between([channelId, afterId], [channelId, MaxKey], false, false)
+				.between(
+					[channelId, afterId],
+					[channelId, MaxKey],
+					false,
+					false,
+				)
 				.limit(limit)
 				.toArray()
 				.then((msgs) => msgs.reverse())
@@ -76,10 +86,12 @@ export const groupAdapter: ChatAdapter = {
 			chat_id: state.chat_id,
 			last_synced_at:
 				state.last_synced_at ?? current?.last_synced_at ?? Date.now(),
-			last_message_id: state.last_message_id ?? current?.last_message_id ?? "",
+			last_message_id:
+				state.last_message_id ?? current?.last_message_id ?? "",
 			has_more_before:
 				state.has_more_before ?? current?.has_more_before ?? true,
-			has_more_after: state.has_more_after ?? current?.has_more_after ?? false,
+			has_more_after:
+				state.has_more_after ?? current?.has_more_after ?? false,
 		})
 	},
 }
@@ -153,10 +165,12 @@ export const dmAdapter: ChatAdapter = {
 			chat_id: state.chat_id,
 			last_synced_at:
 				state.last_synced_at ?? current?.last_synced_at ?? Date.now(),
-			last_message_id: state.last_message_id ?? current?.last_message_id ?? "",
+			last_message_id:
+				state.last_message_id ?? current?.last_message_id ?? "",
 			has_more_before:
 				state.has_more_before ?? current?.has_more_before ?? true,
-			has_more_after: state.has_more_after ?? current?.has_more_after ?? false,
+			has_more_after:
+				state.has_more_after ?? current?.has_more_after ?? false,
 		})
 	},
 }

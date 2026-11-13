@@ -22,7 +22,10 @@ export class Client {
 	core: RTC
 	logger: typeof logger
 
-	constructor(core: RTC, data: Partial<Pick<Client, "userId" | "voiceState">>) {
+	constructor(
+		core: RTC,
+		data: Partial<Pick<Client, "userId" | "voiceState">>,
+	) {
 		this.core = core
 
 		if (!data.userId) {

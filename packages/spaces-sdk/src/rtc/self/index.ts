@@ -183,7 +183,10 @@ export class Self {
 
 		// deafen only silences microphones, screen shares keep playing
 		for (const [_id, consumer] of this.core.consumers) {
-			if (consumer.kind !== "audio" || consumer.appData.mediaTag !== "user-mic")
+			if (
+				consumer.kind !== "audio" ||
+				consumer.appData.mediaTag !== "user-mic"
+			)
 				continue
 
 			if (to) {

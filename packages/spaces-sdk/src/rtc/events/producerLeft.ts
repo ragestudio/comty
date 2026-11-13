@@ -37,17 +37,29 @@ export default async function (this: RTC, data: any) {
 
 			// if a camera stops, drop it
 			if (data.appData.mediaTag === "user-cam") {
-				await this.cameras.removeProducer(data.userId, "video", data.producerId)
+				await this.cameras.removeProducer(
+					data.userId,
+					"video",
+					data.producerId,
+				)
 			}
 
 			// if a screen share ends, stop consuming its tracks
 			if (data.appData.mediaTag === "screen-video") {
 				//app.cores.sfx.play("media_video_leave")
-				await this.screens.removeProducer(data.userId, "video", data.producerId)
+				await this.screens.removeProducer(
+					data.userId,
+					"video",
+					data.producerId,
+				)
 			}
 
 			if (data.appData.mediaTag === "screen-audio") {
-				await this.screens.removeProducer(data.userId, "audio", data.producerId)
+				await this.screens.removeProducer(
+					data.userId,
+					"audio",
+					data.producerId,
+				)
 			}
 		}
 

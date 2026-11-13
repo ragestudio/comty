@@ -38,7 +38,11 @@ export type {
 } from "./utils/parseTransportStats"
 
 type ConnState =
-	"disconnected" | "loading" | "connecting" | "connected" | "failed"
+	| "disconnected"
+	| "loading"
+	| "connecting"
+	| "connected"
+	| "failed"
 
 type TransportConnState = ConnectionState & {}
 
@@ -391,7 +395,10 @@ export class RTC extends BaseStore<RTCReactiveState> {
 			await this.handlers
 				.reset()
 				.catch((resetError) =>
-					logger.error("Failed to reset the failed channel", resetError),
+					logger.error(
+						"Failed to reset the failed channel",
+						resetError,
+					),
 				)
 		} finally {
 			this.recoveringFromTransportFailure = false

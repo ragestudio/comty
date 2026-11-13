@@ -23,10 +23,14 @@ export default async function (this: SyncActions): Promise<void> {
 
 	try {
 		const { logs, newMessages, updatedMessages, users } =
-			await ChatsService.channels.sync(params.group_id!, params.channel_id!, {
-				last_synced_at: lastSyncAt,
-				last_message_id: lastId,
-			})
+			await ChatsService.channels.sync(
+				params.group_id!,
+				params.channel_id!,
+				{
+					last_synced_at: lastSyncAt,
+					last_message_id: lastId,
+				},
+			)
 
 		if (generation !== this.state.initGeneration) return
 
@@ -35,7 +39,9 @@ export default async function (this: SyncActions): Promise<void> {
 				await this.adapter.deleteMessage(log.target_id)
 
 				this.setState((state) => ({
-					timeline: state.timeline.filter((m) => m._id !== log.target_id),
+					timeline: state.timeline.filter(
+						(m) => m._id !== log.target_id,
+					),
 				}))
 			}
 		}

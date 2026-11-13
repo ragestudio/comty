@@ -88,7 +88,9 @@ export class SysAudioSharedCapture extends SysAudioCaptureBase {
 				// already disconnected
 			}
 
-			this.inputDestination.stream.getTracks().forEach((track) => track.stop())
+			this.inputDestination.stream
+				.getTracks()
+				.forEach((track) => track.stop())
 
 			this.inputDestination = null
 		}
@@ -165,7 +167,9 @@ export class SysAudioSharedCapture extends SysAudioCaptureBase {
 				this.header = new Int32Array(data.buffer, 0, HEADER_WORDS)
 				this.port = port
 				this.port.onmessage = (messageEvent) => {
-					this.onControlResponse(messageEvent.data as BridgeControlResponse)
+					this.onControlResponse(
+						messageEvent.data as BridgeControlResponse,
+					)
 				}
 				this.port.start()
 
@@ -192,7 +196,9 @@ export class SysAudioSharedCapture extends SysAudioCaptureBase {
 		this.pending.delete(response.id)
 
 		if (!response.ok) {
-			pending.reject(new Error(response.error ?? "sysaudio control error"))
+			pending.reject(
+				new Error(response.error ?? "sysaudio control error"),
+			)
 			return
 		}
 
@@ -280,13 +286,17 @@ export class SysAudioSharedCapture extends SysAudioCaptureBase {
 	private createInputWorklet(): void {
 		if (!this.inputCtx || !this.bridge) return
 
-		this.pcmInputWorklet = new AudioWorkletNode(this.inputCtx, "pcm-input", {
-			outputChannelCount: [2],
-			processorOptions: {
-				buffer: this.bridge.buffer,
-				layout: this.bridge.layout,
+		this.pcmInputWorklet = new AudioWorkletNode(
+			this.inputCtx,
+			"pcm-input",
+			{
+				outputChannelCount: [2],
+				processorOptions: {
+					buffer: this.bridge.buffer,
+					layout: this.bridge.layout,
+				},
 			},
-		})
+		)
 	}
 
 	private async rebuildInputContext(sampleRate: number): Promise<void> {
@@ -321,12 +331,16 @@ export class SysAudioSharedCapture extends SysAudioCaptureBase {
 		// the output context is created before any gesture, so keep it unlocked
 		keepContextRunning(this.outputCtx)
 
-		this.pcmOutputWorklet = new AudioWorkletNode(this.outputCtx, "pcm-output", {
-			processorOptions: {
-				buffer: this.bridge.buffer,
-				layout: this.bridge.layout,
+		this.pcmOutputWorklet = new AudioWorkletNode(
+			this.outputCtx,
+			"pcm-output",
+			{
+				processorOptions: {
+					buffer: this.bridge.buffer,
+					layout: this.bridge.layout,
+				},
 			},
-		})
+		)
 
 		this.outputBus.connect(this.pcmOutputWorklet)
 
