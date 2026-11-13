@@ -10,6 +10,9 @@
 
 	padding: 5px 15px;
 
+	min-width: 0;
+	overflow: hidden;
+
 	cursor: pointer;
 
 	transition: all 150ms ease-in-out;
@@ -29,7 +32,10 @@
 		align-items: center;
 		justify-content: center;
 
+		min-width: 0;
 		width: 100%;
+
+		overflow: hidden;
 	}
 
 	.uploadButton-content {
@@ -37,10 +43,29 @@
 		flex-direction: row;
 
 		align-items: center;
+		justify-content: center;
+
+		width: 100%;
+		min-width: 0;
+
+		overflow: hidden;
 
 		gap: 7px;
 
 		transition: all 150ms ease-in-out;
+
+		> svg {
+			flex-shrink: 0;
+		}
+
+		> span {
+			min-width: 0;
+			max-width: 100%;
+
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
 
 		.ant-progress {
 			position: relative;
@@ -50,6 +75,8 @@
 
 			align-items: center;
 			justify-content: center;
+
+			flex-shrink: 0;
 
 			height: 17px;
 			width: 17px;

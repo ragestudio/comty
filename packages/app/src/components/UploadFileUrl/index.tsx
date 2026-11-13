@@ -78,7 +78,7 @@ export const UploadFileUrl = (
 				onSuccess={handleUploadDone}
 				onError={handleUploadError}
 			>
-				Upload file or
+				<span>Upload file or</span>
 			</UploadButton>
 
 			<Input

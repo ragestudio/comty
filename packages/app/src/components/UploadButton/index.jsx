@@ -112,6 +112,9 @@ const UploadButton = (props) => {
 		}
 	}, [props.ref, progress])
 
+	const content =
+		typeof props.children === "undefined" ? "Upload" : props.children
+
 	return (
 		<Upload
 			customRequest={handleUpload}
@@ -162,9 +165,11 @@ const UploadButton = (props) => {
 							/>
 						)}
 
-						{typeof props.children === "undefined"
-							? "Upload"
-							: props.children}
+						{typeof content === "string" ? (
+							<span>{content}</span>
+						) : (
+							content
+						)}
 					</div>
 				</>
 			)}
