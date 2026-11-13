@@ -53,6 +53,8 @@ export interface RTC_LeavePayload {
 
 export interface RTC_SoundpadPayload {
 	isDm?: boolean
+	src?: string
+	icon?: string
 	[key: string]: any
 }
 
