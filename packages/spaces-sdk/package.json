@@ -11,7 +11,8 @@
 	},
 	"publishConfig": {
 		"access": "public",
-		"directory": "dist"
+		"directory": "dist",
+		"linkDirectory": false
 	},
 	"type": "module",
 	"main": "./src/index.ts",
