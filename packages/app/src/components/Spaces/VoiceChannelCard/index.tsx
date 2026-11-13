@@ -13,7 +13,11 @@ import { openDialog as openSoundpadDialog } from "@components/SoundpadDialog"
 import { openDialog as openShareCameraDialog } from "@components/ShareCameraDialog"
 
 import { type RTCReactiveState, useRTCStore, rtcService } from "@/rtc"
-import { useSpacesNavigation } from "@/stores/spaces/navigation"
+import {
+	SpacesNavigationStore,
+	isChannelView,
+	useSpacesNavigation,
+} from "@/stores/spaces/navigation"
 
 import VoiceChannelStats from "./stats"
 
@@ -47,7 +51,8 @@ const ConnectionStateIndicator = ({ state }: { state: RTCReactiveState }) => {
 
 				{isLoading && "Connecting..."}
 				{!isLoading &&
-					(stateToText[state.sendTransportState] ?? state.sendTransportState)}
+					(stateToText[state.sendTransportState] ??
+						state.sendTransportState)}
 			</Popover>
 		</div>
 	)
@@ -65,7 +70,12 @@ const VoiceChannelCard = () => {
 	const handleGoToChannel = () => {
 		if (!state.channel) return
 
-		nav.actions.navigate({ channel: state.channel._id, subview: "voice" })
+		nav.actions.navigate({
+			type: "group",
+			room: state.channel.group_id,
+			channel: state.channel._id,
+			subview: "voice",
+		})
 	}
 
 	const toggleScreenShare = async () => {
@@ -77,13 +87,19 @@ const VoiceChannelCard = () => {
 	}
 
 	const handleLeaveChannel = async () => {
-		const channelId = state.channel?._id
+		const channel = state.channel
 
 		await rtcService.handlers.leaveChannel()
 
-		if (channelId && nav.channel === channelId) {
-			nav.actions.navigate({ channel: null, subview: null }, { replace: true })
-		}
+		if (!channel) return
+
+		// only clear the route when the current view is the channel we left
+		if (!isChannelView(SpacesNavigationStore.getState(), channel)) return
+
+		nav.actions.navigate(
+			{ channel: null, subview: null },
+			{ replace: true },
+		)
 	}
 
 	const handleToggleMute = () => {
@@ -145,7 +161,8 @@ const VoiceChannelCard = () => {
 
 				<Button
 					icon={
-						state.screenVideoProducerId || state.screenAudioProducerId ? (
+						state.screenVideoProducerId ||
+						state.screenAudioProducerId ? (
 							<Icons.ScreenShareOff />
 						) : (
 							<Icons.ScreenShare />

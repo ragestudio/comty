@@ -6,6 +6,8 @@ import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
 import { createActions } from "./actions/navigate"
 
+export { isChannelView } from "./selectors"
+
 export const SpacesNavigationStore = create<NavigationStoreType>()(
 	(set, get) => ({
 		type: null,

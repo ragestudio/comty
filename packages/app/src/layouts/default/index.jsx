@@ -9,6 +9,9 @@ import ToolsBar from "@layouts/components/toolsBar"
 import Header from "@layouts/components/header"
 import Modals from "@layouts/components/modals"
 
+import RTCWidgets from "@components/Spaces/RTCWidgets"
+
+import { useSpacesRouteSync } from "@/stores/spaces/navigation"
 import BetaBanner from "@components/BetaBanner"
 
 // mobile components
@@ -21,6 +24,9 @@ import BackgroundDecorator from "@components/BackgroundDecorator"
 const DesktopLayout = (props) => {
 	const location = useLocation()
 
+	// keep the spaces navigation store in sync with the url app wide
+	useSpacesRouteSync()
+
 	React.useEffect(() => {
 		app.eventBus.emit("layout:ready")
 	}, [])
@@ -29,6 +35,7 @@ const DesktopLayout = (props) => {
 		<>
 			<BackgroundDecorator />
 			<Modals />
+			<RTCWidgets />
 			<DraggableDrawerController />
 			<Drawer />
 
@@ -61,6 +68,8 @@ const DesktopLayout = (props) => {
 }
 
 const MobileLayout = (props) => {
+	// keep the spaces navigation store in sync with the url app wide
+	useSpacesRouteSync()
 	React.useEffect(() => {
 		app.eventBus.emit("layout:ready")
 	}, [])
