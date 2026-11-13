@@ -1,6 +1,6 @@
 {
 	"name": "@comty/spaces-sdk",
-	"version": "2.1.1",
+	"version": "2.2.0",
 	"description": "Agnostic SDK for Comty Spaces",
 	"author": "ragestudio",
 	"license": "MIT",
@@ -44,6 +44,7 @@
 		"./classes/*": "./src/classes/*",
 		"./rtc": "./src/rtc/index.ts",
 		"./rtc/audio": "./src/rtc/audio/index.ts",
+		"./rtc/audio/soundpad": "./src/rtc/audio/soundpad.ts",
 		"./rtc/audio/processing": "./src/rtc/audio/processing/index.ts",
 		"./rtc/*": "./src/rtc/*",
 		"./rtc/web": "./src/rtc/web/index.ts",
