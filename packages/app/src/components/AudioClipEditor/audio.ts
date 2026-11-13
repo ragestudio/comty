@@ -1,3 +1,12 @@
+import {
+	AudioBufferSource,
+	BufferTarget,
+	Output,
+	WavOutputFormat,
+} from "mediabunny"
+
+const PEAK_STRIDE = 64
+
 export function createAudioContext() {
 	const AudioContextClass =
 		window.AudioContext ?? (window as any).webkitAudioContext
@@ -38,6 +47,9 @@ export async function loadAudioBuffer(
 export function computePeaks(buffer: AudioBuffer, samples = 240): number[] {
 	const channel = buffer.getChannelData(0)
 	const blockSize = Math.max(1, Math.floor(channel.length / samples))
+	// sample a subset of each block, enough for a waveform and much cheaper
+	// than walking every sample of long files
+	const stride = Math.max(1, Math.floor(blockSize / PEAK_STRIDE))
 	const peaks: number[] = []
 
 	for (let index = 0; index < samples; index++) {
@@ -46,7 +58,7 @@ export function computePeaks(buffer: AudioBuffer, samples = 240): number[] {
 
 		let peak = 0
 
-		for (let cursor = start; cursor < end; cursor++) {
+		for (let cursor = start; cursor < end; cursor += stride) {
 			const value = Math.abs(channel[cursor])
 
 			if (value > peak) peak = value
@@ -58,88 +70,37 @@ export function computePeaks(buffer: AudioBuffer, samples = 240): number[] {
 	return peaks
 }
 
-export async function trimAudioBuffer(
+export function sliceAudioBuffer(
 	buffer: AudioBuffer,
 	start: number,
 	end: number,
-): Promise<AudioBuffer> {
-	const safeStart = Math.max(0, Math.min(start, buffer.duration))
-	const safeEnd = Math.max(safeStart, Math.min(end, buffer.duration))
-	const duration = Math.max(0.01, safeEnd - safeStart)
-
-	const frames = Math.max(1, Math.floor(duration * buffer.sampleRate))
-	const renderDuration = frames / buffer.sampleRate
-	const context = new OfflineAudioContext(
-		buffer.numberOfChannels,
-		frames,
-		buffer.sampleRate,
-	)
-
-	const source = context.createBufferSource()
-
-	source.buffer = buffer
-	source.connect(context.destination)
-	source.start(0, safeStart, renderDuration)
-
-	return await context.startRendering()
-}
-
-function writeString(view: DataView, offset: number, value: string) {
-	for (let index = 0; index < value.length; index++) {
-		view.setUint8(offset + index, value.charCodeAt(index))
-	}
-}
-
-export function encodeWav(buffer: AudioBuffer): Blob {
-	const channels = buffer.numberOfChannels
+): AudioBuffer {
 	const sampleRate = buffer.sampleRate
-	const samples = buffer.length
-	const bytesPerSample = 2
-	const blockAlign = channels * bytesPerSample
-	const dataSize = samples * blockAlign
-	const arrayBuffer = new ArrayBuffer(44 + dataSize)
-	const view = new DataView(arrayBuffer)
+	const startFrame = Math.max(
+		0,
+		Math.min(Math.floor(start * sampleRate), buffer.length - 1),
+	)
+	const endFrame = Math.min(
+		buffer.length,
+		Math.max(Math.ceil(end * sampleRate), startFrame + 1),
+	)
+	const frames = Math.max(1, endFrame - startFrame)
 
-	writeString(view, 0, "RIFF")
-	view.setUint32(4, 36 + dataSize, true)
-	writeString(view, 8, "WAVE")
-	writeString(view, 12, "fmt ")
-	view.setUint32(16, 16, true)
-	view.setUint16(20, 1, true)
-	view.setUint16(22, channels, true)
-	view.setUint32(24, sampleRate, true)
-	view.setUint32(28, sampleRate * blockAlign, true)
-	view.setUint16(32, blockAlign, true)
-	view.setUint16(34, 16, true)
-	writeString(view, 36, "data")
-	view.setUint32(40, dataSize, true)
+	const trimmed = new AudioBuffer({
+		length: frames,
+		numberOfChannels: buffer.numberOfChannels,
+		sampleRate,
+	})
 
-	const channelData: Float32Array[] = []
+	for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+		const data = buffer
+			.getChannelData(channel)
+			.subarray(startFrame, startFrame + frames)
 
-	for (let channel = 0; channel < channels; channel++) {
-		channelData.push(buffer.getChannelData(channel))
+		trimmed.copyToChannel(data, channel)
 	}
 
-	let offset = 44
-
-	for (let sample = 0; sample < samples; sample++) {
-		for (let channel = 0; channel < channels; channel++) {
-			const value = Math.max(
-				-1,
-				Math.min(1, channelData[channel][sample]),
-			)
-
-			view.setInt16(
-				offset,
-				value < 0 ? value * 0x8000 : value * 0x7fff,
-				true,
-			)
-
-			offset += bytesPerSample
-		}
-	}
-
-	return new Blob([arrayBuffer], { type: "audio/wav" })
+	return trimmed
 }
 
 export async function createTrimmedFile(
@@ -148,8 +109,29 @@ export async function createTrimmedFile(
 	end: number,
 	name = "audio-clip.wav",
 ): Promise<File> {
-	const trimmed = await trimAudioBuffer(buffer, start, end)
-	const blob = encodeWav(trimmed)
+	const trimmed = sliceAudioBuffer(buffer, start, end)
 
-	return new File([blob], name, { type: "audio/wav" })
+	const output = new Output({
+		format: new WavOutputFormat(),
+		target: new BufferTarget(),
+	})
+
+	const source = new AudioBufferSource({
+		codec: "pcm-s16",
+	})
+
+	output.addAudioTrack(source)
+
+	await output.start()
+	await source.add(trimmed)
+	source.close()
+	await output.finalize()
+
+	const data = output.target.buffer
+
+	if (!data) {
+		throw new Error("Failed to encode the audio clip")
+	}
+
+	return new File([data], name, { type: "audio/wav" })
 }

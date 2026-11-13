@@ -54,6 +54,7 @@ const AudioClipEditor = ({
 	const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
 	const audioContextRef = React.useRef<AudioContext | null>(null)
 	const sourceNodeRef = React.useRef<AudioBufferSourceNode | null>(null)
+	const accentColorRef = React.useRef("rgb(120, 120, 120)")
 
 	const [buffer, setBuffer] = React.useState<AudioBuffer | null>(null)
 	const [peaks, setPeaks] = React.useState<number[]>([])
@@ -150,22 +151,33 @@ const AudioClipEditor = ({
 
 		if (!canvas || !buffer || peaks.length === 0) return undefined
 
+		accentColorRef.current =
+			window.getComputedStyle(canvas).color || accentColorRef.current
+	}, [buffer, peaks])
+
+	React.useEffect(() => {
+		const canvas = canvasRef.current
+
+		if (!canvas || !buffer || peaks.length === 0) return undefined
+
 		const draw = () => {
 			const width = canvas.clientWidth || 600
 			const height = canvas.clientHeight || 100
 			const ratio = window.devicePixelRatio || 1
+			const pixelWidth = Math.floor(width * ratio)
+			const pixelHeight = Math.floor(height * ratio)
+
+			if (canvas.width !== pixelWidth) canvas.width = pixelWidth
+			if (canvas.height !== pixelHeight) canvas.height = pixelHeight
+
 			const context = canvas.getContext("2d")
 
 			if (!context) return
 
-			canvas.width = Math.floor(width * ratio)
-			canvas.height = Math.floor(height * ratio)
-
 			context.setTransform(ratio, 0, 0, ratio, 0, 0)
 			context.clearRect(0, 0, width, height)
 
-			const accent =
-				window.getComputedStyle(canvas).color || "rgb(120, 120, 120)"
+			const accent = accentColorRef.current
 			const total = Math.max(buffer.duration, 0.001)
 			const startX = (start / total) * width
 			const endX = (end / total) * width
@@ -176,30 +188,48 @@ const AudioClipEditor = ({
 			const step = width / peaks.length
 			const barWidth = Math.max(1, step - 1)
 
-			for (let index = 0; index < peaks.length; index++) {
-				const x = index * step
-				const barHeight = Math.max(1, peaks[index] * height * 0.85)
-				const y = (height - barHeight) / 2
+			const drawBars = (insideSelection: boolean) => {
+				context.beginPath()
 
-				context.fillStyle =
-					x >= startX && x <= endX
-						? accent
-						: "rgba(128, 128, 128, 0.35)"
+				for (let index = 0; index < peaks.length; index++) {
+					const x = index * step
+					const inside = x >= startX && x <= endX
 
-				context.fillRect(x, y, barWidth, barHeight)
+					if (inside !== insideSelection) continue
+
+					const barHeight = Math.max(1, peaks[index] * height * 0.85)
+					const y = (height - barHeight) / 2
+
+					context.rect(x, y, barWidth, barHeight)
+				}
+
+				context.fill()
 			}
 
+			context.fillStyle = "rgba(128, 128, 128, 0.35)"
+			drawBars(false)
+
 			context.fillStyle = accent
+			drawBars(true)
+
 			context.fillRect(startX - 1, 0, 2, height)
 			context.fillRect(endX - 1, 0, 2, height)
 		}
 
-		draw()
+		let frame = 0
 
-		window.addEventListener("resize", draw)
+		const schedule = () => {
+			cancelAnimationFrame(frame)
+			frame = requestAnimationFrame(draw)
+		}
+
+		schedule()
+
+		window.addEventListener("resize", schedule)
 
 		return () => {
-			window.removeEventListener("resize", draw)
+			cancelAnimationFrame(frame)
+			window.removeEventListener("resize", schedule)
 		}
 	}, [buffer, peaks, start, end])
 
