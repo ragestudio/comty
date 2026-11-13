@@ -75,6 +75,10 @@ export function buildGroupSocketEvents(
 			actions.handleUserOnline(payload),
 		[`${prefix}:user:offline`]: (payload: any) =>
 			actions.handleUserOffline(payload),
+
+		// User profile (decorations, badges)
+		[`${prefix}:user:profile`]: (payload: any) =>
+			actions.handleUserProfileUpdate(payload),
 	}
 }
 
