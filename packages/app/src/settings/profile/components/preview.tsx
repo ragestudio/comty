@@ -4,6 +4,7 @@ import UserCard from "@/components/UserCard"
 import { Member } from "@/components/Spaces/Member"
 
 import styles from "./preview.module.less"
+import classNames from "classnames"
 
 interface ProfilePreviewProps {
 	user: User
@@ -13,6 +14,18 @@ interface ProfilePreviewProps {
 export const ProfilePreview = ({ user, decorations }: ProfilePreviewProps) => {
 	return (
 		<div className={styles.preview}>
+			<div className={styles.type}>
+				<h4>Cover preview</h4>
+
+				<img
+					className={classNames(
+						styles.cover_preview,
+						"border-default",
+					)}
+					src={user.cover}
+				/>
+			</div>
+
 			<div className={styles.type}>
 				<h4>Profile preview</h4>
 

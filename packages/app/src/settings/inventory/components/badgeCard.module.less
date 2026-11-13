@@ -1,0 +1,63 @@
+.inventory-badge-card {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 10px;
+
+	padding: 10px 12px;
+
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+
+	background-color: var(--background-color-primary);
+
+	&--active {
+		border-color: var(--colorPrimary);
+	}
+
+	&__icon {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+
+		width: 42px;
+		height: 42px;
+
+		flex-shrink: 0;
+
+		:global(.user-badges__badge) {
+			width: 28px;
+			height: 28px;
+		}
+	}
+
+	&__info {
+		display: flex;
+		flex-direction: column;
+
+		flex: 1;
+
+		min-width: 0;
+
+		gap: 2px;
+	}
+
+	&__name {
+		overflow: hidden;
+
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		font-weight: 500;
+	}
+
+	&__meta {
+		font-size: 0.8rem;
+
+		opacity: 0.6;
+	}
+}

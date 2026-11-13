@@ -1,0 +1,47 @@
+.inventory {
+	display: flex;
+	flex-direction: column;
+
+	gap: 20px;
+
+	&__count {
+		font-size: 0.85rem;
+
+		opacity: 0.6;
+	}
+
+	&__header-actions {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		margin-left: auto;
+
+		gap: 10px;
+
+		flex-wrap: wrap;
+	}
+
+	&__tab {
+		display: flex;
+		flex-direction: column;
+
+		gap: 10px;
+	}
+
+	&__grid {
+		display: grid;
+
+		grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+
+		gap: 12px;
+	}
+
+	&__badge-list {
+		display: flex;
+		flex-direction: column;
+
+		gap: 10px;
+	}
+}
