@@ -35,9 +35,11 @@ export function scanSettings(): SettingTabModule[] {
 	})
 
 	return Object.values(modules)
-		.filter((module): module is SettingTabModule =>
-			Boolean(module && (module as SettingTabModule).group),
-		)
+		.filter((module) => Boolean(module))
+		.map((module: SettingTabModule) => {
+			if (!module.group) module.group = "bottom"
+			return module
+		})
 		.sort(
 			(a, b) =>
 				getGroupOrder(a.group) - getGroupOrder(b.group) ||
@@ -94,7 +96,7 @@ export function composeGroupsFromSettingsTab(
 	const groups: Record<string, Setting[]> = {}
 
 	for (const setting of settings) {
-		if (!setting.group) continue
+		if (!setting.group) setting.group = "default"
 
 		if (!groups[setting.group]) {
 			groups[setting.group] = []
