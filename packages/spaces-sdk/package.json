@@ -10,30 +10,32 @@
 		"directory": "packages/spaces-sdk"
 	},
 	"publishConfig": {
-		"access": "public"
+		"access": "public",
+		"directory": "dist"
 	},
 	"type": "module",
 	"main": "./src/index.ts",
 	"scripts": {
-		"build": "tsc",
+		"build": "./scripts/build.sh",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@comty/shared": "workspace:*",
+		"@linebridge/client": "workspace:*",
 		"@timephy/rnnoise-wasm": "^1.0.0",
 		"axios": "^1.20.0",
+		"comty.js": "workspace:*",
 		"mediasoup-client": "^3.24.4",
 		"tinybase": "^10.0.1",
 		"tseep": "^1.3.1",
 		"valibot": "^1.5.0",
-		"zustand": "^5.0.15",
-		"@comty/shared": "workspace:*",
-		"comty.js": "workspace:*",
-		"@linebridge/client": "workspace:*"
+		"zustand": "^5.0.15"
 	},
 	"devDependencies": {
-		"react": "^19.1.0",
 		"@types/node": "^26.6.4",
 		"@types/react": "^19.2.18",
+		"react": "^19.1.0",
+		"tsc-alias": "^1.9.9",
 		"typescript": "^7.0.2"
 	},
 	"exports": {

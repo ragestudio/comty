@@ -6,7 +6,7 @@
 		"lib": ["es2022", "DOM", "DOM.Iterable"],
 		"types": ["node"],
 		"rootDir": "src",
-		"outDir": "dist",
+		"outDir": "dist/lib",
 		"allowJs": true,
 		"checkJs": true,
 		"strict": true,

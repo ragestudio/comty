@@ -44,13 +44,16 @@ jobs:
             - name: Install dependencies
               run: pnpm install --filter "@comty/spaces-sdk..."
 
+            # comty.js imports @linebridge/client, so the client must be built first
             - name: Build workspace dependencies
               run: |
-                  pnpm --filter comty.js build
                   pnpm --filter @linebridge/client build
+                  pnpm --filter comty.js build
 
-            - name: Build spaces sdk
+            # compiles to dist/lib and copies an adapted package.json into dist
+            - name: Build & package spaces sdk
               run: pnpm --filter @comty/spaces-sdk build
 
+            # publishConfig.directory makes pnpm publish the packaged dist
             - name: Publish spaces sdk
               run: pnpm --filter @comty/spaces-sdk publish --no-git-checks --provenance
