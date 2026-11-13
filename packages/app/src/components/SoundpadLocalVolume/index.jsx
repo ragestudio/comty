@@ -1,6 +1,11 @@
 import { Slider } from "antd"
 import { Icons } from "@components/Icons"
 
+import {
+	getSoundpadVolume,
+	setSoundpadVolume,
+} from "@comty/spaces-sdk/rtc/audio/soundpad"
+
 import "./index.less"
 
 const SoundpadLocalVolume = () => {
@@ -11,11 +16,9 @@ const SoundpadLocalVolume = () => {
 				min={0}
 				max={1}
 				step={0.05}
-				defaultValue={app.cores.settings.get(
-					"mediartc:soundpad:volume",
-				)}
+				defaultValue={getSoundpadVolume()}
 				onChangeComplete={(value) => {
-					app.cores.settings.set("mediartc:soundpad:volume", value)
+					setSoundpadVolume(value)
 				}}
 			/>
 		</div>

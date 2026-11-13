@@ -1,15 +1,16 @@
 import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
-import { Button, Input, Tag } from "antd"
+import React from "react"
+import { Button, Input } from "antd"
 
 import ConfirmButton from "@ui/ConfirmButton"
 import { Icons } from "@components/Icons"
 import createBem from "@/utils/createBem"
 
-import styles from "./SoundpadItemRow.module.less"
-import Popover from "@/ui/Popover"
+import Popover from "@ui/Popover"
 import EmojiPicker from "@/components/Expressions/EmojiPicker"
-import React from "react"
+
+import styles from "./SoundpadItemRow.module.less"
 
 const b = createBem("soundpad-settings__item", styles)
 
@@ -20,7 +21,7 @@ export type SoundpadItemRowProps = {
 	onDelete: (item: SoundpadItemPayload) => void
 	onEdit?: (
 		item: SoundpadItemPayload,
-	) => Promise<SoundpadItemPayload> | SoundpadItemPayload
+	) => Promise<SoundpadItemPayload | null> | SoundpadItemPayload | null
 }
 
 const SoundpadItemRow = ({
@@ -32,6 +33,10 @@ const SoundpadItemRow = ({
 }: SoundpadItemRowProps) => {
 	const [data, setData] = React.useState<typeof item>(item)
 
+	React.useEffect(() => {
+		setData(item)
+	}, [item])
+
 	const editDataField = (field: string, value: any) => {
 		setData((prev) => ({
 			...prev,
@@ -41,12 +46,18 @@ const SoundpadItemRow = ({
 
 	const handleSaveEdit = React.useCallback(async () => {
 		if (typeof onEdit === "function") {
-			setData(await onEdit(data))
+			const result = await onEdit(data)
+
+			if (result) setData(result)
 		}
 	}, [data])
 
 	const hasChanges = React.useCallback(() => {
-		return item !== data
+		return (
+			data.icon !== item.icon ||
+			data.name !== item.name ||
+			data.src !== item.src
+		)
 	}, [item, data])
 
 	return (
@@ -55,7 +66,9 @@ const SoundpadItemRow = ({
 				className={b.elem("emoji-select")}
 				content={({ close }) => (
 					<EmojiPicker
-						injectChar={(char: string) => editDataField("icon", char)}
+						injectChar={(char: string) =>
+							editDataField("icon", char)
+						}
 						close={close}
 					/>
 				)}

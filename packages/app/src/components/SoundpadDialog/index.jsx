@@ -1,3 +1,5 @@
+import { Button } from "antd"
+
 import { Icons } from "@components/Icons"
 
 import SoundpadItems from "@components/SoundpadItems"
@@ -9,12 +11,18 @@ import { rtcService } from "@/rtc"
 
 import "./index.less"
 
-const SoundpadDialog = ({ close, group_id }) => {
+const SoundpadDialog = ({ group_id }) => {
 	const dispatchSrc = (item) => {
 		rtcService.handlers.emitClientEvent("soundpad", {
 			src: item.src,
 			icon: item.icon,
 		})
+	}
+
+	const openMySounds = () => {
+		app.layout.modal.close("soundpad-dialog")
+
+		app.controls.openSettings("soundpad")
 	}
 
 	return (
@@ -24,7 +32,17 @@ const SoundpadDialog = ({ close, group_id }) => {
 					<Icons.Drum /> Soundpad
 				</h1>
 
-				<SoundpadLocalVolume />
+				<div className="soundpad-dialog__header__actions">
+					<Button
+						size="small"
+						icon={<Icons.Settings />}
+						onClick={openMySounds}
+					>
+						My sounds
+					</Button>
+
+					<SoundpadLocalVolume />
+				</div>
 			</div>
 
 			<SoundpadItems

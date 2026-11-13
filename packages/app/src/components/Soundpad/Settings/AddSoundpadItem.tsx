@@ -1,38 +1,49 @@
 import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
+import {
+	SOUNDPAD_MAX_DURATION_SECONDS,
+	SOUNDPAD_NAME_MAX_LENGTH,
+} from "@comty/shared/types/spaces/soundpad"
+
 import React from "react"
 import { Button, Input } from "antd"
+import classNames from "clsx"
 
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
+import UploadFileUrl from "@components/UploadFileUrl"
 
 import isUrl from "@utils/isURL"
+import getErrorMessage from "@utils/getErrorMessage"
 import createBem from "@/utils/createBem"
 
 import EmojiPicker from "@/components/Expressions/EmojiPicker"
 import Popover from "@/ui/Popover"
 
-import {
-	SettingsSection,
-	SettingsSectionField,
-} from "@/components/Spaces/Group/SettingsPanel/layout"
+import { getAudioDuration } from "./audio"
 
 import styles from "./AddSoundpadItem.module.less"
+
 const b = createBem("soundpad-settings__add", styles)
 
 export type AddSoundpadItemProps = {
 	onSubmit: (
 		payload: Pick<SoundpadItemPayload, "icon" | "name" | "src">,
-	) => Promise<void>
+	) => Promise<boolean | void>
+	maxReached?: boolean
 }
 
-const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
+const AddSoundpadItem = ({
+	onSubmit,
+	maxReached = false,
+}: AddSoundpadItemProps) => {
 	const [icon, setIcon] = React.useState("🔊")
 	const [name, setName] = React.useState("")
 	const [src, setSrc] = React.useState("")
 	const [submitting, setSubmitting] = React.useState(false)
 
 	const canSubmit =
+		!maxReached &&
 		icon.trim().length > 0 &&
 		name.trim().length > 0 &&
 		src.trim().length > 0 &&
@@ -40,40 +51,48 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 		src.startsWith("https://")
 
 	const submit = async () => {
-		if (!canSubmit) return
+		if (!canSubmit || submitting) return
 
 		setSubmitting(true)
 
 		try {
-			await onSubmit({
+			const duration = await getAudioDuration(src.trim())
+
+			if (duration > SOUNDPAD_MAX_DURATION_SECONDS) {
+				app.message.error(
+					`Sound must be ${SOUNDPAD_MAX_DURATION_SECONDS} seconds or shorter`,
+				)
+
+				return
+			}
+
+			const added = await onSubmit({
 				icon: icon.trim(),
 				name: name.trim(),
 				src: src.trim(),
 			})
 
+			if (added === false) return
+
 			setName("")
 			setSrc("")
+		} catch (error) {
+			app.message.error(getErrorMessage(error, "Failed to add sound"))
 		} finally {
 			setSubmitting(false)
 		}
 	}
 
 	return (
-		<SettingsSection>
-			<SettingsSectionField row>
+		<div className={classNames(b(), "bg-accent", "border-default")}>
+			<div className={b.elem("header")}>
 				<h3>
 					<Icons.PlusCircle /> Add new sound
 				</h3>
-				<span
-					style={{
-						fontSize: 12,
-					}}
-				>
-					(Trims at max 10s)
-				</span>
-			</SettingsSectionField>
+				<span>Max {SOUNDPAD_MAX_DURATION_SECONDS} seconds</span>
+			</div>
 
-			<SettingsSectionField row>
+			<div className={b.elem("row")}>
 				<Popover
 					className={b.elem("emoji-select")}
 					content={({ close }) => (
@@ -89,41 +108,37 @@ const AddSoundpadItem = ({ onSubmit }: AddSoundpadItemProps) => {
 
 				<Input
 					placeholder="Sound name"
-					maxLength={48}
+					maxLength={SOUNDPAD_NAME_MAX_LENGTH}
 					value={name}
 					onChange={(event) => setName(event.target.value)}
 				/>
-			</SettingsSectionField>
 
-			<SettingsSectionField row>
-				<UploadButton
+				<UploadFileUrl
 					accept="audio/*"
-					onSuccess={(uid, response) => {
-						setSrc(response.url)
+					onChange={(value) => {
+						setSrc(value)
 					}}
-				>
-					Upload
-				</UploadButton>
-
-				<span>or</span>
-
-				<Input
-					placeholder="HTTPS audio URL"
-					value={src}
-					onChange={(event) => setSrc(event.target.value)}
 				/>
-			</SettingsSectionField>
+			</div>
 
-			<Button
-				type="primary"
-				icon={<Icons.Plus />}
-				disabled={!canSubmit || submitting}
-				loading={submitting}
-				onClick={submit}
-			>
-				Add
-			</Button>
-		</SettingsSection>
+			<div className={b.elem("footer")}>
+				<Button
+					type="primary"
+					icon={<Icons.Plus />}
+					disabled={!canSubmit || submitting}
+					loading={submitting}
+					onClick={submit}
+				>
+					Add
+				</Button>
+
+				{maxReached && (
+					<span className={b.elem("hint")}>
+						You reached the sounds limit
+					</span>
+				)}
+			</div>
+		</div>
 	)
 }
 
