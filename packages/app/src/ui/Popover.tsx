@@ -11,6 +11,7 @@ import type {
 } from "./Popover-types"
 
 import React from "react"
+import { createPortal } from "react-dom"
 import classNames from "classnames"
 import { AnimatePresence, motion } from "motion/react"
 
@@ -82,14 +83,17 @@ const Popover = (({
 	trigger = "click",
 	disabled = false,
 	autoAdjust = true,
+	portal = false,
 	className = "",
 	onOpen,
 	onClose,
 	anchorRect,
 }: PopoverProps) => {
 	const isImperative = Boolean(anchorRect)
+	const isPortal = portal && !isImperative
 
 	const [isOpen, setIsOpen] = React.useState(isImperative)
+	const [portalRect, setPortalRect] = React.useState<PopoverRect | null>(null)
 	const popoverRef = React.useRef<HTMLDivElement>(null)
 	const triggerRef = React.useRef<HTMLDivElement>(null)
 	const containerRef = React.useRef<HTMLDivElement>(null)
@@ -107,7 +111,7 @@ const Popover = (({
 	autoAdjustRef.current = autoAdjust
 
 	const getBoundaryRect = React.useCallback((): PopoverRect => {
-		if (isImperative) {
+		if (isImperative || isPortal) {
 			return {
 				left: 0,
 				top: 0,
@@ -122,7 +126,7 @@ const Popover = (({
 			: document.body
 
 		return ancestor.getBoundingClientRect()
-	}, [isImperative])
+	}, [isImperative, isPortal])
 
 	const computeOffset = React.useCallback((): PopoverOffset | null => {
 		const popover = popoverRef.current
@@ -135,11 +139,22 @@ const Popover = (({
 		const popoverRect = popover.getBoundingClientRect()
 
 		const overflowLeft = Math.max(0, boundaryRect.left - popoverRect.left)
-		const overflowRight = Math.max(0, popoverRect.right - boundaryRect.right)
+		const overflowRight = Math.max(
+			0,
+			popoverRect.right - boundaryRect.right,
+		)
 		const overflowTop = Math.max(0, boundaryRect.top - popoverRect.top)
-		const overflowBottom = Math.max(0, popoverRect.bottom - boundaryRect.bottom)
+		const overflowBottom = Math.max(
+			0,
+			popoverRect.bottom - boundaryRect.bottom,
+		)
 
-		if (!overflowLeft && !overflowRight && !overflowTop && !overflowBottom) {
+		if (
+			!overflowLeft &&
+			!overflowRight &&
+			!overflowTop &&
+			!overflowBottom
+		) {
 			return { offsetX: 0, offsetY: 0 }
 		}
 
@@ -161,22 +176,54 @@ const Popover = (({
 		return { offsetX, offsetY }
 	}, [getBoundaryRect])
 
-	const applyOffset = React.useCallback((offsetX: number, offsetY: number) => {
-		const popover = popoverRef.current
+	const applyOffset = React.useCallback(
+		(offsetX: number, offsetY: number) => {
+			const popover = popoverRef.current
 
-		if (!popover) return
+			if (!popover) return
 
-		const currentPosition = positionRef.current
+			const currentPosition = positionRef.current
 
-		if (currentPosition === "top" || currentPosition === "bottom") {
-			popover.style.transform = `translate(calc(-50% + ${offsetX}px), ${offsetY}px)`
-		} else {
-			popover.style.transform = `translate(${offsetX}px, calc(-50% + ${offsetY}px))`
-		}
+			if (currentPosition === "top" || currentPosition === "bottom") {
+				popover.style.transform = `translate(calc(-50% + ${offsetX}px), ${offsetY}px)`
+			} else {
+				popover.style.transform = `translate(${offsetX}px, calc(-50% + ${offsetY}px))`
+			}
+		},
+		[],
+	)
+
+	const updatePortalRect = React.useCallback(() => {
+		const trigger = triggerRef.current
+
+		if (!trigger) return
+
+		const rect = trigger.getBoundingClientRect()
+
+		setPortalRect((previous) => {
+			if (
+				previous &&
+				previous.left === rect.left &&
+				previous.top === rect.top &&
+				previous.right === rect.right &&
+				previous.bottom === rect.bottom
+			) {
+				return previous
+			}
+
+			return {
+				left: rect.left,
+				top: rect.top,
+				right: rect.right,
+				bottom: rect.bottom,
+			}
+		})
 	}, [])
 
 	const openPopover = () => {
 		if (isImperative) return
+
+		if (isPortal) updatePortalRect()
 
 		setIsOpen(true)
 		if (onOpen) onOpen()
@@ -232,6 +279,20 @@ const Popover = (({
 		}
 	}
 
+	React.useEffect(() => {
+		if (!isPortal || !isOpen) return
+
+		updatePortalRect()
+
+		window.addEventListener("resize", updatePortalRect)
+		window.addEventListener("scroll", updatePortalRect, true)
+
+		return () => {
+			window.removeEventListener("resize", updatePortalRect)
+			window.removeEventListener("scroll", updatePortalRect, true)
+		}
+	}, [isPortal, isOpen, updatePortalRect])
+
 	React.useLayoutEffect(() => {
 		if (!autoAdjustRef.current) return
 
@@ -249,9 +310,10 @@ const Popover = (({
 		if (!popover) return
 
 		const currentPosition = positionRef.current
-		const cached = isImperative
-			? undefined
-			: offsetCacheRef.current[currentPosition]
+		const useCache = !isImperative && !isPortal
+		const cached = useCache
+			? offsetCacheRef.current[currentPosition]
+			: undefined
 
 		if (cached) {
 			applyOffset(cached.offsetX, cached.offsetY)
@@ -259,7 +321,7 @@ const Popover = (({
 			const result = computeOffset()
 
 			if (result) {
-				if (!isImperative) {
+				if (useCache) {
 					offsetCacheRef.current[currentPosition] = result
 				}
 
@@ -271,14 +333,14 @@ const Popover = (({
 
 		if (contentEl) {
 			contentObserverRef.current = new ResizeObserver(() => {
-				if (!isImperative) {
+				if (useCache) {
 					delete offsetCacheRef.current[currentPosition]
 				}
 
 				const result = computeOffset()
 
 				if (result) {
-					if (!isImperative) {
+					if (useCache) {
 						offsetCacheRef.current[currentPosition] = result
 					}
 
@@ -295,7 +357,16 @@ const Popover = (({
 				contentObserverRef.current = null
 			}
 		}
-	}, [isImperative, isOpen, anchorRect, position, computeOffset, applyOffset])
+	}, [
+		isImperative,
+		isPortal,
+		isOpen,
+		anchorRect,
+		portalRect,
+		position,
+		computeOffset,
+		applyOffset,
+	])
 
 	React.useEffect(() => {
 		const listen = isImperative || trigger === "click"
@@ -398,7 +469,11 @@ const Popover = (({
 			{...popoverEventHandlers}
 		>
 			<motion.div
-				className={classNames("popover-content", "bg-accent", "border-default")}
+				className={classNames(
+					"popover-content",
+					"bg-accent",
+					"border-default",
+				)}
 				style={{ transformOrigin: getContentOrigin(position) }}
 				{...contentMotion}
 				transition={POPOVER_TRANSITION}
@@ -437,7 +512,26 @@ const Popover = (({
 				{children}
 			</div>
 
-			<AnimatePresence>{isOpen && panel}</AnimatePresence>
+			{isPortal ? (
+				portalRect &&
+				isOpen &&
+				createPortal(
+					<div
+						className="popover-portal"
+						style={{
+							left: portalRect.left,
+							top: portalRect.top,
+							width: portalRect.right - portalRect.left,
+							height: portalRect.bottom - portalRect.top,
+						}}
+					>
+						{panel}
+					</div>,
+					document.body,
+				)
+			) : (
+				<AnimatePresence>{isOpen && panel}</AnimatePresence>
+			)}
 		</div>
 	)
 }) as PopoverComponent

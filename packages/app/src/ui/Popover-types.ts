@@ -18,6 +18,8 @@ export interface PopoverProps {
 	trigger?: PopoverTrigger
 	disabled?: boolean
 	autoAdjust?: boolean
+	// renders the panel in a body portal to escape clipping and stacking
+	portal?: boolean
 	className?: string
 	onOpen?: () => void
 	onClose?: () => void
