@@ -364,7 +364,7 @@ importers:
         version: link:../shared
       '@comty/spaces-sdk':
         specifier: workspace:*
-        version: link:../spaces-sdk
+        version: link:../spaces-sdk/dist
       '@dnd-kit/abstract':
         specifier: ^0.5.0
         version: 0.5.0
@@ -506,6 +506,9 @@ importers:
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
+      mediabunny:
+        specifier: ^1.65.2
+        version: 1.65.2
       mediasoup-client:
         specifier: ^3.22.0
         version: 3.24.4
@@ -5274,6 +5277,12 @@ packages:
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
 
+  '@types/dom-mediacapture-transform@0.1.12':
+    resolution: {integrity: sha512-d7/QsLRwF864A5mgIM/YrfiglHoYn7zgCcAoJgW404r+2DwnNr7EBbLnCWpmOMgH8y0te73L1AV6H1bmauaWFw==}
+
+  '@types/dom-webcodecs@0.1.13':
+    resolution: {integrity: sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ==}
+
   '@types/esrecurse@4.3.1':
     resolution: {integrity: sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw==}
 
@@ -8843,6 +8852,9 @@ packages:
   media-typer@2.0.0:
     resolution: {integrity: sha512-kOy3OxT2HH39N70UnKgu4NWDZjLOz8W/mfyvniHjRH/DrL3f2pOfvWQ4p60offbbtDAnXWp0v9LfMIqMec269Q==}
     engines: {node: '>=18'}
+
+  mediabunny@1.65.2:
+    resolution: {integrity: sha512-goZpibvo/5hkc/56WVNm93Ini+o7K4y8aXA20c/BN1B+m3L5aHQa8MTvO+S1APg/YI8kMILtrX6QCqUtxLW7bA==}
 
   mediasoup-client@3.24.4:
     resolution: {integrity: sha512-iOZzuF2QP80sYCUqYn2AnnMhYRgrtq9pGKOj7rj0YWJamm0hN1PUvHKrQZVcf3XPN0B9W3s4dZqrJOWG5GbnUg==}
@@ -17067,6 +17079,12 @@ snapshots:
 
   '@types/deep-eql@4.0.2': {}
 
+  '@types/dom-mediacapture-transform@0.1.12':
+    dependencies:
+      '@types/dom-webcodecs': 0.1.13
+
+  '@types/dom-webcodecs@0.1.13': {}
+
   '@types/esrecurse@4.3.1': {}
 
   '@types/estree-jsx@1.0.5':
@@ -21286,6 +21304,11 @@ snapshots:
   media-tracks@0.3.5: {}
 
   media-typer@2.0.0: {}
+
+  mediabunny@1.65.2:
+    dependencies:
+      '@types/dom-mediacapture-transform': 0.1.12
+      '@types/dom-webcodecs': 0.1.13
 
   mediasoup-client@3.24.4:
     dependencies:
