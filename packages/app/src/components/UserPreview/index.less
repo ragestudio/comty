@@ -76,6 +76,28 @@
 		}
 	}
 
+	&__avatar-wrapper {
+		position: relative;
+
+		display: inline-flex;
+
+		flex: 0 0 auto;
+	}
+
+	&__avatar-frame {
+		position: absolute;
+
+		top: 0;
+		left: 0;
+
+		width: 100%;
+		height: 100%;
+
+		object-fit: cover;
+
+		pointer-events: none;
+	}
+
 	&__avatar {
 		display: flex;
 
@@ -135,6 +157,46 @@
 
 		> div {
 			align-self: start;
+		}
+	}
+
+	&__meta {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		min-width: 0;
+		gap: 6px;
+	}
+
+	&__badges {
+		margin-left: auto;
+
+		display: inline-flex;
+		align-items: center;
+
+		padding: 3px 5px;
+		background-color: var(--background-color-accent);
+
+		border-radius: 8px;
+		border: 1px solid var(--border-color);
+
+		.user-badges {
+			padding: 0;
+			gap: 4px;
+
+			background-color: transparent;
+			border-radius: 0;
+		}
+
+		.user-badges__badge {
+			width: 0.8em;
+			height: 0.8em;
+
+			svg {
+				margin: 0;
+			}
 		}
 	}
 

@@ -10,7 +10,7 @@ import copyToClipboard from "@utils/copyToClipboard"
 
 import "./index.less"
 
-export const MemberContextMenu = ({ member, close }) => {
+export const MemberContextMenu = ({ member, close, decorations }) => {
 	const onClickUser = React.useCallback(() => {
 		app.navigation.goToAccount(member.user.username)
 		close()
@@ -38,8 +38,18 @@ export const MemberContextMenu = ({ member, close }) => {
 
 	return (
 		<div className="member__context-menu">
+			{decorations?.member_bg && (
+				<MemberBackgroundDecoration
+					decoration={decorations.member_bg}
+					playing={true}
+					className="spaces-member__bg-decoration--menu"
+				/>
+			)}
+
 			<UserPreview
 				user={member.user}
+				decorations={decorations}
+				badges={member.user?.profile_badges}
 				onClick={onClickUser}
 			/>
 
@@ -114,9 +124,11 @@ export const MemberContextMenu = ({ member, close }) => {
 const MemberBackgroundDecoration = ({
 	decoration,
 	playing,
+	className,
 }: {
 	decoration: any
 	playing?: boolean
+	className?: string
 }) => {
 	const mediaRef = React.useRef(null)
 	const [mimetype, setMimetype] = React.useState(null)
@@ -143,11 +155,11 @@ const MemberBackgroundDecoration = ({
 		if (!mediaRef.current) return undefined
 
 		if (playing) {
-			mediaRef.current.play()
+			mediaRef.current.play().catch(() => {})
 		} else {
 			mediaRef.current.pause()
 		}
-	}, [playing])
+	}, [playing, mimetype, decoration?.image_obj])
 
 	React.useEffect(() => {
 		if (!decoration?.image_obj) return undefined
@@ -160,14 +172,19 @@ const MemberBackgroundDecoration = ({
 
 	return (
 		<div
-			className={classNames("spaces-member__bg-decoration", {
-				playing: playing,
-			})}
+			className={classNames(
+				"spaces-member__bg-decoration",
+				{
+					playing: playing,
+				},
+				className,
+			)}
 		>
 			{mimetype[0] === "video" && (
 				<video
 					src={decoration.image_obj}
 					ref={mediaRef}
+					autoPlay={Boolean(playing)}
 					playsInline
 					loop
 					muted
@@ -203,7 +220,10 @@ export const Member = ({
 			const { x, y } = app.cores.ctx_menu.calculateFitCordinates(
 				event,
 				parseInt(
-					app.cores.style.vars["context-menu-width"].replace("px", ""),
+					app.cores.style.vars["context-menu-width"].replace(
+						"px",
+						"",
+					),
 					10,
 				),
 				100,
@@ -213,12 +233,13 @@ export const Member = ({
 				React.createElement(MemberContextMenu, {
 					member: member,
 					close: app.cores.ctx_menu.close,
+					decorations: decorations,
 				}),
 				x,
 				y,
 			)
 		},
-		[member],
+		[member, decorations],
 	)
 
 	return (
@@ -255,6 +276,8 @@ export const Member = ({
 						}
 					}
 					small
+					decorations={decorations}
+					badges={member.user?.profile_badges}
 					onClick={() => {}}
 				/>
 			</div>

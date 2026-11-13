@@ -3,6 +3,7 @@ import { Skeleton } from "antd"
 import classnames from "classnames"
 
 import Image from "@components/Image"
+import UserBadges from "@components/UserBadges"
 import { Icons } from "@components/Icons"
 
 import User from "@endpoints/user"
@@ -70,14 +71,25 @@ const UserPreview = (props) => {
 				["big"]: props.big && !props.small,
 			})}
 		>
-			<div
-				className="user-preview__avatar"
-				onClick={handleOnClick}
-			>
-				<Image
-					alt="Avatar"
-					src={userData.avatar}
-				/>
+			<div className="user-preview__avatar-wrapper">
+				<div
+					className="user-preview__avatar"
+					onClick={handleOnClick}
+				>
+					<Image
+						alt="Avatar"
+						src={userData.avatar}
+					/>
+				</div>
+
+				{props.decorations?.avatar_frame?.obj_url && (
+					<img
+						className="user-preview__avatar-frame"
+						src={props.decorations.avatar_frame.obj_url}
+						style={props.decorations.avatar_frame.style}
+						alt=""
+					/>
+				)}
 			</div>
 
 			{typeof props.presence === "boolean" && (
@@ -104,6 +116,12 @@ const UserPreview = (props) => {
 			{userData.bot && (
 				<div className="user-preview__bot">
 					<span>Bot</span>
+				</div>
+			)}
+
+			{props.badges?.length > 0 && (
+				<div className="user-preview__badges">
+					<UserBadges badges={props.badges} />
 				</div>
 			)}
 		</div>

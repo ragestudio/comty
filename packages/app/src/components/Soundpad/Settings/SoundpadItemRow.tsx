@@ -64,6 +64,7 @@ const SoundpadItemRow = ({
 		<div className={b()}>
 			<Popover
 				className={b.elem("emoji-select")}
+				portal
 				content={({ close }) => (
 					<EmojiPicker
 						injectChar={(char: string) =>
