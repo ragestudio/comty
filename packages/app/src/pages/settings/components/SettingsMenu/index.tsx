@@ -125,8 +125,6 @@ export const SettingsMenu = () => {
 
 	const menuItems = React.useMemo(() => generateMenuItems(groups), [groups])
 
-	console.log(menuItems)
-
 	const handleClick: NonNullable<MenuProps["onClick"]> = (event) => {
 		const eventHandler = menuEvents[event.key]
 
