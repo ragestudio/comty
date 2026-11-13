@@ -1,0 +1,70 @@
+{
+	"file_scan_exclusions": [
+		"**/.git",
+		"**/.svn",
+		"**/.hg",
+		"**/CVS",
+		"**/.DS_Store",
+		"**/Thumbs.db",
+		"**/.classpath",
+		"**/.settings",
+		"**/node_modules",
+		"**/uWebSockets",
+		"**/fuzzing",
+		"**/nats-data"
+	],
+	"show_edit_predictions": false,
+	"languages": {
+		"TypeScript": {
+			"language_servers": [
+				"vtsls",
+				"!typescript-ls",
+				"!typescript-language-server",
+				"..."
+			]
+		},
+		"TSX": {
+			"language_servers": [
+				"vtsls",
+				"!typescript-ls",
+				"!typescript-language-server",
+				"..."
+			]
+		},
+		"JavaScript": {
+			"language_servers": [
+				"vtsls",
+				"!typescript-ls",
+				"!typescript-language-server",
+				"..."
+			]
+		},
+		"JSX": {
+			"language_servers": [
+				"vtsls",
+				"!typescript-ls",
+				"!typescript-language-server",
+				"..."
+			]
+		}
+	},
+	"lsp": {
+		"vtsls": {
+			"settings": {
+				"vtsls": {
+					"experimental": {
+						"projectDiagnostics": false
+					}
+				},
+				"typescript": {
+					"tsserver": {
+						"maxTsServerMemory": 2048
+					},
+					"updateImportsOnFileMove": {
+						"enabled": "always"
+					}
+				}
+			}
+		}
+	}
+}
