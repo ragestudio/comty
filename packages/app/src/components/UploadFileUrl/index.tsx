@@ -14,6 +14,7 @@ export const UploadFileUrl = (
 		onChange?: (value: string) => void
 		value?: string
 		defaultValue?: string
+		beforeUpload?: (file: File) => any
 	} = {},
 ) => {
 	const uploadRef = React.useRef(null)
@@ -74,6 +75,7 @@ export const UploadFileUrl = (
 				ref={uploadRef}
 				className={container.elem("button")}
 				accept={props.accept ?? "*/*"}
+				beforeUpload={props.beforeUpload}
 				onStart={handleUploadStart}
 				onSuccess={handleUploadDone}
 				onError={handleUploadError}
