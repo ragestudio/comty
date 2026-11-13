@@ -35,6 +35,13 @@ export function setUsers(users: SpacesUser[]): void {
 	usersActions.setUsers(users)
 }
 
+export function setUserDecorations(
+	userId: string,
+	decorations: Record<string, any>,
+): void {
+	usersActions.setDecorations(userId, decorations)
+}
+
 export function ensureUsers(
 	userIds: UserIdInput,
 	options?: EnsureUsersOptions,

@@ -75,8 +75,8 @@ const UserCard = (props) => {
 					</h1>
 					<span>@{user.username}</span>
 
-					{user.badges?.length > 0 && (
-						<UserBadges badges={user.badges} />
+					{user.profile_badges?.length > 0 && (
+						<UserBadges badges={user.profile_badges} />
 					)}
 				</div>
 			</div>

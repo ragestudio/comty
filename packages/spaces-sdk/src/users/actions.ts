@@ -154,6 +154,39 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 		}
 	}
 
+	setDecorations(
+		userId: string,
+		decorations: Record<string, any> | null,
+		options: { persist?: boolean } = {},
+	): void {
+		if (!userId) return
+
+		const id = String(userId)
+		const value = decorations ?? {}
+		const current = this.state.users[id]
+
+		this.decorationsSyncedAt.set(id, Date.now())
+		this.pendingDecorations.delete(id)
+
+		if (!current) {
+			this.pendingDecorations.set(id, value)
+			return
+		}
+
+		const user = {
+			...current,
+			decorations: value,
+		}
+
+		this.setState((state) => ({
+			users: { ...state.users, [id]: user },
+		}))
+
+		if (options.persist !== false) {
+			this.persist([user])
+		}
+	}
+
 	patchUser(
 		userId: string,
 		patch: Partial<SpacesUser>,
@@ -341,8 +374,7 @@ export default class UsersActions extends ActionsBase<UsersStoreType> {
 	private async loadCached(ids: string[]): Promise<void> {
 		try {
 			const cached = (await db.users.bulkGet(ids)) as (
-				| SpacesUser
-				| undefined
+				SpacesUser | undefined
 			)[]
 
 			this.hydrateFromCache(

@@ -8,15 +8,20 @@ import svgCss from "@utils/svgCss"
 
 import "./index.less"
 
-const Badge = ({ badge }) => {
+export const Badge = ({ badge }) => {
 	const [bgUrl, setBgUrl] = React.useState(null)
 
+	const icon = badge.iconUrl ?? badge.icon
+
+	const isUrlIcon =
+		typeof icon === "string" && /^(https?:\/\/|data:|\/)/i.test(icon)
+
 	async function load() {
-		if (!badge.iconUrl) {
+		if (!isUrlIcon) {
 			return null
 		}
 
-		let data = await fetch(badge.iconUrl, {
+		let data = await fetch(icon, {
 			method: "GET",
 			headers: {
 				"Cache-Control": "no-cache",
@@ -24,7 +29,7 @@ const Badge = ({ badge }) => {
 		})
 
 		if (!data.ok) {
-			console.warn("Badge: Failed to load the badge icon.", badge.iconUrl)
+			console.warn("Badge: Failed to load the badge icon.", icon)
 			return null
 		}
 
@@ -42,14 +47,13 @@ const Badge = ({ badge }) => {
 				),
 			)
 		} else {
-			setBgUrl(`url('${badge.iconUrl}')`)
+			setBgUrl(`url('${icon}')`)
 		}
 	}
 
 	React.useEffect(() => {
-		if (badge.iconUrl || !bgUrl) {
-			load()
-		}
+		setBgUrl(null)
+		load()
 	}, [badge])
 
 	return (
@@ -68,42 +72,39 @@ const Badge = ({ badge }) => {
 					borderRadius: badge.borderRadius,
 				}}
 			>
-				{!bgUrl && badge.icon && createIconRender(badge.icon)}
+				{!bgUrl && !isUrlIcon && icon && createIconRender(icon)}
 			</div>
 		</Tooltip>
 	)
 }
 
 const UserBadges = ({ badges }) => {
-	if (!badges || !Array.isArray(badges)) {
-		return null
-	}
+	const normalizedBadges = React.useMemo(() => {
+		if (!Array.isArray(badges)) return []
 
-	if (badges.length > 2) {
-		badges = badges.slice(0, 2)
-	}
+		return badges.slice(0, 2)
+	}, [badges])
 
 	const [items, setItems] = React.useState([])
 
 	const load = React.useCallback(async () => {
-		if (!badges) {
+		if (!normalizedBadges.length) {
+			setItems([])
 			return null
 		}
 
-		const data = await BadgesModel.data(badges).catch((err) => {
-			return null
-		})
+		const data = await BadgesModel.data(normalizedBadges).catch(() => null)
 
-		if (data) {
+		if (Array.isArray(data)) {
 			setItems(data)
 		}
-	}, [badges])
+	}, [normalizedBadges])
 
 	React.useEffect(() => {
 		load()
-	}, [])
+	}, [load])
 
-	if (!items.length) {
+	if (!normalizedBadges.length || !items.length) {
 		return null
 	}
 

@@ -9,5 +9,7 @@ export default defineModel({
 		description: { type: String },
 		icon: { type: String },
 		color: { type: String },
+		enabled: { type: Boolean, default: true },
+		deleted_at: { type: Date, default: null },
 	},
 })

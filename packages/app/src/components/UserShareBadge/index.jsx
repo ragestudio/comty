@@ -58,7 +58,9 @@ const UserShareBadge = (props) => {
 					<span>@{user.username}</span>
 				</div>
 
-				{user.badges?.length > 0 && <UserBadges user_id={user._id} />}
+				{user.profile_badges?.length > 0 && (
+					<UserBadges badges={user.profile_badges} />
+				)}
 			</div>
 		</div>
 	)

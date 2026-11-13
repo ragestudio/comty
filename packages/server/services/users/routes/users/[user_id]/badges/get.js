@@ -8,20 +8,30 @@ export default {
 
 		const user = await User.findOne({
 			_id: user_id,
-		})
+		}).lean()
 
 		if (!user) {
 			throw new OperationError(404, "User not found")
 		}
 
+		if (!user.profile_badges?.length) {
+			return []
+		}
+
 		const badges = await Badge.find({
-			name: {
-				$in: user.badges,
-			},
+			_id: { $in: user.profile_badges },
+			enabled: { $ne: false },
 		})
 			.limit(limit)
 			.skip(offset)
+			.lean()
 
-		return badges
+		const badgesById = new Map(
+			badges.map((badge) => [String(badge._id), badge]),
+		)
+
+		return user.profile_badges
+			.map((badgeId) => badgesById.get(String(badgeId)))
+			.filter(Boolean)
 	},
 }

@@ -56,7 +56,7 @@ export interface SettingTabModule {
 	id: string
 	icon?: string
 	label: string
-	group: string
+	group?: string
 	order?: number
 	settings?: Setting[]
 	ctxData?: () => Promise<any> | any

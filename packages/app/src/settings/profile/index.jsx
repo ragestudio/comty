@@ -1,5 +1,6 @@
 import loadable from "@loadable/component"
 import UserModel from "@endpoints/user"
+import InventoryModel from "@endpoints/inventory"
 import { Icons } from "@components/Icons"
 
 import ProfileEditor from "./editor"
@@ -9,9 +10,20 @@ export default {
 	icon: "User",
 	label: "Profile",
 	group: "basic",
-	ctxData: async () => ({
-		userData: await UserModel.data(),
-	}),
+	ctxData: async () => {
+		const userData = await UserModel.data()
+
+		const [decorations, inventory] = await Promise.all([
+			UserModel.decorations.get(userData._id).catch(() => ({})),
+			InventoryModel.list().catch(() => ({ items: [] })),
+		])
+
+		return {
+			userData,
+			decorations,
+			inventory,
+		}
+	},
 	settings: [
 		{
 			id: "preview",

@@ -1,10 +1,7 @@
 import type { User } from "@comty/shared/types/user"
 
 export type UserIdInput =
-	| string
-	| Iterable<string | null | undefined>
-	| null
-	| undefined
+	string | Iterable<string | null | undefined> | null | undefined
 
 export type SpacesUser = Omit<User, "decorations" | "badges"> & {
 	cached_at?: number
@@ -38,6 +35,11 @@ export interface UsersStoreActions {
 		options?: Omit<EnsureUsersOptions, "decorations">,
 	) => Promise<void>
 	setUsers: (users: SpacesUser[], options?: { persist?: boolean }) => void
+	setDecorations: (
+		userId: string,
+		decorations: Record<string, any> | null,
+		options?: { persist?: boolean },
+	) => void
 	patchUser: (
 		userId: string,
 		patch: Partial<SpacesUser>,

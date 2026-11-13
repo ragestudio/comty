@@ -4,9 +4,15 @@ import lodash from "lodash"
 export function useObjectUpdate<T extends object>(initialState: T) {
 	const [current, setCurrent] = React.useState<T>(initialState)
 	const [baseline, setBaseline] = React.useState<T>(initialState)
+	const skipResync = React.useRef(false)
 
 	// resync when the external data changes, keeping local edits on top
 	React.useEffect(() => {
+		if (skipResync.current) {
+			skipResync.current = false
+			return
+		}
+
 		if (lodash.isEqual(baseline, initialState)) {
 			return
 		}
@@ -47,7 +53,24 @@ export function useObjectUpdate<T extends object>(initialState: T) {
 	}
 
 	function restore() {
-		setCurrent(initialState)
+		setCurrent(baseline)
+	}
+
+	function commit() {
+		skipResync.current = true
+		setBaseline(current)
+	}
+
+	function getChanges(): Partial<T> {
+		return Object.keys(current).reduce<Partial<T>>((prev, key) => {
+			const typedKey = key as keyof T
+
+			if (!lodash.isEqual(current[typedKey], baseline[typedKey])) {
+				prev[typedKey] = current[typedKey]
+			}
+
+			return prev
+		}, {})
 	}
 
 	const hasChanges = React.useMemo(
@@ -61,6 +84,8 @@ export function useObjectUpdate<T extends object>(initialState: T) {
 		updateProperty,
 		hasChanges,
 		restore,
+		commit,
+		getChanges,
 	}
 }
 

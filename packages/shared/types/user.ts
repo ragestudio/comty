@@ -15,7 +15,10 @@ export interface User {
 
 	decorations?: Record<string, string>
 	links?: Record<string, string>
+	// legacy owned badges, replaced by the inventory
 	badges?: Array<string>
+	// up to two badges displayed on the profile, in order
+	profile_badges?: Array<string>
 
 	roles?: string[]
 	verified?: boolean

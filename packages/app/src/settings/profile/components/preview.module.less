@@ -1,0 +1,28 @@
+.preview {
+	display: flex;
+	flex-direction: column;
+
+	flex: 1;
+
+	gap: 10px;
+
+	:global {
+		.userCard {
+			width: 100%;
+			min-width: unset;
+		}
+
+		.spaces-member {
+			border: 1px solid var(--border-color);
+
+			border-radius: 12px;
+		}
+	}
+}
+
+.type {
+	display: flex;
+	flex-direction: column;
+
+	gap: 5px;
+}

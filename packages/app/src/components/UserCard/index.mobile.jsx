@@ -50,8 +50,8 @@ const UserCard = (props, ref) => {
 					</div>
 
 					<div className="_mobile_userCard_top_badges_wrapper">
-						{props.user.badges?.length > 0 && (
-							<UserBadges user_id={props.user._id} />
+						{props.user.profile_badges?.length > 0 && (
+							<UserBadges badges={props.user.profile_badges} />
 						)}
 					</div>
 

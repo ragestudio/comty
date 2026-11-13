@@ -10,17 +10,6 @@
 
 	flex-grow: 0;
 
-	&__preview {
-		flex: 1;
-
-		:global {
-			.userCard {
-				width: 100%;
-				min-width: unset;
-			}
-		}
-	}
-
 	&__content {
 		flex: 2;
 
@@ -30,40 +19,35 @@
 		gap: 10px;
 		height: 100%;
 
-		&__field {
+		&__tabs {
+			flex: 1;
+
+			min-height: 0;
+			gap: 10px;
+
+			:global {
+				.ant-tabs-nav {
+					padding: 0;
+					margin: 0;
+
+					.ant-tabs-tab {
+						padding: 0;
+						padding-bottom: 5px;
+						height: fit-content;
+					}
+				}
+
+				.ant-tabs-content-holder {
+					min-height: 0;
+				}
+			}
+		}
+
+		&__tab-content {
 			display: flex;
 			flex-direction: column;
 
-			gap: 5px;
-			padding: 0 10px;
-
-			&__header {
-				display: flex;
-				flex-direction: row;
-
-				align-items: center;
-				justify-content: space-between;
-
-				gap: 7;
-			}
-
-			&--row {
-				flex-direction: row;
-			}
+			gap: 10px;
 		}
-	}
-
-	&__actions {
-		display: flex;
-		flex-direction: row;
-
-		align-items: center;
-
-		margin-top: auto;
-		margin-left: auto;
-
-		padding-top: 15px;
-
-		gap: 10px;
 	}
 }

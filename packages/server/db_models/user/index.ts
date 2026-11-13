@@ -52,6 +52,11 @@ export default defineModel({
 		badges: {
 			type: Array,
 			default: [],
+			select: false,
+		},
+		profile_badges: {
+			type: Array,
+			default: [],
 		},
 		links: {
 			type: Array,

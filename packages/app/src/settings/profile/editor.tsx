@@ -1,132 +1,230 @@
 import type { User } from "@comty/shared/types/user"
 import styles from "./editor.module.less"
 
+import React from "react"
 import classNames from "clsx"
-import UserCard from "@/components/UserCard"
-import createBem from "@/utils/createBem"
-import Icons from "@/components/Icons"
-import UploadFileUrl from "@/components/UploadFileUrl"
+import { Tabs } from "antd"
 
+import createBem from "@/utils/createBem"
 import useObjectUpdate from "@/hooks/useObjectUpdate"
-import Button from "@/ui/Button"
-import { Input } from "antd"
 import UserModel from "@endpoints/user"
+
+import { GroupStore } from "@comty/spaces-sdk/group"
+import { setUserDecorations } from "@comty/spaces-sdk/users"
+
+import {
+	BasicTab,
+	DecorationsTab,
+	EditorActions,
+	ProfilePreview,
+} from "./components"
 
 const container = createBem("profile-editor", styles)
 const content = container.sub("content")
-const field = content.sub("field")
+
+const refreshSpacesDecorations = (
+	userId: string,
+	decorations: Record<string, any>,
+) => {
+	if (!userId) return
+
+	setUserDecorations(userId, decorations)
+
+	const groupState = GroupStore.getState()
+
+	if (groupState.groupId) {
+		void groupState.actions.evaluateDecorations([userId])
+	}
+}
 
 export const ProfileEditor = (props) => {
 	const initialUserData = props.ctx.processedCtx.userData as User
+	const fallbackDecorations = props.ctx.processedCtx.decorations ?? {}
 	const updatedUserData = useObjectUpdate<User>(initialUserData)
 
+	const [inventory, setInventory] = React.useState<any[]>(
+		props.ctx.processedCtx.inventory?.items ?? [],
+	)
+
+	React.useEffect(() => {
+		const handleInventoryUpdate = (next) => {
+			if (Array.isArray(next?.items)) {
+				if (props.ctx.processedCtx) {
+					props.ctx.processedCtx.inventory = next
+				}
+
+				setInventory(next.items)
+			}
+		}
+
+		app.eventBus.on("inventory:update", handleInventoryUpdate)
+
+		return () => {
+			app.eventBus.off("inventory:update", handleInventoryUpdate)
+		}
+	}, [])
+
+	const catalog = React.useMemo(() => {
+		return inventory
+			.filter((entry) => entry.kind === "decoration" && entry.item)
+			.map((entry) => entry.item)
+	}, [inventory])
+
+	const badgeCatalog = React.useMemo(() => {
+		return inventory
+			.filter((entry) => entry.kind === "badge" && entry.item)
+			.map((entry) => entry.item)
+	}, [inventory])
+
+	const selectedDecorations = (updatedUserData.current.decorations ??
+		{}) as Record<string, string>
+
+	const ownedSelected = React.useMemo(() => {
+		const ownedIds = new Set(
+			catalog.map((decoration) => String(decoration._id)),
+		)
+
+		return Object.fromEntries(
+			Object.entries(selectedDecorations).filter(([, id]) =>
+				ownedIds.has(String(id)),
+			),
+		)
+	}, [catalog, selectedDecorations])
+
+	const hydratedDecorations = React.useMemo(() => {
+		if (!catalog.length) {
+			return fallbackDecorations
+		}
+
+		const dict = Object.fromEntries(
+			catalog.map((decoration) => [String(decoration._id), decoration]),
+		)
+
+		const result: Record<string, any> = {}
+
+		for (const [slot, id] of Object.entries(ownedSelected)) {
+			const decoration = dict[id]
+
+			if (decoration) {
+				result[slot] = decoration
+			}
+		}
+
+		return result
+	}, [catalog, ownedSelected, fallbackDecorations])
+
+	const selectedBadges = (updatedUserData.current.profile_badges ??
+		[]) as string[]
+
+	const ownedSelectedBadges = React.useMemo(() => {
+		const ownedIds = new Set(badgeCatalog.map((badge) => String(badge._id)))
+
+		return selectedBadges.filter((id) => ownedIds.has(String(id)))
+	}, [badgeCatalog, selectedBadges])
+
+	const handleDecorationChange = (slot: string, id?: string) => {
+		const next = { ...ownedSelected }
+
+		if (id) {
+			next[slot] = id
+		} else {
+			delete next[slot]
+		}
+
+		updatedUserData.updateProperty("decorations", next)
+	}
+
+	const handleBadgeChange = (index: number, id?: string) => {
+		const next: Array<string | undefined> = [...ownedSelectedBadges]
+
+		next[index] = id
+
+		updatedUserData.updateProperty("profile_badges", next.filter(Boolean))
+	}
+
 	const handleSave = async () => {
-		const changes = Object.keys(updatedUserData.current).reduce((prev, key) => {
-			if (initialUserData[key] !== updatedUserData.current[key]) {
-				prev[key] = updatedUserData.current[key]
+		const changes = updatedUserData.getChanges()
+
+		const { decorations, profile_badges, ...profileChanges } = changes
+
+		try {
+			let result = null
+
+			if (Object.keys(profileChanges).length > 0) {
+				result = await UserModel.updateData(profileChanges)
 			}
 
-			return prev
-		}, {})
+			if (decorations) {
+				await UserModel.decorations.update(decorations)
+				refreshSpacesDecorations(
+					initialUserData._id,
+					hydratedDecorations,
+				)
+			}
 
-		const result = await UserModel.updateData(changes)
+			if (profile_badges) {
+				await UserModel.badges.update(profile_badges)
+			}
 
-		props.ctx.dispatchUpdate(result)
+			updatedUserData.commit()
+			props.ctx.dispatchUpdate(result ?? {})
+		} catch (error: any) {
+			app.message.error(error.response?.data?.error ?? error.message)
+		}
 	}
 
 	return (
 		<div className={classNames(container())}>
-			<div className={container.elem("preview")}>
-				<UserCard user={updatedUserData.current} />
-			</div>
+			<ProfilePreview
+				user={updatedUserData.current}
+				decorations={hydratedDecorations}
+			/>
 
 			<div className={content()}>
-				<div className={field()}>
-					<h4>
-						<Icons.Image /> Images
-					</h4>
+				<Tabs
+					className={content.elem("tabs")}
+					defaultActiveKey="basic"
+					items={[
+						{
+							key: "basic",
+							label: "Basic",
+							children: (
+								<div className={content.elem("tab-content")}>
+									<BasicTab
+										user={updatedUserData.current}
+										updateProperty={
+											updatedUserData.updateProperty
+										}
+									/>
+								</div>
+							),
+						},
+						{
+							key: "decorations",
+							label: "Decorations",
+							children: (
+								<div className={content.elem("tab-content")}>
+									<DecorationsTab
+										decorations={catalog}
+										badges={badgeCatalog}
+										selectedDecorations={ownedSelected}
+										selectedBadges={ownedSelectedBadges}
+										onDecorationChange={
+											handleDecorationChange
+										}
+										onBadgeChange={handleBadgeChange}
+									/>
+								</div>
+							),
+						},
+					]}
+				/>
 
-					<div className={field()}>
-						<span>Avatar</span>
-
-						<UploadFileUrl
-							value={updatedUserData.current.avatar}
-							onChange={(value) =>
-								updatedUserData.updateProperty("avatar", value)
-							}
-						/>
-					</div>
-
-					<div className={field()}>
-						<span>Cover</span>
-
-						<UploadFileUrl
-							value={updatedUserData.current.cover}
-							onChange={(value) =>
-								updatedUserData.updateProperty("cover", value)
-							}
-						/>
-					</div>
-				</div>
-
-				<div className={field()}>
-					<h4>
-						<Icons.Info /> Information
-					</h4>
-
-					<div className={field()}>
-						<span>
-							<Icons.PenLine /> Name
-						</span>
-
-						<Input
-							value={updatedUserData.current.public_name}
-							onChange={(e) =>
-								updatedUserData.updateProperty("public_name", e.target.value)
-							}
-							maxLength={120}
-							showCount
-						/>
-					</div>
-
-					<div className={field()}>
-						<div className={field.elem("header")}>
-							<span>
-								<Icons.BookOpenText />
-								Description
-							</span>
-						</div>
-
-						<Input.TextArea
-							placeholder="Enter here a description for your profile"
-							maxLength={320}
-							value={updatedUserData.current.description}
-							onChange={(e) =>
-								updatedUserData.updateProperty("description", e.target.value)
-							}
-							showCount
-						/>
-					</div>
-				</div>
-
-				<div className={container.elem("actions")}>
-					{updatedUserData.hasChanges && (
-						<Button
-							icon={<Icons.ArrowBigLeft />}
-							onClick={updatedUserData.restore}
-						>
-							Revert
-						</Button>
-					)}
-					<Button
-						icon={<Icons.Save />}
-						disabled={!updatedUserData.hasChanges}
-						type={updatedUserData.hasChanges ? "primary" : "default"}
-						onClick={handleSave}
-					>
-						Save
-					</Button>
-				</div>
+				<EditorActions
+					hasChanges={updatedUserData.hasChanges}
+					onRevert={updatedUserData.restore}
+					onSave={handleSave}
+				/>
 			</div>
 		</div>
 	)

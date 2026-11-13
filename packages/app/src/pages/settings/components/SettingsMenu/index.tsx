@@ -47,14 +47,16 @@ const menuEvents: Partial<Record<string, () => void>> = {
 
 function generateMenuItems(groups: SettingsGroup[]): MenuItems {
 	const items: SettingsMenuGroupItem[] = groups.map((entry, index) => {
-		const children: ItemType[] = entry.children.map((item): MenuItemType => ({
-			key: item.id,
-			type: "item",
-			icon: createIconRender(item.icon ?? "Settings"),
-			label: <span>{item.label}</span>,
-			danger: item.danger,
-			disabled: item.disabled,
-		}))
+		const children: ItemType[] = entry.children.map(
+			(item): MenuItemType => ({
+				key: item.id,
+				type: "item",
+				icon: createIconRender(item.icon ?? "Settings"),
+				label: <span>{item.label}</span>,
+				danger: item.danger,
+				disabled: item.disabled,
+			}),
+		)
 
 		if (index !== groups.length - 1) {
 			children.push({
@@ -70,7 +72,9 @@ function generateMenuItems(groups: SettingsGroup[]): MenuItems {
 			children,
 			icon: decorator?.icon && createIconRender(decorator.icon),
 			label: entry.group !== "bottom" && (
-				<Translation>{(t) => t(decorator?.label ?? entry.group)}</Translation>
+				<Translation>
+					{(t) => t(decorator?.label ?? entry.group)}
+				</Translation>
 			),
 		}
 	})
@@ -91,7 +95,9 @@ export const SettingsMenu = () => {
 	const activeKey = settingsStore((state) => state.activeKey)
 	const searchQuery = settingsStore((state) => state.searchQuery)
 	const navigate = settingsStore((state) => state.actions.navigate)
-	const setSearchQuery = settingsStore((state) => state.actions.setSearchQuery)
+	const setSearchQuery = settingsStore(
+		(state) => state.actions.setSearchQuery,
+	)
 	const [inputValue, setInputValue] = React.useState("")
 
 	React.useEffect(() => {
@@ -118,6 +124,8 @@ export const SettingsMenu = () => {
 	}, [inputValue, searchQuery, setSearchQuery])
 
 	const menuItems = React.useMemo(() => generateMenuItems(groups), [groups])
+
+	console.log(menuItems)
 
 	const handleClick: NonNullable<MenuProps["onClick"]> = (event) => {
 		const eventHandler = menuEvents[event.key]

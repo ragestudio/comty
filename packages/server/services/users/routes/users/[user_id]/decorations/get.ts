@@ -25,7 +25,10 @@ export default {
 		]
 
 		const decos = decoIds.length
-			? await Decorations.find({ _id: { $in: decoIds } }).lean()
+			? await Decorations.find({
+					_id: { $in: decoIds },
+					enabled: { $ne: false },
+				}).lean()
 			: []
 
 		const decoDict = Object.fromEntries(
@@ -40,7 +43,11 @@ export default {
 			const userDecos = userDict[id]?.decorations || {}
 
 			for (const key in userDecos) {
-				hydrated[key] = decoDict[String(userDecos[key])] || null
+				const decoration = decoDict[String(userDecos[key])]
+
+				if (decoration) {
+					hydrated[key] = decoration
+				}
 			}
 
 			return isMultiple

@@ -102,7 +102,7 @@ export default (props) => {
 				</div>
 			</div>
 
-			{props.state.user?.badges.length > 0 && (
+			{props.state.user?.profile_badges?.length > 0 && (
 				<DroppableField
 					header={
 						<>
@@ -111,17 +111,17 @@ export default (props) => {
 									<Icons.Award />
 								</div>
 
-								<span>Badges collected</span>
+								<span>Badges</span>
 							</div>
 
 							<div className="field_value">
-								<p>{props.state.user?.badges.length}</p>
+								<p>{props.state.user?.profile_badges.length}</p>
 							</div>
 						</>
 					}
 				>
 					<React.Suspense fallback={<Skeleton />}>
-						<UserBadges user_id={props.state.user?._id} />
+						<UserBadges badges={props.state.user.profile_badges} />
 					</React.Suspense>
 				</DroppableField>
 			)}
