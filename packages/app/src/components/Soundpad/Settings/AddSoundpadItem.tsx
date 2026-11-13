@@ -6,10 +6,9 @@ import {
 } from "@comty/shared/types/spaces/soundpad"
 
 import React from "react"
-import { Button, Input } from "antd"
+import { Button, Input, Upload } from "antd"
 import classNames from "clsx"
 
-import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
 import UploadFileUrl from "@components/UploadFileUrl"
 
@@ -20,7 +19,8 @@ import createBem from "@/utils/createBem"
 import EmojiPicker from "@/components/Expressions/EmojiPicker"
 import Popover from "@/ui/Popover"
 
-import { getAudioDuration } from "./audio"
+import { openAudioClipEditor } from "@components/AudioClipEditor"
+import { getAudioDuration, uploadAudioFile } from "./audio"
 
 import styles from "./AddSoundpadItem.module.less"
 
@@ -50,32 +50,68 @@ const AddSoundpadItem = ({
 		isUrl(src) &&
 		src.startsWith("https://")
 
-	const submit = async () => {
-		if (!canSubmit || submitting) return
+	const submitSource = async (source: string) => {
+		const value = source.trim()
+
+		if (!value) return false
+
+		const added = await onSubmit({
+			icon: icon.trim(),
+			name: name.trim(),
+			src: value,
+		})
+
+		if (added === false) return false
+
+		setName("")
+		setSrc("")
+
+		return true
+	}
+
+	const handleEditorSaved = async (url: string) => {
+		setSrc(url)
+
+		if (!icon.trim() || !name.trim()) return
 
 		setSubmitting(true)
 
 		try {
-			const duration = await getAudioDuration(src.trim())
+			await submitSource(url)
+		} finally {
+			setSubmitting(false)
+		}
+	}
+
+	const launchEditor = (source: File | string) => {
+		openAudioClipEditor({
+			source,
+			title: "Adjust sound clip",
+			maxDuration: SOUNDPAD_MAX_DURATION_SECONDS,
+			onSave: async (file) => {
+				const url = await uploadAudioFile(file)
+
+				await handleEditorSaved(url)
+			},
+		})
+	}
+
+	const submit = async () => {
+		if (!canSubmit || submitting) return
+
+		const value = src.trim()
+
+		setSubmitting(true)
+
+		try {
+			const duration = await getAudioDuration(value)
 
 			if (duration > SOUNDPAD_MAX_DURATION_SECONDS) {
-				app.message.error(
-					`Sound must be ${SOUNDPAD_MAX_DURATION_SECONDS} seconds or shorter`,
-				)
-
+				launchEditor(value)
 				return
 			}
 
-			const added = await onSubmit({
-				icon: icon.trim(),
-				name: name.trim(),
-				src: src.trim(),
-			})
-
-			if (added === false) return
-
-			setName("")
-			setSrc("")
+			await submitSource(value)
 		} catch (error) {
 			app.message.error(getErrorMessage(error, "Failed to add sound"))
 		} finally {
@@ -116,8 +152,14 @@ const AddSoundpadItem = ({
 
 				<UploadFileUrl
 					accept="audio/*"
+					value={src}
 					onChange={(value) => {
 						setSrc(value)
+					}}
+					beforeUpload={(file) => {
+						launchEditor(file)
+
+						return Upload.LIST_IGNORE
 					}}
 				/>
 			</div>

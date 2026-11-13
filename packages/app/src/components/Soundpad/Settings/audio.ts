@@ -47,3 +47,15 @@ export function getAudioDuration(src: string): Promise<number> {
 		audio.src = src
 	})
 }
+
+export async function uploadAudioFile(file: File): Promise<string> {
+	const result = await app.cores.files.upload(file)
+	const uploaded = Array.isArray(result) ? result[0] : result
+	const url = uploaded?.url ?? uploaded?.file?.url
+
+	if (!url) {
+		throw new Error("Failed to upload the audio")
+	}
+
+	return url
+}

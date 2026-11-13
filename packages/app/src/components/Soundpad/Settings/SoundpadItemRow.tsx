@@ -1,4 +1,5 @@
 import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
+import { SOUNDPAD_MAX_DURATION_SECONDS } from "@comty/shared/types/spaces/soundpad"
 
 import React from "react"
 import { Button, Input } from "antd"
@@ -9,6 +10,10 @@ import createBem from "@/utils/createBem"
 
 import Popover from "@ui/Popover"
 import EmojiPicker from "@/components/Expressions/EmojiPicker"
+
+import { openAudioClipEditor } from "@components/AudioClipEditor"
+
+import { uploadAudioFile } from "./audio"
 
 import styles from "./SoundpadItemRow.module.less"
 
@@ -52,6 +57,34 @@ const SoundpadItemRow = ({
 		}
 	}, [data])
 
+	const handleClipSaved = async (url: string) => {
+		const next = {
+			...data,
+			src: url,
+		}
+
+		setData(next)
+
+		if (typeof onEdit === "function") {
+			const result = await onEdit(next)
+
+			if (result) setData(result)
+		}
+	}
+
+	const launchEditor = () => {
+		openAudioClipEditor({
+			source: data.src,
+			maxDuration: SOUNDPAD_MAX_DURATION_SECONDS,
+			title: "Adjust sound clip",
+			onSave: async (file) => {
+				const url = await uploadAudioFile(file)
+
+				await handleClipSaved(url)
+			},
+		})
+	}
+
 	const hasChanges = React.useCallback(() => {
 		return (
 			data.icon !== item.icon ||
@@ -84,6 +117,14 @@ const SoundpadItemRow = ({
 					onChange={(e) => editDataField("name", e.target.value)}
 				/>
 			</div>
+
+			<Button
+				size="small"
+				icon={<Icons.Scissors />}
+				onClick={launchEditor}
+			>
+				Clip
+			</Button>
 
 			<Button
 				size="small"
