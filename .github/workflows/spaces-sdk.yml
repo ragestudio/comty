@@ -26,9 +26,10 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            # the sdk depends on workspace packages living in these submodules
+            # pnpm validates the whole workspace lockfile even with --filter, so
+            # every workspace submodule referenced by the lockfile must be present
             - name: Checkout submodules
-              run: git submodule update --init modules/comty.js modules/linebridge
+              run: git submodule update --init modules/comty.js modules/linebridge modules/vessel
 
             - name: Install pnpm
               uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
