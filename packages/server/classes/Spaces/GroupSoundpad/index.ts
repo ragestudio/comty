@@ -3,11 +3,10 @@ import type { Document } from "mongoose"
 
 import GroupSoundpadItem from "@db_models/groupSoundpadItem"
 
-import BuiltInItems from "./defaults.json"
+import { normalizeSoundpadItem } from "@shared-classes/Spaces/Soundpad/validation"
+import { assertSoundpadDuration } from "@shared-classes/Spaces/Soundpad/duration"
 
-const ICON_MAX_LENGTH = 16
-const NAME_MAX_LENGTH = 48
-const SRC_MAX_LENGTH = 2048
+import BuiltInItems from "./defaults.json"
 
 export default class GroupSoundpad {
 	static getBuiltInItems(): SoundpadItemPayload[] {
@@ -17,15 +16,19 @@ export default class GroupSoundpad {
 	static async getItems(group_id: string): Promise<any[]> {
 		const groupItems = await GroupSoundpadItem.find({
 			group_id: group_id,
+		}).sort({
+			created_at: -1,
 		})
 
 		return [
 			...groupItems.map((item) => ({
 				...item.toObject(),
+				scope: "group",
 				built_in: false,
 			})),
 			...GroupSoundpad.getBuiltInItems().map((item) => ({
 				...item,
+				scope: "builtin",
 				built_in: true,
 			})),
 		]
@@ -52,29 +55,37 @@ export default class GroupSoundpad {
 	}
 
 	static async updateItem(payload: SoundpadItemPayload) {
-		const { _id, group_id, icon, name, src } = payload
+		const { _id, group_id } = payload
 
 		if (!group_id) {
 			throw new OperationError(400, "Missing group_id")
 		}
+
+		const item = normalizeSoundpadItem(payload)
+
+		await assertSoundpadDuration(item.src)
 
 		const queryFilter = {
 			_id: _id,
 			group_id: group_id,
 		}
 
-		const item = await GroupSoundpadItem.findOne(queryFilter)
+		const update = await GroupSoundpadItem.findOneAndUpdate(
+			queryFilter,
+			{
+				group_id: group_id,
+				...item,
+			},
+			{
+				new: true,
+			},
+		)
 
-		if (!item) {
+		if (!update) {
 			throw new OperationError(404, "Item not found")
 		}
 
-		return await GroupSoundpadItem.findOneAndUpdate(queryFilter, {
-			group_id: group_id,
-			icon: icon,
-			name: name,
-			src: src,
-		})
+		return update
 	}
 
 	static async addItem(payload: SoundpadItemPayload): Promise<any> {
@@ -88,47 +99,14 @@ export default class GroupSoundpad {
 			throw new OperationError(400, "Missing user_id")
 		}
 
-		if (
-			typeof payload.icon !== "string" ||
-			payload.icon.trim().length === 0
-		) {
-			throw new OperationError(400, "Missing icon")
-		}
+		const item = normalizeSoundpadItem(payload)
 
-		const icon = payload.icon.trim().slice(0, ICON_MAX_LENGTH)
-
-		if (
-			typeof payload.name !== "string" ||
-			payload.name.trim().length === 0
-		) {
-			throw new OperationError(400, "Missing name")
-		}
-
-		const name = payload.name.trim().slice(0, NAME_MAX_LENGTH)
-
-		if (
-			typeof payload.src !== "string" ||
-			payload.src.length > SRC_MAX_LENGTH
-		) {
-			throw new OperationError(400, "Invalid src")
-		}
-
-		try {
-			const url = new URL(payload.src)
-
-			if (url.protocol !== "https:") {
-				throw new Error("invalid protocol")
-			}
-		} catch {
-			throw new OperationError(400, "src must be a valid HTTPS URL")
-		}
+		await assertSoundpadDuration(item.src)
 
 		const soundpadItem = await GroupSoundpadItem.create({
 			group_id: group_id,
 			user_id: user_id,
-			icon: icon,
-			name: name,
-			src: payload.src,
+			...item,
 			created_at: new Date(),
 		})
 
