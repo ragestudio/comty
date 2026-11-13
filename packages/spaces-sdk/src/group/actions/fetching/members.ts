@@ -27,7 +27,9 @@ export default async function (this: FetchingActions): Promise<void> {
 			)
 
 			this.state.actions.evaluateConnections(response.items)
-			this.state.actions.evaluateDecorations(response.items)
+			this.state.actions.evaluateDecorations(response.items, {
+				force: true,
+			})
 		}
 	} catch (err: any) {
 		logger.error("fetchMembers failed", err)

@@ -33,6 +33,12 @@ export interface MembershipUpdatedPayload {
 	roles?: MemberRole[]
 }
 
+export interface UserProfileUpdatePayload {
+	user_id: string
+	decorations: Record<string, any>
+	profile_badges?: string[]
+}
+
 export interface ClientVoiceJoinPayload {
 	channelId: string
 	userId: string
@@ -98,7 +104,10 @@ export interface GroupStoreActions {
 	fetchViewerPermissions: () => Promise<void>
 	syncRTCChannels: () => Promise<void>
 	evaluateConnections: (members: Member[]) => Promise<void>
-	evaluateDecorations: (items: (Member | string)[]) => Promise<void>
+	evaluateDecorations: (
+		items: (Member | string)[],
+		options?: { force?: boolean },
+	) => Promise<void>
 	setData: (data: Group | null) => void
 	setChannels: (updater: Channels | ((prev: Channels) => Channels)) => void
 	setMembers: (updater: Members | ((prev: Members) => Members)) => void
@@ -119,6 +128,7 @@ export interface GroupStoreActions {
 	handleRolesUpdated: () => void
 	handleUserOnline: (payload: { userId: string }) => void
 	handleUserOffline: (payload: { userId: string }) => void
+	handleUserProfileUpdate: (payload: UserProfileUpdatePayload) => void
 	handleVoiceChannelStarted: (payload: {
 		channelId: string
 		started_at?: string

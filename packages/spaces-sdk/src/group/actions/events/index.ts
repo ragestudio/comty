@@ -13,6 +13,7 @@ import membershipUpdated from "./memberships/updated"
 import rolesUpdated from "./roles/updated"
 import presenceOnline from "./presence/online"
 import presenceOffline from "./presence/offline"
+import userProfileUpdate from "./users/profileUpdate"
 import voiceStarted from "./voice/started"
 import voiceEnded from "./voice/ended"
 import voiceClientJoin from "./voice/clientJoin"
@@ -46,6 +47,8 @@ class EventsActions extends ActionsBase<GroupStoreType> {
 		presenceOnline.bind(this)
 	handleUserOffline: OmitThisParameter<typeof presenceOffline> =
 		presenceOffline.bind(this)
+	handleUserProfileUpdate: OmitThisParameter<typeof userProfileUpdate> =
+		userProfileUpdate.bind(this)
 	handleVoiceChannelStarted: OmitThisParameter<typeof voiceStarted> =
 		voiceStarted.bind(this)
 	handleVoiceChannelEnded: OmitThisParameter<typeof voiceEnded> =

@@ -61,6 +61,7 @@ export const GroupStore = create<GroupStoreType>()((set, get) => {
 			handleRolesUpdated: eventsActions.handleRolesUpdated,
 			handleUserOnline: eventsActions.handleUserOnline,
 			handleUserOffline: eventsActions.handleUserOffline,
+			handleUserProfileUpdate: eventsActions.handleUserProfileUpdate,
 			handleVoiceChannelStarted: eventsActions.handleVoiceChannelStarted,
 			handleVoiceChannelEnded: eventsActions.handleVoiceChannelEnded,
 			handleClientVoiceJoin: eventsActions.handleClientVoiceJoin,

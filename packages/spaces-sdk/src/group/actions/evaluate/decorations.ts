@@ -7,6 +7,7 @@ import logger from "@comty/shared/utils/logger"
 export default async function (
 	this: EvaluateActions,
 	items: (Member | string)[],
+	options: { force?: boolean } = {},
 ): Promise<void> {
 	const ids = items
 		.map((item) => (typeof item === "string" ? item : item.user_id))
@@ -15,7 +16,7 @@ export default async function (
 	if (ids.length === 0) return
 
 	try {
-		await usersActions.ensureDecorations(ids)
+		await usersActions.ensureDecorations(ids, options)
 
 		const { users } = UsersStore.getState()
 		const decorations: Record<string, any> = {}
