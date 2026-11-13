@@ -1,6 +1,7 @@
 import type API from "@services/main/main.service"
 
 import Redeem from "@classes/redeem"
+import { enforceRedeemRateLimit } from "@classes/redeem/rateLimit"
 
 type RedeemRequestBody = {
 	code?: string
@@ -17,28 +18,8 @@ export default defineRoute<API>()({
 		}
 
 		const userId = req.auth.session.user_id
-		const rateLimitKey = `redeem:attempts:${userId}`
 
-		try {
-			const attempts = await ctx.redis.client.incr(rateLimitKey)
-
-			if (attempts === 1) {
-				await ctx.redis.client.expire(rateLimitKey, 600)
-			}
-
-			if (attempts > 20) {
-				throw new OperationError(
-					429,
-					"Too many attempts, please try again later",
-				)
-			}
-		} catch (error) {
-			if (error instanceof OperationError) {
-				throw error
-			}
-
-			console.error("Failed to apply redeem rate limit", error)
-		}
+		await enforceRedeemRateLimit(ctx.redis, userId)
 
 		return await Redeem.redeem({
 			code,
