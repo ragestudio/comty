@@ -16,6 +16,8 @@ export const UploadFileUrl = (
 		defaultValue?: string
 	} = {},
 ) => {
+	const uploadRef = React.useRef(null)
+	const [uploading, setUploading] = React.useState(false)
 	const [internalValue, setInternalValue] = React.useState(
 		props.defaultValue ?? "",
 	)
@@ -46,10 +48,20 @@ export const UploadFileUrl = (
 		props.onChange?.(nextValue)
 	}
 
+	const handleUploadStart = () => {
+		setUploading(true)
+	}
+
 	const handleUploadDone = (file_uid: string, response: { url: string }) => {
+		setUploading(false)
+
 		if (response && response.url) {
 			commitValue(response.url)
 		}
+	}
+
+	const handleUploadError = () => {
+		setUploading(false)
 	}
 
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,9 +71,12 @@ export const UploadFileUrl = (
 	return (
 		<div className={classNames(container(), "bg-accent", "border-default")}>
 			<UploadButton
+				ref={uploadRef}
 				className={container.elem("button")}
 				accept={props.accept ?? "*/*"}
+				onStart={handleUploadStart}
 				onSuccess={handleUploadDone}
+				onError={handleUploadError}
 			>
 				Upload file or
 			</UploadButton>
@@ -71,6 +86,7 @@ export const UploadFileUrl = (
 				placeholder={"Input a URL"}
 				onChange={handleInputChange}
 				value={value}
+				disabled={uploading}
 			/>
 		</div>
 	)
