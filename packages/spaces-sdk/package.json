@@ -4,6 +4,14 @@
 	"description": "Agnostic SDK for Comty Spaces",
 	"author": "ragestudio",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ragestudio/comty.git",
+		"directory": "packages/spaces-sdk"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"type": "module",
 	"main": "./src/index.ts",
 	"scripts": {
