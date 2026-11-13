@@ -1175,9 +1175,13 @@ importers:
       react:
         specifier: ^19.1.0
         version: 19.3.0
+      tsc-alias:
+        specifier: ^1.9.9
+        version: 1.9.9
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
+    publishDirectory: dist
 
   packages/wrapper:
     dependencies:
