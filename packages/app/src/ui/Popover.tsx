@@ -253,6 +253,7 @@ const Popover = (({
 		const popover = popoverRef.current
 
 		if (!popover) return
+
 		if (popover.contains(event.target as Node)) return
 		if (triggerRef.current?.contains(event.target as Node)) return
 
@@ -282,14 +283,43 @@ const Popover = (({
 	React.useEffect(() => {
 		if (!isPortal || !isOpen) return
 
+		let frame: number | null = null
+
+		const scheduleUpdate = () => {
+			if (frame !== null) return
+
+			frame = window.requestAnimationFrame(() => {
+				frame = null
+				updatePortalRect()
+			})
+		}
+
+		const handleScroll = (event: Event) => {
+			const target = event.target
+
+			// scrolls inside the popover (list, dropdown...) do not move the anchor
+			if (
+				target instanceof Node &&
+				popoverRef.current?.contains(target)
+			) {
+				return
+			}
+
+			scheduleUpdate()
+		}
+
 		updatePortalRect()
 
-		window.addEventListener("resize", updatePortalRect)
-		window.addEventListener("scroll", updatePortalRect, true)
+		window.addEventListener("resize", scheduleUpdate)
+		window.addEventListener("scroll", handleScroll, true)
 
 		return () => {
-			window.removeEventListener("resize", updatePortalRect)
-			window.removeEventListener("scroll", updatePortalRect, true)
+			window.removeEventListener("resize", scheduleUpdate)
+			window.removeEventListener("scroll", handleScroll, true)
+
+			if (frame !== null) {
+				window.cancelAnimationFrame(frame)
+			}
 		}
 	}, [isPortal, isOpen, updatePortalRect])
 
