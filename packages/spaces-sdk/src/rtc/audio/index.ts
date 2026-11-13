@@ -548,5 +548,6 @@ export type {
 } from "./types"
 
 export * from "./processing"
+export * from "./soundpad"
 
 export default useAudioStore

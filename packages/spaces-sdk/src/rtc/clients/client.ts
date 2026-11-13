@@ -6,6 +6,10 @@ import type { SoundpadDispatch } from "@comty/shared/types/rtc/clientEvent"
 import type { RTC_ClientEvent } from "@comty/shared/types/rtc/events/inbound"
 import type { SoundpadPlayback } from "@/adapter"
 
+import { SOUNDPAD_MAX_DURATION_SECONDS } from "@comty/shared/types/spaces/soundpad"
+
+import { getSoundpadVolume } from "../audio/soundpad"
+
 import loggerBase from "@comty/shared/utils/logger"
 import adapter from "@/adapter"
 
@@ -213,7 +217,7 @@ export class Client {
 		try {
 			playback = await player.play({
 				src: payload.data.src,
-				volume: 0.5, // TODO: get value from a persistent store
+				volume: getSoundpadVolume(),
 				onEnded: finish,
 			})
 		} catch (error) {
@@ -228,7 +232,7 @@ export class Client {
 		stopTimer = setTimeout(() => {
 			playback.stop()
 			finish()
-		}, 10000)
+		}, SOUNDPAD_MAX_DURATION_SECONDS * 1000)
 	}
 
 	serialize(): SerializedClient {
