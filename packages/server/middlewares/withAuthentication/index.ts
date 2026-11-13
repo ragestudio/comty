@@ -1,15 +1,27 @@
+import type { AuthSession } from "@comty/shared/db/auth_session"
+import type { DecodedAuthToken } from "@comty/shared/types/session"
+
 import AuthToken from "../../classes/AuthToken"
 import ServerToken from "../../classes/ServerToken"
 //import BotToken from "../../classes/BotToken"
 
+export type AuthSessionContext = Partial<AuthSession> & {
+	user_id: string
+	__server_key?: boolean
+	__bot_key?: boolean
+	bot_id?: string
+}
+
 export interface WithAuthenticationReq {
 	auth: {
 		server?: boolean
+		bot?: boolean
 		token?: string
 		user_id?: string
-		decoded?: any
-		session?: any
+		decoded?: DecodedAuthToken
+		session?: AuthSessionContext
 		user?: any
+		owner?: any
 	}
 	user_id: string
 }
@@ -60,9 +72,13 @@ export default defineMiddleware()({
 					return
 				}
 				case "Server": {
-					const [access_id, secret_token] = tokenAuthHeader[1].split(":")
+					const [access_id, secret_token] =
+						tokenAuthHeader[1].split(":")
 
-					const validation = await ServerToken.validate(access_id, secret_token)
+					const validation = await ServerToken.validate(
+						access_id,
+						secret_token,
+					)
 
 					if (!validation.valid) {
 						return reject(validation)
