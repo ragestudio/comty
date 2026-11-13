@@ -5,7 +5,7 @@ import { UploadProgress, UploadTask } from "../task/task"
 
 export type UploadMethodHandlers = {
 	onFinish: (file: HashedFile, result: any) => void
-	onError: (e: Error) => void
+	onError: (file: HashedFile, error: Error) => void
 	onProgress: (file: HashedFile, progress: UploadProgress) => void
 	onFinally: (file: HashedFile, result: any) => void
 }

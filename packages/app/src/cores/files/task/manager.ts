@@ -99,12 +99,12 @@ export class UploadTasksManager extends EventEmitter {
 		this.tick()
 
 		return new Promise((resolve, reject) => {
-			task.once("finish", (data) => {
-				resolve(data)
+			task.once("finish", (_file, result) => {
+				resolve(result)
 			})
 
-			task.once("error", (e) => {
-				reject(e)
+			task.once("error", (_file, error) => {
+				reject(error)
 			})
 		})
 	}
