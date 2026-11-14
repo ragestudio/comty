@@ -1,6 +1,9 @@
-import copyToClipboard from "@utils/copyToClipboard"
-import pasteFromClipboard from "@utils/pasteFromClipboard"
-import download from "@utils/download"
+import copyToClipboard from "@/utils/copyToClipboard"
+import pasteFromClipboard, {
+	resolvePasteTarget,
+} from "@/utils/pasteFromClipboard"
+import download from "@/utils/download"
+import getErrorMessage from "@/utils/getErrorMessage"
 
 export default {
 	"default-context": (items, parent, element, control) => {
@@ -81,12 +84,19 @@ export default {
 			})
 		}
 
+		const pasteTarget = resolvePasteTarget(element)
+
 		items.push({
 			label: "Paste",
 			icon: "ClipboardPaste",
-			action: (clickedItem, ctx) => {
-				pasteFromClipboard(clickedItem)
-				ctx.close()
+			action: async (clickedItem, ctx) => {
+				try {
+					await pasteFromClipboard(pasteTarget)
+				} catch (error) {
+					app.message.error(getErrorMessage(error, "Failed to paste"))
+				} finally {
+					ctx.close()
+				}
 			},
 		})
 
