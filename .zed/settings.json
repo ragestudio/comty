@@ -16,6 +16,12 @@
 	"show_edit_predictions": false,
 	"languages": {
 		"TypeScript": {
+			// "formatter": {
+			// 	"external": {
+			// 		"command": "prettier",
+			// 		"arguments": ["--stdin-filepath", "{buffer_path}"]
+			// 	}
+			// },
 			"language_servers": [
 				"vtsls",
 				"!typescript-ls",

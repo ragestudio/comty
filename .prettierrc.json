@@ -19,5 +19,5 @@
 	"requirePragma": false,
 	"useTabs": true,
 	"embeddedLanguageFormatting": "auto",
-	"tabWidth": 4
+	"tabWidth": 2
 }
