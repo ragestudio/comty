@@ -1,6 +1,5 @@
 {
 	"prettier": {
-		"parser": "",
 		"allowed": true
 	},
 	"file_scan_exclusions": [
@@ -18,14 +17,12 @@
 		"**/nats-data"
 	],
 	"show_edit_predictions": false,
+	// Keep the editor indentation aligned with .prettierrc.json (useTabs: true, tabWidth: 2)
 	"languages": {
 		"TypeScript": {
-			// "formatter": {
-			// 	"external": {
-			// 		"command": "prettier",
-			// 		"arguments": ["--stdin-filepath", "{buffer_path}"]
-			// 	}
-			// },
+			"formatter": "prettier",
+			"hard_tabs": true,
+			"tab_size": 2,
 			"language_servers": [
 				"vtsls",
 				"!typescript-ls",
@@ -34,6 +31,9 @@
 			]
 		},
 		"TSX": {
+			"formatter": "prettier",
+			"hard_tabs": true,
+			"tab_size": 2,
 			"language_servers": [
 				"vtsls",
 				"!typescript-ls",
@@ -42,6 +42,9 @@
 			]
 		},
 		"JavaScript": {
+			"formatter": "prettier",
+			"hard_tabs": true,
+			"tab_size": 2,
 			"language_servers": [
 				"vtsls",
 				"!typescript-ls",
@@ -50,12 +53,20 @@
 			]
 		},
 		"JSX": {
+			"formatter": "prettier",
+			"hard_tabs": true,
+			"tab_size": 2,
 			"language_servers": [
 				"vtsls",
 				"!typescript-ls",
 				"!typescript-language-server",
 				"..."
 			]
+		},
+		"LESS": {
+			"formatter": "prettier",
+			"hard_tabs": true,
+			"tab_size": 2
 		}
 	},
 	"lsp": {
