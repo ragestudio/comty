@@ -90,7 +90,7 @@ export async function setupLatestRelease(
 	resolvedRelease?: ReleaseWithAsset,
 ): Promise<ReleaseManifest> {
 	const distPath = path.join(destinationPath, distDirectoryName)
-	const manifestPath = path.join(destinationPath, "manifest.json")
+	const manifestPath = path.join(distPath, "manifest.json")
 	const archivePath = path.join(cachePath, assetName)
 	const stagingPath = path.join(cachePath, "staging")
 
