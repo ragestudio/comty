@@ -1,4 +1,8 @@
 {
+	"prettier": {
+		"parser": "",
+		"allowed": true
+	},
 	"file_scan_exclusions": [
 		"**/.git",
 		"**/.svn",
