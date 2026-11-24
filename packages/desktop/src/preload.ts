@@ -88,6 +88,25 @@ contextBridge.exposeInMainWorld("__ELECTRON__", {
 	extensions: () => {
 		return ipcRenderer.invoke("extensions:list")
 	},
+	updater: {
+		info: () => {
+			return ipcRenderer.invoke("app:update:info")
+		},
+		apply: () => {
+			return ipcRenderer.invoke("app:update:apply")
+		},
+		onReady: (
+			listener: (payload: {
+				version: string
+				date: string
+				notes: string | null
+			}) => void,
+		) => {
+			ipcRenderer.on("app:update:ready", (_event, payload) => {
+				listener(payload)
+			})
+		},
+	},
 	versions: {
 		app: appBuildInfo.version,
 		build: appBuildInfo.build,
