@@ -30,6 +30,25 @@ declare global {
 			electron: string
 			sysaudio: string
 		}
+		updater: {
+			info: () => Promise<{
+				activeVersion: string
+				activeDate: string | null
+				activeDistPath: string | null
+				activeSource: "update" | "bundled" | null
+				bundledVersion: string
+				lastCheckedAt?: string
+				updatesDir: string
+			}>
+			apply: () => Promise<unknown>
+			onReady: (
+				listener: (payload: {
+					version: string
+					date: string
+					notes: string | null
+				}) => void,
+			) => void
+		}
 		restart: () => Promise<unknown>
 		extensions: () => Promise<unknown>
 	}
