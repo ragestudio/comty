@@ -14,11 +14,14 @@ export type IpcHandler<Arguments extends any[] = any[], Result = any> = (
 export type IpcHandlers = Record<string, IpcHandler>
 
 const handlers: IpcHandlers = {
-	"app:info": (main) => ({
+	"app:info": async (main) => ({
 		pid: process.pid,
 		isDev: main.isDev,
 		userData: main.app.getPath("userData"),
+		frontend: await main.updater.getInfo(),
 	}),
+	"app:update:info": (main) => main.updater.getInfo(),
+	"app:update:apply": (main) => main.restart(),
 	"app:channel:get": (main) => main.settings.getChannel(),
 	"app:channel:set": (main, event, channel: unknown) =>
 		main.settings.setChannel(channel),
@@ -34,7 +37,7 @@ const handlers: IpcHandlers = {
 		main.mainWindow?.hide()
 	},
 	"app:restart": (main) => {
-		main.restart()
+		return main.restart()
 	},
 	"extensions:load": async () => {
 		//return await main.extensions.load(...args)
