@@ -28,6 +28,9 @@ export default defineModel({
 		preview_url: {
 			type: String,
 		},
+		font_family: {
+			type: String,
+		},
 		style: {
 			type: Object,
 		},

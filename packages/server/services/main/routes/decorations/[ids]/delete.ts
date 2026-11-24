@@ -7,6 +7,14 @@ type RouteParams = {
 	ids: string
 }
 
+const SLOT_ALIASES: Record<string, string> = {
+	profile_font: "font",
+	custom_font: "font",
+	member_background: "member_bg",
+	avatar: "avatar_frame",
+	user_card: "user_card_bg",
+}
+
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication", "onlyAdmin"],
 	fn: async (req) => {
@@ -37,9 +45,11 @@ export default defineRoute<API>()({
 			})
 
 			if (decoration.type) {
+				const slot = SLOT_ALIASES[decoration.type] ?? decoration.type
+
 				await User.updateMany(
-					{ [`decorations.${decoration.type}`]: decorationId },
-					{ $unset: { [`decorations.${decoration.type}`]: "" } },
+					{ [`decorations.${slot}`]: decorationId },
+					{ $unset: { [`decorations.${slot}`]: "" } },
 				)
 			}
 

@@ -3,7 +3,7 @@ import type API from "@services/users/users.service"
 import User from "@db_models/user"
 import Inventory from "@shared-classes/Inventory"
 
-const DECORATION_SLOTS = ["user_card_bg", "avatar_frame", "member_bg"]
+const DECORATION_SLOTS = ["user_card_bg", "avatar_frame", "member_bg", "font"]
 
 const OBJECT_ID_REGEX = /^[0-9a-f]{24}$/i
 
