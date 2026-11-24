@@ -21,6 +21,7 @@
 		"pack:win": "pnpm build:addon && pnpm build && electron-builder --win"
 	},
 	"dependencies": {
+		"adm-zip": "^0.6.1",
 		"electron-store": "^12.0.0",
 		"mime": "^4.1.2",
 		"radix-router": "^3.0.1"
